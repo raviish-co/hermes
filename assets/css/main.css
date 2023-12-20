@@ -1,0 +1,12 @@
+@import url("https://fonts.googleapis.com/css2?family=Jaldi:wght@400;700&family=Manrope:wght@200;300;400;500;600;700;800&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+    @apply p-0 m-0 box-border antialiased;
+}
+
+body {
+    @apply bg-white font-Manrope;
+}
