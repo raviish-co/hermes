@@ -10,3 +10,36 @@
 body {
     @apply bg-white font-Manrope;
 }
+
+h1 {
+    @apply text-2xl font-bold text-gray-900;
+}
+
+.input-field {
+    @apply w-full py-3 px-4 rounded border border-gray-500 bg-white;
+}
+
+.input-field:disabled {
+    @apply bg-gray-200;
+}
+
+.section-content {
+    @apply px-4 md:px-8 lg:px-16 mx-auto;
+}
+
+.table {
+    @apply w-full border-collapse table-auto border border-gray-500;
+}
+
+.table th,
+.table td {
+    @apply py-3 px-4 border border-gray-500;
+}
+
+.table th {
+    @apply text-left;
+}
+
+.btn {
+    @apply py-2 px-4 rounded text-white font-bold bg-slate-500;
+}
