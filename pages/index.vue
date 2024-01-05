@@ -1,5 +1,52 @@
 <script setup lang="ts">
-import { PURPOSES } from "~/lib/data/purposes";
+import type { VDialog } from "#build/components";
+import { PURPOSES, PurposeName } from "~/lib/data/purposes";
+
+const selectedSections = ref<string[]>([]);
+const selectedPlaceholder = ref<string>("Descrição");
+const isDisabledInputText = ref<boolean>(false);
+const dialogRef = ref<typeof VDialog>();
+
+function getPurposeNames(): string[] {
+    return PURPOSES.map((p) => p.name);
+}
+
+const isDisabledSection = computed(() => selectedSections.value.length <= 0);
+
+function findSectionByPurpose(name: string): void {
+    PURPOSES.find((purpose) => {
+        if (purpose.name === name) {
+            changePlaceholder(purpose.placeholder!);
+            disableInputDescription(name);
+            updateSelectedSections(purpose.sections);
+        }
+    });
+}
+
+function changePlaceholder(placeholder: string): void {
+    selectedPlaceholder.value = placeholder;
+}
+
+function disableInputDescription(purposeName: string): void {
+    if (purposeName === PurposeName.Donation) {
+        isDisabledInputText.value = true;
+        return;
+    }
+
+    isDisabledInputText.value = false;
+}
+function updateSelectedSections(sections?: string[]) {
+    if (!sections) {
+        selectedSections.value = [];
+        return;
+    }
+
+    selectedSections.value = sections;
+}
+
+function showDialog() {
+    dialogRef.value?.show();
+}
 </script>
 
 <template>
@@ -12,19 +59,26 @@ import { PURPOSES } from "~/lib/data/purposes";
         <section>
             <form class="mb-6">
                 <div class="flex items-center gap-x-3 mb-4">
-                    <input placeholder="Jonh  Doe" disabled class="input-field" />
-                    <input
-                        type="date"
-                        placeholder="Data prevista para a devolução[dd/mm/aaaa]"
-                        required
-                        class="input-field"
-                    />
+                    <VInput placeholder="John Doe" :disabled="true" />
+                    <VInput placeholder="Data prevista para a devolução[dd/mm/aaaa]" type="date" />
                 </div>
                 <div class="flex items-center gap-x-3 mb-4">
-                    <VSelect placeholder="Finalidade" :options="PURPOSES" />
-                    <VSelect placeholder="Secção" :options="[]" />
+                    <VSelect
+                        placeholder="Finalidade"
+                        :options="getPurposeNames()"
+                        @change="findSectionByPurpose"
+                    />
+                    <VSelect
+                        placeholder="Secção"
+                        :options="selectedSections"
+                        :disabled="isDisabledSection"
+                    />
                 </div>
-                <input placeholder="Descrição" class="input-field" />
+                <VInput
+                    class="input-field"
+                    :placeholder="selectedPlaceholder"
+                    :disabled="isDisabledInputText"
+                />
             </form>
         </section>
         <section>
@@ -51,7 +105,7 @@ import { PURPOSES } from "~/lib/data/purposes";
                     </table>
                 </div>
 
-                <button class="btn w-full">Adicionar</button>
+                <button class="btn w-full" @click="showDialog">Adicionar</button>
             </div>
 
             <p class="text-right space-x-1 mt-4">
@@ -64,4 +118,5 @@ import { PURPOSES } from "~/lib/data/purposes";
             <button class="btn">Cancelar</button>
         </div>
     </section>
+    <VDialog ref="dialogRef" title="Pesquisar Artigo" />
 </template>

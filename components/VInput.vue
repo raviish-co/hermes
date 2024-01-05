@@ -1,22 +1,31 @@
 <script setup lang="ts">
-interface Propos {
+type InputType = "text" | "date";
+
+interface Props {
     disabled?: boolean;
     placeholder: string;
+    type?: InputType;
 }
 
 interface Emits {
     (e: "input", value: string): void;
 }
 
+const emits = defineEmits<Emits>();
+withDefaults(defineProps<Props>(), { type: "text" });
+
 function emitValue(e: Event) {
     const value = (e.target as HTMLInputElement).value;
     emits("input", value);
 }
-
-const emits = defineEmits<Emits>();
-defineProps<Propos>();
 </script>
 
 <template>
-    <input class="input-field" :placeholder="placeholder" :disabled="disabled" @input="emitValue" />
+    <input
+        class="input-field"
+        :placeholder="placeholder"
+        :disabled="disabled"
+        :type="type"
+        @input="emitValue"
+    />
 </template>

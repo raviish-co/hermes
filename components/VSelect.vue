@@ -5,16 +5,16 @@ interface Propos {
 }
 
 interface Emits {
-    (e: "input", value: string): void;
-}
-
-function emitSelectedValue(e: Event) {
-    const selectedValue = (e.target as HTMLSelectElement).value;
-    emits("input", selectedValue);
+    (e: "change", value: string): void;
 }
 
 const emits = defineEmits<Emits>();
 defineProps<Propos>();
+
+function emitSelectedValue(e: Event) {
+    const selectedValue = (e.target as HTMLSelectElement).value;
+    emits("change", selectedValue);
+}
 </script>
 
 <template>
