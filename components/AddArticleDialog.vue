@@ -13,18 +13,10 @@ const currentVariationItems = ref<string[]>([]);
 const currentVariationItem = ref<string>("");
 const props = defineProps<Props>();
 
-function showDialog() {
-    dialogRef.value?.show();
-}
-
 function addArticleToRequestList(article: Article): void {
-    const isEmptyVariation = !currentVariationItem.value || !currentVariationName.value;
-    const isNotSetVariation =
-        currentVariationName.value === "Variação" || currentVariationItem.value === "Item";
-
     const requestRows = props.requestList.filter((a) => a.id === article.id);
 
-    if ((isNotSetVariation || isEmptyVariation) && article.variations) return;
+    if ((isNotSetVariation() || isEmptyVariation()) && article.variations) return;
 
     if (isTheSameVariation(requestRows)) return;
 
@@ -59,8 +51,6 @@ function updateVariationName(variationName: string, article: Article): void {
 }
 
 function isTheSameVariation(rows: RequestRow[]): boolean {
-    console.log(currentVariationItem.value);
-
     return rows.some(
         (row) =>
             currentVariationName.value === row.variationName &&
@@ -75,6 +65,18 @@ function findItemsByVariationName(article: Article): void {
             currentVariationItems.value = v.items;
         }
     });
+}
+
+function isEmptyVariation(): boolean {
+    return !currentVariationItem.value || !currentVariationName.value;
+}
+
+function isNotSetVariation(): boolean {
+    return currentVariationName.value === "Variação" || currentVariationItem.value === "Item";
+}
+
+function showDialog() {
+    dialogRef.value?.show();
 }
 
 defineExpose({ show: showDialog });

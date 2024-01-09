@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ArticleState, type RequestRow } from "~/lib/models/article";
-import type { VDialog, AddArticleDialog } from "#build/components";
+import type { AddArticleDialog, DescribeArticleState } from "#build/components";
+import type { RequestRow } from "~/lib/models/article";
 import { PURPOSES, PurposeName } from "~/lib/data/purposes";
 
 const addArticleDialogRef = ref<typeof AddArticleDialog>();
-const describeArticleDamageDialogRef = ref<typeof VDialog>();
+const describeArticleStateDialog = ref<typeof DescribeArticleState>();
 const selectedSections = ref<string[]>([]);
 const selectedPlaceholder = ref<string>("Descrição");
 const isDisabledInputText = ref<boolean>(false);
@@ -12,8 +12,6 @@ const requestList = ref<RequestRow[]>([]);
 const currentPurposeName = ref<string>("");
 const currentSectionName = ref<string>("");
 const isDisabledSection = computed(() => selectedSections.value.length <= 0);
-const articleState = ref<string>("");
-const isGoodState = computed(() => articleState.value !== ArticleState.Bad);
 
 function getPurposeNames(): string[] {
     return PURPOSES.map((p) => p.name);
@@ -53,15 +51,6 @@ function updateSelectedSections(sections?: string[]) {
 
     selectedSections.value = sections;
 }
-showAddArticleDialog;
-showAddArticleDialog;
-function showAddArticleDialog() {
-    addArticleDialogRef.value?.show();
-}
-
-function showDescribeArticleDamageDialog() {
-    describeArticleDamageDialogRef.value?.show();
-}
 
 function updateCurrentSectionName(sectionName: string) {
     currentSectionName.value = sectionName;
@@ -75,12 +64,12 @@ function clearRequestList() {
     requestList.value = [];
 }
 
-function changeArticleState(state: string) {
-    articleState.value = state;
+function showAddArticleDialog() {
+    addArticleDialogRef.value?.show();
 }
 
-function updateArticleState() {
-    addArticleDialogRef.value?.close();
+function showDescribeArticleStatusDialog() {
+    describeArticleStateDialog.value?.show();
 }
 </script>
 
@@ -129,7 +118,7 @@ function updateArticleState() {
                 <div class="flex-1 overflow-y-auto">
                     <table class="table">
                         <thead>
-                            <tr @click="showDescribeArticleDamageDialog">
+                            <tr @click="showDescribeArticleStatusDialog">
                                 <th>ID</th>
                                 <th>Item</th>
                                 <th>QTD</th>
@@ -142,7 +131,7 @@ function updateArticleState() {
                         <tbody>
                             <tr v-for="(row, idx) in requestList" :key="idx">
                                 <td>{{ row.id }}</td>
-                                <td @click="showDescribeArticleDamageDialog">{{ row.name }}</td>
+                                <td @click="showDescribeArticleStatusDialog">{{ row.name }}</td>
                                 <td v-if="!row.isUnique">
                                     <input type="number" value="1" />
                                 </td>
@@ -176,21 +165,5 @@ function updateArticleState() {
 
     <AddArticleDialog ref="addArticleDialogRef" :request-list="requestList" />
 
-    <VDialog ref="describeArticleDamageDialogRef" title="Descrever danos do artigo">
-        <VSelect
-            v-model="articleState"
-            placeholder="Estado"
-            :options="Object.values(ArticleState)"
-            @update:model-value="changeArticleState"
-        />
-
-        <textarea
-            class="input-field resize-none"
-            placeholder="Descrever o estado do artigo"
-            :rows="3"
-            :disabled="isGoodState"
-        />
-
-        <button class="btn" @click="updateArticleState">Salvar</button>
-    </VDialog>
+    <DescribeArticleState ref="describeArticleStateDialog" />
 </template>
