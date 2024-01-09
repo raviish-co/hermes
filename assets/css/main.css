@@ -24,7 +24,7 @@ h1 {
 }
 
 .section-content {
-    @apply px-4 md:px-8 lg:px-16 mx-auto;
+    @apply px-4 md:px-8 lg:px-16 mx-auto max-w-screen-lg;
 }
 
 .table {

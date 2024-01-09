@@ -29,9 +29,15 @@ function clearOptions() {
 defineExpose({ clearOptions });
 </script>
 <template>
-    <div class="relative" @click="toogleOptions">
-        <p class="p-2">{{ selectedOption || label }}<span>&nbsp;down</span></p>
-        <ul class="absolute bg-white p-2 top-10" v-show="optionsVisibility">
+    <div
+        class="relative cursor-pointer w-full py-3 px-4 rounded border border-gray-500 bg-white"
+        @click="toogleOptions"
+    >
+        <p class="flex justify-between gap-x-2">
+            <span>{{ selectedOption || label }}</span
+            ><span>down</span>
+        </p>
+        <ul class="absolute bg-white p-2 top-10 border" v-show="optionsVisibility">
             <li
                 v-for="option in options"
                 @mousedown="selectOption(option)"

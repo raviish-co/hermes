@@ -1,40 +1,43 @@
 <script setup lang="ts">
-import type { VDialog } from "#build/components";
+import { ArticleState, type RequestRow } from "~/lib/models/article";
+import type { VDialog, AddArticleDialog } from "#build/components";
 import { PURPOSES, PurposeName } from "~/lib/data/purposes";
-import { ARTICLES } from "~/lib/data/articles";
-import type { Article, RequestRow } from "~/lib/models/article";
 
-const dialogRef = ref<typeof VDialog>();
+const addArticleDialogRef = ref<typeof AddArticleDialog>();
+const describeArticleDamageDialogRef = ref<typeof VDialog>();
 const selectedSections = ref<string[]>([]);
 const selectedPlaceholder = ref<string>("Descrição");
 const isDisabledInputText = ref<boolean>(false);
-const currentVariationName = ref<string>("");
-const currentVariationItems = ref<string[]>([]);
-const currentVariationItem = ref<string>("");
 const requestList = ref<RequestRow[]>([]);
+const currentPurposeName = ref<string>("");
+const currentSectionName = ref<string>("");
+const isDisabledSection = computed(() => selectedSections.value.length <= 0);
+const articleState = ref<string>("");
+const isGoodState = computed(() => articleState.value !== ArticleState.Bad);
 
 function getPurposeNames(): string[] {
     return PURPOSES.map((p) => p.name);
 }
 
-const isDisabledSection = computed(() => selectedSections.value.length <= 0);
-
-function findSectionByPurpose(name: string): void {
+function findSectionByPurpose(purposeName: string): void {
     PURPOSES.find((purpose) => {
-        if (purpose.name === name) {
+        if (purpose.name === purposeName) {
             changePlaceholder(purpose.placeholder!);
-            disableInputDescription(name);
+            disableInputDescription(purposeName);
             updateSelectedSections(purpose.sections);
         }
     });
+
+    currentPurposeName.value = purposeName;
+    updateCurrentSectionName("Secção");
 }
 
 function changePlaceholder(placeholder: string): void {
-    selectedPlaceholder.value = placeholder;
+    selectedPlaceholder.value = placeholder || "";
 }
 
 function disableInputDescription(purposeName: string): void {
-    if (purposeName === PurposeName.Donation) {
+    if (purposeName === PurposeName.Discard) {
         isDisabledInputText.value = true;
         return;
     }
@@ -50,64 +53,34 @@ function updateSelectedSections(sections?: string[]) {
 
     selectedSections.value = sections;
 }
-
-function showDialog() {
-    dialogRef.value?.show();
+showAddArticleDialog;
+showAddArticleDialog;
+function showAddArticleDialog() {
+    addArticleDialogRef.value?.show();
 }
 
-function findItemsByVariationName(article: Article): void {
-    article.variations?.map((v) => {
-        if (v.name === currentVariationName.value) {
-            currentVariationItems.value = v.items;
-        }
-    });
+function showDescribeArticleDamageDialog() {
+    describeArticleDamageDialogRef.value?.show();
 }
 
-function updateVariationName(e: Event, article: Article): void {
-    const variationName = (e.target as HTMLSelectElement).value;
-    currentVariationName.value = variationName;
-    findItemsByVariationName(article);
+function updateCurrentSectionName(sectionName: string) {
+    currentSectionName.value = sectionName;
 }
 
-function updateVariationItem(e: Event) {
-    const variationItem = (e.target as HTMLSelectElement).value;
-    currentVariationItem.value = variationItem;
+function removeRequestRow(id: string): void {
+    requestList.value = requestList.value.filter((r) => r.id !== id);
 }
 
-function isTheSameVariation(rows: RequestRow[]): boolean {
-    return rows.some(
-        (row) =>
-            currentVariationName.value === row.variationName &&
-            currentVariationItem.value === row.variationItem
-    );
+function clearRequestList() {
+    requestList.value = [];
 }
 
-function addArticleToRequestList(article: Article): void {
-    console.log(currentVariationItem.value);
-    console.log(currentVariationName.value);
+function changeArticleState(state: string) {
+    articleState.value = state;
+}
 
-    if ((!currentVariationItem.value || !currentVariationName.value) && article.variations) {
-        return;
-    }
-
-    const rows = requestList.value.filter((a) => a.id === article.id);
-
-    if (isTheSameVariation(rows)) return;
-
-    requestList.value.push({
-        id: article.id,
-        name: article.name,
-        isUnique: article.isUnique,
-        variationItem: currentVariationItem.value,
-        variationName: currentVariationName.value,
-        quantity: 0,
-        total: 0,
-        price: article.price,
-        securityDeposit: article.securityDeposit,
-    });
-
-    currentVariationItem.value = "";
-    currentVariationName.value = "";
+function updateArticleState() {
+    addArticleDialogRef.value?.close();
 }
 </script>
 
@@ -127,14 +100,17 @@ function addArticleToRequestList(article: Article): void {
                 </div>
                 <div class="flex items-center gap-x-3 mb-4">
                     <VSelect
+                        v-model="currentPurposeName"
                         placeholder="Finalidade"
                         :options="getPurposeNames()"
-                        @change="findSectionByPurpose"
+                        @update:model-value="findSectionByPurpose"
                     />
                     <VSelect
+                        v-model="currentSectionName"
                         placeholder="Secção"
                         :options="selectedSections"
                         :disabled="isDisabledSection"
+                        @update:model-value="updateCurrentSectionName"
                     />
                 </div>
                 <VInput
@@ -148,34 +124,43 @@ function addArticleToRequestList(article: Article): void {
             <div
                 class="h-72 p-2 flex flex-col justify-between border border-gray-500 rounded overflow-hidden"
             >
+                <button @click="clearRequestList" class="text-right">Limpar</button>
+
                 <div class="flex-1 overflow-y-auto">
                     <table class="table">
                         <thead>
-                            <tr>
+                            <tr @click="showDescribeArticleDamageDialog">
                                 <th>ID</th>
                                 <th>Item</th>
                                 <th>QTD</th>
                                 <th>Preço por unidade</th>
                                 <th>Total</th>
                                 <th>Caução</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="(article, idx) in requestList" :key="idx">
-                                <td>{{ article.id }}</td>
-                                <td>{{ article.name }}</td>
-                                <td v-if="!article.isUnique">
+                            <tr v-for="(row, idx) in requestList" :key="idx">
+                                <td>{{ row.id }}</td>
+                                <td @click="showDescribeArticleDamageDialog">{{ row.name }}</td>
+                                <td v-if="!row.isUnique">
                                     <input type="number" value="1" />
                                 </td>
-                                <td>{{ article.price }}</td>
+                                <td>{{ row.price }}</td>
                                 <td>0</td>
-                                <td>{{ article.securityDeposit }}</td>
+                                <td>{{ row.securityDeposit }}</td>
+                                <td
+                                    class="cursor-poidescribeArticleDamageDialogRefnter"
+                                    @click="removeRequestRow(row.id)"
+                                >
+                                    x
+                                </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <button class="btn w-full" @click="showDialog">Adicionar</button>
+                <button class="btn w-full" @click="showAddArticleDialog">Adicionar</button>
             </div>
 
             <p class="text-right space-x-1 mt-4">
@@ -189,59 +174,23 @@ function addArticleToRequestList(article: Article): void {
         </div>
     </section>
 
-    <VDialog ref="dialogRef" title="Pesquisar Artigo">
-        <VInput class="max-w-sm" placeholder="Pesquisar por Nome ou ID" />
+    <AddArticleDialog ref="addArticleDialogRef" :request-list="requestList" />
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Variação</th>
-                    <th>Item da Variação</th>
-                </tr>
-            </thead>
+    <VDialog ref="describeArticleDamageDialogRef" title="Descrever danos do artigo">
+        <VSelect
+            v-model="articleState"
+            placeholder="Estado"
+            :options="Object.values(ArticleState)"
+            @update:model-value="changeArticleState"
+        />
 
-            <tbody>
-                <tr v-for="(article, idx) in ARTICLES" :key="idx">
-                    <td>{{ article.id }}</td>
-                    <td @click="addArticleToRequestList(article)">{{ article.name }}</td>
-                    <td>
-                        <select
-                            v-if="article.variations"
-                            @change="(e) => updateVariationName(e, article)"
-                            class="w-full border-none focus:ring-0"
-                        >
-                            <option selected>Variação</option>
-                            <option
-                                v-for="(variation, idx) in article.variations"
-                                :key="idx"
-                                :value="variation.name"
-                            >
-                                {{ variation.name }}
-                            </option>
-                        </select>
-                    </td>
-                    <td>
-                        <select
-                            v-if="article.variations"
-                            @change="updateVariationItem"
-                            class="w-full border-none focus:ring-0"
-                        >
-                            <option selected>Item</option>
-                            <option
-                                v-for="(item, idx) in currentVariationItems"
-                                :key="idx"
-                                :value="item"
-                            >
-                                {{ item }}
-                            </option>
-                        </select>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <textarea
+            class="input-field resize-none"
+            placeholder="Descrever o estado do artigo"
+            :rows="3"
+            :disabled="isGoodState"
+        />
 
-        <p>Paginação</p>
+        <button class="btn" @click="updateArticleState">Salvar</button>
     </VDialog>
 </template>

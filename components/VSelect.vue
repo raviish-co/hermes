@@ -1,26 +1,27 @@
 <script setup lang="ts">
 interface Propos {
+    modelValue: string;
     options: string[];
     placeholder: string;
 }
 
 interface Emits {
-    (e: "change", value: string): void;
+    (e: "update:modelValue", value: string): void;
 }
 
 const emits = defineEmits<Emits>();
 defineProps<Propos>();
 
-function emitSelectedValue(e: Event) {
+function emitSelectedOption(e: Event) {
     const selectedValue = (e.target as HTMLSelectElement).value;
-    emits("change", selectedValue);
+    emits("update:modelValue", selectedValue);
 }
 </script>
 
 <template>
-    <select class="input-field" @change="emitSelectedValue">
-        <option selected disabled>{{ placeholder }}</option>
-        <option v-for="(option, idx) in options" :key="idx" :value="option">
+    <select :v-model="modelValue" @change="emitSelectedOption" class="input-field">
+        <option selected>{{ placeholder }}</option>
+        <option v-for="option in options" :key="option" :value="option">
             {{ option }}
         </option>
     </select>
