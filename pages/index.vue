@@ -1,16 +1,24 @@
 <script setup lang="ts">
-import type { AddArticleDialog, DescribeArticleState } from "#build/components";
-import type { RequestRow } from "~/lib/models/article";
+import type {
+    AddArticleDialog,
+    SelectArticleDialog,
+    DescribeArticleStateDialog,
+} from "#build/components";
+import type { Article, ArticleVariation, RequestArticle } from "~/lib/models/article";
 import { PURPOSES, PurposeName } from "~/lib/data/purposes";
+import { formatCurrency } from "~/lib/helpers/formatCurrency";
 
+const selectArticleDialogRef = ref<typeof SelectArticleDialog>();
 const addArticleDialogRef = ref<typeof AddArticleDialog>();
-const describeArticleStateDialog = ref<typeof DescribeArticleState>();
+const describeArticleStateDialogRef = ref<typeof DescribeArticleStateDialog>();
+const selectedArticle = ref<Article>();
 const selectedSections = ref<string[]>([]);
 const selectedPlaceholder = ref<string>("Descrição");
 const isDisabledInputText = ref<boolean>(false);
-const requestList = ref<RequestRow[]>([]);
+const requestList = ref<RequestArticle[]>([]);
 const currentPurposeName = ref<string>("");
 const currentSectionName = ref<string>("");
+const dropdownVisibility = ref<boolean>(false);
 const isDisabledSection = computed(() => selectedSections.value.length <= 0);
 
 function getPurposeNames(): string[] {
@@ -64,23 +72,72 @@ function clearRequestList() {
     requestList.value = [];
 }
 
-function showAddArticleDialog() {
+function showSelectAddArticleDialog() {
+    selectArticleDialogRef.value?.show();
+}
+
+function addArticleToRequestList(article: Article) {
+    if (requestList.value.some((r) => r.id === article.id)) return;
+
+    const requestArticle = {
+        ...article,
+        requestId: new Date().getTime().toString(),
+        quantity: 1,
+        total: article.price,
+        variations: [],
+    };
+
+    requestList.value.push(requestArticle);
+}
+
+function showAddArticleDialog(article: Article) {
+    if (article.isUnique) {
+        addArticleToRequestList(article);
+        return;
+    }
+
+    selectedArticle.value = article;
     addArticleDialogRef.value?.show();
 }
 
 function showDescribeArticleStatusDialog() {
-    describeArticleStateDialog.value?.show();
+    describeArticleStateDialogRef.value?.show();
+}
+
+function toggleDropdown() {
+    dropdownVisibility.value = !dropdownVisibility.value;
+}
+
+function listVariations(articleVariation?: ArticleVariation[]) {
+    if (!articleVariation) return "";
+
+    const values = articleVariation.map((v) => `${v.name}: ${v.value}`);
+
+    return values.join(" | ");
 }
 </script>
 
 <template>
-    <div class="w-full h-36 bg-slate-600"></div>
+    <div class="w-full h-24 py-4 bg-primary flex justify-center items-center">
+        <img src="/images/logo.png" alt="Logotipo da Raviish" class="h-full" />
+    </div>
 
-    <section class="section-content">
+    <section class="section-content mb-20">
         <section class="flex items-center mb-11 mt-4">
             <h1 class="flex-1 text-center">Guia de Saída de Artigos</h1>
-            <span class="text-2xl cursor-pointer">...</span>
+
+            <div class="relative">
+                <span class="text-2xl cursor-pointer" @click="toggleDropdown">...</span>
+
+                <ul
+                    class="absolute right-0 bg-white min-w-44 p-4 shadow-lg flex flex-col gap-2"
+                    :class="{ hidden: !dropdownVisibility }"
+                >
+                    <li class="cursor-pointer">Imprimir contrato</li>
+                </ul>
+            </div>
         </section>
+
         <section>
             <form class="mb-6">
                 <div class="flex items-center gap-x-3 mb-4">
@@ -89,81 +146,102 @@ function showDescribeArticleStatusDialog() {
                 </div>
                 <div class="flex items-center gap-x-3 mb-4">
                     <VSelect
-                        v-model="currentPurposeName"
                         placeholder="Finalidade"
                         :options="getPurposeNames()"
+                        v-model="currentPurposeName"
                         @update:model-value="findSectionByPurpose"
                     />
                     <VSelect
-                        v-model="currentSectionName"
                         placeholder="Secção"
                         :options="selectedSections"
                         :disabled="isDisabledSection"
+                        v-model="currentSectionName"
                         @update:model-value="updateCurrentSectionName"
                     />
                 </div>
                 <VInput
-                    class="input-field"
                     :placeholder="selectedPlaceholder"
                     :disabled="isDisabledInputText"
+                    class="input-field"
                 />
             </form>
         </section>
+
         <section>
             <div
-                class="h-72 p-2 flex flex-col justify-between border border-gray-500 rounded overflow-hidden"
+                class="h-table-lg p-3 flex flex-col justify-between border border-light-500 overflow-hidden"
             >
-                <button @click="clearRequestList" class="text-right">Limpar</button>
+                <button
+                    class="ms-auto hover:bg-light-500 px-4 py-1 hover:bg-opacity-25 mb-2"
+                    @click="clearRequestList"
+                >
+                    Limpar
+                </button>
 
                 <div class="flex-1 overflow-y-auto">
                     <table class="table">
                         <thead>
-                            <tr @click="showDescribeArticleStatusDialog">
+                            <tr>
                                 <th>ID</th>
                                 <th>Item</th>
                                 <th>QTD</th>
-                                <th>Preço por unidade</th>
-                                <th>Total</th>
-                                <th>Caução</th>
+                                <th>Preço Unid (Kz)</th>
+                                <th>Total (Kz)</th>
+                                <th>Caução (Kz)</th>
                                 <th></th>
                             </tr>
                         </thead>
+
                         <tbody>
-                            <tr v-for="(row, idx) in requestList" :key="idx">
-                                <td>{{ row.id }}</td>
-                                <td @click="showDescribeArticleStatusDialog">{{ row.name }}</td>
-                                <td v-if="!row.isUnique">
-                                    <input type="number" value="1" />
+                            <tr v-for="(row, idx) in requestList" :key="idx" class="cursor-pointer">
+                                <td class="w-16">{{ row.id }}</td>
+                                <td @click="showDescribeArticleStatusDialog">
+                                    {{ row.name }}
+                                    <br />
+                                    <span class="text-light-600 text-sm">{{
+                                        listVariations(row?.variations?.[0])
+                                    }}</span>
                                 </td>
-                                <td>{{ row.price }}</td>
-                                <td>0</td>
-                                <td>{{ row.securityDeposit }}</td>
-                                <td
-                                    class="cursor-poidescribeArticleDamageDialogRefnter"
-                                    @click="removeRequestRow(row.id)"
-                                >
-                                    x
+                                <td>{{ row.quantity }}</td>
+                                <td class="w-36">{{ formatCurrency(row.price) }}</td>
+                                <td class="w-36">{{ formatCurrency(row.total) }}</td>
+                                <td class="w-36">
+                                    {{ formatCurrency(row.securityDeposit) }}
                                 </td>
+                                <td class="cursor-pointer" @click="removeRequestRow(row.id)">x</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <button class="btn w-full" @click="showAddArticleDialog">Adicionar</button>
+                <button class="btn-secondary w-full" @click="showSelectAddArticleDialog">
+                    Adicionar
+                </button>
             </div>
+        </section>
+    </section>
 
-            <p class="text-right space-x-1 mt-4">
-                <span class="font-bold">Total:</span>
+    <section class="w-full fixed mx-auto bottom-0 z-50 shadow-lg shadow-primary">
+        <div class="flex justify-between items-center section-content p-4 bg-white">
+            <div class="space-x-4">
+                <button class="btn-secondary">Solicitar</button>
+                <button class="btn-light">Cancelar</button>
+            </div>
+            <p class="text-right space-x-1">
+                <span class="font-medium">Total:</span>
                 <span>10.000,00</span>
             </p>
-        </section>
-        <div class="space-x-4">
-            <button class="btn">Solicitar</button>
-            <button class="btn">Cancelar</button>
         </div>
     </section>
 
-    <AddArticleDialog ref="addArticleDialogRef" :request-list="requestList" />
+    <SelectArticleDialog ref="selectArticleDialogRef" @select="showAddArticleDialog" />
 
-    <DescribeArticleState ref="describeArticleStateDialog" />
+    <AddArticleDialog
+        ref="addArticleDialogRef"
+        :article="selectedArticle!"
+        :request-list="requestList"
+        @continue="showSelectAddArticleDialog"
+    />
+
+    <DescribeArticleStateDialog ref="describeArticleStateDialogRef" />
 </template>

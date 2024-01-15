@@ -1,26 +1,24 @@
-export interface Variation {
-    items: string[];
-    name: string;
-}
-
 export interface Article {
     id: string;
     name: string;
     price: number;
     securityDeposit: number;
-    variations?: Variation[];
+    variations?: ArticleVariation[][];
     isUnique: boolean;
 }
 
-export interface RequestRow {
-    id: string;
-    // articleId: string;
+export interface ArticleVariation {
     name: string;
-    price: number;
-    isUnique: boolean;
-    securityDeposit: number;
-    variationName: string;
-    variationItem: string;
+    value: string;
+}
+
+export interface Variation {
+    items: string[];
+    name: string;
+}
+
+export interface RequestArticle extends Article {
+    requestId: string;
     total: number;
     quantity: number;
 }

@@ -1,31 +1,43 @@
 <script setup lang="ts">
-type InputType = "text" | "date";
+type InputType = "text" | "date" | "search" | "number";
 
 interface Props {
     disabled?: boolean;
-    placeholder: string;
+    modelValue?: string | number | Date;
+    placeholder?: string;
     type?: InputType;
 }
 
 interface Emits {
-    (e: "input", value: string): void;
+    (e: "update:modelValue", value: string): void;
 }
 
 const emits = defineEmits<Emits>();
-withDefaults(defineProps<Props>(), { type: "text" });
+const props = defineProps<Props>();
+
+const currentValue = computed(() => {
+    if (!props.modelValue && props.type === "number") {
+        return 0;
+    }
+
+    return props.modelValue;
+});
 
 function emitValue(e: Event) {
     const value = (e.target as HTMLInputElement).value;
-    emits("input", value);
+    emits("update:modelValue", value);
 }
 </script>
 
 <template>
     <input
-        class="input-field"
+        :v-model="modelValue"
         :placeholder="placeholder"
         :disabled="disabled"
-        :type="type"
+        :type="type || 'text'"
+        :value="currentValue"
+        :min="0"
+        class="input-field"
         @input="emitValue"
     />
 </template>

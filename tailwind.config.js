@@ -10,7 +10,21 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                Manrope: ["Manrope", "sans-serif"],
+                Roboto: ["Roboto", "sans-serif"],
+            },
+            colors: {
+                primary: "#1a1a1a",
+                secondary: {
+                    500: "#d1a98b",
+                    600: "#bb8054",
+                },
+                light: {
+                    500: "#bababa",
+                    600: "#878787",
+                },
+            },
+            height: {
+                "table-lg": "36rem",
             },
         },
     },

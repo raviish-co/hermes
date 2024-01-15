@@ -1,78 +1,87 @@
 <script setup lang="ts">
-import { ARTICLES } from "~/lib/data/articles";
 import type { VDialog } from "#build/components";
-import type { Article, Variation, RequestRow } from "~/lib/models/article";
+import type { Article, ArticleVariation, RequestArticle } from "~/lib/models/article";
 
 interface Props {
-    requestList: RequestRow[];
+    article: Article;
+    requestList: RequestArticle[];
 }
 
-const dialogRef = ref<typeof VDialog>();
-const currentVariationName = ref<string>("");
-const currentVariationItems = ref<string[]>([]);
-const currentVariationItem = ref<string>("");
+interface Emuits {
+    (e: "continue"): void;
+}
+
 const props = defineProps<Props>();
+const emits = defineEmits<Emuits>();
+const dialogRef = ref<typeof VDialog>();
+const quantities = ref<number[]>([]);
+const total = ref<number>(0);
 
-function addArticleToRequestList(article: Article): void {
-    const requestRows = props.requestList.filter((a) => a.id === article.id);
-
-    if ((isNotSetVariation() || isEmptyVariation()) && article.variations) return;
-
-    if (isTheSameVariation(requestRows)) return;
-
-    const newRequestRow = makeRequestRow(article);
-
-    props.requestList.push(newRequestRow);
-
-    currentVariationItem.value = "";
+function defineQuantity(idx: number, quantity: string) {
+    quantities.value[idx] = Number(quantity);
 }
 
-function getVariationNamesByArticle(variations: Variation[]) {
-    return variations.map((v) => v.name);
+function quantityNotDefined() {
+    return quantities.value.length === 0;
 }
 
-function makeRequestRow(article: Article): RequestRow {
+function isSameRequestArticle(requestArticle: RequestArticle) {
+    return props.requestList.some((r) => r.id === requestArticle.id);
+}
+
+function isTheSameVariations(variations: ArticleVariation[]) {
+    return props.requestList.find((ra) => ra.variations?.at(0) === variations);
+}
+
+function makeRequestArticle(article: Article, quantity: number, varitations?: ArticleVariation[]) {
     return {
-        id: article.id,
-        name: article.name,
-        isUnique: article.isUnique,
-        variationItem: currentVariationItem.value,
-        variationName: currentVariationName.value,
-        quantity: 0,
-        total: 0,
-        price: article.price,
-        securityDeposit: article.securityDeposit,
+        ...article,
+        requestId: new Date().getTime().toString(),
+        quantity: quantity,
+        total: total.value,
+        variations: varitations ? [varitations] : [],
     };
 }
 
-function updateVariationName(variationName: string, article: Article): void {
-    currentVariationName.value = variationName;
-    findItemsByVariationName(article);
+function addArticleWithoutVariations() {
+    if (quantityNotDefined()) return;
+
+    const quantity = quantities.value[0];
+
+    const requestArticle = makeRequestArticle(props.article, quantity);
+
+    if (isSameRequestArticle(requestArticle)) return;
+
+    props.requestList.push(requestArticle);
+
+    dialogRef.value?.close();
+    return;
 }
 
-function isTheSameVariation(rows: RequestRow[]): boolean {
-    return rows.some(
-        (row) =>
-            currentVariationName.value === row.variationName &&
-            currentVariationItem.value === row.variationItem
-    );
-}
+function addArticleToRequestList(): void {
+    if (!props.article.variations) {
+        addArticleWithoutVariations();
+        return;
+    }
 
-function findItemsByVariationName(article: Article): void {
-    currentVariationItems.value = [];
-    article.variations?.map((v) => {
-        if (v.name === currentVariationName.value) {
-            currentVariationItems.value = v.items;
+    const requestArticles: RequestArticle[] = [];
+
+    props.article.variations?.forEach((variations, idx) => {
+        const quantity = quantities.value[idx];
+        if (quantity > 0) {
+            const requestArticle = makeRequestArticle(props.article, quantity, variations);
+
+            if (isTheSameVariations(variations)) return;
+
+            requestArticles.push(requestArticle);
         }
     });
-}
 
-function isEmptyVariation(): boolean {
-    return !currentVariationItem.value || !currentVariationName.value;
-}
+    props.requestList.push(...requestArticles);
 
-function isNotSetVariation(): boolean {
-    return currentVariationName.value === "Variação" || currentVariationItem.value === "Item";
+    quantities.value = [];
+
+    dialogRef.value?.close();
 }
 
 function showDialog() {
@@ -83,45 +92,54 @@ defineExpose({ show: showDialog });
 </script>
 
 <template>
-    <VDialog ref="dialogRef" title="Pesquisar Artigo">
-        <VInput class="max-w-sm" placeholder="Pesquisar por Nome ou ID" />
+    <VDialog
+        ref="dialogRef"
+        title="Adicionar artigo a lista de solicitação"
+        class="w-full max-w-[40rem]"
+    >
+        <div class="flex items-center gap-x-4 w-full">
+            <h2 class="font-medium flex-1">{{ article?.id }} # {{ article?.name }}</h2>
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Variação</th>
-                    <th>Item da Variação</th>
-                </tr>
-            </thead>
+            <div v-if="!article?.variations">
+                <VInput
+                    v-if="!article?.isUnique"
+                    type="number"
+                    placeholder="QTD"
+                    @update:model-value="(quantity: string) => defineQuantity(0, quantity)"
+                    class="max-w-24"
+                    default="1"
+                />
+            </div>
+        </div>
 
-            <tbody>
-                <tr v-for="(article, idx) in ARTICLES" :key="idx">
-                    <td>{{ article.id }}</td>
-                    <td @click="addArticleToRequestList(article)">{{ article.name }}</td>
-                    <td>
-                        <VSelect
-                            v-if="article.variations"
-                            v-model="currentVariationName"
-                            placeholder="Variação"
-                            :options="getVariationNamesByArticle(article.variations)"
-                            @update:model-value="(v) => updateVariationName(v, article)"
-                            class="w-full"
-                        />
-                    </td>
-                    <td>
-                        <VSelect
-                            v-if="article.variations"
-                            v-model="currentVariationItem"
-                            :options="currentVariationItems"
-                            placeholder="Item"
-                        />
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="w-full" v-if="article?.variations">
+            <div
+                v-for="(variations, idx) in article?.variations"
+                :key="idx"
+                class="flex gap-x-4 items-center p-2 mb-1"
+            >
+                <div class="flex flex-1 gap-x-2 cursor-pointer">
+                    <div v-for="variation in variations" class="flex space-x-1">
+                        <span>{{ variation.name }}</span>
+                        <span> : </span>
+                        <span>{{ variation.value }}</span>
+                    </div>
+                </div>
 
-        <p>Paginação</p>
+                <span class="px-2 py-1 bg-secondary-600 rounded-3xl text-sm text-white">
+                    3 em stock
+                </span>
+
+                <VInput
+                    v-if="!article.isUnique"
+                    type="number"
+                    class="max-w-24"
+                    placeholder="QTD"
+                    @update:model-value="(quantity: string) => defineQuantity(idx, quantity)"
+                />
+            </div>
+        </div>
+
+        <button class="btn-secondary" @click="addArticleToRequestList">Adicionar</button>
     </VDialog>
 </template>

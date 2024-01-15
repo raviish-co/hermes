@@ -25,7 +25,7 @@ defineExpose({ show: showDialog });
 </script>
 
 <template>
-    <VDialog ref="dialogRef" title="Descrever danos do artigo">
+    <VDialog ref="dialogRef" title="Descrever danos do artigo" class="min-w-96">
         <VSelect
             v-model="articleState"
             placeholder="Estado"
@@ -34,12 +34,12 @@ defineExpose({ show: showDialog });
         />
 
         <textarea
-            class="input-field resize-none"
             placeholder="Descrever o estado do artigo"
             :rows="3"
             :disabled="isGoodState"
+            class="input-field resize-none"
         />
 
-        <button class="btn" @click="updateArticleState">Salvar</button>
+        <button class="btn-secondary" @click="updateArticleState">Salvar</button>
     </VDialog>
 </template>

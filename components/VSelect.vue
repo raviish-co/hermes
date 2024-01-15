@@ -10,16 +10,22 @@ interface Emits {
 }
 
 const emits = defineEmits<Emits>();
-defineProps<Propos>();
+const props = defineProps<Propos>();
 
 function emitSelectedOption(e: Event) {
     const selectedValue = (e.target as HTMLSelectElement).value;
     emits("update:modelValue", selectedValue);
 }
+
+onMounted(() => {
+    if (props.options.includes(props.placeholder)) {
+        emits("update:modelValue", props.placeholder);
+    }
+});
 </script>
 
 <template>
-    <select :v-model="modelValue" @change="emitSelectedOption" class="input-field">
+    <select :v-model="modelValue" class="input-field" @change="emitSelectedOption">
         <option selected>{{ placeholder }}</option>
         <option v-for="option in options" :key="option" :value="option">
             {{ option }}

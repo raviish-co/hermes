@@ -30,7 +30,7 @@ defineExpose({ clearOptions });
 </script>
 <template>
     <div
-        class="relative cursor-pointer w-full py-3 px-4 rounded border border-gray-500 bg-white"
+        class="relative cursor-pointer w-full py-3 px-4 border border-gray-500 bg-white"
         @click="toogleOptions"
     >
         <p class="flex justify-between gap-x-2">
