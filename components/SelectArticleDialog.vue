@@ -9,11 +9,25 @@ interface Emits {
 
 const dialogRef = ref<typeof VDialog>();
 const emits = defineEmits<Emits>();
+const query = ref<string>("");
+const articles = ref<Article[]>(ARTICLES);
 
 function emitSelectedArticle(article: Article) {
     dialogRef.value?.close();
     emits("select", article);
 }
+
+const searchArticles = computed(() => {
+    if (!query.value) {
+        return articles.value;
+    }
+
+    const results = articles.value.filter(
+        (article) => article.name.includes(query.value) || article.id.includes(query.value)
+    );
+
+    return results;
+});
 
 function showDialog() {
     dialogRef.value?.show();
@@ -23,8 +37,8 @@ defineExpose({ show: showDialog });
 </script>
 
 <template>
-    <VDialog ref="dialogRef" title="Pesquisar Artigo">
-        <VInput placeholder="Pesquisar por Nome ou ID" type="search" />
+    <VDialog ref="dialogRef" title="Pesquisar Artigo" class="max-w-[30rem]">
+        <VInput placeholder="Pesquisar por Nome ou ID" type="search" v-model="query" />
 
         <table class="table">
             <thead>
@@ -36,7 +50,7 @@ defineExpose({ show: showDialog });
             </thead>
 
             <tbody>
-                <tr v-for="article in ARTICLES" :key="article.id">
+                <tr v-for="article in searchArticles" :key="article.id">
                     <td class="w-16">{{ article.id }}</td>
                     <td class="w-96" @click="emitSelectedArticle(article)">
                         {{ article.name }}
@@ -49,6 +63,9 @@ defineExpose({ show: showDialog });
                             Único
                         </span>
                     </td>
+                </tr>
+                <tr v-if="searchArticles.length === 0">
+                    <td colspan="3">Nenhum resultado encontrado</td>
                 </tr>
             </tbody>
         </table>

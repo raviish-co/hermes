@@ -25,7 +25,7 @@ defineExpose({ show: showDialog });
 </script>
 
 <template>
-    <VDialog ref="dialogRef" title="Descrever danos do artigo" class="min-w-96">
+    <VDialog ref="dialogRef" title="Descrever danos do artigo" class="max-w-[30rem]">
         <VSelect
             v-model="articleState"
             placeholder="Estado"

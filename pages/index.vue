@@ -65,7 +65,7 @@ function updateCurrentSectionName(sectionName: string) {
 }
 
 function removeRequestRow(id: string): void {
-    requestList.value = requestList.value.filter((r) => r.id !== id);
+    requestList.value = requestList.value.filter((r) => r.requestId !== id);
 }
 
 function clearRequestList() {
@@ -208,7 +208,9 @@ function listVariations(articleVariation?: ArticleVariation[]) {
                                 <td class="w-36">
                                     {{ formatCurrency(row.securityDeposit) }}
                                 </td>
-                                <td class="cursor-pointer" @click="removeRequestRow(row.id)">x</td>
+                                <td class="cursor-pointer" @click="removeRequestRow(row.requestId)">
+                                    x
+                                </td>
                             </tr>
                         </tbody>
                     </table>

@@ -7,26 +7,23 @@ interface Props {
     requestList: RequestArticle[];
 }
 
-interface Emuits {
-    (e: "continue"): void;
-}
-
-const props = defineProps<Props>();
-const emits = defineEmits<Emuits>();
 const dialogRef = ref<typeof VDialog>();
 const quantities = ref<number[]>([]);
 const total = ref<number>(0);
+const props = defineProps<Props>();
 
 function defineQuantity(idx: number, quantity: string) {
-    quantities.value[idx] = Number(quantity);
+    if (parseInt(quantity) > 0) {
+        quantities.value[idx] = Number(quantity);
+    }
 }
 
 function quantityNotDefined() {
     return quantities.value.length === 0;
 }
 
-function isSameRequestArticle(requestArticle: RequestArticle) {
-    return props.requestList.some((r) => r.id === requestArticle.id);
+function isTheSameRequestArticle(article: RequestArticle) {
+    return props.requestList.some((r) => r.id === article.id);
 }
 
 function isTheSameVariations(variations: ArticleVariation[]) {
@@ -44,17 +41,23 @@ function makeRequestArticle(article: Article, quantity: number, varitations?: Ar
 }
 
 function addArticleWithoutVariations() {
-    if (quantityNotDefined()) return;
+    if (quantityNotDefined()) {
+        dialogRef.value?.close();
+        return;
+    }
 
     const quantity = quantities.value[0];
 
     const requestArticle = makeRequestArticle(props.article, quantity);
 
-    if (isSameRequestArticle(requestArticle)) return;
+    if (isTheSameRequestArticle(requestArticle)) return;
 
     props.requestList.push(requestArticle);
 
     dialogRef.value?.close();
+
+    quantities.value = [];
+
     return;
 }
 
@@ -71,7 +74,7 @@ function addArticleToRequestList(): void {
         if (quantity > 0) {
             const requestArticle = makeRequestArticle(props.article, quantity, variations);
 
-            if (isTheSameVariations(variations)) return;
+            if (isTheSameVariations(variations) && quantity === requestArticle.quantity) return;
 
             requestArticles.push(requestArticle);
         }
@@ -92,11 +95,7 @@ defineExpose({ show: showDialog });
 </script>
 
 <template>
-    <VDialog
-        ref="dialogRef"
-        title="Adicionar artigo a lista de solicitação"
-        class="w-full max-w-[40rem]"
-    >
+    <VDialog ref="dialogRef" title="Adicionar artigo a lista de solicitação" class="max-w-[40rem]">
         <div class="flex items-center gap-x-4 w-full">
             <h2 class="font-medium flex-1">{{ article?.id }} # {{ article?.name }}</h2>
 
