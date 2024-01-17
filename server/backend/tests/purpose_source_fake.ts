@@ -1,7 +1,7 @@
-import { PurposeSource, Purpose } from "../domain/purpose";
+import { PurposeSource, PurposeData } from "../domain/purpose";
 
 export class FakePurposeSource implements PurposeSource {
-    list(): Promise<Purpose[]> {
+    list(): Promise<PurposeData[]> {
         return Promise.resolve([]);
     }
 }

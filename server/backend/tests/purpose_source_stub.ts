@@ -1,7 +1,7 @@
-import { PurposeSource, Purpose } from "../domain/purpose";
+import { PurposeSource, PurposeData } from "../domain/purpose";
 
 export class PurposeSourceStub implements PurposeSource {
-    #purposes: Purpose[];
+    #purposes: PurposeData[];
 
     constructor() {
         this.#purposes = [
@@ -15,7 +15,7 @@ export class PurposeSourceStub implements PurposeSource {
         ];
     }
 
-    list(): Promise<Purpose[]> {
+    list(): Promise<PurposeData[]> {
         return Promise.resolve(this.#purposes);
     }
 }

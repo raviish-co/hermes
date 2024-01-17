@@ -21,6 +21,7 @@ describe("Test main Service", () => {
         await service.listPurposes();
 
         expect(spy).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it("should retrieve a list of purposes from data", async () => {
