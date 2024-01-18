@@ -3,6 +3,7 @@ import { RequestArticles, RequestStatus } from "../../domain/request_articles";
 import { RequestLine } from "../../domain/request_line";
 import { Article } from "../../domain/article";
 import { User } from "../../domain/user";
+import { Attribute, Variation, VariationGroup } from "./article.test";
 
 describe("Test Request Articles", () => {
     it("should create the article request", () => {
@@ -107,8 +108,20 @@ describe("Test Request Articles", () => {
     });
 });
 
+const variation = new VariationGroup([new Variation(new Attribute("Cor"), "Vermelha")]);
+
+const articleOptions = {
+    title: "some-title",
+    price: 150,
+    stock: 15,
+    unique: false,
+    securityDeposit: 150,
+    condition: { status: "Mau", comment: "Some comment" },
+    variations: [variation],
+};
+
 export const requestLines: RequestLine[] = [
-    RequestLine.create(Article.create("some article 1", 150, 15), 3),
-    RequestLine.create(Article.create("some article 2", 100, 10), 2),
-    RequestLine.create(Article.create("some article 3", 200, 5), 2),
+    RequestLine.create(Article.create(articleOptions), 3),
+    RequestLine.create(Article.create({ ...articleOptions, price: 100, stock: 10 }), 2),
+    RequestLine.create(Article.create({ ...articleOptions, price: 200, stock: 5 }), 2),
 ];
