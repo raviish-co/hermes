@@ -1,16 +1,19 @@
 import { describe, expect, it } from "vitest";
 import { Article, ArticleState } from "../../domain/article";
+import { Amount } from "../../domain/amount";
+import { Variation } from "../../domain/variation";
+import { Attribute } from "../../domain/attribute";
+import { VariationGroup } from "../../domain/variation_group";
 
 describe("Test Request Articles", () => {
     it("Deve criar um artigo", () => {
         const title = "some-title";
-        const price = 150;
+        const price = "150";
 
         const article = Article.create(options);
 
         expect(article.title).toEqual(title);
-        expect(article.price).toEqual(price);
-        expect(article.getStock()).toEqual(10);
+        expect(article.price).toEqual(Amount.fromString(price));
     });
 
     it("Deve criar um artigo único", () => {
@@ -27,48 +30,10 @@ describe("Test Request Articles", () => {
         expect(article.isUnique()).toBeFalsy();
     });
 
-    it("Deve ser 1 a quantidade em stock de um artigo único", () => {
-        const article = Article.create({ ...options, unique: true });
-
-        expect(article.getStock()).toEqual(1);
-    });
-
-    it("Deve aumentar a quantidade em stock de um artigo", () => {
-        const article = Article.create(options);
-
-        article.increaseStock(3);
-
-        expect(article.getStock()).toEqual(13);
-    });
-
-    it("Deve retirar a quantidade exacta do artigo no stock", () => {
-        const article = Article.create(options);
-
-        article.decreaseStock(3);
-
-        expect(article.getStock()).toEqual(7);
-    });
-
-    it("Deve permanecer 1 a quantidade em stock de um artigo único", () => {
-        const article = Article.create({ ...options, unique: true });
-
-        article.increaseStock(3);
-
-        expect(article.getStock()).toEqual(1);
-    });
-
-    it("Deve diminuir apenas uma unidade no stock para um artigo único", () => {
-        const article = Article.create({ ...options, unique: true });
-
-        article.decreaseStock(3);
-
-        expect(article.getStock()).toEqual(0);
-    });
-
     it("Um artigo deve ter o valor da calção a reter", () => {
-        const article = Article.create({ ...options, securityDeposit: 150, unique: false });
+        const article = Article.create({ ...options, securityDeposit: "150", unique: false });
 
-        expect(article.getSecurityDeposit()).toEqual(150);
+        expect(article.getSecurityDeposit()).toEqual(Amount.fromString("150"));
     });
 
     it("Deve definir a condição actual de um artigo", () => {
@@ -99,7 +64,7 @@ describe("Test Request Articles", () => {
     });
 
     it("Quando um artigo é único não deve ter variações", () => {
-        const article = Article.create({ ...options, unique: true });
+        const article = Article.create({ ...options, unique: true, variationGroup: undefined });
 
         expect(article.variationGroup).toBeUndefined();
     });
@@ -144,36 +109,24 @@ describe("Test Request Articles", () => {
     });
 });
 
-export class Variation {
-    readonly attribute: Attribute;
-    readonly value: string;
-
-    constructor(attribute: Attribute, value: string) {
-        this.attribute = attribute;
-        this.value = value;
-    }
-}
-
-export class Attribute {
-    readonly name: string;
-
-    constructor(name: string) {
-        this.name = name;
-    }
-}
-
-export class VariationGroup {
-    readonly variations: Variation[];
-
-    constructor(variations: Variation[]) {
-        this.variations = variations;
-    }
-}
-
 const color = new Attribute("Cor");
-const colorVariation = new Variation(color, "Vermelha");
 const size = new Attribute("Tamanho");
-const sizeVariation = new Variation(size, "M");
+const red = { value: "Vermelha" };
+
+const variationOptions = {
+    attribute: color,
+    variationValue: red,
+    stock: 10,
+};
+
+const variationOptions1 = {
+    attribute: size,
+    variationValue: { value: "M" },
+    stock: 10,
+};
+
+const colorVariation = Variation.create(variationOptions);
+const sizeVariation = Variation.create(variationOptions1);
 const group = new VariationGroup([colorVariation]);
 const condition = {
     status: "Mau",
@@ -182,10 +135,10 @@ const condition = {
 
 const options = {
     title: "some-title",
-    price: 150,
+    price: "150",
     stock: 10,
     unique: false,
-    securityDeposit: 150,
+    securityDeposit: "150",
     condition: condition,
     variationGroup: [group],
 };

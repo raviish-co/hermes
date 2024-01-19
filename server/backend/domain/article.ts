@@ -1,87 +1,76 @@
-import { VariationGroup } from "../tests/unit/article.test";
+import { Amount } from "./amount";
+import { VariationGroup } from "./variation_group";
 
 export enum ArticleState {
     Good = "Bom",
     Bad = "Mau",
 }
 
-export type Condition = {
+export type ArticleCondition = {
     status: string;
     comment?: string;
 };
 
 export type ArticleOptions = {
     title: string;
-    price: number;
-    stock: number;
+    price: string;
     unique?: boolean;
-    securityDeposit: number;
-    condition: Condition;
+    securityDeposit: string;
+    condition: ArticleCondition;
     variationGroup?: VariationGroup[];
 };
 
 export class Article {
     readonly title: string;
-    readonly price: number;
-    readonly condition: Condition;
+    readonly price: Amount;
+    readonly condition: ArticleCondition;
     variationGroup?: VariationGroup[];
-    #stock: number;
     #unique?: boolean;
-    #securityDeposit: number;
+    #securityDeposit: Amount;
 
     private constructor(
         title: string,
-        price: number,
-        stock: number,
-        securityDeposit: number,
-        condition: Condition
+        price: Amount,
+        securityDeposit: Amount,
+        condition: ArticleCondition,
+        variations?: VariationGroup[]
     ) {
         this.title = title;
         this.price = price;
         this.condition = condition;
-        this.#stock = stock;
         this.#unique = false;
         this.#securityDeposit = securityDeposit;
+        this.variationGroup = variations;
     }
 
     static create(options: ArticleOptions): Article {
-        const { title, price, stock, unique, securityDeposit, condition, variationGroup } = options;
-        const article = new Article(title, price, stock, securityDeposit, condition);
+        const { title, unique, condition, variationGroup } = options;
+
+        const price = Amount.fromString(options.price);
+
+        const securityDeposit = Amount.fromString(options.securityDeposit);
+
+        const article = new Article(title, price, securityDeposit, condition);
+
         if (unique) {
             article.#unique = unique;
-            article.#stock = 1;
             return article;
         }
-        article.variationGroup = variationGroup;
-        return article;
-    }
 
-    decreaseStock(quantity: number): void {
-        if (this.isUnique()) {
-            this.#stock -= 1;
-            return;
-        }
-        this.#stock -= quantity;
+        article.variationGroup = variationGroup;
+
+        return article;
     }
 
     isUnique(): boolean {
         return this.#unique == true;
     }
 
-    increaseStock(quantity: number): void {
-        if (this.isUnique()) return;
-        this.#stock += quantity;
-    }
-
-    getStock(): number {
-        return this.#stock;
-    }
-
-    getSecurityDeposit(): number {
+    getSecurityDeposit(): Amount {
         return this.#securityDeposit;
     }
 
-    getCondition(): Condition {
+    getCondition(): ArticleCondition {
         return this.condition;
     }
 

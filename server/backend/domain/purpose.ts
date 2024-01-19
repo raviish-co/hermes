@@ -10,13 +10,13 @@ export interface PurposeSource {
 export type PurposeOptions = {
     name: string;
     section?: string;
-    [description: string]: string | undefined;
+    destination?: string;
 };
 
 export class Purpose {
     name: string;
     section?: string;
-    description?: string;
+    destination?: string;
 
     private constructor(name: string) {
         this.name = name;
@@ -24,9 +24,9 @@ export class Purpose {
 
     static fromOptions(options: PurposeOptions): Purpose {
         const purpose = new Purpose(options.name);
-        if (!options.section && !options.description) return purpose;
+        if (!options.section && !options.destination) return purpose;
         purpose.section = options.section;
-        purpose.description = options.description;
+        purpose.destination = options.destination;
         return purpose;
     }
 }
