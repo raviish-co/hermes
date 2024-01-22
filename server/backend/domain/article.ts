@@ -1,3 +1,4 @@
+import { ID } from "../tests/integration/service.test";
 import { Amount } from "./amount";
 import { VariationGroup } from "./variation_group";
 
@@ -12,6 +13,7 @@ export type ArticleCondition = {
 };
 
 export type ArticleOptions = {
+    articleId: string;
     title: string;
     price: string;
     unique?: boolean;
@@ -21,6 +23,7 @@ export type ArticleOptions = {
 };
 
 export class Article {
+    readonly articleId: ID;
     readonly title: string;
     readonly price: Amount;
     readonly condition: ArticleCondition;
@@ -29,6 +32,7 @@ export class Article {
     #securityDeposit: Amount;
 
     private constructor(
+        articleId: ID,
         title: string,
         price: Amount,
         securityDeposit: Amount,
@@ -41,16 +45,19 @@ export class Article {
         this.#unique = false;
         this.#securityDeposit = securityDeposit;
         this.variationGroup = variations;
+        this.articleId = articleId;
     }
 
     static create(options: ArticleOptions): Article {
-        const { title, unique, condition, variationGroup } = options;
+        const { articleId, title, unique, condition, variationGroup } = options;
 
         const price = Amount.fromString(options.price);
 
         const securityDeposit = Amount.fromString(options.securityDeposit);
 
-        const article = new Article(title, price, securityDeposit, condition);
+        const newID = ID.New(articleId);
+
+        const article = new Article(newID, title, price, securityDeposit, condition);
 
         if (unique) {
             article.#unique = unique;

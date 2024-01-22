@@ -6,6 +6,7 @@ import { User } from "../../domain/user";
 import { VariationGroup } from "../../domain/variation_group";
 import { Attribute } from "../../domain/attribute";
 import { Variation } from "../../domain/variation";
+import { Service } from "../../application/service";
 
 describe("Test Request Articles", () => {
     it("should create the article request", () => {
@@ -38,7 +39,7 @@ describe("Test Request Articles", () => {
 
     it("Deve definir um destino a solicitação de saída de artigos", () => {
         const client = "John Doe";
-        const purpose = { name: "Aluguer", destination: client };
+        const purpose = { name: "Aluguer", recipient: client };
         const options = {
             ...requestArticlesOptions,
             purposeOptions: purpose,
@@ -46,8 +47,8 @@ describe("Test Request Articles", () => {
 
         const requestArticles = RequestArticles.create(options);
 
-        expect(requestArticles.purpose.destination).toBeDefined();
-        expect(requestArticles.purpose.destination).toEqual(client);
+        expect(requestArticles.purpose.recipient).toBeDefined();
+        expect(requestArticles.purpose.recipient).toEqual(client);
     });
 
     it("Deve garantir que o solicitante seja definido", () => {
@@ -90,7 +91,6 @@ describe("Test Request Articles", () => {
 
         requestArticles.addRequestLines(requestLines);
 
-        const requestLine = requestArticles.requestLines[0];
         expect(requestArticles.getTotal().value).toEqual(total);
     });
 
