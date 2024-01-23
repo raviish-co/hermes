@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { RequestedArticles, RequestStatus } from "../../domain/requests/requested_articles";
 import { RequestedItem } from "../../domain/requests/requested_item";
-import { Article } from "../../domain/articles/article";
+import { Article, ArticleStatus } from "../../domain/articles/article";
 import { User } from "../../domain/user";
 import { VariationGroup } from "../../domain/variation_group";
 import { Attribute } from "../../domain/articles/attribute";
@@ -173,7 +173,7 @@ const articleOptions = {
     price: "150",
     unique: false,
     securityDeposit: "150",
-    condition: { status: "Mau", comment: "Some comment" },
+    condition: { status: ArticleStatus.Bad, comment: "Some comment" },
     variations: [variation],
 };
 

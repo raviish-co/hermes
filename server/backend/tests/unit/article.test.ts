@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Article, ArticleState } from "../../domain/articles/article";
+import { Article, ArticleStatus } from "../../domain/articles/article";
 import { Decimal } from "../../shared/decimal";
 import { Variation } from "../../domain/variation";
 import { Attribute } from "../../domain/articles/attribute";
@@ -41,17 +41,17 @@ describe("Test Request Articles", () => {
 
         const condition = article.getCondition();
 
-        expect(condition.status).toEqual(ArticleState.Bad);
+        expect(condition.status).toEqual(ArticleStatus.Bad);
         expect(condition.comment).toBeDefined();
         expect(condition.comment).toEqual("Some comment");
     });
 
     it("Quando o artigo está em bom estado, não deve ter comentário", () => {
-        const article = Article.create({ ...options, condition: { status: ArticleState.Good } });
+        const article = Article.create({ ...options, condition: { status: ArticleStatus.Good } });
 
         const condition = article.getCondition();
 
-        expect(condition.status).toEqual(ArticleState.Good);
+        expect(condition.status).toEqual(ArticleStatus.Good);
         expect(condition.comment).toBeUndefined();
     });
 

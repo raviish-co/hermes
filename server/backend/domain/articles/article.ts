@@ -2,13 +2,13 @@ import { ID } from "../../shared/id";
 import { Decimal } from "../../shared/decimal";
 import { VariationGroup } from "../variation_group";
 
-export enum ArticleState {
+export enum ArticleStatus {
     Good = "Bom",
     Bad = "Mau",
 }
 
 export type ArticleCondition = {
-    status: string;
+    status: ArticleStatus;
     comment?: string;
 };
 
