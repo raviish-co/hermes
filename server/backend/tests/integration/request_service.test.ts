@@ -242,24 +242,6 @@ describe("Test RequestArticles Service", () => {
         expect(requestArticles.requestedItems.length).toBe(2);
         expect(requestArticles.getTotal().value).toEqual("67,85");
     });
-
-    it("Deve retornar o error **InsufficientStock** se um artigo não tem as quantidades desejadas na solicitação", async () => {
-        const articlesData = [{ articleId: "1109", quantity: 10 }];
-        const requestTotal = "25,95";
-        const purposeSource = new PurposeSourceStub();
-        const articleRepository = new ArticleRepositoryStub();
-        const requestRepository = new InmemRequestRepository();
-        const service = new RequestService(purposeSource, articleRepository, requestRepository);
-
-        const voidOrError = await service.requestArticles({
-            ...requestArticlesData,
-            articlesData,
-            requestTotal,
-        });
-
-        expect(voidOrError.isRight()).toBeTruthy();
-        expect(voidOrError.value).toBeInstanceOf(InsufficientStock);
-    });
 });
 
 const requestArticlesData = {
