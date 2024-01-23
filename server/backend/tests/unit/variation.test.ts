@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Variation } from "../../domain/variation";
-import { Attribute } from "../../domain/attribute";
+import { Attribute } from "../../domain/articles/attribute";
 
 describe("Test Variation", () => {
     it("Deve ter a sua quantidade em stock uma variação **Cor: Vermelha**", () => {

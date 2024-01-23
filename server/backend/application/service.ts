@@ -1,26 +1,25 @@
 import { PurposeSource, PurposeData, PurposeNotFound } from "../domain/purpose";
-import { RequestArticles } from "../domain/request_articles";
-import { RequestLine } from "../domain/request_line";
+import { RequestedArticles } from "../domain/requests/requested_articles";
+import { RequestedItem } from "../domain/requests/requested_item";
 import { User } from "../domain/user";
 import { Either, left, right } from "../shared/either";
-import {
-    ArticleNotFound,
-    ArticleRepository,
-    ID,
-    RequestArticlesRepository,
-} from "../tests/integration/service.test";
+import { ArticleNotFound } from "../domain/articles/article_not_found_error";
+import { InvalidTotal } from "../domain/requests/invalid_total_error";
+import { ArticleRepository } from "../domain/articles/article_repository";
+import { RequestRepository } from "../domain/requests/request_repository";
+import { ID } from "../shared/id";
 
-type NewRequestArticleError = PurposeNotFound | ArticleNotFound;
+type NewRequestArticlesError = PurposeNotFound | ArticleNotFound | InvalidTotal;
 
-export class Service {
+export class RequestService {
     readonly purposeSource: PurposeSource;
     readonly articleRepository: ArticleRepository;
-    readonly requestArticlesRepository: RequestArticlesRepository;
+    readonly requestArticlesRepository: RequestRepository;
 
     constructor(
         purposeSource: PurposeSource,
         articleRepository: ArticleRepository,
-        requestArticlesRepository: RequestArticlesRepository
+        requestArticlesRepository: RequestRepository
     ) {
         this.purposeSource = purposeSource;
         this.articleRepository = articleRepository;
@@ -32,10 +31,11 @@ export class Service {
         return Promise.resolve(purposes);
     }
 
-    async newRequestArticles(
+    async requestArticles(
         purposeName: string,
-        ids: string[]
-    ): Promise<Either<NewRequestArticleError, void>> {
+        ids: string[],
+        requestTotal: string
+    ): Promise<Either<NewRequestArticlesError, void>> {
         const purposeOrError = await this.purposeSource.find(purposeName);
         if (purposeOrError.isLeft()) return left(purposeOrError.value);
 
@@ -50,29 +50,30 @@ export class Service {
         const articles = articlesOrError.value;
         const purpose = purposeOrError.value;
         const user = User.create("Teste");
-        const requestArticles = RequestArticles.create({
+        const requestArticles = RequestedArticles.create({
             purposeOptions: {
                 name: purpose.name,
                 section: purpose.sections?.at(0),
                 recipient: "",
             },
             returnDate: "2021-10-10T00:00:00.000Z",
-            total: "1000",
             user: user,
         });
 
-        const requestLines: RequestLine[] = [];
+        const requestLines: RequestedItem[] = [];
         articles.forEach((article) => {
-            const requestLine = RequestLine.create({
+            const requestLine = RequestedItem.create({
                 article,
                 quantity: 1,
             });
             requestLines.push(requestLine);
         });
 
-        requestArticles.addRequestLines(requestLines);
+        requestArticles.addRequestedItems(requestLines);
 
-        console.log(requestArticles.total.value);
+        if (!requestArticles.isSameTotal(requestTotal)) {
+            return left(new InvalidTotal());
+        }
 
         await this.requestArticlesRepository.save(requestArticles);
 

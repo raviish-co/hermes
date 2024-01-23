@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { Article, ArticleState } from "../../domain/article";
-import { Amount } from "../../domain/amount";
+import { Article, ArticleState } from "../../domain/articles/article";
+import { Decimal } from "../../shared/decimal";
 import { Variation } from "../../domain/variation";
-import { Attribute } from "../../domain/attribute";
+import { Attribute } from "../../domain/articles/attribute";
 import { VariationGroup } from "../../domain/variation_group";
 
 describe("Test Request Articles", () => {
@@ -13,7 +13,7 @@ describe("Test Request Articles", () => {
         const article = Article.create(options);
 
         expect(article.title).toEqual(title);
-        expect(article.price).toEqual(Amount.fromString(price));
+        expect(article.price).toEqual(Decimal.fromString(price));
     });
 
     it("Deve criar um artigo único", () => {
@@ -33,7 +33,7 @@ describe("Test Request Articles", () => {
     it("Um artigo deve ter o valor da calção a reter", () => {
         const article = Article.create({ ...options, securityDeposit: "150", unique: false });
 
-        expect(article.getSecurityDeposit()).toEqual(Amount.fromString("150"));
+        expect(article.getSecurityDeposit()).toEqual(Decimal.fromString("150"));
     });
 
     it("Deve definir a condição actual de um artigo", () => {
