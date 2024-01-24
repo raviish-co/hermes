@@ -129,11 +129,12 @@ const colorVariation = Variation.create(variationOptions);
 const sizeVariation = Variation.create(variationOptions1);
 const group = new VariationGroup([colorVariation]);
 const condition = {
-    status: "Mau",
+    status: ArticleStatus.Bad,
     comment: "Some comment",
 };
 
 const options = {
+    articleId: "1001",
     title: "some-title",
     price: "150",
     stock: 10,
