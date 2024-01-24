@@ -312,7 +312,7 @@ describe("Test ListArticles", () => {
         const purposeSource = new PurposeSourceStub();
         const service = new RequestService(purposeSource, articleRepository, requestRepository);
 
-        const articles = await service.listArticles();
+        const { result: articles } = await service.listArticles();
 
         expect(articles.length).toBeGreaterThanOrEqual(2);
         expect(articles[0].articleId.toString()).toEqual("1001");
@@ -324,7 +324,7 @@ describe("Test ListArticles", () => {
         const purposeSource = new PurposeSourceStub();
         const service = new RequestService(purposeSource, articleRepository, requestRepository);
 
-        const articles = await service.listArticles();
+        const { result: articles } = await service.listArticles();
 
         expect(articles).toEqual([]);
     });
@@ -378,6 +378,49 @@ describe("Test SearchArticles", () => {
         const articles = await service.searchArticles("Teste");
 
         expect(articles).toEqual([]);
+    });
+
+    it("Deve paginar o resultado da listagem de artigos por 12 artigos por página", async () => {
+        const articleRepository = new ArticleRepositoryStub();
+        const requestRepository = new InmemRequestRepository();
+        const purposeSource = new PurposeSourceStub();
+        const service = new RequestService(purposeSource, articleRepository, requestRepository);
+
+        const articles = await service.listArticles();
+
+        expect(articles.result.length).toEqual(2);
+        expect(articles.pageToken).toEqual(1);
+        expect(articles.perPage).toEqual(12);
+    });
+
+    it("Deve buscar os artigos pela página", async () => {
+        const pageToken = 2;
+        const articleRepository = new ArticleRepositoryStub();
+        const requestRepository = new InmemRequestRepository();
+        const purposeSource = new PurposeSourceStub();
+        const service = new RequestService(purposeSource, articleRepository, requestRepository);
+
+        const articles = await service.listArticles(pageToken);
+
+        expect(articles.result.length).toEqual(0);
+        expect(articles.pageToken).toEqual(2);
+        expect(articles.perPage).toEqual(12);
+    });
+
+    it("Deve buscar por um tamanho de página diferente de 12", async () => {
+        const pageToken = 1;
+        const perPage = 30;
+        const articleRepository = new ArticleRepositoryStub();
+        const requestRepository = new InmemRequestRepository();
+        const purposeSource = new PurposeSourceStub();
+
+        const service = new RequestService(purposeSource, articleRepository, requestRepository);
+
+        const articles = await service.listArticles(pageToken, perPage);
+
+        expect(articles.result.length).toEqual(2);
+        expect(articles.pageToken).toEqual(1);
+        expect(articles.perPage).toEqual(perPage);
     });
 });
 

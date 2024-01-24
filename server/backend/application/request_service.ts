@@ -10,6 +10,7 @@ import { ID } from "../shared/id";
 import { Article } from "../domain/articles/article";
 import { StockInsufficient } from "../domain/articles/stock_insufficient";
 import { RequestRepository } from "../domain/requests/request_repository";
+import { Pagination } from "../shared/pagination";
 
 type NewRequestArticlesError = PurposeNotFound | ArticleNotFound | InvalidTotal;
 
@@ -82,8 +83,8 @@ export class RequestService {
         return right(undefined);
     }
 
-    listArticles(): Promise<Article[]> {
-        return this.articleRepository.list();
+    listArticles(pageToken: number = 1, perPage?: number): Promise<Pagination<Article>> {
+        return this.articleRepository.list(pageToken, perPage);
     }
 
     searchArticles(query: string): Promise<Article[]> {

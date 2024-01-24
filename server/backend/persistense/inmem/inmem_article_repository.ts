@@ -3,6 +3,7 @@ import { Either, left, right } from "../../shared/either";
 import { ID } from "../../shared/id";
 import { ArticleNotFound } from "../../domain/articles/article_not_found_error";
 import { ArticleRepository } from "../../domain/articles/article_repository";
+import { Pagination } from "../../shared/pagination";
 
 export class InmemArticleRepository implements ArticleRepository {
     #data: Record<string, Article> = {};
@@ -33,8 +34,22 @@ export class InmemArticleRepository implements ArticleRepository {
         return Promise.resolve(undefined);
     }
 
-    list(): Promise<Article[]> {
-        return Promise.resolve(this.records);
+    list(pageToken: number, perPage?: number): Promise<Pagination<Article>> {
+        const size = perPage ? perPage : 12;
+        const startIndex = (pageToken - 1) * size;
+
+        const endIndex = startIndex + size;
+
+        const result = this.records.slice(startIndex, endIndex);
+
+        const total = Math.ceil(result.length / 12);
+
+        return Promise.resolve({
+            result,
+            perPage: size,
+            pageToken,
+            total,
+        });
     }
 
     search(query: string): Promise<Article[]> {
