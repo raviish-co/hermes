@@ -6,9 +6,10 @@ import { Either, left, right } from "../shared/either";
 import { ArticleNotFound } from "../domain/articles/article_not_found_error";
 import { InvalidTotal } from "../domain/requests/invalid_total_error";
 import { ArticleRepository } from "../domain/articles/article_repository";
-import { RequestRepository } from "../domain/requests/request_repository";
 import { ID } from "../shared/id";
 import { Article } from "../domain/articles/article";
+import { StockInsufficient } from "../domain/articles/stock_insufficient";
+import { RequestRepository } from "../domain/requests/request_repository";
 
 type NewRequestArticlesError = PurposeNotFound | ArticleNotFound | InvalidTotal;
 
@@ -68,13 +69,25 @@ export class RequestService {
             returnDate,
         });
 
-        const requestedItems = this.#buildRequestedItems(articles, articlesData);
-        requestArticles.addRequestedItems(requestedItems);
+        const requestedItemsOrError = this.#buildRequestedItems(articles, articlesData);
+        if (requestedItemsOrError.isLeft()) return left(requestedItemsOrError.value);
+
+        requestArticles.addRequestedItems(requestedItemsOrError.value);
         if (!requestArticles.isSameTotal(requestTotal)) return left(new InvalidTotal());
 
         await this.requestArticlesRepository.save(requestArticles);
 
+        await this.articleRepository.updateStock(articles);
+
         return right(undefined);
+    }
+
+    listArticles(): Promise<Article[]> {
+        return this.articleRepository.list();
+    }
+
+    searchArticles(query: string): Promise<Article[]> {
+        return this.articleRepository.search(query);
     }
 
     #buildArticlesIdentifiers(articlesData: ArticleData[]): ID[] {
@@ -85,13 +98,25 @@ export class RequestService {
         return identifiers;
     }
 
-    #buildRequestedItems(articles: Article[], articlesData: ArticleData[]): RequestedItem[] {
+    #buildRequestedItems(
+        articles: Article[],
+        articlesData: ArticleData[]
+    ): Either<StockInsufficient, RequestedItem[]> {
         const requestedItems: RequestedItem[] = [];
-        articles.forEach((article, idx) => {
-            const { quantity } = articlesData[idx];
+
+        for (const i in articles) {
+            const { quantity } = articlesData[i];
+            const article = articles[i];
+
+            if (article.verifyStock(quantity)) {
+                const message = `Stock insufficient for article ${article.title}`;
+                return left(new StockInsufficient(message));
+            }
+
+            article.decreaseStock(quantity);
             const requestedItem = RequestedItem.create({ article, quantity });
             requestedItems.push(requestedItem);
-        });
-        return requestedItems;
+        }
+        return right(requestedItems);
     }
 }

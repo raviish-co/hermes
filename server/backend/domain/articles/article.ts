@@ -30,6 +30,7 @@ export class Article {
     variationGroup?: VariationGroup[];
     #unique?: boolean;
     #securityDeposit: Decimal;
+    #stock: number;
 
     private constructor(
         articleId: ID,
@@ -46,6 +47,7 @@ export class Article {
         this.#securityDeposit = securityDeposit;
         this.variationGroup = variations;
         this.articleId = articleId;
+        this.#stock = 10;
     }
 
     static create(options: ArticleOptions): Article {
@@ -73,6 +75,14 @@ export class Article {
         return this.#unique == true;
     }
 
+    verifyStock(quantity: number): boolean {
+        return this.getStock() < quantity;
+    }
+
+    decreaseStock(quantity: number): void {
+        this.#stock -= quantity;
+    }
+
     getSecurityDeposit(): Decimal {
         return this.#securityDeposit;
     }
@@ -83,5 +93,9 @@ export class Article {
 
     getVariationGroup(): VariationGroup[] | undefined {
         return this.variationGroup;
+    }
+
+    getStock(): number {
+        return this.#stock;
     }
 }
