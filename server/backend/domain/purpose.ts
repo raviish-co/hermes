@@ -3,6 +3,7 @@ import { Either } from "../shared/either";
 export interface PurposeData {
     name: string;
     sections?: string[];
+    placeholder?: string;
 }
 
 export class PurposeNotFound extends Error {

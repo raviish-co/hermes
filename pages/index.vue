@@ -5,9 +5,11 @@ import type {
     DescribeArticleStateDialog,
 } from "#build/components";
 import type { Article, ArticleVariation, RequestArticle } from "~/lib/models/article";
-import { PURPOSES, PurposeName } from "~/lib/data/purposes";
 import { formatCurrency } from "~/lib/helpers/formatCurrency";
+import { RequestService } from "~/lib/services/request_service";
+import type { Purpose } from "~/lib/models/purpose";
 
+const DISCARD = "Descartar";
 const selectArticleDialogRef = ref<typeof SelectArticleDialog>();
 const addArticleDialogRef = ref<typeof AddArticleDialog>();
 const describeArticleStateDialogRef = ref<typeof DescribeArticleStateDialog>();
@@ -20,13 +22,23 @@ const currentPurposeName = ref<string>("");
 const currentSectionName = ref<string>("");
 const dropdownVisibility = ref<boolean>(false);
 const isDisabledSection = computed(() => selectedSections.value.length <= 0);
+const purpouses = ref<Purpose[]>([]);
+
+const requestService = new RequestService();
+
+function listPurposes() {
+    requestService
+        .listPurposes()
+        .then((p) => purpouses.value.push(...p))
+        .catch((err) => console.log(err));
+}
 
 function getPurposeNames(): string[] {
-    return PURPOSES.map((p) => p.name);
+    return purpouses.value.map((p) => p.name);
 }
 
 function findSectionByPurpose(purposeName: string): void {
-    PURPOSES.find((purpose) => {
+    purpouses.value.find((purpose) => {
         if (purpose.name === purposeName) {
             changePlaceholder(purpose.placeholder!);
             disableInputDescription(purposeName);
@@ -43,7 +55,7 @@ function changePlaceholder(placeholder: string): void {
 }
 
 function disableInputDescription(purposeName: string): void {
-    if (purposeName === PurposeName.Discard) {
+    if (purposeName === DISCARD) {
         isDisabledInputText.value = true;
         return;
     }
@@ -115,6 +127,8 @@ function listVariations(articleVariation?: ArticleVariation[]) {
 
     return values.join(" | ");
 }
+
+listPurposes();
 </script>
 
 <template>

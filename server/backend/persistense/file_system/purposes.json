@@ -1,0 +1,37 @@
+{
+    "purposes": [
+        {
+            "name": "Alugel",
+            "placeholder": "Cliente"
+        },
+        {
+            "name": "Arranjo",
+            "placeholder": "Costureiro"
+        },
+        {
+            "name": "Descartar"
+        },
+        {
+            "name": "Doação",
+            "placeholder": "Descrição"
+        },
+        {
+            "name": "Gravação",
+            "placeholder": "Título",
+            "sections": ["Fashion Filme", "Filme", "Novela", "Publicidade", "Video Clip"]
+        },
+        {
+            "name": "Lavandaria",
+            "placeholder": "Nome",
+            "sections": ["Interna", "Externa"]
+        },
+        {
+            "name": "Photo Shoot",
+            "placeholder": "Descrição"
+        },
+        {
+            "name": "Uso Pessoal",
+            "placeholder": "Técnico"
+        }
+    ]
+}
