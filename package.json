@@ -21,7 +21,6 @@
     "vue-router": "^4.2.5"
   },
   "dependencies": {
-    "currency.js": "^2.0.4",
     "git-commit-msg-linter": "^5.0.6"
   }
 }

@@ -1,8 +1,7 @@
-import currency from "currency.js";
-
-export const formatCurrency = (value: number | string) =>
-    currency(value, { fromCents: true, precision: 0 }).format({
-        separator: ".",
-        decimal: ",",
-        symbol: "",
-    });
+export const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("pt-AO", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+        useGrouping: true,
+    }).format(value);
+};
