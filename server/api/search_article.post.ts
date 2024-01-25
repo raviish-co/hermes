@@ -1,5 +1,5 @@
 import { Article } from "../backend/domain/articles/article";
-import { makeRequestService } from "../backend/main";
+import { makeArticleService } from "../backend/main";
 
 interface ArticleDTO {
     id: string;
@@ -12,7 +12,7 @@ interface ArticleDTO {
 export default defineEventHandler(async (event) => {
     const { query } = await readBody(event);
 
-    const requestService = makeRequestService();
+    const requestService = makeArticleService();
 
     const { result, pageToken, perPage, total } = await requestService.searchArticles(query);
 
