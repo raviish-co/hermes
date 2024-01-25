@@ -92,7 +92,6 @@ export class RequestService {
         pageToken?: number = 1,
         perPage?: number = 12
     ): Promise<Pagination<Article>> {
-        console.log(query, pageToken, perPage);
         return this.articleRepository.search(query, pageToken, perPage);
     }
 
