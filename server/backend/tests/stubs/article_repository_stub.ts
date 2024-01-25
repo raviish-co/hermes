@@ -54,7 +54,10 @@ export class ArticleRepositoryStub implements ArticleRepository {
 
     search(query: string, pageToken: number, perPage: number): Promise<Pagination<Article>> {
         const articles = this.records.filter((a) => {
-            return a.title.includes(query) || a.articleId.toString().includes(query);
+            return (
+                a.title.toLowerCase().includes(query.toLowerCase()) ||
+                a.articleId.toString().includes(query)
+            );
         });
 
         const startIndex = (pageToken - 1) * perPage;
