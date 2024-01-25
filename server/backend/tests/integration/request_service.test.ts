@@ -66,13 +66,21 @@ describe("Test RequestArticles Service", () => {
     it("Deve chamar o método **find** para encontrar a finalidade", () => {
         const purposeName = "Aluguer";
         const articlesData = [{ articleId: "1001", quantity: 1 }];
+        const data = {
+            ...requestArticlesData,
+            purposeData: {
+                name: purposeName,
+            },
+            articlesData,
+        };
+
         const purposeSource = new PurposeSourceStub();
         const articleRepository = new ArticleRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const service = new RequestService(purposeSource, articleRepository, requestRepository);
-        const spy = vi.spyOn(purposeSource, "find");
+        const spy = vi.spyOn(purposeSource, "exists");
 
-        service.requestArticles({ ...requestArticlesData, purposeName, articlesData });
+        service.requestArticles(data);
 
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledTimes(1);
@@ -80,13 +88,16 @@ describe("Test RequestArticles Service", () => {
     });
 
     it("Deve retornar error **PurposeNotFound** se não existir", async () => {
-        const purposeName = "Aluguer";
+        const data = {
+            ...requestArticlesData,
+            purposeData: { name: "Aluguer" },
+        };
         const purposeSource = new PurposeSourceStub();
         const articleRepository = new ArticleRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const service = new RequestService(purposeSource, articleRepository, requestRepository);
 
-        const voidOrError = await service.requestArticles({ ...requestArticlesData, purposeName });
+        const voidOrError = await service.requestArticles(data);
 
         expect(voidOrError.isLeft()).toBeTruthy();
     });
@@ -290,185 +301,50 @@ describe("Test RequestArticles Service", () => {
 
         expect(article.getStock()).toEqual(8);
     });
-});
 
-describe("Test ListArticles", () => {
-    it("Deve chamar o método **list** no repositório de artigos", async () => {
+    it("Caso a finalidade tenha uma seção, deve ser adicionada a solicitação", async () => {
+        const purposeSource = new PurposeSourceStub();
         const articleRepository = new ArticleRepositoryStub();
         const requestRepository = new InmemRequestRepository();
-        const purposeSource = new PurposeSourceStub();
         const service = new RequestService(purposeSource, articleRepository, requestRepository);
-        const spy = vi.spyOn(articleRepository, "list");
 
-        await service.listArticles();
+        await service.requestArticles(requestArticlesData);
 
-        expect(spy).toHaveBeenCalled();
-        expect(spy).toHaveBeenCalledTimes(1);
+        const requestArticles = await requestRepository.last();
+
+        expect(requestArticles.purpose.section).toBeDefined();
+        expect(requestArticles.purpose.section).toEqual("Interna");
     });
 
-    it("Deve buscar os artigos no repositório", async () => {
+    it("Caso a finalidade tenha um destino, deve ser adicionada a solicitação", async () => {
+        const purposeSource = new PurposeSourceStub();
         const articleRepository = new ArticleRepositoryStub();
         const requestRepository = new InmemRequestRepository();
-        const purposeSource = new PurposeSourceStub();
-        const service = new RequestService(purposeSource, articleRepository, requestRepository);
-
-        const { result: articles } = await service.listArticles();
-
-        expect(articles.length).toBeGreaterThanOrEqual(2);
-        expect(articles[0].articleId.toString()).toEqual("1001");
-    });
-
-    it("Deve retornar um array vazio se não existir artigos", async () => {
-        const articleRepository = new InmemArticleRepository();
-        const requestRepository = new InmemRequestRepository();
-        const purposeSource = new PurposeSourceStub();
-        const service = new RequestService(purposeSource, articleRepository, requestRepository);
-
-        const { result: articles } = await service.listArticles();
-
-        expect(articles).toEqual([]);
-    });
-});
-
-describe("Test SearchArticles", () => {
-    it("Deve chamar o método **search** no repositório de artigos", async () => {
-        const articleRepository = new ArticleRepositoryStub();
-        const requestRepository = new InmemRequestRepository();
-        const purposeSource = new PurposeSourceStub();
-        const service = new RequestService(purposeSource, articleRepository, requestRepository);
-        const spy = vi.spyOn(articleRepository, "search");
-
-        await service.searchArticles("Teste");
-
-        expect(spy).toHaveBeenCalled();
-        expect(spy).toHaveBeenCalledTimes(1);
-        expect(spy).toHaveBeenCalledWith("Teste", 1, 12);
-    });
-
-    it("Deve pesquisar o artigo pelo seu nome", async () => {
-        const articleRepository = new ArticleRepositoryStub();
-        const requestRepository = new InmemRequestRepository();
-        const purposeSource = new PurposeSourceStub();
-        const service = new RequestService(purposeSource, articleRepository, requestRepository);
-
-        const { result: articles } = await service.searchArticles("Teste");
-
-        expect(articles.length).toBeGreaterThanOrEqual(2);
-        expect(articles[0].articleId.toString()).toEqual("1001");
-    });
-
-    it("Deve pesquisar o artigo pelo seu identificador", async () => {
-        const articleRepository = new ArticleRepositoryStub();
-        const requestRepository = new InmemRequestRepository();
-        const purposeSource = new PurposeSourceStub();
-        const service = new RequestService(purposeSource, articleRepository, requestRepository);
-
-        const { result: articles } = await service.searchArticles("1002");
-
-        expect(articles.length).toBeGreaterThanOrEqual(1);
-        expect(articles[0].articleId.toString()).toEqual("1002");
-    });
-
-    it("Deve retornar um array vazio se não existir artigos", async () => {
-        const articleRepository = new InmemArticleRepository();
-        const requestRepository = new InmemRequestRepository();
-        const purposeSource = new PurposeSourceStub();
-        const service = new RequestService(purposeSource, articleRepository, requestRepository);
-
-        const { result: articles } = await service.searchArticles("Teste");
-
-        expect(articles).toEqual([]);
-    });
-
-    it("Deve paginar o resultado da listagem de artigos por 12 artigos por página", async () => {
-        const articleRepository = new ArticleRepositoryStub();
-        const requestRepository = new InmemRequestRepository();
-        const purposeSource = new PurposeSourceStub();
-        const service = new RequestService(purposeSource, articleRepository, requestRepository);
-
-        const articles = await service.listArticles();
-
-        expect(articles.result.length).toEqual(2);
-        expect(articles.pageToken).toEqual(1);
-        expect(articles.perPage).toEqual(12);
-    });
-
-    it("Deve buscar os artigos pela página", async () => {
-        const pageToken = 2;
-        const articleRepository = new ArticleRepositoryStub();
-        const requestRepository = new InmemRequestRepository();
-        const purposeSource = new PurposeSourceStub();
-        const service = new RequestService(purposeSource, articleRepository, requestRepository);
-
-        const articles = await service.listArticles(pageToken);
-
-        expect(articles.result.length).toEqual(0);
-        expect(articles.pageToken).toEqual(2);
-        expect(articles.perPage).toEqual(12);
-    });
-
-    it("Deve buscar por um tamanho de página diferente de 12", async () => {
-        const pageToken = 1;
-        const perPage = 30;
-        const articleRepository = new ArticleRepositoryStub();
-        const requestRepository = new InmemRequestRepository();
-        const purposeSource = new PurposeSourceStub();
+        const data = {
+            ...requestArticlesData,
+            purposeData: {
+                name: "Lavandaria",
+                section: "Externa",
+                recipient: "John Doe",
+            },
+        };
 
         const service = new RequestService(purposeSource, articleRepository, requestRepository);
 
-        const articles = await service.listArticles(pageToken, perPage);
+        await service.requestArticles(data);
 
-        expect(articles.result.length).toEqual(2);
-        expect(articles.pageToken).toEqual(1);
-        expect(articles.perPage).toEqual(perPage);
-    });
+        const requestArticles = await requestRepository.last();
 
-    it("Deve paginar o resultado da pesquisa de artigos por 12 artigos por página", async () => {
-        const articleRepository = new ArticleRepositoryStub();
-        const requestRepository = new InmemRequestRepository();
-        const purposeSource = new PurposeSourceStub();
-
-        const service = new RequestService(purposeSource, articleRepository, requestRepository);
-
-        const articles = await service.searchArticles("Teste");
-
-        expect(articles.result.length).toEqual(2);
-        expect(articles.pageToken).toEqual(1);
-        expect(articles.perPage).toEqual(12);
-    });
-
-    it("Deve paginar o resultado da pesquisa por um tamanho de página diferente de 12", async () => {
-        const perPage = 30;
-        const articleRepository = new ArticleRepositoryStub();
-        const requestRepository = new InmemRequestRepository();
-        const purposeSource = new PurposeSourceStub();
-        const service = new RequestService(purposeSource, articleRepository, requestRepository);
-
-        const articles = await service.searchArticles("Teste", 1, perPage);
-
-        expect(articles.result.length).toEqual(2);
-        expect(articles.pageToken).toEqual(1);
-        expect(articles.perPage).toEqual(perPage);
-    });
-
-    it("Deve paginar o resultado da pesquisa pelo número da página", async () => {
-        const pageToken = 2;
-        const articleRepository = new ArticleRepositoryStub();
-        const requestRepository = new InmemRequestRepository();
-        const purposeSource = new PurposeSourceStub();
-
-        const service = new RequestService(purposeSource, articleRepository, requestRepository);
-
-        const articles = await service.searchArticles("Teste", pageToken, 12);
-
-        expect(articles.result.length).toEqual(0);
-        expect(articles.pageToken).toEqual(2);
-        expect(articles.perPage).toEqual(12);
+        expect(requestArticles.purpose.recipient).toBeDefined();
+        expect(requestArticles.purpose.recipient).toEqual("John Doe");
     });
 });
 
 const requestArticlesData = {
-    purposeName: "Lavandaria",
+    purposeData: {
+        name: "Lavandaria",
+        section: "Interna",
+    },
     articlesData: [
         { articleId: "1001", quantity: 2 },
         { articleId: "1002", quantity: 3 },

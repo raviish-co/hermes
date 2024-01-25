@@ -18,7 +18,7 @@ describe("Test Request Articles", () => {
         const purpose = { name: "Lavandaria", section: "Interna" };
         const options = {
             ...requestArticlesOptions,
-            purposeOptions: purpose,
+            purpose: purpose,
         };
 
         const requestArticles = RequestedArticles.create(options);
@@ -41,7 +41,7 @@ describe("Test Request Articles", () => {
         const purpose = { name: "Aluguer", recipient: client };
         const options = {
             ...requestArticlesOptions,
-            purposeOptions: purpose,
+            purpose: purpose,
         };
 
         const requestArticles = RequestedArticles.create(options);
@@ -153,7 +153,7 @@ describe("Test Request Articles", () => {
 });
 
 const requestArticlesOptions = {
-    purposeOptions: { name: "Aluguer" },
+    purpose: { name: "Aluguer" },
     user: User.create("John Doe"),
     returnDate: "2024-01-21T00:00:00.000Z",
     total: "1050",
