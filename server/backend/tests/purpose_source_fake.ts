@@ -1,12 +1,12 @@
-import { PurposeSource, PurposeData, PurposeNotFound } from "../domain/purpose";
-import { Either, right } from "../shared/either";
+import { PurposeData } from "../domain/purposes/purpose_data";
+import { PurposeSource } from "../domain/purposes/purpose_source";
 
 export class FakePurposeSource implements PurposeSource {
     list(): Promise<PurposeData[]> {
         return Promise.resolve([]);
     }
 
-    find(name: string): Promise<Either<PurposeNotFound, PurposeData>> {
-        return Promise.resolve(right({ name: "Aluguer" }));
+    exists(name: string): Promise<boolean> {
+        return Promise.resolve(false);
     }
 }

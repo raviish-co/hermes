@@ -1,5 +1,5 @@
-import { PurposeSource, PurposeData, PurposeNotFound } from "../domain/purpose";
-import { Either, left, right } from "../shared/either";
+import { PurposeData } from "../domain/purposes/purpose_data";
+import { PurposeSource } from "../domain/purposes/purpose_source";
 
 export class PurposeSourceStub implements PurposeSource {
     #purposes: PurposeData[];
@@ -20,9 +20,7 @@ export class PurposeSourceStub implements PurposeSource {
         return Promise.resolve(this.#purposes);
     }
 
-    find(name: string): Promise<Either<PurposeNotFound, PurposeData>> {
-        const purpose = this.#purposes.find((p) => p.name === name);
-        if (!purpose) return Promise.resolve(left(new PurposeNotFound(name)));
-        return Promise.resolve(right(purpose));
+    exists(name: string): Promise<boolean> {
+        return Promise.resolve(this.#purposes.some((p) => p.name === name));
     }
 }
