@@ -1,23 +1,4 @@
-import { Either } from "../shared/either";
-
-export interface PurposeData {
-    name: string;
-    sections?: string[];
-    placeholder?: string;
-}
-
-export class PurposeNotFound extends Error {
-    constructor(name: string) {
-        super(`Purpose ${name} not found`);
-    }
-}
-
-export interface PurposeSource {
-    list(): Promise<PurposeData[]>;
-    find(name: string): Promise<Either<PurposeNotFound, PurposeData>>;
-}
-
-export type PurposeOptions = {
+type PurposeOptions = {
     name: string;
     section?: string;
     recipient?: string;
