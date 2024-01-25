@@ -1,4 +1,7 @@
-import { PurposeSource, PurposeData } from "../domain/purpose";
+import { Purpose } from "../domain/purposes/purpose";
+import { PurposeData } from "../domain/purposes/purpose_data";
+import { PurposeSource } from "../domain/purposes/purpose_source";
+import { PurposeNotFound } from "../domain/purposes/purpose_not_found_error";
 import { RequestedArticles } from "../domain/requests/requested_articles";
 import { RequestedItem } from "../domain/requests/requested_item";
 import { User } from "../domain/user";
@@ -9,7 +12,6 @@ import { ID } from "../shared/id";
 import { Article } from "../domain/articles/article";
 import { InsufficientStock } from "../domain/articles/insufficient_stock_error";
 import { RequestRepository } from "../domain/requests/request_repository";
-import { Pagination } from "../shared/pagination";
 import { ArticleData, RequestArticlesData } from "../shared/types";
 import { NewRequestArticlesError } from "../shared/errors";
 
@@ -36,23 +38,21 @@ export class RequestService {
     async requestArticles(
         data: RequestArticlesData
     ): Promise<Either<NewRequestArticlesError, void>> {
-        const { purposeName, articlesData, requestTotal, returnDate } = data;
-        const purposeOrError = await this.purposeSource.find(purposeName);
-        if (purposeOrError.isLeft()) return left(purposeOrError.value);
+        const { purposeData, articlesData, requestTotal, returnDate } = data;
+
+        const purposeExists = await this.purposeSource.exists(purposeData.name);
+        if (!purposeExists) return left(new PurposeNotFound(purposeData.name));
 
         const identifiers = this.#buildArticlesIdentifiers(articlesData);
+
         const articlesOrError = await this.articleRepository.getAll(identifiers);
         if (articlesOrError.isLeft()) return left(articlesOrError.value);
 
+        const purpose = Purpose.fromOptions(purposeData);
         const articles = articlesOrError.value;
-        const purpose = purposeOrError.value;
         const user = User.create("Teste");
         const requestArticles = RequestedArticles.create({
-            purposeOptions: {
-                name: purpose.name,
-                section: purpose.sections?.at(0),
-                recipient: "",
-            },
+            purpose,
             user,
             returnDate,
         });
@@ -68,18 +68,6 @@ export class RequestService {
         await this.articleRepository.updateStock(articles);
 
         return right(undefined);
-    }
-
-    listArticles(pageToken: number = 1, perPage: number = 12): Promise<Pagination<Article>> {
-        return this.articleRepository.list(pageToken, perPage);
-    }
-
-    searchArticles(
-        query: string,
-        pageToken: number = 1,
-        perPage: number = 12
-    ): Promise<Pagination<Article>> {
-        return this.articleRepository.search(query, pageToken, perPage);
     }
 
     #buildArticlesIdentifiers(articles: ArticleData[]): ID[] {
