@@ -83,12 +83,17 @@ export class RequestService {
         return right(undefined);
     }
 
-    listArticles(pageToken: number = 1, perPage?: number): Promise<Pagination<Article>> {
+    listArticles(pageToken?: number = 1, perPage?: number = 12): Promise<Pagination<Article>> {
         return this.articleRepository.list(pageToken, perPage);
     }
 
-    searchArticles(query: string): Promise<Article[]> {
-        return this.articleRepository.search(query);
+    searchArticles(
+        query: string,
+        pageToken?: number = 1,
+        perPage?: number = 12
+    ): Promise<Pagination<Article>> {
+        console.log(query, pageToken, perPage);
+        return this.articleRepository.search(query, pageToken, perPage);
     }
 
     #buildArticlesIdentifiers(articlesData: ArticleData[]): ID[] {

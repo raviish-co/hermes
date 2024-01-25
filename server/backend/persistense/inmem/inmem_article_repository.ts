@@ -34,30 +34,42 @@ export class InmemArticleRepository implements ArticleRepository {
         return Promise.resolve(undefined);
     }
 
-    list(pageToken: number, perPage?: number): Promise<Pagination<Article>> {
-        const size = perPage ? perPage : 12;
-        const startIndex = (pageToken - 1) * size;
+    list(pageToken: number, perPage: number): Promise<Pagination<Article>> {
+        const startIndex = (pageToken - 1) * perPage;
 
-        const endIndex = startIndex + size;
+        const endIndex = startIndex + perPage;
 
         const result = this.records.slice(startIndex, endIndex);
 
-        const total = Math.ceil(result.length / 12);
+        const total = Math.ceil(result.length / perPage);
 
         return Promise.resolve({
-            result,
-            perPage: size,
             pageToken,
+            perPage,
             total,
+            result,
         });
     }
 
-    search(query: string): Promise<Article[]> {
+    search(query: string, pageToken: number, perPage: number): Promise<Pagination<Article>> {
         const articles = this.records.filter((a) => {
             return a.title.includes(query) || a.articleId.toString().includes(query);
         });
 
-        return Promise.resolve(articles);
+        const startIndex = (pageToken - 1) * perPage;
+
+        const endIndex = startIndex + perPage;
+
+        const result = articles.slice(startIndex, endIndex);
+
+        const total = Math.ceil(result.length / perPage);
+
+        return Promise.resolve({
+            pageToken,
+            perPage,
+            total,
+            result,
+        });
     }
 
     get records(): Article[] {

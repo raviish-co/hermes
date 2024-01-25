@@ -8,7 +8,7 @@ import { ArticleRepositoryStub } from "../stubs/article_repository_stub";
 import { InmemArticleRepository } from "../../persistense/inmem/inmem_article_repository";
 import { ArticleNotFound } from "../../domain/articles/article_not_found_error";
 import { InvalidTotal } from "../../domain/requests/invalid_total_error";
-import { StockInsufficient } from "../../domain/articles/stock_insufficient";
+import { StockInsufficient as InsufficientStock } from "../../domain/articles/stock_insufficient";
 
 describe("Test main Service", () => {
     it("should be return an  list void of purposes", async () => {
@@ -248,7 +248,7 @@ describe("Test RequestArticles Service", () => {
         expect(requestArticles.getTotal().value).toEqual("67,85");
     });
 
-    it("Deve retornar **StockInsufficient** se a quantidade solicitada for maior que a quantidade em estoque", async () => {
+    it("Deve retornar **InsufficientStock** se a quantidade solicitada for maior que a quantidade em estoque", async () => {
         const articlesData = [
             { articleId: "1001", quantity: 10 },
             { articleId: "1002", quantity: 15 },
@@ -262,7 +262,7 @@ describe("Test RequestArticles Service", () => {
         const voidOrError = await service.requestArticles({ ...requestArticlesData, articlesData });
 
         expect(voidOrError.isLeft()).toBeTruthy();
-        expect(voidOrError.value).toBeInstanceOf(StockInsufficient);
+        expect(voidOrError.value).toBeInstanceOf(InsufficientStock);
     });
 
     it("Deve atualizar o estoque dos artigos solicitados no repositório", async () => {
@@ -342,7 +342,7 @@ describe("Test SearchArticles", () => {
 
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledTimes(1);
-        expect(spy).toHaveBeenCalledWith("Teste");
+        expect(spy).toHaveBeenCalledWith("Teste", 1, 12);
     });
 
     it("Deve pesquisar o artigo pelo seu nome", async () => {
@@ -351,7 +351,7 @@ describe("Test SearchArticles", () => {
         const purposeSource = new PurposeSourceStub();
         const service = new RequestService(purposeSource, articleRepository, requestRepository);
 
-        const articles = await service.searchArticles("Teste");
+        const { result: articles } = await service.searchArticles("Teste");
 
         expect(articles.length).toBeGreaterThanOrEqual(2);
         expect(articles[0].articleId.toString()).toEqual("1001");
@@ -363,7 +363,7 @@ describe("Test SearchArticles", () => {
         const purposeSource = new PurposeSourceStub();
         const service = new RequestService(purposeSource, articleRepository, requestRepository);
 
-        const articles = await service.searchArticles("1002");
+        const { result: articles } = await service.searchArticles("1002");
 
         expect(articles.length).toBeGreaterThanOrEqual(1);
         expect(articles[0].articleId.toString()).toEqual("1002");
@@ -375,7 +375,7 @@ describe("Test SearchArticles", () => {
         const purposeSource = new PurposeSourceStub();
         const service = new RequestService(purposeSource, articleRepository, requestRepository);
 
-        const articles = await service.searchArticles("Teste");
+        const { result: articles } = await service.searchArticles("Teste");
 
         expect(articles).toEqual([]);
     });
@@ -421,6 +421,49 @@ describe("Test SearchArticles", () => {
         expect(articles.result.length).toEqual(2);
         expect(articles.pageToken).toEqual(1);
         expect(articles.perPage).toEqual(perPage);
+    });
+
+    it("Deve paginar o resultado da pesquisa de artigos por 12 artigos por página", async () => {
+        const articleRepository = new ArticleRepositoryStub();
+        const requestRepository = new InmemRequestRepository();
+        const purposeSource = new PurposeSourceStub();
+
+        const service = new RequestService(purposeSource, articleRepository, requestRepository);
+
+        const articles = await service.searchArticles("Teste");
+
+        expect(articles.result.length).toEqual(2);
+        expect(articles.pageToken).toEqual(1);
+        expect(articles.perPage).toEqual(12);
+    });
+
+    it("Deve paginar o resultado da pesquisa por um tamanho de página diferente de 12", async () => {
+        const perPage = 30;
+        const articleRepository = new ArticleRepositoryStub();
+        const requestRepository = new InmemRequestRepository();
+        const purposeSource = new PurposeSourceStub();
+        const service = new RequestService(purposeSource, articleRepository, requestRepository);
+
+        const articles = await service.searchArticles("Teste", 1, perPage);
+
+        expect(articles.result.length).toEqual(2);
+        expect(articles.pageToken).toEqual(1);
+        expect(articles.perPage).toEqual(perPage);
+    });
+
+    it("Deve paginar o resultado da pesquisa pelo número da página", async () => {
+        const pageToken = 2;
+        const articleRepository = new ArticleRepositoryStub();
+        const requestRepository = new InmemRequestRepository();
+        const purposeSource = new PurposeSourceStub();
+
+        const service = new RequestService(purposeSource, articleRepository, requestRepository);
+
+        const articles = await service.searchArticles("Teste", pageToken, 12);
+
+        expect(articles.result.length).toEqual(0);
+        expect(articles.pageToken).toEqual(2);
+        expect(articles.perPage).toEqual(12);
     });
 });
 
