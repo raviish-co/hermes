@@ -21,11 +21,11 @@ function emitSelectedArticle(article: Article) {
 
 async function searchArticles() {
     if (query.value.length < 3) {
-        return [];
+        articles.value = [];
+        return;
     }
 
     articles.value = await requestService.searchArticles(query.value);
-    console.log(articles);
 }
 
 function showDialog() {
@@ -41,7 +41,7 @@ defineExpose({ show: showDialog });
             placeholder="Pesquisar por Nome ou ID"
             type="search"
             v-model="query"
-            @update:model-value="() => searchArticles()"
+            @update:model-value="searchArticles"
         />
 
         <table class="table">
@@ -68,7 +68,7 @@ defineExpose({ show: showDialog });
                         </span>
                     </td>
                 </tr>
-                <tr v-if="searchArticles.length === 0">
+                <tr v-if="articles.length === 0">
                     <td colspan="3">Nenhum resultado encontrado</td>
                 </tr>
             </tbody>
