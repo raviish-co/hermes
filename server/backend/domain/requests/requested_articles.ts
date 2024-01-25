@@ -1,5 +1,5 @@
 import { User } from "../user";
-import { Purpose, PurposeOptions } from "../purpose";
+import { Purpose } from "../purposes/purpose";
 import { RequestedItem } from "./requested_item";
 import { Decimal } from "../../shared/decimal";
 
@@ -8,7 +8,7 @@ export enum RequestStatus {
 }
 
 export type RequestOptions = {
-    purposeOptions: PurposeOptions;
+    purpose: Purpose;
     user: User;
     returnDate: string;
 };
@@ -33,8 +33,7 @@ export class RequestedArticles {
     }
 
     static create(options: RequestOptions): RequestedArticles {
-        const { purposeOptions, user, returnDate } = options;
-        const purpose = Purpose.fromOptions(purposeOptions);
+        const { purpose, user, returnDate } = options;
         const returnDateParsed = new Date(returnDate);
         const requestedArticles = new RequestedArticles(purpose, user, returnDateParsed);
         return requestedArticles;
