@@ -1,4 +1,4 @@
-export class StockInsufficient extends Error {
+export class InsufficientStock extends Error {
     constructor(name: string) {
         super(`Article ${name} Stock Insufficient`);
     }

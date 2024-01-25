@@ -8,7 +8,7 @@ import { InvalidTotal } from "../domain/requests/invalid_total_error";
 import { ArticleRepository } from "../domain/articles/article_repository";
 import { ID } from "../shared/id";
 import { Article } from "../domain/articles/article";
-import { StockInsufficient } from "../domain/articles/stock_insufficient";
+import { InsufficientStock } from "../domain/articles/insufficient_stock_error";
 import { RequestRepository } from "../domain/requests/request_repository";
 import { Pagination } from "../shared/pagination";
 
@@ -115,7 +115,7 @@ export class RequestService {
 
             if (article.verifyStock(quantity)) {
                 const message = `Stock insufficient for article ${article.title}`;
-                return left(new StockInsufficient(message));
+                return left(new InsufficientStock(message));
             }
 
             article.decreaseStock(quantity);
