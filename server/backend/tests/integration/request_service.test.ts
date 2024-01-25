@@ -8,7 +8,7 @@ import { ArticleRepositoryStub } from "../stubs/article_repository_stub";
 import { InmemArticleRepository } from "../../persistense/inmem/inmem_article_repository";
 import { ArticleNotFound } from "../../domain/articles/article_not_found_error";
 import { InvalidTotal } from "../../domain/requests/invalid_total_error";
-import { StockInsufficient as InsufficientStock } from "../../domain/articles/stock_insufficient";
+import { InsufficientStock } from "../../domain/articles/insufficient_stock_error";
 
 describe("Test main Service", () => {
     it("should be return an  list void of purposes", async () => {

@@ -1,30 +1,17 @@
-import { PurposeSource, PurposeData, PurposeNotFound } from "../domain/purpose";
+import { PurposeSource, PurposeData } from "../domain/purpose";
 import { RequestedArticles } from "../domain/requests/requested_articles";
 import { RequestedItem } from "../domain/requests/requested_item";
 import { User } from "../domain/user";
 import { Either, left, right } from "../shared/either";
-import { ArticleNotFound } from "../domain/articles/article_not_found_error";
 import { InvalidTotal } from "../domain/requests/invalid_total_error";
 import { ArticleRepository } from "../domain/articles/article_repository";
 import { ID } from "../shared/id";
 import { Article } from "../domain/articles/article";
-import { StockInsufficient } from "../domain/articles/stock_insufficient";
+import { InsufficientStock } from "../domain/articles/insufficient_stock_error";
 import { RequestRepository } from "../domain/requests/request_repository";
 import { Pagination } from "../shared/pagination";
-
-type NewRequestArticlesError = PurposeNotFound | ArticleNotFound | InvalidTotal;
-
-type ArticleData = {
-    articleId: string;
-    quantity: number;
-};
-
-type RequestArticlesData = {
-    purposeName: string;
-    articlesData: ArticleData[];
-    requestTotal: string;
-    returnDate: string;
-};
+import { ArticleData, RequestArticlesData } from "../shared/types";
+import { NewRequestArticlesError } from "../shared/errors";
 
 export class RequestService {
     readonly purposeSource: PurposeSource;
@@ -83,22 +70,22 @@ export class RequestService {
         return right(undefined);
     }
 
-    listArticles(pageToken?: number = 1, perPage?: number = 12): Promise<Pagination<Article>> {
+    listArticles(pageToken: number = 1, perPage: number = 12): Promise<Pagination<Article>> {
         return this.articleRepository.list(pageToken, perPage);
     }
 
     searchArticles(
         query: string,
-        pageToken?: number = 1,
-        perPage?: number = 12
+        pageToken: number = 1,
+        perPage: number = 12
     ): Promise<Pagination<Article>> {
         return this.articleRepository.search(query, pageToken, perPage);
     }
 
-    #buildArticlesIdentifiers(articlesData: ArticleData[]): ID[] {
+    #buildArticlesIdentifiers(articles: ArticleData[]): ID[] {
         const identifiers: ID[] = [];
-        for (const articleData of articlesData) {
-            identifiers.push(ID.New(articleData.articleId));
+        for (const article of articles) {
+            identifiers.push(ID.New(article.articleId));
         }
         return identifiers;
     }
@@ -106,7 +93,7 @@ export class RequestService {
     #buildRequestedItems(
         articles: Article[],
         articlesData: ArticleData[]
-    ): Either<StockInsufficient, RequestedItem[]> {
+    ): Either<InsufficientStock, RequestedItem[]> {
         const requestedItems: RequestedItem[] = [];
 
         for (const i in articles) {
@@ -115,7 +102,7 @@ export class RequestService {
 
             if (article.verifyStock(quantity)) {
                 const message = `Stock insufficient for article ${article.title}`;
-                return left(new StockInsufficient(message));
+                return left(new InsufficientStock(message));
             }
 
             article.decreaseStock(quantity);
