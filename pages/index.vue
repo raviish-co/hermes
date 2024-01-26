@@ -6,8 +6,8 @@ import type {
 } from "#build/components";
 import type { Article, ArticleVariation, RequestArticle } from "~/lib/models/article";
 import { formatCurrency } from "~/lib/helpers/formatCurrency";
-import { ArticleService } from "~/lib/services/request_service";
 import type { Purpose } from "~/lib/models/purpose";
+import { RequestService } from "~/lib/services/request_service";
 
 const INNER_LAUNDRY = "Interna";
 const DISCARD = "Descartar";
@@ -25,10 +25,10 @@ const dropdownVisibility = ref<boolean>(false);
 const isDisabledSection = computed(() => selectedSections.value.length <= 0);
 const purpouses = ref<Purpose[]>([]);
 
-const articleService = new ArticleService();
+const requestService = new RequestService();
 
 function listPurposes() {
-    articleService
+    requestService
         .listPurposes()
         .then((p) => purpouses.value.push(...p))
         .catch((err) => console.log(err));

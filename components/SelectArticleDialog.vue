@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
 import type { Article } from "~/lib/models/article";
-import { ArticleService } from "~/lib/services/request_service";
+import { ArticleService } from "~/lib/services/article_service";
 
 interface Emits {
     (e: "select", article: Article): void;
@@ -28,11 +28,19 @@ async function searchArticles() {
     articles.value = await articleService.searchArticles(query.value);
 }
 
+async function listArticles() {
+    articles.value = await articleService.listAtricles();
+}
+
 function showDialog() {
     dialogRef.value?.show();
 }
 
 defineExpose({ show: showDialog });
+
+onMounted(() => {
+    listArticles();
+});
 </script>
 
 <template>
