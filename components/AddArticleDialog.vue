@@ -12,12 +12,6 @@ const quantities = ref<number[]>([]);
 const total = ref<number>(0);
 const props = defineProps<Props>();
 
-function defineQuantity(idx: number, quantity: string) {
-    if (parseInt(quantity) > 0) {
-        quantities.value[idx] = Number(quantity);
-    }
-}
-
 function quantityNotDefined() {
     return quantities.value.length === 0;
 }
@@ -103,10 +97,9 @@ defineExpose({ show: showDialog });
                 <VInput
                     v-if="!article?.isUnique"
                     type="number"
+                    v-model="quantities[0]"
                     placeholder="QTD"
-                    @update:model-value="(quantity: string) => defineQuantity(0, quantity)"
                     class="max-w-24"
-                    default="1"
                 />
             </div>
         </div>
@@ -129,12 +122,12 @@ defineExpose({ show: showDialog });
                     3 em stock
                 </span>
 
-                <VInput
+                <input
                     v-if="!article.isUnique"
+                    v-model="quantities[idx]"
                     type="number"
                     class="max-w-24"
                     placeholder="QTD"
-                    @update:model-value="(quantity: string) => defineQuantity(idx, quantity)"
                 />
             </div>
         </div>
