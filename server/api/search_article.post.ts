@@ -12,9 +12,9 @@ interface ArticleDTO {
 export default defineEventHandler(async (event) => {
     const { query } = await readBody(event);
 
-    const requestService = makeArticleService();
+    const service = makeArticleService();
 
-    const { result, pageToken, perPage, total } = await requestService.searchArticles(query);
+    const { result, pageToken, perPage, total } = await service.searchArticles(query);
 
     const articles = makeArticleDTO(result);
 
