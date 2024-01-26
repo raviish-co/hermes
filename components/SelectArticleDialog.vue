@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
 import type { Article } from "~/lib/models/article";
-import { RequestService } from "~/lib/services/request_service";
+import { ArticleService } from "~/lib/services/request_service";
 
 interface Emits {
     (e: "select", article: Article): void;
@@ -12,7 +12,7 @@ const emits = defineEmits<Emits>();
 const query = ref<string>("");
 const articles = ref<Article[]>([]);
 
-const requestService = new RequestService();
+const articleService = new ArticleService();
 
 function emitSelectedArticle(article: Article) {
     dialogRef.value?.close();
@@ -25,7 +25,7 @@ async function searchArticles() {
         return;
     }
 
-    articles.value = await requestService.searchArticles(query.value);
+    articles.value = await articleService.searchArticles(query.value);
 }
 
 function showDialog() {

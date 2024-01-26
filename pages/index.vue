@@ -6,9 +6,10 @@ import type {
 } from "#build/components";
 import type { Article, ArticleVariation, RequestArticle } from "~/lib/models/article";
 import { formatCurrency } from "~/lib/helpers/formatCurrency";
-import { RequestService } from "~/lib/services/request_service";
+import { ArticleService } from "~/lib/services/request_service";
 import type { Purpose } from "~/lib/models/purpose";
 
+const INNER_LAUNDRY = "Interna";
 const DISCARD = "Descartar";
 const selectArticleDialogRef = ref<typeof SelectArticleDialog>();
 const addArticleDialogRef = ref<typeof AddArticleDialog>();
@@ -24,10 +25,10 @@ const dropdownVisibility = ref<boolean>(false);
 const isDisabledSection = computed(() => selectedSections.value.length <= 0);
 const purpouses = ref<Purpose[]>([]);
 
-const requestService = new RequestService();
+const articleService = new ArticleService();
 
 function listPurposes() {
-    requestService
+    articleService
         .listPurposes()
         .then((p) => purpouses.value.push(...p))
         .catch((err) => console.log(err));
@@ -74,6 +75,13 @@ function updateSelectedSections(sections?: string[]) {
 
 function updateCurrentSectionName(sectionName: string) {
     currentSectionName.value = sectionName;
+
+    if (sectionName === INNER_LAUNDRY) {
+        isDisabledInputText.value = true;
+        return;
+    }
+
+    isDisabledInputText.value = false;
 }
 
 function removeRequestRow(id: string): void {

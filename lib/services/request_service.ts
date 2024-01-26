@@ -1,9 +1,9 @@
 import type { Purpose } from "~/lib/models/purpose";
 import type { Article } from "../models/article";
 
-export class RequestService {
+export class ArticleService {
     async listPurposes(): Promise<Purpose[]> {
-        return await $fetch("/api/purposes", { method: "get" });
+        return await $fetch("/api/list_purposes", { method: "get" });
     }
 
     async searchArticles(query: string): Promise<Article[]> {
