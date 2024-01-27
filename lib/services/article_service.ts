@@ -13,7 +13,7 @@ export class ArticleService {
     }
 
     async listAtricles(): Promise<Article[]> {
-        const response = await $fetch("/api/list_articles", {
+        const response = await $fetch("/api/articles", {
             method: "get",
         });
 
