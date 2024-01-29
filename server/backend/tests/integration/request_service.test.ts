@@ -338,6 +338,15 @@ describe("Test RequestArticles Service", () => {
         expect(requestArticles.purpose.recipient).toBeDefined();
         expect(requestArticles.purpose.recipient).toEqual("John Doe");
     });
+
+    it("Deve retornar o erro **InsufficientStock** se a quantidade solicitada de uma variação não tiver estoque suficiente", async () => {
+        const purposeSource = new PurposeSourceStub();
+        const articleRepository = new ArticleRepositoryStub();
+        const requestRepository = new InmemRequestRepository();
+        const service = new RequestService(purposeSource, articleRepository, requestRepository);
+
+        await service.requestArticles(requestArticlesData);
+    });
 });
 
 const requestArticlesData = {
