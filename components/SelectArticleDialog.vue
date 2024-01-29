@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
+import { ARTICLES } from "~/lib/data/articles";
 import type { Article } from "~/lib/models/article";
 import { ArticleService } from "~/lib/services/article_service";
 
@@ -29,7 +30,8 @@ async function searchArticles() {
 }
 
 async function listArticles() {
-    articles.value = await articleService.listAtricles();
+    // articles.value = await articleService.listAtricles();
+    articles.value = ARTICLES;
 }
 
 function showDialog() {

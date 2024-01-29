@@ -24,6 +24,7 @@ const currentSectionName = ref<string>("");
 const dropdownVisibility = ref<boolean>(false);
 const isDisabledSection = computed(() => selectedSections.value.length <= 0);
 const purpouses = ref<Purpose[]>([]);
+const grandTotal = ref<string>("0,00");
 
 const requestService = new RequestService();
 
@@ -92,7 +93,39 @@ function clearRequestList() {
     requestList.value = [];
 }
 
-function showSelectAddArticleDialog() {
+function sumTotalWithSecurityDepositForRow(rowTotal: string, rowSecurityDeposit: string): string {
+    const total = Number(rowTotal.replace(",", "."));
+    const securityDeposit = Number(rowSecurityDeposit.replace(",", "."));
+    const result = total + securityDeposit;
+    return formatCurrency(result);
+}
+
+function calculateGrandTotal() {
+    const totalsToPayPerRow = requestList.value.map((row) =>
+        sumTotalWithSecurityDepositForRow(row.total, row.securityDeposit)
+    );
+
+    totalsToPayPerRow.forEach((totalPerRow, idx) => {
+        if (idx === 0) {
+            grandTotal.value = totalPerRow;
+            return;
+        }
+
+        const value = Number(totalPerRow.replace(",", "."));
+        const total = Number(grandTotal.value.replace(",", "."));
+
+        const result = value + total;
+
+        grandTotal.value = formatCurrency(result);
+    });
+}
+
+function onAddedArticle() {
+    showSelectArticleDialog();
+    calculateGrandTotal();
+}
+
+function showSelectArticleDialog() {
     selectArticleDialogRef.value?.show();
 }
 
@@ -108,6 +141,8 @@ function addArticleToRequestList(article: Article) {
     };
 
     requestList.value.push(requestArticle);
+
+    onAddedArticle();
 }
 
 function showAddArticleDialog(article: Article) {
@@ -225,10 +260,10 @@ listPurposes();
                                     }}</span>
                                 </td>
                                 <td>{{ row.quantity }}</td>
-                                <td class="w-36">{{ formatCurrency(row.price) }}</td>
-                                <td class="w-36">{{ formatCurrency(row.total) }}</td>
+                                <td class="w-36">{{ row.price }}</td>
+                                <td class="w-36">{{ row.total }}</td>
                                 <td class="w-36">
-                                    {{ formatCurrency(row.securityDeposit) }}
+                                    {{ row.securityDeposit }}
                                 </td>
                                 <td class="cursor-pointer" @click="removeRequestRow(row.requestId)">
                                     x
@@ -238,7 +273,7 @@ listPurposes();
                     </table>
                 </div>
 
-                <button class="btn-secondary w-full" @click="showSelectAddArticleDialog">
+                <button class="btn-secondary w-full" @click="showSelectArticleDialog">
                     Adicionar
                 </button>
             </div>
@@ -252,8 +287,8 @@ listPurposes();
                 <button class="btn-light">Cancelar</button>
             </div>
             <p class="text-right space-x-1">
-                <span class="font-medium">Total:</span>
-                <span>10.000,00</span>
+                <span class="font-medium">Total Geral(kz):</span>
+                <span>{{ grandTotal }}</span>
             </p>
         </div>
     </section>
@@ -264,7 +299,7 @@ listPurposes();
         ref="addArticleDialogRef"
         :article="selectedArticle!"
         :request-list="requestList"
-        @continue="showSelectAddArticleDialog"
+        @added="onAddedArticle"
     />
 
     <DescribeArticleStateDialog ref="describeArticleStateDialogRef" />

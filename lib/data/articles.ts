@@ -28,8 +28,8 @@ export const ARTICLES: Article[] = [
     {
         id: "13424",
         name: "Adams Family Thing hand / Mão",
-        price: 1000,
-        securityDeposit: 1000,
+        price: "17,00",
+        securityDeposit: "3,00",
         isUnique: false,
         variations: [
             [
@@ -45,15 +45,15 @@ export const ARTICLES: Article[] = [
     {
         id: "43242",
         name: "Base de Pele Clara 35 FU",
-        price: 1000,
-        securityDeposit: 1000,
+        price: "12,00",
+        securityDeposit: "1,00",
         isUnique: true,
     },
     {
         id: "12822",
         name: "Sapatilhas planas respiráveis",
-        price: 1000,
-        securityDeposit: 1000,
+        price: "155,00",
+        securityDeposit: "120,00",
         isUnique: false,
         variations: [
             [
@@ -71,8 +71,8 @@ export const ARTICLES: Article[] = [
     {
         id: "4328127",
         name: "Base de Pele Escura 35 FU",
-        price: 1000,
-        securityDeposit: 1000,
+        price: "20,00",
+        securityDeposit: "30,00",
         isUnique: false,
     },
 ];

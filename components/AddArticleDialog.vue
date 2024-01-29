@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
+import { formatCurrency } from "~/lib/helpers/formatCurrency";
 import type { Article, ArticleVariation, RequestArticle } from "~/lib/models/article";
 
 interface Props {
@@ -7,10 +8,15 @@ interface Props {
     requestList: RequestArticle[];
 }
 
+interface Emits {
+    (e: "added"): void;
+}
+
 const dialogRef = ref<typeof VDialog>();
 const quantities = ref<number[]>([]);
-const total = ref<number>(0);
+const total = ref<string>("0");
 const props = defineProps<Props>();
+const emits = defineEmits<Emits>();
 
 function quantityNotDefined() {
     return quantities.value.length === 0;
@@ -34,6 +40,12 @@ function makeRequestArticle(article: Article, quantity: number, varitations?: Ar
     };
 }
 
+function calculateTotal(quantity: number): string {
+    const price = Number(props.article.price.replace(",", "."));
+    const total = price * quantity;
+    return formatCurrency(total);
+}
+
 function addArticleWithoutVariations() {
     if (quantityNotDefined()) {
         dialogRef.value?.close();
@@ -42,6 +54,8 @@ function addArticleWithoutVariations() {
 
     const quantity = quantities.value[0];
 
+    total.value = calculateTotal(quantity);
+
     const requestArticle = makeRequestArticle(props.article, quantity);
 
     if (isTheSameRequestArticle(requestArticle)) return;
@@ -49,7 +63,6 @@ function addArticleWithoutVariations() {
     props.requestList.push(requestArticle);
 
     dialogRef.value?.close();
-
     quantities.value = [];
 
     return;
@@ -66,6 +79,8 @@ function addArticleToRequestList(): void {
     props.article.variations?.forEach((variations, idx) => {
         const quantity = quantities.value[idx];
         if (quantity > 0) {
+            total.value = calculateTotal(quantity);
+
             const requestArticle = makeRequestArticle(props.article, quantity, variations);
 
             if (isTheSameVariations(variations) && quantity === requestArticle.quantity) return;
@@ -77,8 +92,9 @@ function addArticleToRequestList(): void {
     props.requestList.push(...requestArticles);
 
     quantities.value = [];
-
     dialogRef.value?.close();
+
+    emits("added");
 }
 
 function showDialog() {
@@ -94,13 +110,7 @@ defineExpose({ show: showDialog });
             <h2 class="font-medium flex-1">{{ article?.id }} # {{ article?.name }}</h2>
 
             <div v-if="!article?.variations">
-                <VInput
-                    v-if="!article?.isUnique"
-                    type="number"
-                    v-model="quantities[0]"
-                    placeholder="QTD"
-                    class="max-w-24"
-                />
+                <input v-model="quantities[0]" type="number" class="max-w-24" placeholder="QTD" />
             </div>
         </div>
 
@@ -122,13 +132,7 @@ defineExpose({ show: showDialog });
                     3 em stock
                 </span>
 
-                <input
-                    v-if="!article.isUnique"
-                    v-model="quantities[idx]"
-                    type="number"
-                    class="max-w-24"
-                    placeholder="QTD"
-                />
+                <input v-model="quantities[idx]" type="number" class="max-w-24" placeholder="QTD" />
             </div>
         </div>
 

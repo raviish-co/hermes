@@ -1,8 +1,8 @@
 export interface Article {
     id: string;
     name: string;
-    price: number;
-    securityDeposit: number;
+    price: string;
+    securityDeposit: string;
     variations?: ArticleVariation[][];
     isUnique: boolean;
 }
@@ -19,7 +19,7 @@ export interface Variation {
 
 export interface RequestArticle extends Article {
     requestId: string;
-    total: number;
+    total: string;
     quantity: number;
 }
 

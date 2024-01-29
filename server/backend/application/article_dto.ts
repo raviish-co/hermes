@@ -3,17 +3,17 @@ import { Article } from "../domain/articles/article";
 interface ArticleDTO {
     id: string;
     name: string;
-    price: number;
+    price: string;
     isUnique: boolean;
-    securityDeposit: number;
+    securityDeposit: string;
 }
 
 export function makeArticlesDTO(articles: Article[]): ArticleDTO[] {
     return articles.map((a) => ({
         id: a.articleId.toString(),
         name: a.title,
-        price: Number(a.price.value.replace(",", ".")),
+        price: a.price.value,
         isUnique: a.isUnique(),
-        securityDeposit: Number(a.getSecurityDeposit().value.replace(",", ".")),
+        securityDeposit: a.getSecurityDeposit().value,
     }));
 }
