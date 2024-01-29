@@ -316,7 +316,7 @@ describe("Test RequestArticles Service", () => {
         expect(requestArticles.purpose.section).toEqual("Interna");
     });
 
-    it("Caso a finalidade tenha um destino, deve ser adicionada a solicitação", async () => {
+    it("Deve ser adicionada a solicitação caso a finalidade tenha um destino", async () => {
         const purposeSource = new PurposeSourceStub();
         const articleRepository = new ArticleRepositoryStub();
         const requestRepository = new InmemRequestRepository();
