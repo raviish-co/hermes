@@ -1,4 +1,4 @@
-import { Article } from "../domain/articles/article";
+import { Product } from "../domain/products/product";
 
 interface ArticleDTO {
     id: string;
@@ -8,7 +8,7 @@ interface ArticleDTO {
     securityDeposit: string;
 }
 
-export function makeArticlesDTO(articles: Article[]): ArticleDTO[] {
+export function makeArticlesDTO(articles: Product[]): ArticleDTO[] {
     return articles.map((a) => ({
         id: a.articleId.toString(),
         name: a.title,

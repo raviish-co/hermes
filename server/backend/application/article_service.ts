@@ -1,15 +1,15 @@
-import { Article } from "../domain/articles/article";
-import { ArticleRepository } from "../domain/articles/article_repository";
+import { Product } from "../domain/products/product";
+import { ItemRepository } from "../domain/products/item_repository";
 import { Pagination } from "../shared/pagination";
 
 export class ArticleService {
-    readonly articleRepository: ArticleRepository;
+    readonly articleRepository: ItemRepository;
 
-    constructor(articleRepository: ArticleRepository) {
+    constructor(articleRepository: ItemRepository) {
         this.articleRepository = articleRepository;
     }
 
-    listArticles(pageToken: number = 1, perPage: number = 12): Promise<Pagination<Article>> {
+    listArticles(pageToken: number = 1, perPage: number = 12): Promise<Pagination<Product>> {
         return this.articleRepository.list(pageToken, perPage);
     }
 
@@ -17,7 +17,7 @@ export class ArticleService {
         query: string,
         pageToken: number = 1,
         perPage: number = 12
-    ): Promise<Pagination<Article>> {
+    ): Promise<Pagination<Product>> {
         return this.articleRepository.search(query, pageToken, perPage);
     }
 }

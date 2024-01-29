@@ -1,6 +1,6 @@
 import { ID } from "../../shared/id";
 import { Decimal } from "../../shared/decimal";
-import { VariationGroup } from "../variation_group";
+import { VariationGroup } from "../variations/variation_group";
 
 export enum ArticleStatus {
     Good = "Bom",
@@ -22,7 +22,7 @@ export type ArticleOptions = {
     variationGroup?: VariationGroup[];
 };
 
-export class Article {
+export class Product {
     readonly articleId: ID;
     readonly title: string;
     readonly price: Decimal;
@@ -50,7 +50,7 @@ export class Article {
         this.#stock = 10;
     }
 
-    static create(options: ArticleOptions): Article {
+    static create(options: ArticleOptions): Product {
         const { articleId, title, unique, condition, variationGroup } = options;
 
         const price = Decimal.fromString(options.price);
@@ -59,7 +59,7 @@ export class Article {
 
         const newID = ID.New(articleId);
 
-        const article = new Article(newID, title, price, securityDeposit, condition);
+        const article = new Product(newID, title, price, securityDeposit, condition);
 
         if (unique) {
             article.#unique = unique;

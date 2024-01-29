@@ -1,16 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { Article, ArticleStatus } from "../../domain/articles/article";
+import { Product, ArticleStatus } from "../../domain/products/product";
 import { Decimal } from "../../shared/decimal";
-import { Variation } from "../../domain/variation";
-import { Attribute } from "../../domain/articles/attribute";
-import { VariationGroup } from "../../domain/variation_group";
+import { Variation } from "../../domain/variations/variation";
+import { Attribute } from "../../domain/variations/attribute";
+import { VariationGroup } from "../../domain/variations/variation_group";
 
-describe("Test Request Articles", () => {
+describe("Test Product", () => {
     it("Deve criar um artigo", () => {
         const title = "some-title";
         const price = "150";
 
-        const article = Article.create(options);
+        const article = Product.create(options);
 
         expect(article.title).toEqual(title);
         expect(article.price).toEqual(Decimal.fromString(price));
@@ -19,25 +19,25 @@ describe("Test Request Articles", () => {
     it("Deve criar um artigo único", () => {
         const unique = true;
 
-        const article = Article.create({ ...options, unique });
+        const article = Product.create({ ...options, unique });
 
         expect(article.isUnique()).toBeTruthy();
     });
 
     it("Deve criar um artigo que não seja único", () => {
-        const article = Article.create(options);
+        const article = Product.create(options);
 
         expect(article.isUnique()).toBeFalsy();
     });
 
     it("Um artigo deve ter o valor da calção a reter", () => {
-        const article = Article.create({ ...options, securityDeposit: "150", unique: false });
+        const article = Product.create({ ...options, securityDeposit: "150", unique: false });
 
         expect(article.getSecurityDeposit()).toEqual(Decimal.fromString("150"));
     });
 
     it("Deve definir a condição actual de um artigo", () => {
-        const article = Article.create(options);
+        const article = Product.create(options);
 
         const condition = article.getCondition();
 
@@ -47,7 +47,7 @@ describe("Test Request Articles", () => {
     });
 
     it("Quando o artigo está em bom estado, não deve ter comentário", () => {
-        const article = Article.create({ ...options, condition: { status: ArticleStatus.Good } });
+        const article = Product.create({ ...options, condition: { status: ArticleStatus.Good } });
 
         const condition = article.getCondition();
 
@@ -56,7 +56,7 @@ describe("Test Request Articles", () => {
     });
 
     it("Deve criar um artigo com uma variação", () => {
-        const article = Article.create(options);
+        const article = Product.create(options);
 
         const variations = article.getVariationGroup();
         expect(variations?.length).toEqual(1);
@@ -64,7 +64,7 @@ describe("Test Request Articles", () => {
     });
 
     it("Quando um artigo é único não deve ter variações", () => {
-        const article = Article.create({ ...options, unique: true, variationGroup: undefined });
+        const article = Product.create({ ...options, unique: true, variationGroup: undefined });
 
         expect(article.variationGroup).toBeUndefined();
     });
@@ -72,7 +72,7 @@ describe("Test Request Articles", () => {
     it("Deve criar um artigo com uma variação **Cor: Vermelha**", () => {
         const variationGroup = new VariationGroup([colorVariation]);
 
-        const article = Article.create({ ...options, variationGroup: [variationGroup] });
+        const article = Product.create({ ...options, variationGroup: [variationGroup] });
 
         const group = article.getVariationGroup();
         expect(group?.length).toEqual(1);
@@ -84,7 +84,7 @@ describe("Test Request Articles", () => {
         const group1 = new VariationGroup([colorVariation]);
         const group2 = new VariationGroup([sizeVariation]);
 
-        const article = Article.create({ ...options, variationGroup: [group1, group2] });
+        const article = Product.create({ ...options, variationGroup: [group1, group2] });
 
         const groups = article.getVariationGroup();
         expect(groups?.length).toEqual(2);
@@ -97,7 +97,7 @@ describe("Test Request Articles", () => {
     it("Deve criar um artigo com uma variação **Cor: Vermelha** e **Tamanho: M**", () => {
         const variationGroup = new VariationGroup([colorVariation, sizeVariation]);
 
-        const article = Article.create({ ...options, variationGroup: [variationGroup] });
+        const article = Product.create({ ...options, variationGroup: [variationGroup] });
 
         const group = article.getVariationGroup();
         expect(group?.length).toEqual(1);

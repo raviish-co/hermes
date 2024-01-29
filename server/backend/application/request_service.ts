@@ -2,32 +2,36 @@ import { Purpose } from "../domain/purposes/purpose";
 import { PurposeData } from "../domain/purposes/purpose_data";
 import { PurposeSource } from "../domain/purposes/purpose_source";
 import { PurposeNotFound } from "../domain/purposes/purpose_not_found_error";
-import { RequestedArticles } from "../domain/requests/requested_articles";
+import { RequestedArticles as RequestedItems } from "../domain/requests/requested_articles";
 import { RequestedItem } from "../domain/requests/requested_item";
 import { User } from "../domain/user";
 import { Either, left, right } from "../shared/either";
 import { InvalidTotal } from "../domain/requests/invalid_total_error";
-import { ArticleRepository } from "../domain/articles/article_repository";
+import { ItemRepository } from "../domain/products/item_repository";
 import { ID } from "../shared/id";
-import { Article } from "../domain/articles/article";
-import { InsufficientStock } from "../domain/articles/insufficient_stock_error";
+import { InsufficientStock } from "../domain/insufficient_stock_error";
 import { RequestRepository } from "../domain/requests/request_repository";
-import { ArticleData, RequestArticlesData } from "../shared/types";
-import { NewRequestArticlesError } from "../shared/errors";
+import { ProductData, ProductQuery, RequestProductsData, StockQuery } from "../shared/types";
+import { NewRequestProductsError } from "../shared/errors";
+import { Item } from "../domain/products/item";
+import { StockRepository } from "../domain/stock_repository";
 
 export class RequestService {
     readonly purposeSource: PurposeSource;
-    readonly articleRepository: ArticleRepository;
+    readonly itemRepository: ItemRepository;
     readonly requestArticlesRepository: RequestRepository;
+    readonly stockRepository: StockRepository;
 
     constructor(
         purposeSource: PurposeSource,
-        articleRepository: ArticleRepository,
-        requestArticlesRepository: RequestRepository
+        itemRepository: ItemRepository,
+        requestArticlesRepository: RequestRepository,
+        stockRepository: StockRepository
     ) {
         this.purposeSource = purposeSource;
-        this.articleRepository = articleRepository;
+        this.itemRepository = itemRepository;
         this.requestArticlesRepository = requestArticlesRepository;
+        this.stockRepository = stockRepository;
     }
 
     async listPurposes(): Promise<PurposeData[]> {
@@ -36,67 +40,79 @@ export class RequestService {
     }
 
     async requestArticles(
-        data: RequestArticlesData
-    ): Promise<Either<NewRequestArticlesError, void>> {
-        const { purposeData, articlesData, requestTotal, returnDate } = data;
+        data: RequestProductsData
+    ): Promise<Either<NewRequestProductsError, void>> {
+        const { purposeData, productsData, requestTotal, returnDate } = data;
 
         const purposeExists = await this.purposeSource.exists(purposeData.name);
         if (!purposeExists) return left(new PurposeNotFound(purposeData.name));
 
-        const identifiers = this.#buildArticlesIdentifiers(articlesData);
+        const itemsQueries = this.#buildQueries(productsData);
+        const itemsOrError = await this.itemRepository.getAll(itemsQueries);
+        if (itemsOrError.isLeft()) return left(itemsOrError.value);
 
-        const articlesOrError = await this.articleRepository.getAll(identifiers);
-        if (articlesOrError.isLeft()) return left(articlesOrError.value);
+        const stockQueries = this.#buildStockQueries(productsData);
+        const voidOrError = await this.stockRepository.verifyStock(stockQueries);
+        if (voidOrError.isLeft()) return left(voidOrError.value);
 
         const purpose = Purpose.fromOptions(purposeData);
-        const articles = articlesOrError.value;
+        const items = itemsOrError.value;
         const user = User.create("Teste");
-        const requestArticles = RequestedArticles.create({
+        const requestedItems = RequestedItems.create({
             purpose,
             user,
             returnDate,
         });
 
-        const requestedItemsOrError = this.#buildRequestedItems(articles, articlesData);
+        const requestedItemsOrError = this.#buildRequestedItems(items, productsData);
         if (requestedItemsOrError.isLeft()) return left(requestedItemsOrError.value);
 
-        requestArticles.addRequestedItems(requestedItemsOrError.value);
-        if (!requestArticles.isSameTotal(requestTotal)) return left(new InvalidTotal());
+        requestedItems.addRequestedItems(requestedItemsOrError.value);
+        if (!requestedItems.isSameTotal(requestTotal)) return left(new InvalidTotal());
 
-        await this.requestArticlesRepository.save(requestArticles);
+        await this.requestArticlesRepository.save(requestedItems);
 
-        await this.articleRepository.updateStock(articles);
+        // await this.articleRepository.updateStock(articles);
 
         return right(undefined);
     }
 
-    #buildArticlesIdentifiers(articles: ArticleData[]): ID[] {
-        const identifiers: ID[] = [];
-        for (const article of articles) {
-            identifiers.push(ID.New(article.articleId));
+    #buildQueries(products: ProductData[]): ProductQuery[] {
+        const queries: ProductQuery[] = [];
+        for (const product of products) {
+            const query = {
+                productId: ID.New(product.productId),
+                variations: product.variations ? product.variations.map((v) => ID.New(v)) : [],
+            };
+            queries.push(query);
         }
-        return identifiers;
+        return queries;
     }
 
     #buildRequestedItems(
-        articles: Article[],
-        articlesData: ArticleData[]
+        articles: Item[],
+        articlesData: ProductData[]
     ): Either<InsufficientStock, RequestedItem[]> {
         const requestedItems: RequestedItem[] = [];
 
         for (const i in articles) {
             const { quantity } = articlesData[i];
             const article = articles[i];
-
-            if (article.verifyStock(quantity)) {
-                const message = `Stock insufficient for article ${article.title}`;
-                return left(new InsufficientStock(message));
-            }
-
-            article.decreaseStock(quantity);
-            const requestedItem = RequestedItem.create({ article, quantity });
+            const requestedItem = RequestedItem.create({ item: article, quantity });
             requestedItems.push(requestedItem);
         }
         return right(requestedItems);
+    }
+
+    #buildStockQueries(products: ProductData[]): StockQuery[] {
+        const queries: StockQuery[] = [];
+        for (const product of products) {
+            const query = {
+                itemId: ID.New(product.productId),
+                quantity: product.quantity,
+            };
+            queries.push(query);
+        }
+        return queries;
     }
 }

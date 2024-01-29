@@ -1,4 +1,4 @@
-import { Attribute } from "./articles/attribute";
+import { Attribute } from "./attribute";
 
 type VariationValue = {
     value: string;

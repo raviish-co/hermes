@@ -1,11 +1,11 @@
 import { describe, it, vi, expect } from "vitest";
 import { ArticleService } from "../../application/article_service";
-import { InmemArticleRepository } from "../../persistense/inmem/inmem_article_repository";
-import { ArticleRepositoryStub } from "../stubs/article_repository_stub";
+import { InmemItemRepository } from "../../persistense/inmem/inmem_article_repository";
+import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 
 describe("Test ListArticles", () => {
     it("Deve chamar o método **list** no repositório de artigos", async () => {
-        const articleRepository = new ArticleRepositoryStub();
+        const articleRepository = new ItemRepositoryStub();
         const service = new ArticleService(articleRepository);
         const spy = vi.spyOn(articleRepository, "list");
 
@@ -16,7 +16,7 @@ describe("Test ListArticles", () => {
     });
 
     it("Deve buscar os artigos no repositório", async () => {
-        const articleRepository = new ArticleRepositoryStub();
+        const articleRepository = new ItemRepositoryStub();
         const service = new ArticleService(articleRepository);
 
         const { result: articles } = await service.listArticles();
@@ -26,7 +26,7 @@ describe("Test ListArticles", () => {
     });
 
     it("Deve retornar um array vazio se não existir artigos", async () => {
-        const articleRepository = new InmemArticleRepository();
+        const articleRepository = new InmemItemRepository();
         const service = new ArticleService(articleRepository);
 
         const { result: articles } = await service.listArticles();
@@ -37,7 +37,7 @@ describe("Test ListArticles", () => {
 
 describe("Test SearchArticles", () => {
     it("Deve chamar o método **search** no repositório de artigos", async () => {
-        const articleRepository = new ArticleRepositoryStub();
+        const articleRepository = new ItemRepositoryStub();
         const service = new ArticleService(articleRepository);
         const spy = vi.spyOn(articleRepository, "search");
 
@@ -49,7 +49,7 @@ describe("Test SearchArticles", () => {
     });
 
     it("Deve pesquisar o artigo pelo seu nome", async () => {
-        const articleRepository = new ArticleRepositoryStub();
+        const articleRepository = new ItemRepositoryStub();
         const service = new ArticleService(articleRepository);
 
         const { result: articles } = await service.searchArticles("Teste");
@@ -59,7 +59,7 @@ describe("Test SearchArticles", () => {
     });
 
     it("Deve pesquisar o artigo pelo seu identificador", async () => {
-        const articleRepository = new ArticleRepositoryStub();
+        const articleRepository = new ItemRepositoryStub();
         const service = new ArticleService(articleRepository);
 
         const { result: articles } = await service.searchArticles("1002");
@@ -69,7 +69,7 @@ describe("Test SearchArticles", () => {
     });
 
     it("Deve retornar um array vazio se não existir artigos", async () => {
-        const articleRepository = new InmemArticleRepository();
+        const articleRepository = new InmemItemRepository();
         const service = new ArticleService(articleRepository);
 
         const { result: articles } = await service.searchArticles("Teste");
@@ -78,7 +78,7 @@ describe("Test SearchArticles", () => {
     });
 
     it("Deve paginar o resultado da listagem de artigos por 12 artigos por página", async () => {
-        const articleRepository = new ArticleRepositoryStub();
+        const articleRepository = new ItemRepositoryStub();
         const service = new ArticleService(articleRepository);
 
         const articles = await service.listArticles();
@@ -90,7 +90,7 @@ describe("Test SearchArticles", () => {
 
     it("Deve buscar os artigos pela página", async () => {
         const pageToken = 2;
-        const articleRepository = new ArticleRepositoryStub();
+        const articleRepository = new ItemRepositoryStub();
         const service = new ArticleService(articleRepository);
 
         const articles = await service.listArticles(pageToken);
@@ -103,7 +103,7 @@ describe("Test SearchArticles", () => {
     it("Deve buscar por um tamanho de página diferente de 12", async () => {
         const pageToken = 1;
         const perPage = 30;
-        const articleRepository = new ArticleRepositoryStub();
+        const articleRepository = new ItemRepositoryStub();
         const service = new ArticleService(articleRepository);
 
         const articles = await service.listArticles(pageToken, perPage);
@@ -114,7 +114,7 @@ describe("Test SearchArticles", () => {
     });
 
     it("Deve paginar o resultado da pesquisa de artigos por 12 artigos por página", async () => {
-        const articleRepository = new ArticleRepositoryStub();
+        const articleRepository = new ItemRepositoryStub();
         const service = new ArticleService(articleRepository);
 
         const articles = await service.searchArticles("Teste");
@@ -126,7 +126,7 @@ describe("Test SearchArticles", () => {
 
     it("Deve paginar o resultado da pesquisa por um tamanho de página diferente de 12", async () => {
         const perPage = 30;
-        const articleRepository = new ArticleRepositoryStub();
+        const articleRepository = new ItemRepositoryStub();
         const service = new ArticleService(articleRepository);
 
         const articles = await service.searchArticles("Teste", 1, perPage);
@@ -138,7 +138,7 @@ describe("Test SearchArticles", () => {
 
     it("Deve paginar o resultado da pesquisa pelo número da página", async () => {
         const pageToken = 2;
-        const articleRepository = new ArticleRepositoryStub();
+        const articleRepository = new ItemRepositoryStub();
         const service = new ArticleService(articleRepository);
 
         const articles = await service.searchArticles("Teste", pageToken, 12);

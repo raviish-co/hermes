@@ -1,15 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { RequestedArticles, RequestStatus } from "../../domain/requests/requested_articles";
 import { RequestedItem } from "../../domain/requests/requested_item";
-import { Article, ArticleStatus } from "../../domain/articles/article";
+import { Product, ArticleStatus } from "../../domain/products/product";
 import { User } from "../../domain/user";
-import { VariationGroup } from "../../domain/variation_group";
-import { Attribute } from "../../domain/articles/attribute";
-import { Variation } from "../../domain/variation";
+import { VariationGroup } from "../../domain/variations/variation_group";
+import { Attribute } from "../../domain/variations/attribute";
+import { Variation } from "../../domain/variations/variation";
+import { Item } from "../../domain/products/item";
 
-describe("Test Request Articles", () => {
-    it("should create the article request", () => {
-        const requestArticles = RequestedArticles.create(requestArticlesOptions);
+describe("Test Request Products", () => {
+    it("should create the request products", () => {
+        const requestArticles = RequestedArticles.create(requestProductsOptions);
 
         expect(requestArticles.getStatus()).toEqual(RequestStatus.PENDING);
     });
@@ -17,7 +18,7 @@ describe("Test Request Articles", () => {
     it("Deve garantir que a seção será definida caso a finalidade tenha seções", () => {
         const purpose = { name: "Lavandaria", section: "Interna" };
         const options = {
-            ...requestArticlesOptions,
+            ...requestProductsOptions,
             purpose: purpose,
         };
 
@@ -30,7 +31,7 @@ describe("Test Request Articles", () => {
     it("Deve garantir que a seção não será definida caso a finalidade não tenha seções", () => {
         const purpose = { name: "Aluguer" };
 
-        const requestArticles = RequestedArticles.create(requestArticlesOptions);
+        const requestArticles = RequestedArticles.create(requestProductsOptions);
 
         expect(requestArticles.purpose).toEqual(purpose);
         expect(requestArticles.purpose.section).toBeUndefined();
@@ -40,7 +41,7 @@ describe("Test Request Articles", () => {
         const client = "John Doe";
         const purpose = { name: "Aluguer", recipient: client };
         const options = {
-            ...requestArticlesOptions,
+            ...requestProductsOptions,
             purpose: purpose,
         };
 
@@ -53,7 +54,7 @@ describe("Test Request Articles", () => {
     it("Deve garantir que o solicitante seja definido", () => {
         const user = User.create("John Doe");
         const options = {
-            ...requestArticlesOptions,
+            ...requestProductsOptions,
             user,
         };
 
@@ -63,7 +64,7 @@ describe("Test Request Articles", () => {
     });
 
     it("Deve definir o momento que a solicitação foi efetuada", () => {
-        const requestArticles = RequestedArticles.create(requestArticlesOptions);
+        const requestArticles = RequestedArticles.create(requestProductsOptions);
 
         expect(requestArticles.issuedAt.getTime()).toBeLessThanOrEqual(new Date().getTime());
     });
@@ -71,13 +72,13 @@ describe("Test Request Articles", () => {
     it("Deve definir a data de devolução da solicitação", () => {
         const returnDate = "2024-01-21T00:00:00.000Z";
 
-        const requestArticles = RequestedArticles.create(requestArticlesOptions);
+        const requestArticles = RequestedArticles.create(requestProductsOptions);
 
         expect(requestArticles.returnDate.getTime()).toEqual(new Date(returnDate).getTime());
     });
 
     it("Deve adicionar os artigos a solicitação", () => {
-        const requestArticles = RequestedArticles.create(requestArticlesOptions);
+        const requestArticles = RequestedArticles.create(requestProductsOptions);
 
         requestArticles.addRequestedItems(requestLines);
 
@@ -86,7 +87,7 @@ describe("Test Request Articles", () => {
 
     it("Deve calcular o valor total da solicitação", () => {
         const total = "1050,00";
-        const requestArticles = RequestedArticles.create(requestArticlesOptions);
+        const requestArticles = RequestedArticles.create(requestProductsOptions);
 
         requestArticles.addRequestedItems(requestLines);
 
@@ -94,7 +95,7 @@ describe("Test Request Articles", () => {
     });
 
     it("Deve calcular o valor total da linha com base na quantidade de artigos solicitados", () => {
-        const requestArticles = RequestedArticles.create(requestArticlesOptions);
+        const requestArticles = RequestedArticles.create(requestProductsOptions);
 
         requestArticles.addRequestedItems(requestLines);
 
@@ -103,11 +104,12 @@ describe("Test Request Articles", () => {
     });
 
     it("Deve calcular o valor total da linha com base num preço com casas decimais", () => {
-        const requestArticles = RequestedArticles.create(requestArticlesOptions);
-        const article = Article.create({ ...articleOptions, price: "1150,50" });
+        const requestArticles = RequestedArticles.create(requestProductsOptions);
+        const product = Product.create({ ...productOptions, price: "1150,50" });
+        const item = new Item(product);
         const requestLines = [
             RequestedItem.create({
-                article,
+                item,
                 quantity: 3,
             }),
         ];
@@ -120,31 +122,34 @@ describe("Test Request Articles", () => {
     });
 
     it("Deve calcular o valor total da solicitação de uma linha, onde o total da linha tem casas decimais", () => {
+        const item = new Item(Product.create({ ...productOptions, price: "1150,50" }));
         const requestLines = [
             RequestedItem.create({
-                article: Article.create({ ...articleOptions, price: "1150,50" }),
+                item,
                 quantity: 3,
             }),
         ];
-        const requestArticles = RequestedArticles.create(requestArticlesOptions);
+        const requestedArticles = RequestedArticles.create(requestProductsOptions);
 
-        requestArticles.addRequestedItems(requestLines);
+        requestedArticles.addRequestedItems(requestLines);
 
-        expect(requestArticles.getTotal().value).toEqual("3451,50");
+        expect(requestedArticles.getTotal().value).toEqual("3451,50");
     });
 
     it("Deve calcular o valor total de uma solicitação com várias linhas, onde o total de cada linha tem casas decimais", () => {
+        const item1 = new Item(Product.create({ ...productOptions, price: "1150,50" }));
+        const item2 = new Item(Product.create({ ...productOptions, price: "1150,50" }));
         const requestLines = [
             RequestedItem.create({
-                article: Article.create({ ...articleOptions, price: "1150,50" }),
+                item: item1,
                 quantity: 3,
             }),
             RequestedItem.create({
-                article: Article.create({ ...articleOptions, price: "1150,50" }),
+                item: item2,
                 quantity: 2,
             }),
         ];
-        const requestArticles = RequestedArticles.create(requestArticlesOptions);
+        const requestArticles = RequestedArticles.create(requestProductsOptions);
 
         requestArticles.addRequestedItems(requestLines);
 
@@ -152,7 +157,7 @@ describe("Test Request Articles", () => {
     });
 });
 
-const requestArticlesOptions = {
+const requestProductsOptions = {
     purpose: { name: "Aluguer" },
     user: User.create("John Doe"),
     returnDate: "2024-01-21T00:00:00.000Z",
@@ -167,7 +172,7 @@ const options = {
 
 const variation = new VariationGroup([Variation.create(options)]);
 
-const articleOptions = {
+const productOptions = {
     articleId: "some-id",
     title: "some-title",
     price: "150",
@@ -178,7 +183,7 @@ const articleOptions = {
 };
 
 const requestLineOptions = {
-    article: Article.create(articleOptions),
+    item: new Item(Product.create(productOptions)),
     quantity: 3,
 };
 

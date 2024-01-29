@@ -1,5 +1,5 @@
 export class InsufficientStock extends Error {
     constructor(name: string) {
-        super(`Article ${name} Stock Insufficient`);
+        super(`Product ${name} Stock Insufficient`);
     }
 }
