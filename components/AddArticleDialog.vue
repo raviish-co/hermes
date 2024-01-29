@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
-import { formatCurrency } from "~/lib/helpers/formatCurrency";
+import { convertToNumber } from "~/lib/helpers/convert_to_number";
+import { formatCurrency } from "~/lib/helpers/format_currency";
 import type { Article, ArticleVariation, RequestArticle } from "~/lib/models/article";
 
 interface Props {
@@ -41,8 +42,8 @@ function makeRequestArticle(article: Article, quantity: number, varitations?: Ar
 }
 
 function calculateTotal(quantity: number): string {
-    const price = Number(props.article.price.replace(",", "."));
-    const total = price * quantity;
+    const price = convertToNumber(props.article.price);
+    const total = (price * quantity) / 100;
     return formatCurrency(total);
 }
 
@@ -102,6 +103,12 @@ function showDialog() {
 }
 
 defineExpose({ show: showDialog });
+
+onMounted(() => {
+    quantities.value = props.article?.variations?.map((v) => 0) ?? [0];
+
+    console.log(props.article);
+});
 </script>
 
 <template>

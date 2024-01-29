@@ -28,7 +28,7 @@ export const ARTICLES: Article[] = [
     {
         id: "13424",
         name: "Adams Family Thing hand / Mão",
-        price: "17,00",
+        price: "17,83",
         securityDeposit: "3,00",
         isUnique: false,
         variations: [
@@ -45,7 +45,7 @@ export const ARTICLES: Article[] = [
     {
         id: "43242",
         name: "Base de Pele Clara 35 FU",
-        price: "12,00",
+        price: "54,72",
         securityDeposit: "1,00",
         isUnique: true,
     },

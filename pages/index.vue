@@ -5,9 +5,10 @@ import type {
     DescribeArticleStateDialog,
 } from "#build/components";
 import type { Article, ArticleVariation, RequestArticle } from "~/lib/models/article";
-import { formatCurrency } from "~/lib/helpers/formatCurrency";
+import { formatCurrency } from "~/lib/helpers/format_currency";
 import type { Purpose } from "~/lib/models/purpose";
 import { RequestService } from "~/lib/services/request_service";
+import { convertToNumber } from "~/lib/helpers/convert_to_number";
 
 const INNER_LAUNDRY = "Interna";
 const DISCARD = "Descartar";
@@ -17,7 +18,7 @@ const describeArticleStateDialogRef = ref<typeof DescribeArticleStateDialog>();
 const selectedArticle = ref<Article>();
 const selectedSections = ref<string[]>([]);
 const selectedPlaceholder = ref<string>("Descrição");
-const isDisabledInputText = ref<boolean>(false);
+const complementaryDataIsDisabled = ref<boolean>(false);
 const requestList = ref<RequestArticle[]>([]);
 const currentPurposeName = ref<string>("");
 const currentSectionName = ref<string>("");
@@ -43,7 +44,7 @@ function findSectionByPurpose(purposeName: string): void {
     purpouses.value.find((purpose) => {
         if (purpose.name === purposeName) {
             changePlaceholder(purpose.placeholder!);
-            disableInputDescription(purposeName);
+            disableComplementaryDataToThePurpose(purposeName);
             updateSelectedSections(purpose.sections);
         }
     });
@@ -56,13 +57,13 @@ function changePlaceholder(placeholder: string): void {
     selectedPlaceholder.value = placeholder || "";
 }
 
-function disableInputDescription(purposeName: string): void {
+function disableComplementaryDataToThePurpose(purposeName: string): void {
     if (purposeName === DISCARD) {
-        isDisabledInputText.value = true;
+        complementaryDataIsDisabled.value = true;
         return;
     }
 
-    isDisabledInputText.value = false;
+    complementaryDataIsDisabled.value = false;
 }
 
 function updateSelectedSections(sections?: string[]) {
@@ -78,11 +79,13 @@ function updateCurrentSectionName(sectionName: string) {
     currentSectionName.value = sectionName;
 
     if (sectionName === INNER_LAUNDRY) {
-        isDisabledInputText.value = true;
+        complementaryDataIsDisabled.value = true;
         return;
     }
 
-    isDisabledInputText.value = false;
+    complementaryDataIsDisabled.value = false;
+
+    disableComplementaryDataToThePurpose(currentPurposeName.value);
 }
 
 function removeRequestRow(id: string): void {
@@ -94,9 +97,14 @@ function clearRequestList() {
 }
 
 function sumTotalWithSecurityDepositForRow(rowTotal: string, rowSecurityDeposit: string): string {
-    const total = Number(rowTotal.replace(",", "."));
-    const securityDeposit = Number(rowSecurityDeposit.replace(",", "."));
-    const result = total + securityDeposit;
+    const total = convertToNumber(rowTotal);
+    const securityDeposit = convertToNumber(rowSecurityDeposit);
+    const result = (total + securityDeposit) / 100;
+
+    console.log(rowTotal);
+
+    console.log(total);
+
     return formatCurrency(result);
 }
 
@@ -111,10 +119,10 @@ function calculateGrandTotal() {
             return;
         }
 
-        const value = Number(totalPerRow.replace(",", "."));
-        const total = Number(grandTotal.value.replace(",", "."));
+        const value = convertToNumber(totalPerRow);
+        const total = convertToNumber(grandTotal.value);
 
-        const result = value + total;
+        const result = (value + total) / 100;
 
         grandTotal.value = formatCurrency(result);
     });
@@ -180,20 +188,7 @@ listPurposes();
     </div>
 
     <section class="section-content mb-20">
-        <section class="flex items-center mb-11 mt-4">
-            <h1 class="flex-1 text-center">Guia de Saída de Artigos</h1>
-
-            <div class="relative">
-                <span class="text-2xl cursor-pointer" @click="toggleDropdown">...</span>
-
-                <ul
-                    class="absolute right-0 bg-white min-w-44 p-4 shadow-lg flex flex-col gap-2"
-                    :class="{ hidden: !dropdownVisibility }"
-                >
-                    <li class="cursor-pointer">Imprimir contrato</li>
-                </ul>
-            </div>
-        </section>
+        <h1 class="flex-1 text-center mb-11 mt-4">Guia de Saída de Artigos</h1>
 
         <section>
             <form class="mb-6">
@@ -218,7 +213,7 @@ listPurposes();
                 </div>
                 <VInput
                     :placeholder="selectedPlaceholder"
-                    :disabled="isDisabledInputText"
+                    :disabled="complementaryDataIsDisabled"
                     class="input-field"
                 />
             </form>
