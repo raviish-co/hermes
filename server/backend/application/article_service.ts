@@ -9,8 +9,10 @@ export class ArticleService {
         this.articleRepository = articleRepository;
     }
 
-    listArticles(pageToken: number = 1, perPage: number = 12): Promise<Pagination<Article>> {
-        return this.articleRepository.list(pageToken, perPage);
+    async listArticles(pageToken: number = 1, perPage: number = 12): Promise<Pagination<Article>> {
+        const x = await this.articleRepository.list(pageToken, perPage);
+        console.log(x);
+        return x;
     }
 
     searchArticles(

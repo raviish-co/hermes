@@ -1,9 +1,17 @@
 import { makeArticlesDTO } from "../backend/application/article_dto";
 import { makeArticleService } from "../backend/main";
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
+    const query = getQuery(event);
+    const page = Number(query.pageToken);
+
+    console.log("XPTO");
+    console.log(page);
+    console.log("XPTO");
+
     const articleService = makeArticleService();
-    const { result, pageToken, perPage, total } = await articleService.listArticles();
+
+    const { result, pageToken, perPage, total } = await articleService.listArticles(page);
 
     const articles = makeArticlesDTO(result);
 
