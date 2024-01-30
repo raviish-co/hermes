@@ -3,6 +3,8 @@ interface Props {
     title: string;
 }
 
+defineProps<Props>();
+
 const dialogRef = ref<HTMLDialogElement>();
 
 function show() {
@@ -13,7 +15,6 @@ function close() {
     dialogRef.value?.close();
 }
 
-defineProps<Props>();
 defineExpose({ show, close });
 </script>
 

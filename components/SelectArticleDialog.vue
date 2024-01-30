@@ -78,6 +78,7 @@ onMounted(() => {
                         </span>
                     </td>
                 </tr>
+
                 <tr v-if="articles.length === 0">
                     <td colspan="3">Nenhum resultado encontrado</td>
                 </tr>

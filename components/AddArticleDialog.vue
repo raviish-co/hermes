@@ -50,6 +50,7 @@ function calculateTotal(quantity: number): string {
 function addArticleWithoutVariations() {
     if (quantityNotDefined()) {
         dialogRef.value?.close();
+        emits("added");
         return;
     }
 
@@ -65,8 +66,6 @@ function addArticleWithoutVariations() {
 
     dialogRef.value?.close();
     quantities.value = [];
-
-    return;
 }
 
 function addArticleToRequestList(): void {
@@ -79,6 +78,7 @@ function addArticleToRequestList(): void {
 
     props.article.variations?.forEach((variations, idx) => {
         const quantity = quantities.value[idx];
+
         if (quantity > 0) {
             total.value = calculateTotal(quantity);
 
