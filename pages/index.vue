@@ -99,11 +99,8 @@ function clearRequestList() {
 function sumTotalWithSecurityDepositForRow(rowTotal: string, rowSecurityDeposit: string): string {
     const total = convertToNumber(rowTotal);
     const securityDeposit = convertToNumber(rowSecurityDeposit);
+
     const result = (total + securityDeposit) / 100;
-
-    console.log(rowTotal);
-
-    console.log(total);
 
     return formatCurrency(result);
 }
@@ -160,6 +157,8 @@ function showAddArticleDialog(article: Article) {
     }
 
     selectedArticle.value = article;
+    addArticleDialogRef.value?.initializeQuantities(article.variations);
+
     addArticleDialogRef.value?.show();
 }
 

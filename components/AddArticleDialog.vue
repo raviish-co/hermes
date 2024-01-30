@@ -102,13 +102,11 @@ function showDialog() {
     dialogRef.value?.show();
 }
 
-defineExpose({ show: showDialog });
+function initializeQuantities(variations: ArticleVariation[][]) {
+    variations?.forEach((_, idx) => (quantities.value[idx] = 0));
+}
 
-onMounted(() => {
-    quantities.value = props.article?.variations?.map((v) => 0) ?? [0];
-
-    console.log(props.article);
-});
+defineExpose({ show: showDialog, initializeQuantities });
 </script>
 
 <template>
