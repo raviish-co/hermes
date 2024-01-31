@@ -23,9 +23,10 @@ const requestList = ref<RequestArticle[]>([]);
 const currentPurposeName = ref<string>("");
 const currentSectionName = ref<string>("");
 const dropdownVisibility = ref<boolean>(false);
-const isDisabledSection = computed(() => selectedSections.value.length <= 0);
 const purpouses = ref<Purpose[]>([]);
 const grandTotal = ref<string>("0,00");
+
+const isDisabledSection = computed(() => selectedSections.value.length <= 0);
 
 const requestService = new RequestService();
 
@@ -96,21 +97,18 @@ function clearRequestList() {
     requestList.value = [];
 }
 
-function sumTotalWithSecurityDepositForRow(rowTotal: string, rowSecurityDeposit: string): string {
+function sumTotalWithSecurityDepositPerRow(rowTotal: string, rowSecurityDeposit: string): string {
     const total = convertToNumber(rowTotal);
     const securityDeposit = convertToNumber(rowSecurityDeposit);
+
     const result = (total + securityDeposit) / 100;
-
-    console.log(rowTotal);
-
-    console.log(total);
 
     return formatCurrency(result);
 }
 
 function calculateGrandTotal() {
     const totalsToPayPerRow = requestList.value.map((row) =>
-        sumTotalWithSecurityDepositForRow(row.total, row.securityDeposit)
+        sumTotalWithSecurityDepositPerRow(row.total, row.securityDeposit)
     );
 
     totalsToPayPerRow.forEach((totalPerRow, idx) => {
@@ -129,8 +127,8 @@ function calculateGrandTotal() {
 }
 
 function onAddedArticle() {
-    showSelectArticleDialog();
     calculateGrandTotal();
+    showSelectArticleDialog();
 }
 
 function showSelectArticleDialog() {
@@ -160,15 +158,13 @@ function showAddArticleDialog(article: Article) {
     }
 
     selectedArticle.value = article;
+    addArticleDialogRef.value?.initializeQuantities(article.variations);
+
     addArticleDialogRef.value?.show();
 }
 
 function showDescribeArticleStatusDialog() {
     describeArticleStateDialogRef.value?.show();
-}
-
-function toggleDropdown() {
-    dropdownVisibility.value = !dropdownVisibility.value;
 }
 
 function listVariations(articleVariation?: ArticleVariation[]) {
@@ -261,7 +257,7 @@ listPurposes();
                                     {{ row.securityDeposit }}
                                 </td>
                                 <td class="cursor-pointer" @click="removeRequestRow(row.requestId)">
-                                    x
+                                    X
                                 </td>
                             </tr>
                         </tbody>

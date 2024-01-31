@@ -4,7 +4,9 @@ import { ArticleState } from "~/lib/models/article";
 
 const dialogRef = ref<typeof VDialog>();
 const articleState = ref<string>("");
+
 const isGoodState = computed(() => articleState.value !== ArticleState.Bad);
+
 const stateOptions = computed(() => {
     return [ArticleState.Good, ArticleState.Bad];
 });

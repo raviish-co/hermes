@@ -13,14 +13,8 @@ interface Emits {
 }
 
 const emits = defineEmits<Emits>();
-const props = defineProps<Props>();
-
-const currentValue = computed(() => {
-    if (!props.modelValue && props.type === "number") {
-        return 0;
-    }
-
-    return props.modelValue;
+withDefaults(defineProps<Props>(), {
+    type: "text",
 });
 
 function emitValue(e: Event) {
@@ -34,9 +28,7 @@ function emitValue(e: Event) {
         :v-model="modelValue"
         :placeholder="placeholder"
         :disabled="disabled"
-        :type="type || 'text'"
-        :value="currentValue"
-        :min="0"
+        :type="type"
         class="input-field"
         @input="emitValue"
     />

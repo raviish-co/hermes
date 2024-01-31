@@ -12,6 +12,7 @@ const dialogRef = ref<typeof VDialog>();
 const emits = defineEmits<Emits>();
 const query = ref<string>("");
 const articles = ref<Article[]>([]);
+const total = ref<number>(1);
 
 const articleService = new ArticleService();
 
@@ -29,9 +30,11 @@ async function searchArticles() {
     articles.value = await articleService.searchArticles(query.value);
 }
 
-async function listArticles() {
-    // articles.value = await articleService.listAtricles();
-    articles.value = ARTICLES;
+async function listArticles(pageToken: number = 1) {
+    const { articles: a, total: t } = await articleService.listAtricles(pageToken);
+
+    articles.value = a;
+    total.value = t;
 }
 
 function showDialog() {
@@ -40,8 +43,8 @@ function showDialog() {
 
 defineExpose({ show: showDialog });
 
-onMounted(() => {
-    listArticles();
+onMounted(async () => {
+    await listArticles();
 });
 </script>
 
@@ -78,12 +81,15 @@ onMounted(() => {
                         </span>
                     </td>
                 </tr>
+
                 <tr v-if="articles.length === 0">
                     <td colspan="3">Nenhum resultado encontrado</td>
                 </tr>
             </tbody>
         </table>
 
-        <p>Paginação</p>
+        <p>
+            <ThePagination :total="total" @changed="listArticles" />
+        </p>
     </VDialog>
 </template>
