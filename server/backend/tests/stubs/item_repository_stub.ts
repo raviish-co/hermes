@@ -1,10 +1,11 @@
-import { Product, ArticleStatus } from "../../domain/products/product";
+import { ProductNotFound } from "../../domain/catalog/product_not_found_error";
+import { ItemRepository } from "../../domain/catalog/item_repository";
+import { Product, ProductStatus } from "../../domain/catalog/product";
 import { Either, left, right } from "../../shared/either";
-import { ID } from "../../shared/id";
-import { ProductNotFound } from "../../domain/products/product_not_found_error";
-import { ProductQuery, ItemRepository } from "../../domain/products/item_repository";
 import { Pagination } from "../../shared/pagination";
-import { Item } from "../../domain/products/item";
+import { ProductQuery } from "../../shared/types";
+import { Item } from "../../domain/catalog/item";
+import { ID } from "../../shared/id";
 
 export class ItemRepositoryStub implements ItemRepository {
     #data: Record<string, Product> = {};
@@ -24,7 +25,7 @@ export class ItemRepositoryStub implements ItemRepository {
 
         for (const query of queries) {
             const filtered = items.find(
-                (item) => item.product.articleId.toString() === query.productId.toString()
+                (item) => item.product.productId.toString() === query.productId.toString()
             );
 
             if (!filtered)
@@ -55,8 +56,8 @@ export class ItemRepositoryStub implements ItemRepository {
     search(query: string, pageToken: number, perPage: number): Promise<Pagination<Product>> {
         const articles = this.records.filter((a) => {
             return (
-                a.title.toLowerCase().includes(query.toLowerCase()) ||
-                a.articleId.toString().includes(query)
+                a.name.toLowerCase().includes(query.toLowerCase()) ||
+                a.productId.toString().includes(query)
             );
         });
 
@@ -82,49 +83,44 @@ export class ItemRepositoryStub implements ItemRepository {
     #populate() {
         this.#data = {
             "1001": Product.create({
-                articleId: "1001",
-                title: "Teste",
+                productId: "1001",
+                name: "Teste",
                 price: "10,00",
-                condition: { status: ArticleStatus.Good },
-                securityDeposit: "100",
+                condition: { status: ProductStatus.Good },
             }),
             "1002": Product.create({
-                articleId: "1002",
-                title: "Teste 2",
+                productId: "1002",
+                name: "Teste 2",
                 price: "15,95",
-                condition: { status: ArticleStatus.Good },
-                securityDeposit: "150",
+                condition: { status: ProductStatus.Good },
             }),
         };
 
         this.#items = {
             "1001": {
                 product: Product.create({
-                    articleId: "1001",
-                    title: "Teste 1",
+                    productId: "1001",
+                    name: "Teste 1",
                     price: "15,95",
-                    condition: { status: ArticleStatus.Good },
-                    securityDeposit: "150",
+                    condition: { status: ProductStatus.Good },
                 }),
                 variations: [ID.New("1001")],
             },
             "1002": {
                 product: Product.create({
-                    articleId: "1002",
-                    title: "Teste 2",
+                    productId: "1002",
+                    name: "Teste 2",
                     price: "150,95",
-                    condition: { status: ArticleStatus.Good },
-                    securityDeposit: "150",
+                    condition: { status: ProductStatus.Good },
                 }),
                 variations: [ID.New("1002")],
             },
             "1003": {
                 product: Product.create({
-                    articleId: "1003",
-                    title: "Teste 2",
+                    productId: "1003",
+                    name: "Teste 2",
                     price: "315,95",
-                    condition: { status: ArticleStatus.Good },
-                    securityDeposit: "150",
+                    condition: { status: ProductStatus.Good },
                 }),
                 variations: [ID.New("1003")],
             },

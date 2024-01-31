@@ -1,10 +1,11 @@
-import { Product } from "../../domain/products/product";
+import { ProductNotFound } from "../../domain/catalog/product_not_found_error";
+import { ItemRepository } from "../../domain/catalog/item_repository";
 import { Either, left, right } from "../../shared/either";
-import { ID } from "../../shared/id";
-import { ProductNotFound } from "../../domain/products/product_not_found_error";
-import { ProductQuery, ItemRepository } from "../../domain/products/item_repository";
+import { Product } from "../../domain/catalog/product";
 import { Pagination } from "../../shared/pagination";
-import { Item } from "../../domain/products/item";
+import { ProductQuery } from "../../shared/types";
+import { Item } from "../../domain/catalog/item";
+import { ID } from "../../shared/id";
 
 export class InmemItemRepository implements ItemRepository {
     #data: Record<string, Product> = {};
@@ -25,7 +26,7 @@ export class InmemItemRepository implements ItemRepository {
         for (const query of queries) {
             const filtered = items.find(
                 (item) =>
-                    item.product.articleId.toString() === query.productId.toString() &&
+                    item.product.productId.toString() === query.productId.toString() &&
                     item.variations?.toString() === query.variations?.toString()
             );
 
@@ -57,8 +58,8 @@ export class InmemItemRepository implements ItemRepository {
     search(query: string, pageToken: number, perPage: number): Promise<Pagination<Product>> {
         const articles = this.records.filter((a) => {
             return (
-                a.title.toLowerCase().includes(query.toLowerCase()) ||
-                a.articleId.toString().includes(query)
+                a.name.toLowerCase().includes(query.toLowerCase()) ||
+                a.productId.toString().includes(query)
             );
         });
 

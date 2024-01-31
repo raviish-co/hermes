@@ -1,22 +1,22 @@
-import { User } from "../user";
-import { Purpose } from "../purposes/purpose";
-import { RequestedItem } from "./requested_item";
 import { Decimal } from "../../shared/decimal";
+import { Purpose } from "../purposes/purpose";
+import { RequestItem } from "./request_item";
+import { User } from "../user";
 
-export enum RequestStatus {
-    PENDING = "Por Devolver",
-}
-
-export type RequestOptions = {
+type Options = {
     purpose: Purpose;
     user: User;
     returnDate: string;
 };
 
-export class RequestedArticles {
+export enum RequestStatus {
+    PENDING = "Por Devolver",
+}
+
+export class RequestedItems {
     readonly purpose: Purpose;
     readonly user: User;
-    readonly requestedItems: RequestedItem[];
+    readonly items: RequestItem[];
     readonly returnDate: Date;
     readonly issuedAt: Date;
     status: RequestStatus;
@@ -29,24 +29,24 @@ export class RequestedArticles {
         this.issuedAt = new Date();
         this.returnDate = returnDate;
         this.total = Decimal.fromString("0");
-        this.requestedItems = [];
+        this.items = [];
     }
 
-    static create(options: RequestOptions): RequestedArticles {
+    static create(options: Options): RequestedItems {
         const { purpose, user, returnDate } = options;
         const returnDateParsed = new Date(returnDate);
-        const requestedArticles = new RequestedArticles(purpose, user, returnDateParsed);
+        const requestedArticles = new RequestedItems(purpose, user, returnDateParsed);
         return requestedArticles;
     }
 
-    addRequestedItems(requestLines: RequestedItem[]): void {
-        for (const requestLine of requestLines) {
-            this.addRequestedItem(requestLine);
+    addItems(items: RequestItem[]): void {
+        for (const requestLine of items) {
+            this.addItem(requestLine);
         }
     }
 
-    addRequestedItem(requestedItem: RequestedItem): void {
-        this.requestedItems.push(requestedItem);
+    addItem(requestedItem: RequestItem): void {
+        this.items.push(requestedItem);
         this.total = this.total.add(requestedItem.getTotal());
     }
 

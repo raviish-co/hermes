@@ -1,15 +1,15 @@
-import { describe, expect, it, vi } from "vitest";
+import { InmemRequestRepository } from "../../persistense/inmem/inmem_request_repository";
+import { InmemItemRepository } from "../../persistense/inmem/inmem_article_repository";
+import { ProductNotFound } from "../../domain/catalog/product_not_found_error";
+import { InsufficientStock } from "../../domain/insufficient_stock_error";
+import { InvalidTotal } from "../../domain/requests/invalid_total_error";
+import { StockRepositoryStub } from "../stubs/stock_repository_stub";
+import { RequestService } from "../../application/request_service";
+import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { FakePurposeSource } from "../purpose_source_fake";
 import { PurposeSourceStub } from "../purpose_source_stub";
-import { RequestService } from "../../application/request_service";
+import { describe, expect, it, vi } from "vitest";
 import { ID } from "../../shared/id";
-import { InmemRequestRepository } from "../../persistense/inmem/inmem_request_repository";
-import { ItemRepositoryStub } from "../stubs/item_repository_stub";
-import { InmemItemRepository } from "../../persistense/inmem/inmem_article_repository";
-import { ProductNotFound } from "../../domain/products/product_not_found_error";
-import { InvalidTotal } from "../../domain/requests/invalid_total_error";
-import { InsufficientStock } from "../../domain/insufficient_stock_error";
-import { StockRepositoryStub } from "../stubs/stock_repository_stub";
 
 describe("Test Purpose Source", () => {
     it("should be return an  list void of purposes", async () => {
@@ -227,10 +227,10 @@ describe("Test RequestArticles Service", () => {
         });
 
         const requestArticles = await requestRepository.last();
-        const requestedItem = requestArticles.requestedItems[0];
+        const requestedItem = requestArticles.items[0];
 
-        expect(requestArticles.requestedItems.length).toBe(1);
-        expect(requestedItem.item.product.articleId.toString()).toEqual("1001");
+        expect(requestArticles.items.length).toBe(1);
+        expect(requestedItem.item.product.productId.toString()).toEqual("1001");
         expect(requestedItem.getTotal().value).toEqual("15,95");
         expect(requestedItem.quantity).toEqual(1);
     });
@@ -259,7 +259,7 @@ describe("Test RequestArticles Service", () => {
         });
 
         const requestArticles = await requestRepository.last();
-        expect(requestArticles.requestedItems.length).toBe(2);
+        expect(requestArticles.items.length).toBe(2);
         expect(requestArticles.getTotal().value).toEqual(requestTotal);
     });
 
@@ -346,7 +346,7 @@ describe("Test RequestArticles Service", () => {
 
         const requestArticles = await requestRepository.last();
 
-        expect(requestArticles.requestedItems.length).toBe(2);
+        expect(requestArticles.items.length).toBe(2);
         expect(requestArticles.getTotal().value).toEqual("484,75");
     });
 

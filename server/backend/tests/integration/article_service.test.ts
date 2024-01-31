@@ -1,7 +1,7 @@
-import { describe, it, vi, expect } from "vitest";
-import { ArticleService } from "../../application/article_service";
 import { InmemItemRepository } from "../../persistense/inmem/inmem_article_repository";
+import { ArticleService } from "../../application/article_service";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
+import { describe, it, vi, expect } from "vitest";
 
 describe("Test ListArticles", () => {
     it("Deve chamar o método **list** no repositório de artigos", async () => {
@@ -22,7 +22,7 @@ describe("Test ListArticles", () => {
         const { result: articles } = await service.listArticles();
 
         expect(articles.length).toBeGreaterThanOrEqual(2);
-        expect(articles[0].articleId.toString()).toEqual("1001");
+        expect(articles[0].productId.toString()).toEqual("1001");
     });
 
     it("Deve retornar um array vazio se não existir artigos", async () => {
@@ -55,7 +55,7 @@ describe("Test SearchArticles", () => {
         const { result: articles } = await service.searchArticles("Teste");
 
         expect(articles.length).toBeGreaterThanOrEqual(2);
-        expect(articles[0].articleId.toString()).toEqual("1001");
+        expect(articles[0].productId.toString()).toEqual("1001");
     });
 
     it("Deve pesquisar o artigo pelo seu identificador", async () => {
@@ -65,7 +65,7 @@ describe("Test SearchArticles", () => {
         const { result: articles } = await service.searchArticles("1002");
 
         expect(articles.length).toBeGreaterThanOrEqual(1);
-        expect(articles[0].articleId.toString()).toEqual("1002");
+        expect(articles[0].productId.toString()).toEqual("1002");
     });
 
     it("Deve retornar um array vazio se não existir artigos", async () => {

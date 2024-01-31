@@ -1,16 +1,13 @@
+import { RequestedItems, RequestStatus } from "../../domain/requests/requested_items";
+import { Product, ProductStatus } from "../../domain/catalog/product";
+import { RequestItem } from "../../domain/requests/request_item";
+import { Item } from "../../domain/catalog/item";
 import { describe, expect, it } from "vitest";
-import { RequestedArticles, RequestStatus } from "../../domain/requests/requested_articles";
-import { RequestedItem } from "../../domain/requests/requested_item";
-import { Product, ArticleStatus } from "../../domain/products/product";
 import { User } from "../../domain/user";
-import { VariationGroup } from "../../domain/variations/variation_group";
-import { Attribute } from "../../domain/variations/attribute";
-import { Variation } from "../../domain/variations/variation";
-import { Item } from "../../domain/products/item";
 
 describe("Test Request Products", () => {
     it("should create the request products", () => {
-        const requestArticles = RequestedArticles.create(requestProductsOptions);
+        const requestArticles = RequestedItems.create(requestProductsOptions);
 
         expect(requestArticles.getStatus()).toEqual(RequestStatus.PENDING);
     });
@@ -22,7 +19,7 @@ describe("Test Request Products", () => {
             purpose: purpose,
         };
 
-        const requestArticles = RequestedArticles.create(options);
+        const requestArticles = RequestedItems.create(options);
 
         expect(requestArticles.purpose).toEqual(purpose);
         expect(requestArticles.purpose.section).toBeDefined();
@@ -31,7 +28,7 @@ describe("Test Request Products", () => {
     it("Deve garantir que a seção não será definida caso a finalidade não tenha seções", () => {
         const purpose = { name: "Aluguer" };
 
-        const requestArticles = RequestedArticles.create(requestProductsOptions);
+        const requestArticles = RequestedItems.create(requestProductsOptions);
 
         expect(requestArticles.purpose).toEqual(purpose);
         expect(requestArticles.purpose.section).toBeUndefined();
@@ -45,7 +42,7 @@ describe("Test Request Products", () => {
             purpose: purpose,
         };
 
-        const requestArticles = RequestedArticles.create(options);
+        const requestArticles = RequestedItems.create(options);
 
         expect(requestArticles.purpose.recipient).toBeDefined();
         expect(requestArticles.purpose.recipient).toEqual(client);
@@ -58,13 +55,13 @@ describe("Test Request Products", () => {
             user,
         };
 
-        const requestArticles = RequestedArticles.create(options);
+        const requestArticles = RequestedItems.create(options);
 
         expect(requestArticles.user).toEqual(user);
     });
 
     it("Deve definir o momento que a solicitação foi efetuada", () => {
-        const requestArticles = RequestedArticles.create(requestProductsOptions);
+        const requestArticles = RequestedItems.create(requestProductsOptions);
 
         expect(requestArticles.issuedAt.getTime()).toBeLessThanOrEqual(new Date().getTime());
     });
@@ -72,51 +69,51 @@ describe("Test Request Products", () => {
     it("Deve definir a data de devolução da solicitação", () => {
         const returnDate = "2024-01-21T00:00:00.000Z";
 
-        const requestArticles = RequestedArticles.create(requestProductsOptions);
+        const requestArticles = RequestedItems.create(requestProductsOptions);
 
         expect(requestArticles.returnDate.getTime()).toEqual(new Date(returnDate).getTime());
     });
 
     it("Deve adicionar os artigos a solicitação", () => {
-        const requestArticles = RequestedArticles.create(requestProductsOptions);
+        const requestArticles = RequestedItems.create(requestProductsOptions);
 
-        requestArticles.addRequestedItems(requestLines);
+        requestArticles.addItems(requestLines);
 
-        expect(requestArticles.requestedItems.length).toEqual(3);
+        expect(requestArticles.items.length).toEqual(3);
     });
 
     it("Deve calcular o valor total da solicitação", () => {
         const total = "1050,00";
-        const requestArticles = RequestedArticles.create(requestProductsOptions);
+        const requestArticles = RequestedItems.create(requestProductsOptions);
 
-        requestArticles.addRequestedItems(requestLines);
+        requestArticles.addItems(requestLines);
 
         expect(requestArticles.getTotal().value).toEqual(total);
     });
 
     it("Deve calcular o valor total da linha com base na quantidade de artigos solicitados", () => {
-        const requestArticles = RequestedArticles.create(requestProductsOptions);
+        const requestArticles = RequestedItems.create(requestProductsOptions);
 
-        requestArticles.addRequestedItems(requestLines);
+        requestArticles.addItems(requestLines);
 
-        const requestLine = requestArticles.requestedItems[0];
+        const requestLine = requestArticles.items[0];
         expect(requestLine.getTotal().value).toEqual("450,00");
     });
 
     it("Deve calcular o valor total da linha com base num preço com casas decimais", () => {
-        const requestArticles = RequestedArticles.create(requestProductsOptions);
+        const requestArticles = RequestedItems.create(requestProductsOptions);
         const product = Product.create({ ...productOptions, price: "1150,50" });
         const item = new Item(product);
         const requestLines = [
-            RequestedItem.create({
+            RequestItem.create({
                 item,
                 quantity: 3,
             }),
         ];
 
-        requestArticles.addRequestedItems(requestLines);
+        requestArticles.addItems(requestLines);
 
-        const requestLine = requestArticles.requestedItems[0];
+        const requestLine = requestArticles.items[0];
 
         expect(requestLine.getTotal().value).toEqual("3451,50");
     });
@@ -124,14 +121,14 @@ describe("Test Request Products", () => {
     it("Deve calcular o valor total da solicitação de uma linha, onde o total da linha tem casas decimais", () => {
         const item = new Item(Product.create({ ...productOptions, price: "1150,50" }));
         const requestLines = [
-            RequestedItem.create({
+            RequestItem.create({
                 item,
                 quantity: 3,
             }),
         ];
-        const requestedArticles = RequestedArticles.create(requestProductsOptions);
+        const requestedArticles = RequestedItems.create(requestProductsOptions);
 
-        requestedArticles.addRequestedItems(requestLines);
+        requestedArticles.addItems(requestLines);
 
         expect(requestedArticles.getTotal().value).toEqual("3451,50");
     });
@@ -140,18 +137,18 @@ describe("Test Request Products", () => {
         const item1 = new Item(Product.create({ ...productOptions, price: "1150,50" }));
         const item2 = new Item(Product.create({ ...productOptions, price: "1150,50" }));
         const requestLines = [
-            RequestedItem.create({
+            RequestItem.create({
                 item: item1,
                 quantity: 3,
             }),
-            RequestedItem.create({
+            RequestItem.create({
                 item: item2,
                 quantity: 2,
             }),
         ];
-        const requestArticles = RequestedArticles.create(requestProductsOptions);
+        const requestArticles = RequestedItems.create(requestProductsOptions);
 
-        requestArticles.addRequestedItems(requestLines);
+        requestArticles.addItems(requestLines);
 
         expect(requestArticles.getTotal().value).toEqual("5752,50");
     });
@@ -164,22 +161,20 @@ const requestProductsOptions = {
     total: "1050",
 };
 
-const options = {
-    attribute: new Attribute("Cor"),
-    variationValue: { value: "Vermelha" },
-    stock: 10,
-};
+// const options = {
+//     attribute: new Attribute("Cor"),
+//     variationValue: { value: "Vermelha" },
+//     stock: 10,
+// };
 
-const variation = new VariationGroup([Variation.create(options)]);
+// const variation = new VariationGroup([Variation.create(options)]);
 
 const productOptions = {
-    articleId: "some-id",
-    title: "some-title",
+    productId: "some-id",
+    name: "some-title",
     price: "150",
     unique: false,
-    securityDeposit: "150",
-    condition: { status: ArticleStatus.Bad, comment: "Some comment" },
-    variations: [variation],
+    condition: { status: ProductStatus.Bad, comment: "Some comment" },
 };
 
 const requestLineOptions = {
@@ -187,8 +182,8 @@ const requestLineOptions = {
     quantity: 3,
 };
 
-export const requestLines: RequestedItem[] = [
-    RequestedItem.create(requestLineOptions),
-    RequestedItem.create({ ...requestLineOptions, quantity: 2 }),
-    RequestedItem.create({ ...requestLineOptions, quantity: 2 }),
+export const requestLines: RequestItem[] = [
+    RequestItem.create(requestLineOptions),
+    RequestItem.create({ ...requestLineOptions, quantity: 2 }),
+    RequestItem.create({ ...requestLineOptions, quantity: 2 }),
 ];

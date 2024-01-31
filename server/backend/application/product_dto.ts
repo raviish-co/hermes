@@ -1,4 +1,4 @@
-import { Product } from "../domain/products/product";
+import { Product } from "../domain/catalog/product";
 
 interface ProductDTO {
     id: string;
@@ -9,8 +9,8 @@ interface ProductDTO {
 
 export function makeProductsDTO(products: Product[]): ProductDTO[] {
     return products.map((a) => ({
-        id: a.articleId.toString(),
-        name: a.title,
+        id: a.productId.toString(),
+        name: a.name,
         price: a.price.value,
         isUnique: a.isUnique(),
     }));
