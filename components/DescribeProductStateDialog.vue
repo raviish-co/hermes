@@ -1,25 +1,25 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
-import { ArticleState } from "~/lib/models/article";
+import { ProductState } from "~/lib/models/product";
 
 const dialogRef = ref<typeof VDialog>();
-const articleState = ref<string>("");
+const productState = ref<string>("");
 
-const isGoodState = computed(() => articleState.value !== ArticleState.Bad);
+const isGoodState = computed(() => productState.value !== ProductState.Bad);
 
 const stateOptions = computed(() => {
-    return [ArticleState.Good, ArticleState.Bad];
+    return [ProductState.Good, ProductState.Bad];
 });
 
-function changeArticleState(state: string) {
-    articleState.value = state;
+function changeProductState(state: string) {
+    productState.value = state;
 }
 
 function showDialog() {
     dialogRef.value?.show();
 }
 
-function updateArticleState() {
+function updateProductState() {
     dialogRef.value?.close();
 }
 
@@ -29,10 +29,10 @@ defineExpose({ show: showDialog });
 <template>
     <VDialog ref="dialogRef" title="Descrever danos do artigo" class="max-w-[30rem]">
         <VSelect
-            v-model="articleState"
+            v-model="productState"
             placeholder="Estado"
             :options="stateOptions"
-            @update:model-value="changeArticleState"
+            @update:model-value="changeProductState"
         />
 
         <textarea
@@ -42,6 +42,7 @@ defineExpose({ show: showDialog });
             class="input-field resize-none"
         />
 
-        <button class="btn-secondary" @click="updateArticleState">Salvar</button>
+        <button class="btn-secondary" @click="updateProductState">Salvar</button>
     </VDialog>
 </template>
+~/lib/models/product

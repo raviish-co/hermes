@@ -12,6 +12,6 @@ export const makeRequestService = (): RequestService => {
     return new RequestService(purposeSourceAdapter, articleRepository, requestRepository);
 };
 
-export const makeArticleService = (): ArticleService => {
+export const makeProductService = (): ArticleService => {
     return new ArticleService(articleRepository);
 };

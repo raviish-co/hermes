@@ -1,13 +1,12 @@
-export interface Article {
+export interface Product {
     id: string;
     name: string;
     price: string;
-    securityDeposit: string;
-    variations?: ArticleVariation[][];
+    variations?: ProductVariation[][];
     isUnique: boolean;
 }
 
-export interface ArticleVariation {
+export interface ProductVariation {
     name: string;
     value: string;
 }
@@ -17,13 +16,13 @@ export interface Variation {
     name: string;
 }
 
-export interface RequestArticle extends Article {
+export interface RequestProduct extends Product {
     requestId: string;
     total: string;
     quantity: number;
 }
 
-export enum ArticleState {
+export enum ProductState {
     Good = "Bom",
     Bad = "Mau",
 }

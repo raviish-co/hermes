@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type {
-    AddArticleDialog,
-    SelectArticleDialog,
-    DescribeArticleStateDialog,
+    AddProductDialog,
+    SelectProductDialog,
+    DescribeProductStateDialog,
 } from "#build/components";
-import type { Article, ArticleVariation, RequestArticle } from "~/lib/models/article";
+import type { Product, ProductVariation, RequestProduct } from "~/lib/models/product";
 import { formatCurrency } from "~/lib/helpers/format_currency";
 import type { Purpose } from "~/lib/models/purpose";
 import { RequestService } from "~/lib/services/request_service";
@@ -12,14 +12,14 @@ import { convertToNumber } from "~/lib/helpers/convert_to_number";
 
 const INNER_LAUNDRY = "Interna";
 const DISCARD = "Descartar";
-const selectArticleDialogRef = ref<typeof SelectArticleDialog>();
-const addArticleDialogRef = ref<typeof AddArticleDialog>();
-const describeArticleStateDialogRef = ref<typeof DescribeArticleStateDialog>();
-const selectedArticle = ref<Article>();
+const selectProductDialogRef = ref<typeof SelectProductDialog>();
+const addProductDialogRef = ref<typeof AddProductDialog>();
+const describeProductStateDialogRef = ref<typeof DescribeProductStateDialog>();
+const selectedProduct = ref<Product>();
 const selectedSections = ref<string[]>([]);
 const selectedPlaceholder = ref<string>("Descrição");
 const complementaryDataIsDisabled = ref<boolean>(false);
-const requestList = ref<RequestArticle[]>([]);
+const requestList = ref<RequestProduct[]>([]);
 const currentPurposeName = ref<string>("");
 const currentSectionName = ref<string>("");
 const securityDeposit = ref<string>("0,00");
@@ -116,51 +116,51 @@ function calculateGrandTotal() {
     });
 }
 
-function onAddedArticle() {
+function onAddedProduct() {
     calculateGrandTotal();
-    showSelectArticleDialog();
+    showSelectProductDialog();
 }
 
-function showSelectArticleDialog() {
-    selectArticleDialogRef.value?.show();
+function showSelectProductDialog() {
+    selectProductDialogRef.value?.show();
 }
 
-function addArticleToRequestList(article: Article) {
-    if (requestList.value.some((r) => r.id === article.id)) return;
+function addProductToRequestList(product: Product) {
+    if (requestList.value.some((r) => r.id === product.id)) return;
 
-    const requestArticle = {
-        ...article,
+    const requestProduct = {
+        ...product,
         requestId: new Date().getTime().toString(),
         quantity: 1,
-        total: article.price,
+        total: product.price,
         variations: [],
     };
 
-    requestList.value.push(requestArticle);
+    requestList.value.push(requestProduct);
 
-    onAddedArticle();
+    onAddedProduct();
 }
 
-function showAddArticleDialog(article: Article) {
-    if (article.isUnique) {
-        addArticleToRequestList(article);
+function showAddProductDialog(product: Product) {
+    if (product.isUnique) {
+        addProductToRequestList(product);
         return;
     }
 
-    selectedArticle.value = article;
-    addArticleDialogRef.value?.initializeQuantities(article.variations);
+    selectedProduct.value = product;
+    addProductDialogRef.value?.initializeQuantities(product.variations);
 
-    addArticleDialogRef.value?.show();
+    addProductDialogRef.value?.show();
 }
 
-function showDescribeArticleStatusDialog() {
-    describeArticleStateDialogRef.value?.show();
+function showDescribeProductStatusDialog() {
+    describeProductStateDialogRef.value?.show();
 }
 
-function listVariations(articleVariation?: ArticleVariation[]) {
-    if (!articleVariation) return "";
+function listVariations(productVariation?: ProductVariation[]) {
+    if (!productVariation) return "";
 
-    const values = articleVariation.map((v) => `${v.name}: ${v.value}`);
+    const values = productVariation.map((v) => `${v.name}: ${v.value}`);
 
     return values.join(" | ");
 }
@@ -225,7 +225,6 @@ listPurposes();
                                 <th>QTD</th>
                                 <th>Preço Unid (Kz)</th>
                                 <th>Total (Kz)</th>
-                                <th>Caução (Kz)</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -233,7 +232,7 @@ listPurposes();
                         <tbody>
                             <tr v-for="(row, idx) in requestList" :key="idx" class="cursor-pointer">
                                 <td class="w-16">{{ row.id }}</td>
-                                <td @click="showDescribeArticleStatusDialog">
+                                <td @click="showDescribeProductStatusDialog">
                                     {{ row.name }}
                                     <br />
                                     <span class="text-light-600 text-sm">{{
@@ -243,9 +242,6 @@ listPurposes();
                                 <td>{{ row.quantity }}</td>
                                 <td class="w-36">{{ row.price }}</td>
                                 <td class="w-36">{{ row.total }}</td>
-                                <td class="w-36">
-                                    {{ row.securityDeposit }}
-                                </td>
                                 <td class="cursor-pointer" @click="removeRequestRow(row.requestId)">
                                     X
                                 </td>
@@ -254,7 +250,7 @@ listPurposes();
                     </table>
                 </div>
 
-                <button class="btn-secondary w-full" @click="showSelectArticleDialog">
+                <button class="btn-secondary w-full" @click="showSelectProductDialog">
                     Adicionar
                 </button>
             </div>
@@ -282,14 +278,15 @@ listPurposes();
         </div>
     </section>
 
-    <SelectArticleDialog ref="selectArticleDialogRef" @select="showAddArticleDialog" />
+    <SelectProductDialog ref="selectProductDialogRef" @select="showAddProductDialog" />
 
-    <AddArticleDialog
-        ref="addArticleDialogRef"
-        :article="selectedArticle!"
+    <AddProductDialog
+        ref="addProductDialogRef"
+        :product="selectedProduct!"
         :request-list="requestList"
-        @added="onAddedArticle"
+        @added="onAddedProduct"
     />
 
-    <DescribeArticleStateDialog ref="describeArticleStateDialogRef" />
+    <DescribeProductStateDialog ref="describeProductStateDialogRef" />
 </template>
+~/lib/models/product

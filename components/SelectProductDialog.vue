@@ -1,43 +1,40 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
-import { ARTICLES } from "~/lib/data/articles";
-import type { Article } from "~/lib/models/article";
-import { ArticleService } from "~/lib/services/article_service";
+import { PRODUCTS } from "~/lib/data/products";
+import type { Product } from "~/lib/models/product";
+import { ProductService } from "~/lib/services/product_service";
 
 interface Emits {
-    (e: "select", article: Article): void;
+    (e: "select", article: Product): void;
 }
 
 const dialogRef = ref<typeof VDialog>();
 const emits = defineEmits<Emits>();
 const query = ref<string>("");
-const articles = ref<Article[]>([]);
+const products = ref<Product[]>([]);
 const total = ref<number>(1);
 
-const articleService = new ArticleService();
+const productService = new ProductService();
 
-function emitSelectedArticle(article: Article) {
+function emitSelectedProduct(product: Product) {
     dialogRef.value?.close();
-    emits("select", article);
+    emits("select", product);
 }
 
-async function searchArticles() {
+async function searchProduct() {
     if (query.value.length < 3) {
-        articles.value = [];
+        products.value = [];
         return;
     }
 
-    articles.value = await articleService.searchArticles(query.value);
+    products.value = await productService.searchProducts(query.value);
 }
 
-async function listArticles(pageToken: number = 1) {
-    // const { articles: a, total: t } = await articleService.listAtricles(pageToken);
+async function listProducts(pageToken: number = 1) {
+    const { products: a, total: t } = await productService.listProducts(pageToken);
 
-    // articles.value = a;
-    // total.value = t;
-
-    articles.value = ARTICLES;
-    total.value = 1;
+    products.value = a;
+    total.value = t;
 }
 
 function showDialog() {
@@ -47,7 +44,7 @@ function showDialog() {
 defineExpose({ show: showDialog });
 
 onMounted(async () => {
-    await listArticles();
+    await listProducts();
 });
 </script>
 
@@ -57,7 +54,7 @@ onMounted(async () => {
             placeholder="Pesquisar por Nome ou ID"
             type="search"
             v-model="query"
-            @update:model-value="searchArticles"
+            @update:model-value="searchProduct"
         />
 
         <table class="table">
@@ -70,14 +67,14 @@ onMounted(async () => {
             </thead>
 
             <tbody>
-                <tr v-if="articles" v-for="article in articles" :key="article.id">
-                    <td class="w-16">{{ article.id }}</td>
-                    <td class="w-96" @click="emitSelectedArticle(article)">
-                        {{ article.name }}
+                <tr v-if="products" v-for="product in products" :key="product.id">
+                    <td class="w-16">{{ product.id }}</td>
+                    <td class="w-96" @click="emitSelectedProduct(product)">
+                        {{ product.name }}
                     </td>
                     <td>
                         <span
-                            v-if="article.isUnique"
+                            v-if="product.isUnique"
                             class="px-2 py-1 bg-secondary-600 rounded-3xl text-sm text-white"
                         >
                             Único
@@ -85,14 +82,15 @@ onMounted(async () => {
                     </td>
                 </tr>
 
-                <tr v-if="articles.length === 0">
+                <tr v-if="products.length === 0">
                     <td colspan="3">Nenhum resultado encontrado</td>
                 </tr>
             </tbody>
         </table>
 
         <p>
-            <ThePagination :total="total" @changed="listArticles" />
+            <ThePagination :total="total" @changed="listProducts" />
         </p>
     </VDialog>
 </template>
+~/lib/data/products ~/lib/models/product
