@@ -2,18 +2,18 @@ import { Purpose } from "../domain/purposes/purpose";
 import { PurposeData } from "../domain/purposes/purpose_data";
 import { PurposeSource } from "../domain/purposes/purpose_source";
 import { PurposeNotFound } from "../domain/purposes/purpose_not_found_error";
-import { RequestedArticles as RequestedItems } from "../domain/requests/requested_articles";
-import { RequestedItem } from "../domain/requests/requested_item";
+import { RequestedItems as RequestedItems } from "../domain/requests/requested_items";
+import { RequestItem } from "../domain/requests/request_item";
 import { User } from "../domain/user";
 import { Either, left, right } from "../shared/either";
 import { InvalidTotal } from "../domain/requests/invalid_total_error";
-import { ItemRepository } from "../domain/products/item_repository";
+import { ItemRepository } from "../domain/catalog/item_repository";
 import { ID } from "../shared/id";
 import { InsufficientStock } from "../domain/insufficient_stock_error";
 import { RequestRepository } from "../domain/requests/request_repository";
 import { ProductData, ProductQuery, RequestProductsData, StockQuery } from "../shared/types";
 import { NewRequestProductsError } from "../shared/errors";
-import { Item } from "../domain/products/item";
+import { Item } from "../domain/catalog/item";
 import { StockRepository } from "../domain/stock_repository";
 
 export class RequestService {
@@ -67,7 +67,7 @@ export class RequestService {
         const requestedItemsOrError = this.#buildRequestedItems(items, productsData);
         if (requestedItemsOrError.isLeft()) return left(requestedItemsOrError.value);
 
-        requestedItems.addRequestedItems(requestedItemsOrError.value);
+        requestedItems.addItems(requestedItemsOrError.value);
         if (!requestedItems.isSameTotal(requestTotal)) return left(new InvalidTotal());
 
         await this.requestArticlesRepository.save(requestedItems);
@@ -92,13 +92,13 @@ export class RequestService {
     #buildRequestedItems(
         articles: Item[],
         articlesData: ProductData[]
-    ): Either<InsufficientStock, RequestedItem[]> {
-        const requestedItems: RequestedItem[] = [];
+    ): Either<InsufficientStock, RequestItem[]> {
+        const requestedItems: RequestItem[] = [];
 
         for (const i in articles) {
             const { quantity } = articlesData[i];
             const article = articles[i];
-            const requestedItem = RequestedItem.create({ item: article, quantity });
+            const requestedItem = RequestItem.create({ item: article, quantity });
             requestedItems.push(requestedItem);
         }
         return right(requestedItems);

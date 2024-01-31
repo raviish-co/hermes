@@ -1,5 +1,5 @@
-import { Product } from "../domain/products/product";
-import { ItemRepository } from "../domain/products/item_repository";
+import { Product } from "../domain/catalog/product";
+import { ItemRepository } from "../domain/catalog/item_repository";
 import { Pagination } from "../shared/pagination";
 
 export class ArticleService {

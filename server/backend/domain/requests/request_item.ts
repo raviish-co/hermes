@@ -1,12 +1,12 @@
 import { Decimal } from "../../shared/decimal";
-import { Item } from "../products/item";
+import { Item } from "../catalog/item";
 
 type Options = {
     item: Item;
     quantity: number;
 };
 
-export class RequestedItem {
+export class RequestItem {
     readonly item: Item;
     readonly quantity: number;
     #total: Decimal;
@@ -17,11 +17,11 @@ export class RequestedItem {
         this.#total = Decimal.fromString("0");
     }
 
-    static create(options: Options): RequestedItem {
+    static create(options: Options): RequestItem {
         const { item, quantity } = options;
-        const requestedItem = new RequestedItem(item, quantity);
-        requestedItem.#calculateTotal();
-        return requestedItem;
+        const requestItem = new RequestItem(item, quantity);
+        requestItem.#calculateTotal();
+        return requestItem;
     }
 
     #calculateTotal(): void {

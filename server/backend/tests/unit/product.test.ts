@@ -1,145 +1,55 @@
 import { describe, expect, it } from "vitest";
-import { Product, ArticleStatus } from "../../domain/products/product";
-import { Decimal } from "../../shared/decimal";
-import { Variation } from "../../domain/variations/variation";
-import { Attribute } from "../../domain/variations/attribute";
-import { VariationGroup } from "../../domain/variations/variation_group";
+import { Product, ProductStatus } from "../../domain/catalog/product";
 
 describe("Test Product", () => {
-    it("Deve criar um artigo", () => {
-        const title = "some-title";
-        const price = "150";
+    it("Deve criar um produto", () => {
+        const name = "some-name";
+        const price = "150,00";
 
-        const article = Product.create(options);
+        const product = Product.create(options);
 
-        expect(article.title).toEqual(title);
-        expect(article.price).toEqual(Decimal.fromString(price));
+        expect(product.name).toEqual(name);
+        expect(product.price.value).toEqual(price);
+        expect(product.isUnique()).toBeFalsy();
     });
 
-    it("Deve criar um artigo único", () => {
+    it("Deve criar um produto único", () => {
         const unique = true;
 
-        const article = Product.create({ ...options, unique });
+        const product = Product.create({ ...options, unique });
 
-        expect(article.isUnique()).toBeTruthy();
+        expect(product.isUnique()).toBeTruthy();
     });
 
-    it("Deve criar um artigo que não seja único", () => {
-        const article = Product.create(options);
+    it("Deve definir a condição actual de um produto", () => {
+        const product = Product.create(options);
 
-        expect(article.isUnique()).toBeFalsy();
-    });
+        const condition = product.getCondition();
 
-    it("Um artigo deve ter o valor da calção a reter", () => {
-        const article = Product.create({ ...options, securityDeposit: "150", unique: false });
-
-        expect(article.getSecurityDeposit()).toEqual(Decimal.fromString("150"));
-    });
-
-    it("Deve definir a condição actual de um artigo", () => {
-        const article = Product.create(options);
-
-        const condition = article.getCondition();
-
-        expect(condition.status).toEqual(ArticleStatus.Bad);
+        expect(condition.status).toEqual(ProductStatus.Bad);
         expect(condition.comment).toBeDefined();
         expect(condition.comment).toEqual("Some comment");
     });
 
     it("Quando o artigo está em bom estado, não deve ter comentário", () => {
-        const article = Product.create({ ...options, condition: { status: ArticleStatus.Good } });
+        const article = Product.create({ ...options, condition: { status: ProductStatus.Good } });
 
         const condition = article.getCondition();
 
-        expect(condition.status).toEqual(ArticleStatus.Good);
+        expect(condition.status).toEqual(ProductStatus.Good);
         expect(condition.comment).toBeUndefined();
-    });
-
-    it("Deve criar um artigo com uma variação", () => {
-        const article = Product.create(options);
-
-        const variations = article.getVariationGroup();
-        expect(variations?.length).toEqual(1);
-        expect(variations?.at(0)).toBeInstanceOf(VariationGroup);
-    });
-
-    it("Quando um artigo é único não deve ter variações", () => {
-        const article = Product.create({ ...options, unique: true, variationGroup: undefined });
-
-        expect(article.variationGroup).toBeUndefined();
-    });
-
-    it("Deve criar um artigo com uma variação **Cor: Vermelha**", () => {
-        const variationGroup = new VariationGroup([colorVariation]);
-
-        const article = Product.create({ ...options, variationGroup: [variationGroup] });
-
-        const group = article.getVariationGroup();
-        expect(group?.length).toEqual(1);
-        expect(group?.at(0)?.variations.at(0)?.attribute.name).toEqual(color.name);
-        expect(group?.at(0)?.variations.at(0)?.value).toEqual(colorVariation.value);
-    });
-
-    it("Deve criar um artigo com duas variações", () => {
-        const group1 = new VariationGroup([colorVariation]);
-        const group2 = new VariationGroup([sizeVariation]);
-
-        const article = Product.create({ ...options, variationGroup: [group1, group2] });
-
-        const groups = article.getVariationGroup();
-        expect(groups?.length).toEqual(2);
-        expect(groups?.at(0)?.variations.at(0)?.attribute.name).toEqual(color.name);
-        expect(groups?.at(0)?.variations.at(0)?.value).toEqual(colorVariation.value);
-        expect(groups?.at(1)?.variations.at(0)?.attribute.name).toEqual(size.name);
-        expect(groups?.at(1)?.variations.at(0)?.value).toEqual(sizeVariation.value);
-    });
-
-    it("Deve criar um artigo com uma variação **Cor: Vermelha** e **Tamanho: M**", () => {
-        const variationGroup = new VariationGroup([colorVariation, sizeVariation]);
-
-        const article = Product.create({ ...options, variationGroup: [variationGroup] });
-
-        const group = article.getVariationGroup();
-        expect(group?.length).toEqual(1);
-        expect(group?.at(0)?.variations.length).toEqual(2);
-        expect(group?.at(0)?.variations.at(0)?.attribute).toEqual(color);
-        expect(group?.at(0)?.variations.at(0)?.value).toEqual(colorVariation.value);
-        expect(group?.at(0)?.variations.at(1)?.attribute).toEqual(size);
-        expect(group?.at(0)?.variations.at(1)?.value).toEqual(sizeVariation.value);
     });
 });
 
-const color = new Attribute("Cor");
-const size = new Attribute("Tamanho");
-const red = { value: "Vermelha" };
-
-const variationOptions = {
-    attribute: color,
-    variationValue: red,
-    stock: 10,
-};
-
-const variationOptions1 = {
-    attribute: size,
-    variationValue: { value: "M" },
-    stock: 10,
-};
-
-const colorVariation = Variation.create(variationOptions);
-const sizeVariation = Variation.create(variationOptions1);
-const group = new VariationGroup([colorVariation]);
 const condition = {
-    status: ArticleStatus.Bad,
+    status: ProductStatus.Bad,
     comment: "Some comment",
 };
 
 const options = {
-    articleId: "1001",
-    title: "some-title",
+    productId: "1001",
+    name: "some-name",
     price: "150",
-    stock: 10,
     unique: false,
-    securityDeposit: "150",
     condition: condition,
-    variationGroup: [group],
 };
