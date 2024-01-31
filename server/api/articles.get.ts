@@ -5,10 +5,6 @@ export default defineEventHandler(async (event) => {
     const query = getQuery(event);
     const page = Number(query.pageToken);
 
-    console.log("XPTO");
-    console.log(page);
-    console.log("XPTO");
-
     const articleService = makeArticleService();
 
     const { result, pageToken, perPage, total } = await articleService.listArticles(page);

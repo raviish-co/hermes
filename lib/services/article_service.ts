@@ -7,11 +7,8 @@ interface ArticleList {
 
 export class ArticleService {
     async searchArticles(query: string): Promise<Article[]> {
-        const response = await $fetch("/api/search_article", {
-            method: "post",
-            body: {
-                query,
-            },
+        const response = await $fetch(`/api/search_article?query=${query}`, {
+            method: "get",
         });
 
         return response.articles;
