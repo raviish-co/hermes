@@ -31,10 +31,13 @@ async function searchArticles() {
 }
 
 async function listArticles(pageToken: number = 1) {
-    const { articles: a, total: t } = await articleService.listAtricles(pageToken);
+    // const { articles: a, total: t } = await articleService.listAtricles(pageToken);
 
-    articles.value = a;
-    total.value = t;
+    // articles.value = a;
+    // total.value = t;
+
+    articles.value = ARTICLES;
+    total.value = 1;
 }
 
 function showDialog() {

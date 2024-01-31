@@ -22,7 +22,7 @@ const complementaryDataIsDisabled = ref<boolean>(false);
 const requestList = ref<RequestArticle[]>([]);
 const currentPurposeName = ref<string>("");
 const currentSectionName = ref<string>("");
-const dropdownVisibility = ref<boolean>(false);
+const securityDeposit = ref<string>("0,00");
 const purpouses = ref<Purpose[]>([]);
 const grandTotal = ref<string>("0,00");
 
@@ -97,31 +97,21 @@ function clearRequestList() {
     requestList.value = [];
 }
 
-function sumTotalWithSecurityDepositPerRow(rowTotal: string, rowSecurityDeposit: string): string {
-    const total = convertToNumber(rowTotal);
-    const securityDeposit = convertToNumber(rowSecurityDeposit);
-
-    const result = (total + securityDeposit) / 100;
-
-    return formatCurrency(result);
-}
-
 function calculateGrandTotal() {
-    const totalsToPayPerRow = requestList.value.map((row) =>
-        sumTotalWithSecurityDepositPerRow(row.total, row.securityDeposit)
-    );
-
-    totalsToPayPerRow.forEach((totalPerRow, idx) => {
+    requestList.value.forEach((row, idx) => {
         if (idx === 0) {
-            grandTotal.value = totalPerRow;
+            grandTotal.value = row.total;
+            securityDeposit.value = row.total;
             return;
         }
 
-        const value = convertToNumber(totalPerRow);
+        const value = convertToNumber(row.total);
         const total = convertToNumber(grandTotal.value);
 
         const result = (value + total) / 100;
+        const doubleResult = result * 2;
 
+        securityDeposit.value = formatCurrency(doubleResult);
         grandTotal.value = formatCurrency(result);
     });
 }
@@ -277,10 +267,18 @@ listPurposes();
                 <button class="btn-secondary">Solicitar</button>
                 <button class="btn-light">Cancelar</button>
             </div>
-            <p class="text-right space-x-1">
-                <span class="font-medium">Total Geral(kz):</span>
-                <span>{{ grandTotal }}</span>
-            </p>
+
+            <div class="flex gap-4 flex-wrap">
+                <p class="text-right space-x-1">
+                    <span class="font-medium">Total Geral(kz):</span>
+                    <span>{{ grandTotal }}</span>
+                </p>
+
+                <p class="text-right space-x-1">
+                    <span class="font-medium">Caução(kz):</span>
+                    <span>{{ securityDeposit }}</span>
+                </p>
+            </div>
         </div>
     </section>
 
