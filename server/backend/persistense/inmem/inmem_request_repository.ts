@@ -1,19 +1,19 @@
 import { RequestRepository } from "../../domain/requests/request_repository";
-import { RequestedItems } from "../../domain/requests/requested_items";
+import { Request } from "../../domain/requests/request";
 
 export class InmemRequestRepository implements RequestRepository {
-    #data: Record<string, RequestedItems> = {};
+    #data: Record<string, Request> = {};
 
-    save(requestArticles: RequestedItems): Promise<void> {
+    save(requestArticles: Request): Promise<void> {
         this.#data["1000"] = requestArticles;
         return Promise.resolve(undefined);
     }
 
-    last(): Promise<RequestedItems> {
+    last(): Promise<Request> {
         return Promise.resolve(this.records[this.records.length - 1]);
     }
 
-    get records(): RequestedItems[] {
+    get records(): Request[] {
         return Object.values(this.#data);
     }
 }

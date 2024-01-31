@@ -3,7 +3,7 @@ import { PurposeNotFound } from "../domain/purposes/purpose_not_found_error";
 import { RequestRepository } from "../domain/requests/request_repository";
 import { InsufficientStock } from "../domain/insufficient_stock_error";
 import { InvalidTotal } from "../domain/requests/invalid_total_error";
-import { RequestedItems } from "../domain/requests/requested_items";
+import { Request } from "../domain/requests/request";
 import { ItemRepository } from "../domain/catalog/item_repository";
 import { PurposeSource } from "../domain/purposes/purpose_source";
 import { RequestItem } from "../domain/requests/request_item";
@@ -19,18 +19,18 @@ import { ID } from "../shared/id";
 export class RequestService {
     readonly purposeSource: PurposeSource;
     readonly itemRepository: ItemRepository;
-    readonly requestArticlesRepository: RequestRepository;
+    readonly requestRepository: RequestRepository;
     readonly stockRepository: StockRepository;
 
     constructor(
         purposeSource: PurposeSource,
         itemRepository: ItemRepository,
-        requestArticlesRepository: RequestRepository,
+        requestRepository: RequestRepository,
         stockRepository: StockRepository
     ) {
         this.purposeSource = purposeSource;
         this.itemRepository = itemRepository;
-        this.requestArticlesRepository = requestArticlesRepository;
+        this.requestRepository = requestRepository;
         this.stockRepository = stockRepository;
     }
 
@@ -56,21 +56,22 @@ export class RequestService {
         const purpose = Purpose.fromOptions(purposeData);
         const items = itemsOrError.value;
         const user = User.create("Teste");
-        const requestedItems = RequestedItems.create({
+        const request = Request.create({
             purpose,
             user,
             returnDate,
         });
 
-        const requestedItemsOrError = this.#buildRequestedItems(items, productsData);
-        if (requestedItemsOrError.isLeft()) return left(requestedItemsOrError.value);
+        const requestItemsOrError = this.#buildRequestItems(items, productsData);
+        if (requestItemsOrError.isLeft()) return left(requestItemsOrError.value);
 
-        requestedItems.addItems(requestedItemsOrError.value);
-        if (!requestedItems.isSameTotal(total)) return left(new InvalidTotal());
+        request.addItems(requestItemsOrError.value);
 
-        if (!requestedItems.isSameSecurityDeposit(securityDeposit)) return left(new InvalidTotal());
+        if (!request.isSameTotal(total)) return left(new InvalidTotal());
 
-        await this.requestArticlesRepository.save(requestedItems);
+        if (!request.isSameSecurityDeposit(securityDeposit)) return left(new InvalidTotal());
+
+        await this.requestRepository.save(request);
 
         // await this.articleRepository.updateStock(articles);
 
@@ -89,7 +90,7 @@ export class RequestService {
         return queries;
     }
 
-    #buildRequestedItems(
+    #buildRequestItems(
         articles: Item[],
         articlesData: ProductData[]
     ): Either<InsufficientStock, RequestItem[]> {

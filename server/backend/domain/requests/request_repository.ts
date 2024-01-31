@@ -1,6 +1,6 @@
-import { RequestedItems } from "./requested_items";
+import { Request } from "./request";
 
 export interface RequestRepository {
-    save(requestItems: RequestedItems): Promise<void>;
-    last(): Promise<RequestedItems>;
+    save(requestItems: Request): Promise<void>;
+    last(): Promise<Request>;
 }

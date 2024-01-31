@@ -1,4 +1,4 @@
-import { RequestedItems, RequestStatus } from "../../domain/requests/requested_items";
+import { Request, RequestStatus } from "../../domain/requests/request";
 import { Product, ProductStatus } from "../../domain/catalog/product";
 import { RequestItem } from "../../domain/requests/request_item";
 import { Item } from "../../domain/catalog/item";
@@ -7,7 +7,7 @@ import { User } from "../../domain/user";
 
 describe("Test Request Products", () => {
     it("should create the request products", () => {
-        const requestedItems = RequestedItems.create(requestProductsOptions);
+        const requestedItems = Request.create(requestProductsOptions);
 
         expect(requestedItems.getStatus()).toEqual(RequestStatus.PENDING);
     });
@@ -19,7 +19,7 @@ describe("Test Request Products", () => {
             purpose: purpose,
         };
 
-        const requestedItems = RequestedItems.create(options);
+        const requestedItems = Request.create(options);
 
         expect(requestedItems.purpose).toEqual(purpose);
         expect(requestedItems.purpose.section).toBeDefined();
@@ -28,7 +28,7 @@ describe("Test Request Products", () => {
     it("Deve garantir que a seção não será definida caso a finalidade não tenha seções", () => {
         const purpose = { name: "Aluguer" };
 
-        const requestedItems = RequestedItems.create(requestProductsOptions);
+        const requestedItems = Request.create(requestProductsOptions);
 
         expect(requestedItems.purpose).toEqual(purpose);
         expect(requestedItems.purpose.section).toBeUndefined();
@@ -42,7 +42,7 @@ describe("Test Request Products", () => {
             purpose: purpose,
         };
 
-        const requestedItems = RequestedItems.create(options);
+        const requestedItems = Request.create(options);
 
         expect(requestedItems.purpose.recipient).toBeDefined();
         expect(requestedItems.purpose.recipient).toEqual(client);
@@ -55,13 +55,13 @@ describe("Test Request Products", () => {
             user,
         };
 
-        const requestedItems = RequestedItems.create(options);
+        const requestedItems = Request.create(options);
 
         expect(requestedItems.user).toEqual(user);
     });
 
     it("Deve definir o momento que a solicitação foi efetuada", () => {
-        const requestedItems = RequestedItems.create(requestProductsOptions);
+        const requestedItems = Request.create(requestProductsOptions);
 
         expect(requestedItems.issuedAt.getTime()).toBeLessThanOrEqual(new Date().getTime());
     });
@@ -69,13 +69,13 @@ describe("Test Request Products", () => {
     it("Deve definir a data de devolução da solicitação", () => {
         const returnDate = "2024-01-21T00:00:00.000Z";
 
-        const requestedItems = RequestedItems.create(requestProductsOptions);
+        const requestedItems = Request.create(requestProductsOptions);
 
         expect(requestedItems.returnDate.getTime()).toEqual(new Date(returnDate).getTime());
     });
 
     it("Deve adicionar os artigos a solicitação", () => {
-        const requestedItems = RequestedItems.create(requestProductsOptions);
+        const requestedItems = Request.create(requestProductsOptions);
 
         requestedItems.addItems(requestItems);
 
@@ -84,7 +84,7 @@ describe("Test Request Products", () => {
 
     it("Deve calcular o valor total da solicitação", () => {
         const total = "1050,00";
-        const requestedItems = RequestedItems.create(requestProductsOptions);
+        const requestedItems = Request.create(requestProductsOptions);
 
         requestedItems.addItems(requestItems);
 
@@ -92,7 +92,7 @@ describe("Test Request Products", () => {
     });
 
     it("Deve calcular o valor total da linha com base na quantidade de artigos solicitados", () => {
-        const requestedItems = RequestedItems.create(requestProductsOptions);
+        const requestedItems = Request.create(requestProductsOptions);
 
         requestedItems.addItems(requestItems);
 
@@ -101,7 +101,7 @@ describe("Test Request Products", () => {
     });
 
     it("Deve calcular o valor total da linha com base num preço com casas decimais", () => {
-        const requestedItems = RequestedItems.create(requestProductsOptions);
+        const requestedItems = Request.create(requestProductsOptions);
         const product = Product.create({ ...productOptions, price: "1150,50" });
         const item = new Item(product);
         const requestLines = [
@@ -126,7 +126,7 @@ describe("Test Request Products", () => {
                 quantity: 3,
             }),
         ];
-        const requestedArticles = RequestedItems.create(requestProductsOptions);
+        const requestedArticles = Request.create(requestProductsOptions);
 
         requestedArticles.addItems(requestLines);
 
@@ -146,7 +146,7 @@ describe("Test Request Products", () => {
                 quantity: 2,
             }),
         ];
-        const requestedItems = RequestedItems.create(requestProductsOptions);
+        const requestedItems = Request.create(requestProductsOptions);
 
         requestedItems.addItems(requestItems);
 
@@ -154,7 +154,7 @@ describe("Test Request Products", () => {
     });
 
     it("Deve ser o dobro do valor total da solicitação o valor da caução a reter", () => {
-        const requestedItems = RequestedItems.create(requestProductsOptions);
+        const requestedItems = Request.create(requestProductsOptions);
 
         requestedItems.addItems(requestItems);
 

@@ -14,12 +14,12 @@ import { ID } from "../../shared/id";
 describe("Test Purpose Source", () => {
     it("should be return an  list void of purposes", async () => {
         const purposeSource = new FakePurposeSource();
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
@@ -31,12 +31,12 @@ describe("Test Purpose Source", () => {
 
     it("should be call list method in source data", async () => {
         const purposeSource = new FakePurposeSource();
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
@@ -50,12 +50,12 @@ describe("Test Purpose Source", () => {
 
     it("should retrieve a list of purposes from data", async () => {
         const purposeSource = new PurposeSourceStub();
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
@@ -69,12 +69,12 @@ describe("Test Purpose Source", () => {
 
     it("should retrieve a purpose without sections", async () => {
         const purposeSource = new PurposeSourceStub();
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
@@ -100,12 +100,12 @@ describe("Test RequestArticles Service", () => {
         };
 
         const purposeSource = new PurposeSourceStub();
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
@@ -124,12 +124,12 @@ describe("Test RequestArticles Service", () => {
             purposeData: { name: "Aluguer" },
         };
         const purposeSource = new PurposeSourceStub();
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
@@ -142,16 +142,16 @@ describe("Test RequestArticles Service", () => {
     it("Deve chamar o método **getAll** no repositório de artigos", async () => {
         const productsData = [{ productId: "1001", quantity: 1 }];
         const purposeSource = new PurposeSourceStub();
-        const articleRepository = new InmemItemRepository();
+        const itemRepository = new InmemItemRepository();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
-        const artSpy = vi.spyOn(articleRepository, "getAll");
+        const artSpy = vi.spyOn(itemRepository, "getAll");
 
         await service.requestItems({ ...requestData, productsData });
 
@@ -163,12 +163,12 @@ describe("Test RequestArticles Service", () => {
     it("Deve retornar um erro **ArticleNotFound** se não existir", async () => {
         const productsData = [{ productId: "1008", quantity: 1 }];
         const purposeSource = new PurposeSourceStub();
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
@@ -186,12 +186,12 @@ describe("Test RequestArticles Service", () => {
         const productsData = [{ productId: "1001", quantity: 1 }];
         const total = "15,95";
         const purposeSource = new PurposeSourceStub();
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
@@ -211,12 +211,12 @@ describe("Test RequestArticles Service", () => {
     it("Deve efectuar a solicitação de um uníco artigo", async () => {
         const productsData = [{ productId: "1001", quantity: 1 }];
         const purposeSource = new PurposeSourceStub();
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
@@ -245,12 +245,12 @@ describe("Test RequestArticles Service", () => {
         ];
         const total = "166,90";
         const securityDeposit = "333,80";
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
@@ -275,12 +275,12 @@ describe("Test RequestArticles Service", () => {
         const total = "166,90";
         const securityDeposit = "333,80";
         const purposeSource = new PurposeSourceStub();
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
@@ -300,12 +300,12 @@ describe("Test RequestArticles Service", () => {
     it("Deve retornar **InvalidTotal** se o total enviado pelo solicitante for diferente do total a pagar da solicitação", async () => {
         const requestTotal = "25,00";
         const purposeSource = new PurposeSourceStub();
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
@@ -321,12 +321,12 @@ describe("Test RequestArticles Service", () => {
 
     it("Deve registrar a data de devolução da solicitação", async () => {
         const purposeSource = new PurposeSourceStub();
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
@@ -341,12 +341,12 @@ describe("Test RequestArticles Service", () => {
 
     it("Deve solicitar vários artigos com diferentes quantidades", async () => {
         const purposeSource = new PurposeSourceStub();
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
@@ -365,13 +365,13 @@ describe("Test RequestArticles Service", () => {
             { productId: "1002", quantity: 15 },
         ];
 
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const purposeSource = new PurposeSourceStub();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
@@ -387,16 +387,16 @@ describe("Test RequestArticles Service", () => {
 
     it.skip("Deve atualizar o estoque dos artigos solicitados no repositório", async () => {
         const purposeSource = new PurposeSourceStub();
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
-        const spy = vi.spyOn(articleRepository, "updateStock");
+        const spy = vi.spyOn(itemRepository, "updateStock");
 
         await service.requestItems(requestData);
 
@@ -406,31 +406,31 @@ describe("Test RequestArticles Service", () => {
 
     it.skip("Deve diminuir o estoque dos artigos solicitados", async () => {
         const purposeSource = new PurposeSourceStub();
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
 
         await service.requestItems(requestData);
 
-        const article = await articleRepository.getById(ID.New("1001"));
+        const article = await itemRepository.getById(ID.New("1001"));
 
         expect(article.getStock()).toEqual(8);
     });
 
     it("Caso a finalidade tenha uma seção, deve ser adicionada a solicitação", async () => {
         const purposeSource = new PurposeSourceStub();
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
@@ -445,7 +445,7 @@ describe("Test RequestArticles Service", () => {
 
     it("Deve ser adicionada a solicitação caso a finalidade tenha um destino", async () => {
         const purposeSource = new PurposeSourceStub();
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const data = {
@@ -459,7 +459,7 @@ describe("Test RequestArticles Service", () => {
 
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
@@ -474,12 +474,12 @@ describe("Test RequestArticles Service", () => {
 
     it("Deve retornar **InsufficientStock** se a quantidade solicitada de uma variação não tiver estoque suficiente", async () => {
         const purposeSource = new PurposeSourceStub();
-        const articleRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const service = new RequestService(
             purposeSource,
-            articleRepository,
+            itemRepository,
             requestRepository,
             stockRepository
         );
