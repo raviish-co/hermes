@@ -19,6 +19,6 @@ export const makeRequestService = (): RequestService => {
     );
 };
 
-export const makeArticleService = (): ArticleService => {
+export const makeProductService = (): ArticleService => {
     return new ArticleService(articleRepository);
 };
