@@ -92,7 +92,7 @@ describe("Test RequestArticles Service", () => {
         const purposeName = "Aluguer";
         const articlesData = [{ articleId: "1001", quantity: 1 }];
         const data = {
-            ...requestArticlesData,
+            ...requestData,
             purposeData: {
                 name: purposeName,
             },
@@ -111,7 +111,7 @@ describe("Test RequestArticles Service", () => {
         );
         const spy = vi.spyOn(purposeSource, "exists");
 
-        service.requestArticles(data);
+        service.requestItems(data);
 
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledTimes(1);
@@ -120,7 +120,7 @@ describe("Test RequestArticles Service", () => {
 
     it("Deve retornar error **PurposeNotFound** se não existir", async () => {
         const data = {
-            ...requestArticlesData,
+            ...requestData,
             purposeData: { name: "Aluguer" },
         };
         const purposeSource = new PurposeSourceStub();
@@ -134,9 +134,9 @@ describe("Test RequestArticles Service", () => {
             stockRepository
         );
 
-        const voidOrError = await service.requestArticles(data);
+        const error = await service.requestItems(data);
 
-        expect(voidOrError.isLeft()).toBeTruthy();
+        expect(error.isLeft()).toBeTruthy();
     });
 
     it("Deve chamar o método **getAll** no repositório de artigos", async () => {
@@ -153,7 +153,7 @@ describe("Test RequestArticles Service", () => {
         );
         const artSpy = vi.spyOn(articleRepository, "getAll");
 
-        await service.requestArticles({ ...requestArticlesData, productsData });
+        await service.requestItems({ ...requestData, productsData });
 
         expect(artSpy).toHaveBeenCalled();
         expect(artSpy).toHaveBeenCalledTimes(1);
@@ -173,18 +173,18 @@ describe("Test RequestArticles Service", () => {
             stockRepository
         );
 
-        const voidOrError = await service.requestArticles({
-            ...requestArticlesData,
+        const error = await service.requestItems({
+            ...requestData,
             productsData,
         });
 
-        expect(voidOrError.isLeft()).toBeTruthy();
-        expect(voidOrError.value).toBeInstanceOf(ProductNotFound);
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(ProductNotFound);
     });
 
     it("Deve chamar o método **save** no repositório de solicitações de artigos", async () => {
         const productsData = [{ productId: "1001", quantity: 1 }];
-        const requestTotal = "15,95";
+        const total = "15,95";
         const purposeSource = new PurposeSourceStub();
         const articleRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
@@ -197,10 +197,11 @@ describe("Test RequestArticles Service", () => {
         );
         const spy = vi.spyOn(requestRepository, "save");
 
-        await service.requestArticles({
-            ...requestArticlesData,
+        await service.requestItems({
+            ...requestData,
             productsData,
-            requestTotal,
+            total,
+            securityDeposit: "31,90",
         });
 
         expect(spy).toHaveBeenCalled();
@@ -220,10 +221,11 @@ describe("Test RequestArticles Service", () => {
             stockRepository
         );
 
-        await service.requestArticles({
-            ...requestArticlesData,
+        await service.requestItems({
+            ...requestData,
             productsData,
-            requestTotal: "15,95",
+            total: "15,95",
+            securityDeposit: "31,90",
         });
 
         const requestArticles = await requestRepository.last();
@@ -241,7 +243,8 @@ describe("Test RequestArticles Service", () => {
             { productId: "1001", quantity: 1 },
             { productId: "1002", quantity: 1 },
         ];
-        const requestTotal = "166,90";
+        const total = "166,90";
+        const securityDeposit = "333,80";
         const articleRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
@@ -252,15 +255,16 @@ describe("Test RequestArticles Service", () => {
             stockRepository
         );
 
-        await service.requestArticles({
-            ...requestArticlesData,
+        await service.requestItems({
+            ...requestData,
             productsData,
-            requestTotal,
+            total,
+            securityDeposit,
         });
 
         const requestArticles = await requestRepository.last();
         expect(requestArticles.items.length).toBe(2);
-        expect(requestArticles.getTotal().value).toEqual(requestTotal);
+        expect(requestArticles.getTotal().value).toEqual(total);
     });
 
     it("Deve verificar se o calculo do total a pagar da solicitação é igual ao total enviado pelo solicitante", async () => {
@@ -268,7 +272,8 @@ describe("Test RequestArticles Service", () => {
             { productId: "1001", quantity: 1 },
             { productId: "1002", quantity: 1 },
         ];
-        const requestTotal = "166,90";
+        const total = "166,90";
+        const securityDeposit = "333,80";
         const purposeSource = new PurposeSourceStub();
         const articleRepository = new ItemRepositoryStub();
         const requestRepository = new InmemRequestRepository();
@@ -280,15 +285,16 @@ describe("Test RequestArticles Service", () => {
             stockRepository
         );
 
-        await service.requestArticles({
-            ...requestArticlesData,
+        await service.requestItems({
+            ...requestData,
             productsData,
-            requestTotal,
+            total,
+            securityDeposit,
         });
 
         const requestArticles = await requestRepository.last();
 
-        expect(requestArticles.isSameTotal(requestTotal)).toBeTruthy();
+        expect(requestArticles.isSameTotal(total)).toBeTruthy();
     });
 
     it("Deve retornar **InvalidTotal** se o total enviado pelo solicitante for diferente do total a pagar da solicitação", async () => {
@@ -304,10 +310,13 @@ describe("Test RequestArticles Service", () => {
             stockRepository
         );
 
-        const voidOrError = await service.requestArticles({ ...requestArticlesData, requestTotal });
+        const error = await service.requestItems({
+            ...requestData,
+            total: requestTotal,
+        });
 
-        expect(voidOrError.isLeft()).toBeTruthy();
-        expect(voidOrError.value).toBeInstanceOf(InvalidTotal);
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(InvalidTotal);
     });
 
     it("Deve registrar a data de devolução da solicitação", async () => {
@@ -322,7 +331,7 @@ describe("Test RequestArticles Service", () => {
             stockRepository
         );
 
-        await service.requestArticles(requestArticlesData);
+        await service.requestItems(requestData);
 
         const requestArticles = await requestRepository.last();
 
@@ -342,7 +351,7 @@ describe("Test RequestArticles Service", () => {
             stockRepository
         );
 
-        await service.requestArticles(requestArticlesData);
+        await service.requestItems(requestData);
 
         const requestArticles = await requestRepository.last();
 
@@ -367,13 +376,13 @@ describe("Test RequestArticles Service", () => {
             stockRepository
         );
 
-        const voidOrError = await service.requestArticles({
-            ...requestArticlesData,
+        const error = await service.requestItems({
+            ...requestData,
             productsData,
         });
 
-        expect(voidOrError.isLeft()).toBeTruthy();
-        expect(voidOrError.value).toBeInstanceOf(InsufficientStock);
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(InsufficientStock);
     });
 
     it.skip("Deve atualizar o estoque dos artigos solicitados no repositório", async () => {
@@ -389,7 +398,7 @@ describe("Test RequestArticles Service", () => {
         );
         const spy = vi.spyOn(articleRepository, "updateStock");
 
-        await service.requestArticles(requestArticlesData);
+        await service.requestItems(requestData);
 
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledTimes(1);
@@ -407,7 +416,7 @@ describe("Test RequestArticles Service", () => {
             stockRepository
         );
 
-        await service.requestArticles(requestArticlesData);
+        await service.requestItems(requestData);
 
         const article = await articleRepository.getById(ID.New("1001"));
 
@@ -426,7 +435,7 @@ describe("Test RequestArticles Service", () => {
             stockRepository
         );
 
-        await service.requestArticles(requestArticlesData);
+        await service.requestItems(requestData);
 
         const requestArticles = await requestRepository.last();
 
@@ -440,7 +449,7 @@ describe("Test RequestArticles Service", () => {
         const requestRepository = new InmemRequestRepository();
         const stockRepository = new StockRepositoryStub();
         const data = {
-            ...requestArticlesData,
+            ...requestData,
             purposeData: {
                 name: "Lavandaria",
                 section: "Externa",
@@ -455,7 +464,7 @@ describe("Test RequestArticles Service", () => {
             stockRepository
         );
 
-        await service.requestArticles(data);
+        await service.requestItems(data);
 
         const requestArticles = await requestRepository.last();
 
@@ -480,17 +489,39 @@ describe("Test RequestArticles Service", () => {
             { productId: "1003", quantity: 4, variations: ["1004", "1005"] },
         ];
 
-        const voidOrError = await service.requestArticles({
-            ...requestArticlesData,
+        const error = await service.requestItems({
+            ...requestData,
             productsData,
         });
 
-        expect(voidOrError.isLeft()).toBeTruthy();
-        expect(voidOrError.value).toBeInstanceOf(InsufficientStock);
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(InsufficientStock);
+    });
+
+    it("Deve retornar **InvalidTotal** se o total da çaução não foi igual ao valor calculado", async () => {
+        const purposeSource = new PurposeSourceStub();
+        const itemRepository = new ItemRepositoryStub();
+        const requestRepository = new InmemRequestRepository();
+        const stockRepository = new StockRepositoryStub();
+
+        const service = new RequestService(
+            purposeSource,
+            itemRepository,
+            requestRepository,
+            stockRepository
+        );
+
+        const error = await service.requestItems({
+            ...requestData,
+            securityDeposit: "100,00",
+        });
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(InvalidTotal);
     });
 });
 
-const requestArticlesData = {
+const requestData = {
     purposeData: {
         name: "Lavandaria",
         section: "Interna",
@@ -499,6 +530,7 @@ const requestArticlesData = {
         { productId: "1001", quantity: 2 },
         { productId: "1002", quantity: 3 },
     ],
-    requestTotal: "484,75",
+    total: "484,75",
+    securityDeposit: "969,50",
     returnDate: "2021-01-01T16:40:00",
 };

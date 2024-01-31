@@ -1,20 +1,20 @@
-import { Purpose } from "../domain/purposes/purpose";
-import { PurposeData } from "../domain/purposes/purpose_data";
-import { PurposeSource } from "../domain/purposes/purpose_source";
+import { ProductData, ProductQuery, RequestData, StockQuery } from "../shared/types";
 import { PurposeNotFound } from "../domain/purposes/purpose_not_found_error";
-import { RequestedItems as RequestedItems } from "../domain/requests/requested_items";
-import { RequestItem } from "../domain/requests/request_item";
-import { User } from "../domain/user";
-import { Either, left, right } from "../shared/either";
-import { InvalidTotal } from "../domain/requests/invalid_total_error";
-import { ItemRepository } from "../domain/catalog/item_repository";
-import { ID } from "../shared/id";
-import { InsufficientStock } from "../domain/insufficient_stock_error";
 import { RequestRepository } from "../domain/requests/request_repository";
-import { ProductData, ProductQuery, RequestProductsData, StockQuery } from "../shared/types";
-import { NewRequestProductsError } from "../shared/errors";
-import { Item } from "../domain/catalog/item";
+import { InsufficientStock } from "../domain/insufficient_stock_error";
+import { InvalidTotal } from "../domain/requests/invalid_total_error";
+import { RequestedItems } from "../domain/requests/requested_items";
+import { ItemRepository } from "../domain/catalog/item_repository";
+import { PurposeSource } from "../domain/purposes/purpose_source";
+import { RequestItem } from "../domain/requests/request_item";
+import { PurposeData } from "../domain/purposes/purpose_data";
 import { StockRepository } from "../domain/stock_repository";
+import { Either, left, right } from "../shared/either";
+import { Purpose } from "../domain/purposes/purpose";
+import { RequestError } from "../shared/errors";
+import { Item } from "../domain/catalog/item";
+import { User } from "../domain/user";
+import { ID } from "../shared/id";
 
 export class RequestService {
     readonly purposeSource: PurposeSource;
@@ -39,10 +39,8 @@ export class RequestService {
         return Promise.resolve(purposes);
     }
 
-    async requestArticles(
-        data: RequestProductsData
-    ): Promise<Either<NewRequestProductsError, void>> {
-        const { purposeData, productsData, requestTotal, returnDate } = data;
+    async requestItems(data: RequestData): Promise<Either<RequestError, void>> {
+        const { purposeData, productsData, total, returnDate, securityDeposit } = data;
 
         const purposeExists = await this.purposeSource.exists(purposeData.name);
         if (!purposeExists) return left(new PurposeNotFound(purposeData.name));
@@ -68,7 +66,9 @@ export class RequestService {
         if (requestedItemsOrError.isLeft()) return left(requestedItemsOrError.value);
 
         requestedItems.addItems(requestedItemsOrError.value);
-        if (!requestedItems.isSameTotal(requestTotal)) return left(new InvalidTotal());
+        if (!requestedItems.isSameTotal(total)) return left(new InvalidTotal());
+
+        if (!requestedItems.isSameSecurityDeposit(securityDeposit)) return left(new InvalidTotal());
 
         await this.requestArticlesRepository.save(requestedItems);
 

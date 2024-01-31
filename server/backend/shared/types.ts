@@ -22,9 +22,10 @@ export type ProductData = {
     variations?: string[];
 };
 
-export type RequestProductsData = {
+export type RequestData = {
     purposeData: PurposeData;
     productsData: ProductData[];
-    requestTotal: string;
+    total: string;
     returnDate: string;
+    securityDeposit: string;
 };

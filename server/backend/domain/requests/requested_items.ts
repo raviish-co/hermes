@@ -58,6 +58,10 @@ export class RequestedItems {
         return this.total.value === total;
     }
 
+    isSameSecurityDeposit(securityDeposit: string): boolean {
+        return this.securityDeposity.value === securityDeposit;
+    }
+
     getSecurityDeposit(): Decimal {
         return this.securityDeposity;
     }
