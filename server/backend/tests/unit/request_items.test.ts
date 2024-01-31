@@ -7,9 +7,9 @@ import { User } from "../../domain/user";
 
 describe("Test Request Products", () => {
     it("should create the request products", () => {
-        const requestArticles = RequestedItems.create(requestProductsOptions);
+        const requestedItems = RequestedItems.create(requestProductsOptions);
 
-        expect(requestArticles.getStatus()).toEqual(RequestStatus.PENDING);
+        expect(requestedItems.getStatus()).toEqual(RequestStatus.PENDING);
     });
 
     it("Deve garantir que a seção será definida caso a finalidade tenha seções", () => {
@@ -19,19 +19,19 @@ describe("Test Request Products", () => {
             purpose: purpose,
         };
 
-        const requestArticles = RequestedItems.create(options);
+        const requestedItems = RequestedItems.create(options);
 
-        expect(requestArticles.purpose).toEqual(purpose);
-        expect(requestArticles.purpose.section).toBeDefined();
+        expect(requestedItems.purpose).toEqual(purpose);
+        expect(requestedItems.purpose.section).toBeDefined();
     });
 
     it("Deve garantir que a seção não será definida caso a finalidade não tenha seções", () => {
         const purpose = { name: "Aluguer" };
 
-        const requestArticles = RequestedItems.create(requestProductsOptions);
+        const requestedItems = RequestedItems.create(requestProductsOptions);
 
-        expect(requestArticles.purpose).toEqual(purpose);
-        expect(requestArticles.purpose.section).toBeUndefined();
+        expect(requestedItems.purpose).toEqual(purpose);
+        expect(requestedItems.purpose.section).toBeUndefined();
     });
 
     it("Deve definir um destino a solicitação de saída de artigos", () => {
@@ -42,10 +42,10 @@ describe("Test Request Products", () => {
             purpose: purpose,
         };
 
-        const requestArticles = RequestedItems.create(options);
+        const requestedItems = RequestedItems.create(options);
 
-        expect(requestArticles.purpose.recipient).toBeDefined();
-        expect(requestArticles.purpose.recipient).toEqual(client);
+        expect(requestedItems.purpose.recipient).toBeDefined();
+        expect(requestedItems.purpose.recipient).toEqual(client);
     });
 
     it("Deve garantir que o solicitante seja definido", () => {
@@ -55,53 +55,53 @@ describe("Test Request Products", () => {
             user,
         };
 
-        const requestArticles = RequestedItems.create(options);
+        const requestedItems = RequestedItems.create(options);
 
-        expect(requestArticles.user).toEqual(user);
+        expect(requestedItems.user).toEqual(user);
     });
 
     it("Deve definir o momento que a solicitação foi efetuada", () => {
-        const requestArticles = RequestedItems.create(requestProductsOptions);
+        const requestedItems = RequestedItems.create(requestProductsOptions);
 
-        expect(requestArticles.issuedAt.getTime()).toBeLessThanOrEqual(new Date().getTime());
+        expect(requestedItems.issuedAt.getTime()).toBeLessThanOrEqual(new Date().getTime());
     });
 
     it("Deve definir a data de devolução da solicitação", () => {
         const returnDate = "2024-01-21T00:00:00.000Z";
 
-        const requestArticles = RequestedItems.create(requestProductsOptions);
+        const requestedItems = RequestedItems.create(requestProductsOptions);
 
-        expect(requestArticles.returnDate.getTime()).toEqual(new Date(returnDate).getTime());
+        expect(requestedItems.returnDate.getTime()).toEqual(new Date(returnDate).getTime());
     });
 
     it("Deve adicionar os artigos a solicitação", () => {
-        const requestArticles = RequestedItems.create(requestProductsOptions);
+        const requestedItems = RequestedItems.create(requestProductsOptions);
 
-        requestArticles.addItems(requestLines);
+        requestedItems.addItems(requestItems);
 
-        expect(requestArticles.items.length).toEqual(3);
+        expect(requestedItems.items.length).toEqual(3);
     });
 
     it("Deve calcular o valor total da solicitação", () => {
         const total = "1050,00";
-        const requestArticles = RequestedItems.create(requestProductsOptions);
+        const requestedItems = RequestedItems.create(requestProductsOptions);
 
-        requestArticles.addItems(requestLines);
+        requestedItems.addItems(requestItems);
 
-        expect(requestArticles.getTotal().value).toEqual(total);
+        expect(requestedItems.getTotal().value).toEqual(total);
     });
 
     it("Deve calcular o valor total da linha com base na quantidade de artigos solicitados", () => {
-        const requestArticles = RequestedItems.create(requestProductsOptions);
+        const requestedItems = RequestedItems.create(requestProductsOptions);
 
-        requestArticles.addItems(requestLines);
+        requestedItems.addItems(requestItems);
 
-        const requestLine = requestArticles.items[0];
+        const requestLine = requestedItems.items[0];
         expect(requestLine.getTotal().value).toEqual("450,00");
     });
 
     it("Deve calcular o valor total da linha com base num preço com casas decimais", () => {
-        const requestArticles = RequestedItems.create(requestProductsOptions);
+        const requestedItems = RequestedItems.create(requestProductsOptions);
         const product = Product.create({ ...productOptions, price: "1150,50" });
         const item = new Item(product);
         const requestLines = [
@@ -111,9 +111,9 @@ describe("Test Request Products", () => {
             }),
         ];
 
-        requestArticles.addItems(requestLines);
+        requestedItems.addItems(requestLines);
 
-        const requestLine = requestArticles.items[0];
+        const requestLine = requestedItems.items[0];
 
         expect(requestLine.getTotal().value).toEqual("3451,50");
     });
@@ -136,7 +136,7 @@ describe("Test Request Products", () => {
     it("Deve calcular o valor total de uma solicitação com várias linhas, onde o total de cada linha tem casas decimais", () => {
         const item1 = new Item(Product.create({ ...productOptions, price: "1150,50" }));
         const item2 = new Item(Product.create({ ...productOptions, price: "1150,50" }));
-        const requestLines = [
+        const requestItems = [
             RequestItem.create({
                 item: item1,
                 quantity: 3,
@@ -146,11 +146,20 @@ describe("Test Request Products", () => {
                 quantity: 2,
             }),
         ];
-        const requestArticles = RequestedItems.create(requestProductsOptions);
+        const requestedItems = RequestedItems.create(requestProductsOptions);
 
-        requestArticles.addItems(requestLines);
+        requestedItems.addItems(requestItems);
 
-        expect(requestArticles.getTotal().value).toEqual("5752,50");
+        expect(requestedItems.getTotal().value).toEqual("5752,50");
+    });
+
+    it("Deve ser o dobro do valor total da solicitação o valor da caução a reter", () => {
+        const requestedItems = RequestedItems.create(requestProductsOptions);
+
+        requestedItems.addItems(requestItems);
+
+        expect(requestedItems.getTotal().value).toEqual("1050,00");
+        expect(requestedItems.getSecurityDeposit().value).toEqual("2100,00");
     });
 });
 
@@ -160,14 +169,6 @@ const requestProductsOptions = {
     returnDate: "2024-01-21T00:00:00.000Z",
     total: "1050",
 };
-
-// const options = {
-//     attribute: new Attribute("Cor"),
-//     variationValue: { value: "Vermelha" },
-//     stock: 10,
-// };
-
-// const variation = new VariationGroup([Variation.create(options)]);
 
 const productOptions = {
     productId: "some-id",
@@ -182,7 +183,7 @@ const requestLineOptions = {
     quantity: 3,
 };
 
-export const requestLines: RequestItem[] = [
+export const requestItems: RequestItem[] = [
     RequestItem.create(requestLineOptions),
     RequestItem.create({ ...requestLineOptions, quantity: 2 }),
     RequestItem.create({ ...requestLineOptions, quantity: 2 }),
