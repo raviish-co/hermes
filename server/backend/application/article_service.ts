@@ -3,14 +3,14 @@ import { ItemRepository } from "../domain/catalog/item_repository";
 import { Pagination } from "../shared/pagination";
 
 export class ArticleService {
-    readonly articleRepository: ItemRepository;
+    readonly itemRepository: ItemRepository;
 
-    constructor(articleRepository: ItemRepository) {
-        this.articleRepository = articleRepository;
+    constructor(itemRepository: ItemRepository) {
+        this.itemRepository = itemRepository;
     }
 
     async listArticles(pageToken: number = 1, perPage: number = 12): Promise<Pagination<Product>> {
-        return await this.articleRepository.list(pageToken, perPage);
+        return await this.itemRepository.list(pageToken, perPage);
     }
 
     searchArticles(
@@ -18,6 +18,6 @@ export class ArticleService {
         pageToken: number = 1,
         perPage: number = 12
     ): Promise<Pagination<Product>> {
-        return this.articleRepository.search(query, pageToken, perPage);
+        return this.itemRepository.search(query, pageToken, perPage);
     }
 }
