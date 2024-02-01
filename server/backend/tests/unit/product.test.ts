@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Product, ProductStatus } from "../../domain/catalog/product";
+import { Product } from "../../domain/catalog/product";
 
 describe("Test Product", () => {
     it("Deve criar um produto", () => {
@@ -21,35 +21,18 @@ describe("Test Product", () => {
         expect(product.isUnique()).toBeTruthy();
     });
 
-    it("Deve definir a condição actual de um produto", () => {
+    it("Deve criar um produto com a sua subcatergoria", () => {
         const product = Product.create(options);
 
-        const condition = product.getCondition();
-
-        expect(condition.status).toEqual(ProductStatus.Bad);
-        expect(condition.comment).toBeDefined();
-        expect(condition.comment).toEqual("Some comment");
-    });
-
-    it("Quando o artigo está em bom estado, não deve ter comentário", () => {
-        const article = Product.create({ ...options, condition: { status: ProductStatus.Good } });
-
-        const condition = article.getCondition();
-
-        expect(condition.status).toEqual(ProductStatus.Good);
-        expect(condition.comment).toBeUndefined();
+        expect(product.subcategory).toBeDefined();
+        expect(product.subcategory).toEqual("some-subcategory");
     });
 });
-
-const condition = {
-    status: ProductStatus.Bad,
-    comment: "Some comment",
-};
 
 const options = {
     productId: "1001",
     name: "some-name",
     price: "150",
     unique: false,
-    condition: condition,
+    subcategory: "some-subcategory",
 };

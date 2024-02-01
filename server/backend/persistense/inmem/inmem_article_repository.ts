@@ -1,22 +1,16 @@
 import { ProductNotFound } from "../../domain/catalog/product_not_found_error";
 import { ItemRepository } from "../../domain/catalog/item_repository";
 import { Either, left, right } from "../../shared/either";
-import { Product } from "../../domain/catalog/product";
 import { Pagination } from "../../shared/pagination";
 import { ProductQuery } from "../../shared/types";
 import { Item } from "../../domain/catalog/item";
 import { ID } from "../../shared/id";
 
 export class InmemItemRepository implements ItemRepository {
-    #data: Record<string, Product> = {};
     #items: Record<string, Item> = {};
 
-    constructor() {
-        this.#data = {};
-    }
-
-    getById(articleId: ID): Promise<Product> {
-        return Promise.resolve(this.#data[articleId.toString()]);
+    getById(articleId: ID): Promise<Item> {
+        return Promise.resolve(this.#items[articleId.toString()]);
     }
 
     getAll(queries: ProductQuery[]): Promise<Either<ProductNotFound, Item[]>> {
@@ -38,7 +32,7 @@ export class InmemItemRepository implements ItemRepository {
         return Promise.resolve(right(articles));
     }
 
-    list(pageToken: number, perPage: number): Promise<Pagination<Product>> {
+    list(pageToken: number, perPage: number): Promise<Pagination<Item>> {
         const startIndex = (pageToken - 1) * perPage;
 
         const endIndex = startIndex + perPage;
@@ -55,11 +49,11 @@ export class InmemItemRepository implements ItemRepository {
         });
     }
 
-    search(query: string, pageToken: number, perPage: number): Promise<Pagination<Product>> {
-        const articles = this.records.filter((a) => {
+    search(query: string, pageToken: number, perPage: number): Promise<Pagination<Item>> {
+        const items = this.records.filter((item) => {
             return (
-                a.name.toLowerCase().includes(query.toLowerCase()) ||
-                a.productId.toString().includes(query)
+                item.product.name.toLowerCase().includes(query.toLowerCase()) ||
+                item.product.productId.toString().includes(query)
             );
         });
 
@@ -67,7 +61,7 @@ export class InmemItemRepository implements ItemRepository {
 
         const endIndex = startIndex + perPage;
 
-        const result = articles.slice(startIndex, endIndex);
+        const result = items.slice(startIndex, endIndex);
 
         const total = Math.ceil(result.length / perPage);
 
@@ -79,7 +73,14 @@ export class InmemItemRepository implements ItemRepository {
         });
     }
 
-    get records(): Product[] {
-        return Object.values(this.#data);
+    updateAll(items: Item[]): Promise<void> {
+        for (const item of items) {
+            this.#items[item.itemId.toString()] = item;
+        }
+        return Promise.resolve(undefined);
+    }
+
+    get records(): Item[] {
+        return Object.values(this.#items);
     }
 }

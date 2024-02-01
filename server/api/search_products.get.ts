@@ -6,9 +6,7 @@ export default defineEventHandler(async (event) => {
 
     const productService = makeProductService();
 
-    const { result, pageToken, perPage, total } = await productService.searchArticles(
-        query as string
-    );
+    const { result, pageToken, perPage, total } = await productService.searchItems(query as string);
 
     const products = makeProductsDTO(result);
 

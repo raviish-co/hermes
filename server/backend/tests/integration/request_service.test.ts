@@ -1,21 +1,18 @@
 import { InmemRequestRepository } from "../../persistense/inmem/inmem_request_repository";
-import { InmemItemRepository } from "../../persistense/inmem/inmem_article_repository";
+import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
 import { ProductNotFound } from "../../domain/catalog/product_not_found_error";
 import { InsufficientStock } from "../../domain/insufficient_stock_error";
 import { InvalidTotal } from "../../domain/requests/invalid_total_error";
+import { ItemRepository } from "../../domain/catalog/item_repository";
 import { StockRepositoryStub } from "../stubs/stock_repository_stub";
+import { PurposeSource } from "../../domain/purposes/purpose_source";
+import { SequenceGenerator } from "../../domain/sequence_generator";
 import { RequestService } from "../../application/request_service";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { FakePurposeSource } from "../purpose_source_fake";
 import { PurposeSourceStub } from "../purpose_source_stub";
 import { describe, expect, it, vi } from "vitest";
 import { ID } from "../../shared/id";
-import { SequenceGenerator } from "../../domain/sequence_generator";
-import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
-import { StockRepository } from "../../domain/stock_repository";
-import { RequestRepository } from "../../domain/requests/request_repository";
-import { ItemRepository } from "../../domain/catalog/item_repository";
-import { PurposeSource } from "../../domain/purposes/purpose_source";
 
 describe("Test Purpose Source", () => {
     it("should be return an  list void of purposes", async () => {
@@ -342,6 +339,34 @@ describe("Test RequestArticles Service", () => {
         expect(request.requestId).toBeInstanceOf(ID);
         expect(request.requestId.toString()).toEqual("GS - 1000");
     });
+
+    it("Deve gerar 2 solicitações com IDs diferentes", async () => {
+        const { service, requestRepository } = makeService();
+
+        await service.requestItems(requestData);
+
+        await service.requestItems(requestData);
+
+        const request1 = await requestRepository.get(ID.New("GS - 1000"));
+        const request2 = await requestRepository.get(ID.New("GS - 1001"));
+
+        expect(request1.requestId.toString()).toEqual("GS - 1000");
+        expect(request2.requestId.toString()).toEqual("GS - 1001");
+    });
+
+    it("Deve receber o estado atual dos artigos solicitados", async () => {
+        const { service, itemRepository } = makeService();
+
+        await service.requestItems(requestData);
+
+        const item1 = await itemRepository.getById(ID.New("1001"));
+        const item2 = await itemRepository.getById(ID.New("1002"));
+
+        expect(item1.getCondition().status).toEqual("Bom");
+        expect(item2.getCondition().status).toEqual("Mau");
+        expect(item1.getCondition().comment).toBeUndefined();
+        expect(item2.getCondition().comment).toEqual("T-shirt rasgada");
+    });
 });
 
 const requestData = {
@@ -350,8 +375,16 @@ const requestData = {
         section: "Interna",
     },
     productsData: [
-        { productId: "1001", quantity: 2 },
-        { productId: "1002", quantity: 3 },
+        {
+            productId: "1001",
+            quantity: 2,
+            condition: { status: "Bom" },
+        },
+        {
+            productId: "1002",
+            quantity: 3,
+            condition: { status: "Mau", comment: "T-shirt rasgada" },
+        },
     ],
     total: "484,75",
     securityDeposit: "969,50",

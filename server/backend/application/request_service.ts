@@ -80,7 +80,7 @@ export class RequestService {
 
         await this.#requestRepository.save(request);
 
-        // await this.articleRepository.updateStock(articles);
+        await this.#itemRepository.updateAll(items);
 
         return right(undefined);
     }
@@ -98,18 +98,23 @@ export class RequestService {
     }
 
     #buildRequestItems(
-        articles: Item[],
-        articlesData: ProductData[]
+        items: Item[],
+        productsData: ProductData[]
     ): Either<InsufficientStock, RequestItem[]> {
-        const requestedItems: RequestItem[] = [];
+        const requestItems: RequestItem[] = [];
 
-        for (const i in articles) {
-            const { quantity } = articlesData[i];
-            const article = articles[i];
-            const requestedItem = RequestItem.create({ item: article, quantity });
-            requestedItems.push(requestedItem);
+        for (const i in items) {
+            const { quantity, condition } = productsData[i];
+
+            const item = items[i];
+
+            if (condition) item.updateCondition(condition);
+
+            const requestItem = RequestItem.create({ item, quantity });
+
+            requestItems.push(requestItem);
         }
-        return right(requestedItems);
+        return right(requestItems);
     }
 
     #buildStockQueries(products: ProductData[]): StockQuery[] {

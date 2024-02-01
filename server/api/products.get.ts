@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
 
     const articleService = makeProductService();
 
-    const { result, pageToken, perPage, total } = await articleService.listArticles(page);
+    const { result, pageToken, perPage, total } = await articleService.listItems(page);
 
     const products = makeProductsDTO(result);
 

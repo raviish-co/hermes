@@ -8,11 +8,19 @@ describe("Test Variation", () => {
         expect(colorVariation.attribute.name).toEqual(color.name);
         expect(colorVariation.value.value).toEqual(red.value);
     });
+
+    it("Deve criar uma variação com o seu ID", () => {
+        const variation = Variation.create(options);
+
+        expect(variation.variationId).toBeDefined();
+        expect(variation.variationId.toString()).toEqual("1001");
+    });
 });
 
 const color = { name: "Cor" };
 const red = { value: "Vermelha" };
 const options = {
+    variationId: "1001",
     attribute: color,
     value: red,
 };

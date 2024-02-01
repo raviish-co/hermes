@@ -1,4 +1,4 @@
-import { ArticleService } from "./application/article_service";
+import { ItemService } from "./application/article_service";
 import { RequestService } from "./application/request_service";
 import { JsonPurposeSource } from "./persistense/data/json_purpouse_source";
 import { InmemRequestRepository } from "./persistense/inmem/inmem_request_repository";
@@ -19,6 +19,6 @@ export const makeRequestService = (): RequestService => {
     );
 };
 
-export const makeProductService = (): ArticleService => {
-    return new ArticleService(articleRepository);
+export const makeProductService = (): ItemService => {
+    return new ItemService(articleRepository);
 };

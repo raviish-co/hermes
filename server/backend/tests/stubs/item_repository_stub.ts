@@ -1,22 +1,21 @@
 import { ProductNotFound } from "../../domain/catalog/product_not_found_error";
 import { ItemRepository } from "../../domain/catalog/item_repository";
-import { Product, ProductStatus } from "../../domain/catalog/product";
+import { Product } from "../../domain/catalog/product";
 import { Either, left, right } from "../../shared/either";
 import { Pagination } from "../../shared/pagination";
 import { ProductQuery } from "../../shared/types";
-import { Item } from "../../domain/catalog/item";
+import { Item, ItemStatus } from "../../domain/catalog/item";
 import { ID } from "../../shared/id";
 
 export class ItemRepositoryStub implements ItemRepository {
-    #data: Record<string, Product> = {};
     #items: Record<string, Item> = {};
 
     constructor() {
         this.#populate();
     }
 
-    getById(articleId: ID): Promise<Product> {
-        return Promise.resolve(this.#data[articleId.toString()]);
+    getById(itemId: ID): Promise<Item> {
+        return Promise.resolve(this.#items[itemId.toString()]);
     }
 
     getAll(queries: ProductQuery[]): Promise<Either<ProductNotFound, Item[]>> {
@@ -36,7 +35,7 @@ export class ItemRepositoryStub implements ItemRepository {
         return Promise.resolve(right(articles));
     }
 
-    list(pageToken: number, perPage: number): Promise<Pagination<Product>> {
+    list(pageToken: number, perPage: number): Promise<Pagination<Item>> {
         const startIndex = (pageToken - 1) * perPage;
 
         const endIndex = startIndex + perPage;
@@ -53,11 +52,11 @@ export class ItemRepositoryStub implements ItemRepository {
         });
     }
 
-    search(query: string, pageToken: number, perPage: number): Promise<Pagination<Product>> {
-        const articles = this.records.filter((a) => {
+    search(query: string, pageToken: number, perPage: number): Promise<Pagination<Item>> {
+        const items = this.records.filter((i) => {
             return (
-                a.name.toLowerCase().includes(query.toLowerCase()) ||
-                a.productId.toString().includes(query)
+                i.product.name.toLowerCase().includes(query.toLowerCase()) ||
+                i.product.productId.toString().includes(query)
             );
         });
 
@@ -65,7 +64,7 @@ export class ItemRepositoryStub implements ItemRepository {
 
         const endIndex = startIndex + perPage;
 
-        const result = articles.slice(startIndex, endIndex);
+        const result = items.slice(startIndex, endIndex);
 
         const total = Math.ceil(result.length / perPage);
 
@@ -76,54 +75,63 @@ export class ItemRepositoryStub implements ItemRepository {
             result,
         });
     }
-    get records(): Product[] {
-        return Object.values(this.#data);
+
+    updateAll(items: Item[]): Promise<void> {
+        for (const item of items) {
+            this.#items[item.itemId.toString()] = item;
+        }
+
+        return Promise.resolve(undefined);
+    }
+
+    get records(): Item[] {
+        return Object.values(this.#items);
     }
 
     #populate() {
-        this.#data = {
-            "1001": Product.create({
-                productId: "1001",
-                name: "Teste",
-                price: "10,00",
-                condition: { status: ProductStatus.Good },
-            }),
-            "1002": Product.create({
-                productId: "1002",
-                name: "Teste 2",
-                price: "15,95",
-                condition: { status: ProductStatus.Good },
-            }),
-        };
+        const product = Product.create({
+            productId: "1001",
+            name: "Teste 1",
+            price: "15,95",
+            subcategory: "some-subcategory",
+        });
+
+        const product2 = Product.create({
+            productId: "1002",
+            name: "Teste 2",
+            price: "150,95",
+            subcategory: "some-subcategory",
+        });
+
+        const product3 = Product.create({
+            productId: "1003",
+            name: "Teste 2",
+            price: "315,95",
+            subcategory: "some-subcategory",
+        });
+
+        const item1 = Item.create({
+            itemId: "1001",
+            product,
+            condition: { status: ItemStatus.Good },
+        });
+
+        const item2 = Item.create({
+            itemId: "1002",
+            product: product2,
+            condition: { status: ItemStatus.Good },
+        });
+
+        const item3 = Item.create({
+            itemId: "1003",
+            product: product3,
+            condition: { status: ItemStatus.Good },
+        });
 
         this.#items = {
-            "1001": {
-                product: Product.create({
-                    productId: "1001",
-                    name: "Teste 1",
-                    price: "15,95",
-                    condition: { status: ProductStatus.Good },
-                }),
-                variations: [ID.New("1001")],
-            },
-            "1002": {
-                product: Product.create({
-                    productId: "1002",
-                    name: "Teste 2",
-                    price: "150,95",
-                    condition: { status: ProductStatus.Good },
-                }),
-                variations: [ID.New("1002")],
-            },
-            "1003": {
-                product: Product.create({
-                    productId: "1003",
-                    name: "Teste 2",
-                    price: "315,95",
-                    condition: { status: ProductStatus.Good },
-                }),
-                variations: [ID.New("1003")],
-            },
+            "1001": item1,
+            "1002": item2,
+            "1003": item3,
         };
     }
 }

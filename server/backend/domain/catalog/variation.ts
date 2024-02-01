@@ -1,3 +1,5 @@
+import { ID } from "../../shared/id";
+
 type Attribute = {
     name: string;
 };
@@ -7,21 +9,24 @@ type VariationValue = {
 };
 
 type Options = {
+    variationId: string;
     attribute: Attribute;
     value: VariationValue;
 };
 
 export class Variation {
+    readonly variationId: ID;
     readonly attribute: Attribute;
     readonly value: VariationValue;
 
-    private constructor(attribute: Attribute, value: VariationValue) {
+    private constructor(variationId: ID, attribute: Attribute, value: VariationValue) {
+        this.variationId = variationId;
         this.attribute = attribute;
         this.value = value;
     }
 
     static create(options: Options): Variation {
-        const { attribute, value } = options;
-        return new Variation(attribute, value);
+        const { variationId, attribute, value } = options;
+        return new Variation(ID.New(variationId), attribute, value);
     }
 }

@@ -16,10 +16,16 @@ export type ProductQuery = {
     variations?: ID[];
 };
 
+export type Condition = {
+    status: string;
+    comment?: string;
+};
+
 export type ProductData = {
     productId: string;
     quantity: number;
     variations?: string[];
+    condition?: Condition;
 };
 
 export type RequestData = {

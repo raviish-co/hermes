@@ -1,23 +1,23 @@
-import { Product } from "../domain/catalog/product";
 import { ItemRepository } from "../domain/catalog/item_repository";
 import { Pagination } from "../shared/pagination";
+import { Item } from "../domain/catalog/item";
 
-export class ArticleService {
+export class ItemService {
     readonly itemRepository: ItemRepository;
 
     constructor(itemRepository: ItemRepository) {
         this.itemRepository = itemRepository;
     }
 
-    async listArticles(pageToken: number = 1, perPage: number = 12): Promise<Pagination<Product>> {
+    async listItems(pageToken: number = 1, perPage: number = 12): Promise<Pagination<Item>> {
         return await this.itemRepository.list(pageToken, perPage);
     }
 
-    searchArticles(
+    async searchItems(
         query: string,
         pageToken: number = 1,
         perPage: number = 12
-    ): Promise<Pagination<Product>> {
-        return this.itemRepository.search(query, pageToken, perPage);
+    ): Promise<Pagination<Item>> {
+        return await this.itemRepository.search(query, pageToken, perPage);
     }
 }
