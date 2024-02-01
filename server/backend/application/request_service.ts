@@ -11,52 +11,59 @@ import { PurposeData } from "../domain/purposes/purpose_data";
 import { StockRepository } from "../domain/stock_repository";
 import { Either, left, right } from "../shared/either";
 import { Purpose } from "../domain/purposes/purpose";
+import { Generator } from "../domain/generator";
 import { RequestError } from "../shared/errors";
 import { Item } from "../domain/catalog/item";
 import { User } from "../domain/user";
 import { ID } from "../shared/id";
 
 export class RequestService {
-    readonly purposeSource: PurposeSource;
-    readonly itemRepository: ItemRepository;
-    readonly requestRepository: RequestRepository;
-    readonly stockRepository: StockRepository;
+    readonly #purposeSource: PurposeSource;
+    readonly #itemRepository: ItemRepository;
+    readonly #requestRepository: RequestRepository;
+    readonly #stockRepository: StockRepository;
+    readonly #sequenceGenerator: Generator;
 
     constructor(
         purposeSource: PurposeSource,
         itemRepository: ItemRepository,
         requestRepository: RequestRepository,
-        stockRepository: StockRepository
+        stockRepository: StockRepository,
+        sequenceGenerator: Generator
     ) {
-        this.purposeSource = purposeSource;
-        this.itemRepository = itemRepository;
-        this.requestRepository = requestRepository;
-        this.stockRepository = stockRepository;
+        this.#purposeSource = purposeSource;
+        this.#itemRepository = itemRepository;
+        this.#requestRepository = requestRepository;
+        this.#stockRepository = stockRepository;
+        this.#sequenceGenerator = sequenceGenerator;
     }
 
     async listPurposes(): Promise<PurposeData[]> {
-        const purposes = await this.purposeSource.list();
+        const purposes = await this.#purposeSource.list();
         return Promise.resolve(purposes);
     }
 
     async requestItems(data: RequestData): Promise<Either<RequestError, void>> {
         const { purposeData, productsData, total, returnDate, securityDeposit } = data;
 
-        const purposeExists = await this.purposeSource.exists(purposeData.name);
+        const purposeExists = await this.#purposeSource.exists(purposeData.name);
         if (!purposeExists) return left(new PurposeNotFound(purposeData.name));
 
         const itemsQueries = this.#buildQueries(productsData);
-        const itemsOrError = await this.itemRepository.getAll(itemsQueries);
+        const itemsOrError = await this.#itemRepository.getAll(itemsQueries);
         if (itemsOrError.isLeft()) return left(itemsOrError.value);
 
         const stockQueries = this.#buildStockQueries(productsData);
-        const voidOrError = await this.stockRepository.verifyStock(stockQueries);
+        const voidOrError = await this.#stockRepository.verifyStock(stockQueries);
         if (voidOrError.isLeft()) return left(voidOrError.value);
+
+        const requestId = this.#sequenceGenerator.generate("GS");
 
         const purpose = Purpose.fromOptions(purposeData);
         const items = itemsOrError.value;
         const user = User.create("Teste");
         const request = Request.create({
+            requestId,
             purpose,
             user,
             returnDate,
@@ -71,7 +78,7 @@ export class RequestService {
 
         if (!request.isSameSecurityDeposit(securityDeposit)) return left(new InvalidTotal());
 
-        await this.requestRepository.save(request);
+        await this.#requestRepository.save(request);
 
         // await this.articleRepository.updateStock(articles);
 

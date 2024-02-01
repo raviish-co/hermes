@@ -2,8 +2,10 @@ import { Decimal } from "../../shared/decimal";
 import { Purpose } from "../purposes/purpose";
 import { RequestItem } from "./request_item";
 import { User } from "../user";
+import { ID } from "../../shared/id";
 
 type Options = {
+    requestId: string;
     purpose: Purpose;
     user: User;
     returnDate: string;
@@ -14,6 +16,7 @@ export enum RequestStatus {
 }
 
 export class Request {
+    readonly requestId: ID;
     readonly purpose: Purpose;
     readonly user: User;
     readonly items: RequestItem[];
@@ -23,7 +26,8 @@ export class Request {
     total: Decimal;
     securityDeposity: Decimal;
 
-    private constructor(purpose: Purpose, user: User, returnDate: Date) {
+    private constructor(requestId: ID, purpose: Purpose, user: User, returnDate: Date) {
+        this.requestId = requestId;
         this.purpose = purpose;
         this.user = user;
         this.status = RequestStatus.PENDING;
@@ -35,10 +39,9 @@ export class Request {
     }
 
     static create(options: Options): Request {
-        const { purpose, user, returnDate } = options;
+        const { requestId, purpose, user, returnDate } = options;
         const returnDateParsed = new Date(returnDate);
-        const requestedArticles = new Request(purpose, user, returnDateParsed);
-        return requestedArticles;
+        return new Request(ID.New(requestId), purpose, user, returnDateParsed);
     }
 
     addItems(items: RequestItem[]): void {
