@@ -32,14 +32,8 @@ export const ITEMS: Item[] = [
         isUnique: false,
         stock: 4,
         variations: [
-            [
-                { name: "Cor", value: Color.Red },
-                { name: "Tamanho", value: ClothingSize.L },
-            ],
-            [
-                { name: "Cor", value: Color.White },
-                { name: "Tamanho", value: ClothingSize.XL },
-            ],
+            { name: "Cor", value: Color.White },
+            { name: "Tamanho", value: ClothingSize.XL },
         ],
     },
     {
@@ -56,18 +50,11 @@ export const ITEMS: Item[] = [
         isUnique: false,
         stock: 15,
         variations: [
-            [
-                { name: "Cor", value: Color.White },
-                { name: "Tamanho", value: ShoesSize.FourtyThree },
-                { name: "Marca", value: Brand.Converse },
-                { name: "Marca", value: Brand.Converse },
-                { name: "Marca", value: Brand.Converse },
-            ],
-            [
-                { name: "Cor", value: Color.White },
-                { name: "Tamanho", value: ShoesSize.FourtyFive },
-                { name: "Marca", value: Brand.Nike },
-            ],
+            { name: "Cor", value: Color.White },
+            { name: "Tamanho", value: ShoesSize.FourtyThree },
+            { name: "Marca", value: Brand.Converse },
+            { name: "Marca", value: Brand.Converse },
+            { name: "Marca", value: Brand.Converse },
         ],
     },
     {

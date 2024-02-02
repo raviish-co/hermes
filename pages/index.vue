@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { AddItemDialog, DescribeItemStateDialog } from "#build/components";
-import type { ItemVariation, RequestItem } from "~/lib/models/item";
+import type { Variation, RequestItem } from "~/lib/models/item";
 import { formatCurrency } from "~/lib/helpers/format_currency";
 import type { Purpose } from "~/lib/models/purpose";
 import { RequestService } from "~/lib/services/request_service";
@@ -121,7 +121,7 @@ function showDescribeItemStatusDialog() {
     describeItemStateDialogRef.value?.show();
 }
 
-function listVariations(itemVariation?: ItemVariation[]) {
+function listVariations(itemVariation?: Variation[]) {
     if (!itemVariation) return "";
 
     const values = itemVariation.map((v) => `${v.name}: ${v.value}`);
@@ -200,7 +200,7 @@ listPurposes();
                                     {{ row.name }}
                                     <br />
                                     <span class="text-light-600 text-sm">{{
-                                        listVariations(row?.variations?.[0])
+                                        listVariations(row?.variations)
                                     }}</span>
                                 </td>
                                 <td>{{ row.quantity }}</td>

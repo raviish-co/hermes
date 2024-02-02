@@ -2,19 +2,14 @@ export interface Item {
     id: string;
     name: string;
     price: string;
-    variations?: ItemVariation[][];
+    variations?: Variation[];
     isUnique: boolean;
     stock: number;
 }
 
-export interface ItemVariation {
+export interface Variation {
     name: string;
     value: string;
-}
-
-export interface Variation {
-    items: string[];
-    name: string;
 }
 
 export interface RequestItem extends Item {

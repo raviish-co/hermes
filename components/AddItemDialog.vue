@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
-import { ITEMS } from "~/lib/data/items";
 import { convertToNumber } from "~/lib/helpers/convert_to_number";
 import { formatCurrency } from "~/lib/helpers/format_currency";
-import type { Item, ItemVariation, RequestItem } from "~/lib/models/item";
+import type { Item, RequestItem, Variation } from "~/lib/models/item";
 import { ItemService } from "~/lib/services/item_service";
 
 interface Props {
@@ -20,7 +19,7 @@ const dialogRef = ref<typeof VDialog>();
 const query = ref<string>("");
 const items = ref<Item[]>([]);
 const total = ref<string>("0,00");
-const pages = ref<number>(8);
+const pages = ref<number>(1);
 const itemService = new ItemService();
 const quantities = ref<number[]>([]);
 
@@ -79,13 +78,12 @@ async function searchItems() {
     items.value = await itemService.searchItems(query.value);
 }
 
-async function listProducts(pageToken: number = 1) {
-    // const { items: i, total: t } = await itemService.listItems(pageToken);
+async function listItems(pageToken: number = 1) {
+    const { items: i, total: t } = await itemService.listItems(pageToken);
 
-    // items.value = i;
-    // pages.value = t;
+    items.value = i;
+    pages.value = t;
 
-    items.value = ITEMS;
     initializeQuantities();
 }
 
@@ -93,7 +91,7 @@ function initializeQuantities() {
     items.value.forEach((_, idx) => (quantities.value[idx] = 0));
 }
 
-function listVariations(itemVariation?: ItemVariation[]) {
+function listVariations(itemVariation?: Variation[]) {
     if (!itemVariation) return "";
 
     const values = itemVariation.map((v) => `${v.name}: ${v.value}`);
@@ -108,7 +106,7 @@ function showDialog() {
 defineExpose({ show: showDialog });
 
 onMounted(async () => {
-    await listProducts();
+    await listItems();
 });
 </script>
 
@@ -132,16 +130,21 @@ onMounted(async () => {
             </thead>
 
             <tbody>
-                <tr v-if="items" v-for="(item, idx) in items" :key="item.id">
-                    <td class="w-16">{{ item.id }}</td>
+                <tr
+                    v-if="items"
+                    v-for="(item, idx) in items"
+                    :key="item.id"
+                    class="hover:bg-gray-50"
+                >
+                    <td class="w-16 cursor-pointer">{{ item.id }}</td>
 
-                    <td class="min-w-[16rem]" @click="emitItemAdded(item, idx)">
+                    <td class="min-w-[16rem] cursor-pointer" @click="emitItemAdded(item, idx)">
                         {{ item.name }}
 
                         <br />
 
                         <span class="text-light-600 text-sm">
-                            {{ listVariations(item?.variations?.[0]) }}
+                            {{ listVariations(item?.variations) }}
                         </span>
                     </td>
 
@@ -185,7 +188,7 @@ onMounted(async () => {
         </table>
 
         <p>
-            <ThePagination :total="pages" @changed="listProducts" />
+            <ThePagination :total="pages" @changed="listItems" />
         </p>
     </VDialog>
 </template>

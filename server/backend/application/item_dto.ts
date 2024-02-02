@@ -1,4 +1,6 @@
 import { Item } from "../domain/catalog/item";
+import { Variation } from "../domain/catalog/variation";
+import { ID } from "../shared/id";
 
 interface ItemDTO {
     id: string;
@@ -6,6 +8,12 @@ interface ItemDTO {
     price: string;
     isUnique: boolean;
     stock: number;
+    variation?: string;
+}
+
+interface VariationDTO {
+    name: string;
+    value: string;
 }
 
 export function makeItemsDTO(items: Item[]): ItemDTO[] {
@@ -14,6 +22,16 @@ export function makeItemsDTO(items: Item[]): ItemDTO[] {
         name: a.product.name,
         price: a.product.price.value.toString(),
         isUnique: a.product.isUnique(),
-        stock: 0,
+        stock: a.getStock().getQuantity(),
+        variations: makeVariationDTO(a.variations),
+    }));
+}
+
+function makeVariationDTO(variations?: Variation[]): VariationDTO[] | undefined {
+    if (!variations) return;
+
+    return variations.map((v) => ({
+        name: v.attribute.name,
+        value: v.value.value,
     }));
 }
