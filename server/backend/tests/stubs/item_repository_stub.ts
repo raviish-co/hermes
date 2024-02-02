@@ -7,6 +7,7 @@ import { ProductQuery } from "../../shared/types";
 import { Item, ItemStatus } from "../../domain/catalog/item";
 import { ID } from "../../shared/id";
 import { ItemStock } from "../../domain/item_stock";
+import { Variation } from "../../domain/catalog/variation";
 
 export class ItemRepositoryStub implements ItemRepository {
     #items: Record<string, Item> = {};
@@ -111,6 +112,18 @@ export class ItemRepositoryStub implements ItemRepository {
             subcategory: "some-subcategory",
         });
 
+        const variation = Variation.create({
+            variationId: "9999",
+            attribute: { name: "Cor" },
+            value: { value: "Azul" },
+        });
+
+        const variation1 = Variation.create({
+            variationId: "9991",
+            attribute: { name: "Marca" },
+            value: { value: "Nike" },
+        });
+
         const stock1 = new ItemStock(ID.Random(), 10);
         const stock2 = new ItemStock(ID.Random(), 10);
         const stock3 = new ItemStock(ID.Random(), 10);
@@ -120,6 +133,7 @@ export class ItemRepositoryStub implements ItemRepository {
             product,
             condition: { status: ItemStatus.Good },
             stock: stock1,
+            variations: [variation, variation1],
         });
 
         const item2 = Item.create({
@@ -127,6 +141,7 @@ export class ItemRepositoryStub implements ItemRepository {
             product: product2,
             condition: { status: ItemStatus.Good },
             stock: stock2,
+            variations: [variation],
         });
 
         const item3 = Item.create({

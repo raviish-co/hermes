@@ -1,5 +1,6 @@
 import { Condition } from "../../shared/types";
 import { ItemStock } from "../item_stock";
+import { Variation } from "./variation";
 import { ID } from "../../shared/id";
 import { Product } from "./product";
 
@@ -8,7 +9,7 @@ type Options = {
     product: Product;
     condition: ItemCondition;
     stock: ItemStock;
-    variations?: string[];
+    variations?: Variation[];
 };
 
 export enum ItemStatus {
@@ -26,14 +27,14 @@ export class Item {
     readonly product: Product;
     readonly #stock: ItemStock;
     #condition: ItemCondition;
-    variations?: ID[];
+    variations?: Variation[];
 
     private constructor(
         itemId: ID,
         product: Product,
         condition: ItemCondition,
         stockItem: ItemStock,
-        variations?: ID[]
+        variations?: Variation[]
     ) {
         this.itemId = itemId;
         this.product = product;
@@ -51,7 +52,7 @@ export class Item {
 
         if (!variations) return item;
 
-        item.variations = variations.map((v) => ID.New(v));
+        item.variations = variations;
 
         return item;
     }
