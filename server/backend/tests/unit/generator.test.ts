@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
-import { SequenceGenerator } from "../../domain/sequence_generator";
+import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
+import { describe, expect, it } from "vitest";
 
 describe("Test ID generation", () => {
     it("Deve gerar um ID com o seguinte formato **HRC - 1000**", () => {
