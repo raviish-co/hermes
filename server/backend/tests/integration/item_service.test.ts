@@ -1,6 +1,6 @@
 import { InmemItemRepository } from "../../persistense/inmem/inmem_article_repository";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
-import { ItemService } from "../../application/article_service";
+import { ItemService } from "../../application/item_service";
 import { describe, it, vi, expect } from "vitest";
 
 describe("Test ListItems", () => {

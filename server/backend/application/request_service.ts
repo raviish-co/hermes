@@ -1,40 +1,37 @@
-import { ProductData, ProductQuery, RequestData, StockQuery } from "../shared/types";
 import { PurposeNotFound } from "../domain/purposes/purpose_not_found_error";
 import { RequestRepository } from "../domain/requests/request_repository";
-import { InsufficientStock } from "../domain/insufficient_stock_error";
+import { ProductData, ProductQuery, RequestData } from "../shared/types";
+import { InsufficientStockItem } from "../domain/sequences/insufficient_item_stock_error";
 import { InvalidTotal } from "../domain/requests/invalid_total_error";
-import { Request } from "../domain/requests/request";
 import { ItemRepository } from "../domain/catalog/item_repository";
 import { PurposeSource } from "../domain/purposes/purpose_source";
 import { RequestItem } from "../domain/requests/request_item";
+import { SequencePrefix } from "../domain/sequences/sequence_prefix";
 import { PurposeData } from "../domain/purposes/purpose_data";
-import { StockRepository } from "../domain/stock_repository";
+import { Generator } from "../domain/sequences/generator";
 import { Either, left, right } from "../shared/either";
 import { Purpose } from "../domain/purposes/purpose";
-import { Generator } from "../domain/generator";
+import { Request } from "../domain/requests/request";
 import { RequestError } from "../shared/errors";
 import { Item } from "../domain/catalog/item";
 import { User } from "../domain/user";
 import { ID } from "../shared/id";
 
 export class RequestService {
-    readonly #purposeSource: PurposeSource;
-    readonly #itemRepository: ItemRepository;
-    readonly #requestRepository: RequestRepository;
-    readonly #stockRepository: StockRepository;
-    readonly #sequenceGenerator: Generator;
+    #purposeSource: PurposeSource;
+    #itemRepository: ItemRepository;
+    #requestRepository: RequestRepository;
+    #sequenceGenerator: Generator;
 
     constructor(
         purposeSource: PurposeSource,
         itemRepository: ItemRepository,
         requestRepository: RequestRepository,
-        stockRepository: StockRepository,
         sequenceGenerator: Generator
     ) {
         this.#purposeSource = purposeSource;
         this.#itemRepository = itemRepository;
         this.#requestRepository = requestRepository;
-        this.#stockRepository = stockRepository;
         this.#sequenceGenerator = sequenceGenerator;
     }
 
@@ -53,11 +50,7 @@ export class RequestService {
         const itemsOrError = await this.#itemRepository.getAll(itemsQueries);
         if (itemsOrError.isLeft()) return left(itemsOrError.value);
 
-        const stockQueries = this.#buildStockQueries(productsData);
-        const voidOrError = await this.#stockRepository.verifyStock(stockQueries);
-        if (voidOrError.isLeft()) return left(voidOrError.value);
-
-        const requestId = this.#sequenceGenerator.generate("GS");
+        const requestId = this.#sequenceGenerator.generate(SequencePrefix.Request);
 
         const purpose = Purpose.fromOptions(purposeData);
         const items = itemsOrError.value;
@@ -74,9 +67,7 @@ export class RequestService {
 
         request.addItems(requestItemsOrError.value);
 
-        if (!request.isSameTotal(total)) return left(new InvalidTotal());
-
-        if (!request.isSameSecurityDeposit(securityDeposit)) return left(new InvalidTotal());
+        if (this.#verifyTotal(request, total, securityDeposit)) return left(new InvalidTotal());
 
         await this.#requestRepository.save(request);
 
@@ -99,14 +90,19 @@ export class RequestService {
 
     #buildRequestItems(
         items: Item[],
-        productsData: ProductData[]
-    ): Either<InsufficientStock, RequestItem[]> {
+        itemData: ProductData[]
+    ): Either<InsufficientStockItem, RequestItem[]> {
         const requestItems: RequestItem[] = [];
 
-        for (const i in items) {
-            const { quantity, condition } = productsData[i];
+        for (const idx in items) {
+            const { quantity, condition } = itemData[idx];
 
-            const item = items[i];
+            const item = items[idx];
+
+            if (!item.canBeReducedStock(quantity))
+                return left(new InsufficientStockItem(item.itemId.toString()));
+
+            item.reduceStock(quantity);
 
             if (condition) item.updateCondition(condition);
 
@@ -114,18 +110,11 @@ export class RequestService {
 
             requestItems.push(requestItem);
         }
+
         return right(requestItems);
     }
 
-    #buildStockQueries(products: ProductData[]): StockQuery[] {
-        const queries: StockQuery[] = [];
-        for (const product of products) {
-            const query = {
-                itemId: ID.New(product.productId),
-                quantity: product.quantity,
-            };
-            queries.push(query);
-        }
-        return queries;
+    #verifyTotal(request: Request, total: string, securityDeposit: string): boolean {
+        return !request.isSameTotal(total) || !request.isSameSecurityDeposit(securityDeposit);
     }
 }

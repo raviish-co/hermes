@@ -1,12 +1,11 @@
 import { InmemRequestRepository } from "../../persistense/inmem/inmem_request_repository";
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
 import { ProductNotFound } from "../../domain/catalog/product_not_found_error";
-import { InsufficientStock } from "../../domain/insufficient_stock_error";
+import { InsufficientStockItem } from "../../domain/sequences/insufficient_item_stock_error";
 import { InvalidTotal } from "../../domain/requests/invalid_total_error";
 import { ItemRepository } from "../../domain/catalog/item_repository";
-import { StockRepositoryStub } from "../stubs/stock_repository_stub";
 import { PurposeSource } from "../../domain/purposes/purpose_source";
-import { SequenceGenerator } from "../../domain/sequence_generator";
+import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
 import { RequestService } from "../../application/request_service";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { FakePurposeSource } from "../purpose_source_fake";
@@ -175,34 +174,13 @@ describe("Test RequestArticles Service", () => {
         expect(request.getTotal().value).toEqual(total);
     });
 
-    it("Deve verificar se o calculo do total a pagar da solicitação é igual ao total enviado pelo solicitante", async () => {
-        const productsData = [
-            { productId: "1001", quantity: 1 },
-            { productId: "1002", quantity: 1 },
-        ];
-        const total = "166,90";
-        const securityDeposit = "333,80";
-        const { service, requestRepository } = makeService();
-
-        await service.requestItems({
-            ...requestData,
-            productsData,
-            total,
-            securityDeposit,
-        });
-
-        const request = await requestRepository.last();
-
-        expect(request.isSameTotal(total)).toBeTruthy();
-    });
-
     it("Deve retornar **InvalidTotal** se o total enviado pelo solicitante for diferente do total a pagar da solicitação", async () => {
-        const requestTotal = "25,00";
+        const total = "25,00";
         const { service } = makeService();
 
         const error = await service.requestItems({
             ...requestData,
-            total: requestTotal,
+            total,
         });
 
         expect(error.isLeft()).toBeTruthy();
@@ -244,13 +222,13 @@ describe("Test RequestArticles Service", () => {
         });
 
         expect(error.isLeft()).toBeTruthy();
-        expect(error.value).toBeInstanceOf(InsufficientStock);
+        expect(error.value).toBeInstanceOf(InsufficientStockItem);
     });
 
-    it.skip("Deve atualizar o estoque dos artigos solicitados no repositório", async () => {
-        const { service, itemRepository } = makeService();
+    it("Deve atualizar o estoque dos artigos solicitados no repositório", async () => {
+        const { service, itemRepository } = makeService({});
 
-        const spy = vi.spyOn(itemRepository, "updateStock");
+        const spy = vi.spyOn(itemRepository, "updateAll");
 
         await service.requestItems(requestData);
 
@@ -258,25 +236,27 @@ describe("Test RequestArticles Service", () => {
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
-    it.skip("Deve diminuir o estoque dos artigos solicitados", async () => {
+    it("Deve diminuir o estoque dos artigos solicitados", async () => {
         const { service, itemRepository } = makeService();
 
         await service.requestItems(requestData);
 
-        const item = await itemRepository?.getById(ID.New("1001"));
+        const item = await itemRepository.getById(ID.New("1001"));
 
-        expect(item?.getStock()).toEqual(8);
+        const stock = item.getStock();
+
+        expect(stock.getQuantity()).toEqual(8);
     });
 
-    it("Caso a finalidade tenha uma seção, deve ser adicionada a solicitação", async () => {
+    it("Deve ser adicionada a solicitação, caso a finalidade tenha uma seção", async () => {
         const { service, requestRepository } = makeService();
 
         await service.requestItems(requestData);
 
-        const requestArticles = await requestRepository.last();
+        const request = await requestRepository.last();
 
-        expect(requestArticles.purpose.section).toBeDefined();
-        expect(requestArticles.purpose.section).toEqual("Interna");
+        expect(request.purpose.section).toBeDefined();
+        expect(request.purpose.section).toEqual("Interna");
     });
 
     it("Deve ser adicionada a solicitação caso a finalidade tenha um destino", async () => {
@@ -303,7 +283,7 @@ describe("Test RequestArticles Service", () => {
         const productsData = [
             { productId: "1001", quantity: 2 },
             { productId: "1002", quantity: 3 },
-            { productId: "1003", quantity: 4, variations: ["1004", "1005"] },
+            { productId: "1003", quantity: 14, variations: ["1004", "1005"] },
         ];
         const { service } = makeService();
 
@@ -313,7 +293,7 @@ describe("Test RequestArticles Service", () => {
         });
 
         expect(error.isLeft()).toBeTruthy();
-        expect(error.value).toBeInstanceOf(InsufficientStock);
+        expect(error.value).toBeInstanceOf(InsufficientStockItem);
     });
 
     it("Deve retornar **InvalidTotal** se o total da çaução não foi igual ao valor calculado", async () => {
@@ -399,17 +379,10 @@ interface Dependencies {
 function makeService(deps?: Dependencies) {
     const purposeSource = deps?.purposeSource ?? new PurposeSourceStub();
     const itemRepository = deps?.itemRepository ?? new ItemRepositoryStub();
-    const stockRepository = new StockRepositoryStub();
     const requestRepository = new InmemRequestRepository();
     const storage = new InmemSequenceStorage();
     const generator = new SequenceGenerator(storage, 1000);
-    const service = new RequestService(
-        purposeSource,
-        itemRepository,
-        requestRepository,
-        stockRepository,
-        generator
-    );
+    const service = new RequestService(purposeSource, itemRepository, requestRepository, generator);
 
     return { requestRepository, service, itemRepository, purposeSource };
 }

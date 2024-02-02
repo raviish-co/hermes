@@ -1,4 +1,5 @@
 import { Condition } from "../../shared/types";
+import { ItemStock } from "../item_stock";
 import { ID } from "../../shared/id";
 import { Product } from "./product";
 
@@ -6,6 +7,7 @@ type Options = {
     itemId: string;
     product: Product;
     condition: ItemCondition;
+    stock: ItemStock;
     variations?: string[];
 };
 
@@ -22,22 +24,30 @@ export type ItemCondition = {
 export class Item {
     readonly itemId: ID;
     readonly product: Product;
-    condition: ItemCondition;
+    readonly #stock: ItemStock;
+    #condition: ItemCondition;
     variations?: ID[];
 
-    private constructor(itemId: ID, product: Product, condition: ItemCondition, variations?: ID[]) {
+    private constructor(
+        itemId: ID,
+        product: Product,
+        condition: ItemCondition,
+        stockItem: ItemStock,
+        variations?: ID[]
+    ) {
         this.itemId = itemId;
         this.product = product;
-        this.condition = condition;
+        this.#condition = condition;
+        this.#stock = stockItem;
         this.variations = variations;
     }
 
     static create(options: Options): Item {
-        const { itemId, product, condition, variations } = options;
+        const { itemId, product, condition, stock, variations } = options;
 
         const newID = ID.New(itemId);
 
-        const item = new Item(newID, product, condition);
+        const item = new Item(newID, product, condition, stock);
 
         if (!variations) return item;
 
@@ -49,13 +59,25 @@ export class Item {
     updateCondition(condition: Condition): void {
         const { status, comment } = condition;
         if (ItemStatus.Good == status) {
-            this.condition = { status: ItemStatus.Good };
+            this.#condition = { status: ItemStatus.Good };
             return;
         }
-        this.condition = { status: ItemStatus.Bad, comment };
+        this.#condition = { status: ItemStatus.Bad, comment };
+    }
+
+    canBeReducedStock(quantity: number): boolean {
+        return this.#stock.verify(quantity);
+    }
+
+    reduceStock(quantity: number): void {
+        this.#stock.reduce(quantity);
     }
 
     getCondition(): ItemCondition {
-        return this.condition;
+        return this.#condition;
+    }
+
+    getStock(): ItemStock {
+        return this.#stock;
     }
 }

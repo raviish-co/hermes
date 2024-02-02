@@ -6,6 +6,7 @@ import { Pagination } from "../../shared/pagination";
 import { ProductQuery } from "../../shared/types";
 import { Item, ItemStatus } from "../../domain/catalog/item";
 import { ID } from "../../shared/id";
+import { ItemStock } from "../../domain/item_stock";
 
 export class ItemRepositoryStub implements ItemRepository {
     #items: Record<string, Item> = {};
@@ -110,22 +111,29 @@ export class ItemRepositoryStub implements ItemRepository {
             subcategory: "some-subcategory",
         });
 
+        const stock1 = new ItemStock(ID.Random(), 10);
+        const stock2 = new ItemStock(ID.Random(), 10);
+        const stock3 = new ItemStock(ID.Random(), 10);
+
         const item1 = Item.create({
             itemId: "1001",
             product,
             condition: { status: ItemStatus.Good },
+            stock: stock1,
         });
 
         const item2 = Item.create({
             itemId: "1002",
             product: product2,
             condition: { status: ItemStatus.Good },
+            stock: stock2,
         });
 
         const item3 = Item.create({
             itemId: "1003",
             product: product3,
             condition: { status: ItemStatus.Good },
+            stock: stock3,
         });
 
         this.#items = {
