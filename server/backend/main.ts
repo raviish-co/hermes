@@ -7,7 +7,7 @@ import { RequestService } from "./application/request_service";
 import { ItemService } from "./application/item_service";
 
 const jsonPurposeSource = new JsonPurposeSource();
-const articleRepository = new ItemRepositoryStub();
+const itemRepository = new ItemRepositoryStub();
 const requestRepository = new InmemRequestRepository();
 const sequenceStore = new InmemSequenceStorage();
 const sequenceGenerator = new SequenceGenerator(sequenceStore);
@@ -15,12 +15,12 @@ const sequenceGenerator = new SequenceGenerator(sequenceStore);
 export const makeRequestService = (): RequestService => {
     return new RequestService(
         jsonPurposeSource,
-        articleRepository,
+        itemRepository,
         requestRepository,
         sequenceGenerator
     );
 };
 
 export const makeItemService = (): ItemService => {
-    return new ItemService(articleRepository);
+    return new ItemService(itemRepository);
 };
