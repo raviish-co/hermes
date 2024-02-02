@@ -1,4 +1,4 @@
-import { ItemService } from "./application/article_service";
+import { ItemService } from "./application/item_service";
 import { RequestService } from "./application/request_service";
 import { JsonPurposeSource } from "./persistense/data/json_purpouse_source";
 import { InmemRequestRepository } from "./persistense/inmem/inmem_request_repository";
