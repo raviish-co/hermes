@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import type {
-    AddProductDialog,
-    SelectProductDialog,
-    DescribeProductStateDialog,
-} from "#build/components";
-import type { Product, ProductVariation, RequestProduct } from "~/lib/models/product";
+import type { AddItemDialog, DescribeItemStateDialog } from "#build/components";
+import type { ItemVariation, RequestItem } from "~/lib/models/item";
 import { formatCurrency } from "~/lib/helpers/format_currency";
 import type { Purpose } from "~/lib/models/purpose";
 import { RequestService } from "~/lib/services/request_service";
@@ -12,14 +8,12 @@ import { convertToNumber } from "~/lib/helpers/convert_to_number";
 
 const INNER_LAUNDRY = "Interna";
 const DISCARD = "Descartar";
-const selectProductDialogRef = ref<typeof SelectProductDialog>();
-const addProductDialogRef = ref<typeof AddProductDialog>();
-const describeProductStateDialogRef = ref<typeof DescribeProductStateDialog>();
-const selectedProduct = ref<Product>();
+const addItemDialogRef = ref<typeof AddItemDialog>();
+const describeItemStateDialogRef = ref<typeof DescribeItemStateDialog>();
 const selectedSections = ref<string[]>([]);
 const selectedPlaceholder = ref<string>("Descrição");
 const complementaryDataIsDisabled = ref<boolean>(false);
-const requestList = ref<RequestProduct[]>([]);
+const requestList = ref<RequestItem[]>([]);
 const currentPurposeName = ref<string>("");
 const currentSectionName = ref<string>("");
 const securityDeposit = ref<string>("0,00");
@@ -90,11 +84,14 @@ function updateCurrentSectionName(sectionName: string) {
 }
 
 function removeRequestRow(id: string): void {
-    requestList.value = requestList.value.filter((r) => r.requestId !== id);
+    requestList.value = requestList.value.filter((r) => r.id !== id);
+    calculateGrandTotal();
 }
 
 function clearRequestList() {
     requestList.value = [];
+    grandTotal.value = "0,00";
+    securityDeposit.value = "0,00";
 }
 
 function calculateGrandTotal() {
@@ -116,51 +113,18 @@ function calculateGrandTotal() {
     });
 }
 
-function onAddedProduct() {
-    calculateGrandTotal();
-    showSelectProductDialog();
+function showAddItemDialog() {
+    addItemDialogRef.value?.show();
 }
 
-function showSelectProductDialog() {
-    selectProductDialogRef.value?.show();
+function showDescribeItemStatusDialog() {
+    describeItemStateDialogRef.value?.show();
 }
 
-function addProductToRequestList(product: Product) {
-    if (requestList.value.some((r) => r.id === product.id)) return;
+function listVariations(itemVariation?: ItemVariation[]) {
+    if (!itemVariation) return "";
 
-    const requestProduct = {
-        ...product,
-        requestId: new Date().getTime().toString(),
-        quantity: 1,
-        total: product.price,
-        variations: [],
-    };
-
-    requestList.value.push(requestProduct);
-
-    onAddedProduct();
-}
-
-function showAddProductDialog(product: Product) {
-    if (product.isUnique) {
-        addProductToRequestList(product);
-        return;
-    }
-
-    selectedProduct.value = product;
-    addProductDialogRef.value?.initializeQuantities(product.variations);
-
-    addProductDialogRef.value?.show();
-}
-
-function showDescribeProductStatusDialog() {
-    describeProductStateDialogRef.value?.show();
-}
-
-function listVariations(productVariation?: ProductVariation[]) {
-    if (!productVariation) return "";
-
-    const values = productVariation.map((v) => `${v.name}: ${v.value}`);
+    const values = itemVariation.map((v) => `${v.name}: ${v.value}`);
 
     return values.join(" | ");
 }
@@ -232,7 +196,7 @@ listPurposes();
                         <tbody>
                             <tr v-for="(row, idx) in requestList" :key="idx" class="cursor-pointer">
                                 <td class="w-16">{{ row.id }}</td>
-                                <td @click="showDescribeProductStatusDialog">
+                                <td @click="showDescribeItemStatusDialog">
                                     {{ row.name }}
                                     <br />
                                     <span class="text-light-600 text-sm">{{
@@ -242,17 +206,13 @@ listPurposes();
                                 <td>{{ row.quantity }}</td>
                                 <td class="w-36">{{ row.price }}</td>
                                 <td class="w-36">{{ row.total }}</td>
-                                <td class="cursor-pointer" @click="removeRequestRow(row.requestId)">
-                                    X
-                                </td>
+                                <td class="cursor-pointer" @click="removeRequestRow(row.id)">X</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <button class="btn-secondary w-full" @click="showSelectProductDialog">
-                    Adicionar
-                </button>
+                <button class="btn-secondary w-full" @click="showAddItemDialog">Adicionar</button>
             </div>
         </section>
     </section>
@@ -278,15 +238,11 @@ listPurposes();
         </div>
     </section>
 
-    <SelectProductDialog ref="selectProductDialogRef" @select="showAddProductDialog" />
-
-    <AddProductDialog
-        ref="addProductDialogRef"
-        :product="selectedProduct!"
+    <AddItemDialog
+        ref="addItemDialogRef"
+        @added="calculateGrandTotal"
         :request-list="requestList"
-        @added="onAddedProduct"
     />
 
-    <DescribeProductStateDialog ref="describeProductStateDialogRef" />
+    <DescribeItemStateDialog ref="describeItemStateDialogRef" />
 </template>
-~/lib/models/product

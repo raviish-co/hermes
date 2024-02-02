@@ -34,7 +34,7 @@ h1 {
 
 .table th,
 .table td {
-    @apply p-1 border-b border-light-500 border-opacity-40 overflow-hidden;
+    @apply px-1 py-2 border-b border-light-500 border-opacity-40 overflow-hidden;
 }
 
 .table th {
@@ -51,4 +51,15 @@ h1 {
 
 .btn-light {
     @apply btn bg-light-500 hover:bg-light-600;
+}
+
+.input-number::-webkit-inner-spin-button {
+    display: none;
+}
+
+.input-number {
+    @apply appearance-none w-full py-2 px-3 leading-tight overflow-hidden focus:ring-0 focus:border-secondary-600 border-0 border-b border-light-500;
+}
+.input-number:invalid {
+    @apply border-red-500 border;
 }

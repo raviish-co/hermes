@@ -29,12 +29,10 @@ function goToPreviousPage() {
 <template>
     <div v-if="total > 1" class="flex items-center gap-x-4">
         <span @click="goToPreviousPage" class="cursor-pointer p-2 hover:bg-gray-200">«</span>
-        <div class="flex gap-x-1 font-semibold text-white">
-            <span v-if="currentPage > 1" class="px-2 pt-1 bg-gray-400">{{ currentPage - 1 }}</span>
-            <span class="px-2 pt-1 bg-gray-500">{{ currentPage }}</span>
-            <span v-if="currentPage < total" class="px-2 pt-1 bg-gray-400">{{
-                currentPage + 1
-            }}</span>
+        <div class="flex gap-x-1 font-semibold">
+            <span v-if="currentPage > 1" class="px-2 pt-1">{{ currentPage - 1 }}</span>
+            <span class="px-2 pt-1 bg-secondary-600 text-white">{{ currentPage }}</span>
+            <span v-if="currentPage < total" class="px-2 pt-1">{{ currentPage + 1 }}</span>
         </div>
         <span @click="goToNexPage" class="cursor-pointer p-2 hover:bg-gray-200">»</span>
     </div>
