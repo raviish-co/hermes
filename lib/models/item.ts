@@ -5,11 +5,13 @@ export interface Item {
     variations?: Variation[];
     isUnique: boolean;
     stock: number;
+    productId: string;
 }
 
 export interface Variation {
-    name: string;
+    id: string;
     value: string;
+    name: string;
 }
 
 export interface RequestItem extends Item {

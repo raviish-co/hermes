@@ -5,6 +5,7 @@ import { formatCurrency } from "~/lib/helpers/format_currency";
 import type { Purpose } from "~/lib/models/purpose";
 import { RequestService } from "~/lib/services/request_service";
 import { convertToNumber } from "~/lib/helpers/convert_to_number";
+import type { ProductData, RequestItems } from "~/lib/models/request";
 
 const INNER_LAUNDRY = "Interna";
 const DISCARD = "Descartar";
@@ -19,10 +20,53 @@ const currentSectionName = ref<string>("");
 const securityDeposit = ref<string>("0,00");
 const purpouses = ref<Purpose[]>([]);
 const grandTotal = ref<string>("0,00");
+const returnData = ref<Date>(new Date());
+const recipient = ref<string>("");
 
 const isDisabledSection = computed(() => selectedSections.value.length <= 0);
 
 const requestService = new RequestService();
+
+function makeRequest(): RequestItems {
+    return {
+        total: grandTotal.value,
+        securityDeposit: securityDeposit.value,
+        returnDate: returnData.value?.toISOString(),
+        purposeData: {
+            name: currentPurposeName.value,
+            section: currentSectionName.value,
+            recipient: recipient.value,
+        },
+        productsData: makeProductData(),
+    };
+}
+
+function makeProductData(): ProductData[] {
+    return requestList.value.map((row) => ({
+        productId: row.productId,
+        quantity: row.quantity,
+        condition: undefined,
+        variations: row.variations?.map((v) => v.id),
+    }));
+}
+
+async function request() {
+    const request = makeRequest();
+    await requestService
+        .requestItems(request)
+        .then((res) => {
+            if (res.value !== undefined) {
+                alert("Aconteceu um erro durante a requisição.");
+                return;
+            }
+
+            alert("Requisição feita com sucesso!");
+        })
+        .catch((err) => {
+            console.log(err);
+            alert("Aconteceu um erro durante a requisiçãoo.");
+        });
+}
 
 function listPurposes() {
     requestService
@@ -94,11 +138,17 @@ function clearRequestList() {
     securityDeposit.value = "0,00";
 }
 
+function calculateSecurityDeposit() {
+    const total = convertToNumber(grandTotal.value);
+    const doubleTotal = (total * 2) / 100;
+    securityDeposit.value = formatCurrency(doubleTotal);
+}
+
 function calculateGrandTotal() {
     requestList.value.forEach((row, idx) => {
         if (idx === 0) {
             grandTotal.value = row.total;
-            securityDeposit.value = row.total;
+            calculateSecurityDeposit();
             return;
         }
 
@@ -106,10 +156,9 @@ function calculateGrandTotal() {
         const total = convertToNumber(grandTotal.value);
 
         const result = (value + total) / 100;
-        const doubleResult = result * 2;
 
-        securityDeposit.value = formatCurrency(doubleResult);
         grandTotal.value = formatCurrency(result);
+        calculateSecurityDeposit();
     });
 }
 
@@ -144,7 +193,11 @@ listPurposes();
             <form class="mb-6">
                 <div class="flex items-center gap-x-3 mb-4">
                     <VInput placeholder="John Doe" :disabled="true" />
-                    <VInput placeholder="Data prevista para a devolução[dd/mm/aaaa]" type="date" />
+                    <VInput
+                        v-model="returnData"
+                        placeholder="Data prevista para a devolução[dd/mm/aaaa]"
+                        type="date"
+                    />
                 </div>
                 <div class="flex items-center gap-x-3 mb-4">
                     <VSelect
@@ -162,6 +215,7 @@ listPurposes();
                     />
                 </div>
                 <VInput
+                    v-model="recipient"
                     :placeholder="selectedPlaceholder"
                     :disabled="complementaryDataIsDisabled"
                     class="input-field"
@@ -220,7 +274,7 @@ listPurposes();
     <section class="w-full fixed mx-auto bottom-0 z-50 shadow-lg shadow-primary">
         <div class="flex justify-between items-center section-content p-4 bg-white">
             <div class="space-x-4">
-                <button class="btn-secondary">Solicitar</button>
+                <button class="btn-secondary" @click="request">Solicitar</button>
                 <button class="btn-light">Cancelar</button>
             </div>
 

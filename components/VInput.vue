@@ -9,7 +9,7 @@ interface Props {
 }
 
 interface Emits {
-    (e: "update:modelValue", value: string): void;
+    (e: "update:modelValue", value: string | Date | number): void;
 }
 
 const emits = defineEmits<Emits>();
@@ -18,7 +18,16 @@ withDefaults(defineProps<Props>(), {
 });
 
 function emitValue(e: Event) {
+    const type = (e.target as HTMLInputElement).type;
+
+    if (type === "date") {
+        const value = (e.target as HTMLInputElement).valueAsDate;
+        emits("update:modelValue", value!);
+        return;
+    }
+
     const value = (e.target as HTMLInputElement).value;
+
     emits("update:modelValue", value);
 }
 </script>
