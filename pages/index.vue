@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { AddItemDialog, DescribeItemStateDialog } from "#build/components";
-import type { Variation, RequestItem } from "~/lib/models/item";
+import { type Variation, type RequestItem, ItemStateOption } from "~/lib/models/item";
 import { formatCurrency } from "~/lib/helpers/format_currency";
 import type { Purpose } from "~/lib/models/purpose";
 import { RequestService } from "~/lib/services/request_service";
@@ -22,8 +22,8 @@ const purpouses = ref<Purpose[]>([]);
 const grandTotal = ref<string>("0,00");
 const returnData = ref<Date>(new Date());
 const recipient = ref<string>("");
-
 const isDisabledSection = computed(() => selectedSections.value.length <= 0);
+const selectedRow = ref<RequestItem>({} as RequestItem);
 
 const requestService = new RequestService();
 
@@ -45,7 +45,10 @@ function makeProductData(): ProductData[] {
     return requestList.value.map((row) => ({
         productId: row.productId,
         quantity: row.quantity,
-        condition: undefined,
+        condition: {
+            comment: row.state.comment,
+            status: row.state.status,
+        },
         variations: row.variations?.map((v) => v.id),
     }));
 }
@@ -55,7 +58,7 @@ async function request() {
     await requestService
         .requestItems(request)
         .then((res) => {
-            if (res.value !== undefined) {
+            if (res.value) {
                 alert("Aconteceu um erro durante a requisição.");
                 return;
             }
@@ -166,7 +169,9 @@ function showAddItemDialog() {
     addItemDialogRef.value?.show();
 }
 
-function showDescribeItemStatusDialog() {
+function showDescribeItemStatusDialog(row: RequestItem) {
+    selectedRow.value = row;
+    describeItemStateDialogRef.value?.initializeItemState(row.state.status, row.state.comment);
     describeItemStateDialogRef.value?.show();
 }
 
@@ -225,6 +230,7 @@ listPurposes();
                     :placeholder="selectedPlaceholder"
                     :disabled="complementaryDataIsDisabled"
                     class="input-field mb-4"
+                    required
                 />
             </form>
         </section>
@@ -256,7 +262,7 @@ listPurposes();
                         <tbody>
                             <tr v-for="(row, idx) in requestList" :key="idx" class="cursor-pointer">
                                 <td>{{ row.id }}</td>
-                                <td @click="showDescribeItemStatusDialog">
+                                <td @click="showDescribeItemStatusDialog(row)">
                                     {{ row.name }}
                                     <br />
                                     <span class="text-light-600 text-sm">{{
@@ -306,5 +312,5 @@ listPurposes();
         :request-list="requestList"
     />
 
-    <DescribeItemStateDialog ref="describeItemStateDialogRef" />
+    <DescribeItemStateDialog :row="selectedRow" ref="describeItemStateDialogRef" />
 </template>

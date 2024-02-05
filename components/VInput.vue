@@ -6,6 +6,7 @@ interface Props {
     modelValue?: string | number | Date;
     placeholder?: string;
     type?: InputType;
+    required?: boolean;
 }
 
 interface Emits {
@@ -35,6 +36,7 @@ function emitValue(e: Event) {
 <template>
     <input
         :v-model="modelValue"
+        :required="required"
         :placeholder="placeholder"
         :disabled="disabled"
         :type="type"

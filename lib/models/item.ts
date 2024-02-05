@@ -6,6 +6,7 @@ export interface Item {
     isUnique: boolean;
     stock: number;
     productId: string;
+    state: ItemState;
 }
 
 export interface Variation {
@@ -19,7 +20,12 @@ export interface RequestItem extends Item {
     quantity: number;
 }
 
-export enum ItemState {
+export interface ItemState {
+    status: ItemStateOption;
+    comment?: string;
+}
+
+export enum ItemStateOption {
     Good = "Bom",
     Bad = "Mau",
 }

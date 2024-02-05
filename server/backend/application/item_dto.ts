@@ -9,12 +9,23 @@ interface ItemDTO {
     stock: number;
     variation?: VariationDTO;
     productId: string;
+    state: ItemStateDTO;
 }
 
 interface VariationDTO {
     id: string;
     name: string;
     value: string;
+}
+
+export interface ItemStateDTO {
+    status: ItemStateOption;
+    comment?: string;
+}
+
+export enum ItemStateOption {
+    Good = "Bom",
+    Bad = "Mau",
 }
 
 export function makeItemsDTO(items: Item[]): ItemDTO[] {
@@ -26,6 +37,10 @@ export function makeItemsDTO(items: Item[]): ItemDTO[] {
         isUnique: a.product.isUnique(),
         stock: a.getStock().getQuantity(),
         variations: makeVariationDTO(a.variations),
+        state: {
+            status: a.getCondition().status.toString() as ItemStateOption,
+            comment: a.getCondition().comment,
+        },
     }));
 }
 

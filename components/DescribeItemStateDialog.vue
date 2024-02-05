@@ -1,41 +1,71 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
-import { ItemState } from "~/lib/models/item";
+import { ItemStateOption, type RequestItem } from "~/lib/models/item";
+import { Item } from "~/server/backend/domain/catalog/item";
+
+interface Props {
+    row: RequestItem;
+}
+
+const pros = defineProps<Props>();
 
 const dialogRef = ref<typeof VDialog>();
-const itemState = ref<string>("");
+const status = ref<string>("");
+const comment = ref<string>("");
 
-const isGoodState = computed(() => itemState.value !== ItemState.Bad);
-
-const stateOptions = computed(() => {
-    return [ItemState.Good, ItemState.Bad];
-});
-
-function changeItemState(state: string) {
-    itemState.value = state;
-}
+const isGoodState = computed(() => status.value !== ItemStateOption.Bad);
 
 function showDialog() {
     dialogRef.value?.show();
 }
 
+function canUpdateState(): boolean {
+    const options = Object.values(ItemStateOption);
+
+    if (!options.includes(status.value as ItemStateOption)) {
+        alert("Selecione um estado!");
+        return false;
+    }
+
+    if (
+        status.value === ItemStateOption.Bad &&
+        (comment.value === undefined || comment.value === "")
+    ) {
+        alert("Descreva o estado do artigo.");
+        return false;
+    }
+
+    return true;
+}
+
 function updateItemState() {
+    if (!canUpdateState()) return;
+
+    if (status.value === ItemStateOption.Good) {
+        comment.value = "";
+    }
+
+    pros.row.state = {
+        status: status.value as ItemStateOption,
+        comment: comment.value,
+    };
+
     dialogRef.value?.close();
 }
 
-defineExpose({ show: showDialog });
+function initializeItemState(state: ItemStateOption, note: string) {
+    (status.value = state as ItemStateOption), (comment.value = note);
+}
+
+defineExpose({ show: showDialog, initializeItemState });
 </script>
 
 <template>
     <VDialog ref="dialogRef" title="Descrever danos do artigo" class="max-w-[30rem]">
-        <VSelect
-            v-model="itemState"
-            placeholder="Estado"
-            :options="stateOptions"
-            @update:model-value="changeItemState"
-        />
+        <VSelect v-model="status" placeholder="Estado" :options="Object.values(ItemStateOption)" />
 
         <textarea
+            v-model="comment"
             placeholder="Descrever o estado do artigo"
             :rows="3"
             :disabled="isGoodState"
