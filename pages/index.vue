@@ -15,7 +15,7 @@ const selectedSections = ref<string[]>([]);
 const selectedPlaceholder = ref<string>("Descrição");
 const complementaryDataIsDisabled = ref<boolean>(false);
 const requestList = ref<RequestItem[]>([]);
-const currentPurposeName = ref<string>("");
+const currentPurposeName = ref<string>("Finalidade");
 const currentSectionName = ref<string>("");
 const securityDeposit = ref<string>("0,00");
 const purpouses = ref<Purpose[]>([]);
@@ -64,6 +64,7 @@ async function request() {
             }
 
             alert("Requisição feita com sucesso!");
+            clearValues();
         })
         .catch((err) => {
             console.log(err);
@@ -183,6 +184,14 @@ function listVariations(itemVariation?: Variation[]) {
     return values.join(" | ");
 }
 
+function clearValues() {
+    returnData.value = new Date();
+    recipient.value = "";
+    requestList.value = [];
+    grandTotal.value = "0,00";
+    securityDeposit.value = "0,00";
+}
+
 listPurposes();
 </script>
 
@@ -210,27 +219,26 @@ listPurposes();
 
                 <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
                     <VSelect
+                        v-model="currentPurposeName"
                         placeholder="Finalidade"
                         :options="getPurposeNames()"
-                        v-model="currentPurposeName"
                         @update:model-value="findSectionByPurpose"
                     />
 
                     <VSelect
+                        v-model="currentSectionName"
                         placeholder="Secção"
                         :options="selectedSections"
                         :disabled="isDisabledSection"
-                        v-model="currentSectionName"
                         @update:model-value="updateCurrentSectionName"
                     />
                 </div>
 
-                <VInput
+                <input
                     v-model="recipient"
                     :placeholder="selectedPlaceholder"
                     :disabled="complementaryDataIsDisabled"
                     class="input-field mb-4"
-                    required
                 />
             </form>
         </section>
