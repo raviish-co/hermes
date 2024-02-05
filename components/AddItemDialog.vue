@@ -123,9 +123,9 @@ onMounted(async () => {
             <table class="table">
                 <thead>
                     <tr>
-                        <th class="min-w-16 w-16">ID</th>
+                        <th class="min-w-16 w-16 hidden sm:initial">ID</th>
                         <th class="min-w-36 w-36">Nome</th>
-                        <th class="min-w-28 w-28">Stock</th>
+                        <th class="min-w-16 w-16">Stock</th>
                         <th class="min-w-12 w-12 md:w-16">QTD</th>
                     </tr>
                 </thead>
@@ -137,24 +137,27 @@ onMounted(async () => {
                         :key="item.id"
                         class="hover:bg-gray-50"
                     >
-                        <td class="w-16 cursor-pointer">{{ item.id }}</td>
+                        <td class="w-16 cursor-pointer hidden sm:initial">{{ item.id }}</td>
 
                         <td class="cursor-pointer" @click="emitItemAdded(item, idx)">
                             {{ item.name }}
 
                             <br />
 
-                            <span class="text-light-600 text-sm">
+                            <span class="text-light-600 text-xs sm:text-sm">
                                 {{ listVariations(item?.variations) }}
                             </span>
                         </td>
 
                         <td>
-                            <div
-                                class="px-2 py-1 bg-secondary-600 rounded-3xl text-white text-center"
-                            >
-                                <span v-if="item.isUnique" class=""> Único </span>
-                                <span v-else> {{ item.stock }} em stock </span>
+                            <div>
+                                <span
+                                    v-if="item.isUnique"
+                                    class="px-2 py-1 bg-secondary-600 rounded-3xl text-white text-center w-fit"
+                                >
+                                    Único
+                                </span>
+                                <span v-else> {{ item.stock }}</span>
                             </div>
                         </td>
 
