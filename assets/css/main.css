@@ -63,3 +63,14 @@ h1 {
 .input-number:invalid {
     @apply border-red-500 border;
 }
+
+::-webkit-scrollbar {
+    background-color: transparent;
+    width: 0.5rem;
+    height: 0.5rem;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #f0f1f3;
+    border-radius: 0.8rem;
+}

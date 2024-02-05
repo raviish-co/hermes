@@ -279,14 +279,14 @@ listPurposes();
 
     <section class="w-full fixed mx-auto bottom-0 z-50 shadow-lg shadow-primary">
         <div
-            class="flex justify-between items-center section-content p-4 bg-white flex-wrap md:flex-nowrap gap-4"
+            class="flex justify-between items-center section-content p-4 bg-white flex-wrap flex-col-reverse md:flex-row md:flex-nowrap gap-4"
         >
-            <div class="flex gap-4 w-full md:w-auto">
-                <button class="btn-secondary flex-1" @click="request">Solicitar</button>
-                <button class="btn-light flex-1">Cancelar</button>
+            <div class="flex flex-wrap sm:flex-nowrap gap-4 w-full md:w-auto pb-4 md:pb-0">
+                <button class="btn-secondary w-full md:flex-1" @click="request">Solicitar</button>
+                <button class="btn-light w-full md:flex-1">Cancelar</button>
             </div>
 
-            <div class="flex gap-1 flex-wrap w-full md:w-auto pb-4 md:pb-0">
+            <div class="text-sm md:text-base flex gap-2 w-full md:w-auto">
                 <p class="text-center w-full md:w-auto md:text-right space-x-1">
                     <span class="font-medium">Total Geral(kz):</span>
                     <span>{{ grandTotal }}</span>
