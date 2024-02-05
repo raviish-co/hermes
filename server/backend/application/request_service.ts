@@ -2,7 +2,6 @@ import { PurposeNotFound } from "../domain/purposes/purpose_not_found_error";
 import { RequestRepository } from "../domain/requests/request_repository";
 import { ProductData, ProductQuery, RequestData } from "../shared/types";
 import { InsufficientStockItem } from "../domain/sequences/insufficient_item_stock_error";
-import { InvalidTotal } from "../domain/requests/invalid_total_error";
 import { ItemRepository } from "../domain/catalog/item_repository";
 import { PurposeSource } from "../domain/purposes/purpose_source";
 import { RequestItem } from "../domain/requests/request_item";
@@ -10,12 +9,11 @@ import { SequencePrefix } from "../domain/sequences/sequence_prefix";
 import { PurposeData } from "../domain/purposes/purpose_data";
 import { Generator } from "../domain/sequences/generator";
 import { Either, left, right } from "../shared/either";
-import { Purpose } from "../domain/purposes/purpose";
-import { Request } from "../domain/requests/request";
 import { RequestError } from "../shared/errors";
 import { Item } from "../domain/catalog/item";
 import { User } from "../domain/user";
 import { ID } from "../shared/id";
+import { RequestBuilder } from "../domain/requests/request_builder";
 
 export class RequestService {
     #purposeSource: PurposeSource;
@@ -50,26 +48,25 @@ export class RequestService {
         const itemsOrError = await this.#itemRepository.getAll(itemsQueries);
         if (itemsOrError.isLeft()) return left(itemsOrError.value);
 
-        const requestId = this.#sequenceGenerator.generate(SequencePrefix.Request);
-
-        const purpose = Purpose.fromOptions(purposeData);
         const items = itemsOrError.value;
-        const user = User.create("Teste");
-        const request = Request.create({
-            requestId,
-            purpose,
-            user,
-            returnDate,
-        });
-
         const requestItemsOrError = this.#buildRequestItems(items, productsData);
         if (requestItemsOrError.isLeft()) return left(requestItemsOrError.value);
 
-        request.addItems(requestItemsOrError.value);
+        const requestId = this.#sequenceGenerator.generate(SequencePrefix.Request);
+        const requestItems = requestItemsOrError.value;
+        const user = User.create("Teste");
+        const requestOrError = new RequestBuilder()
+            .withRequestId(requestId)
+            .withPurpose(purposeData)
+            .withRequestItems(requestItems)
+            .withUser(user)
+            .withReturnDate(returnDate)
+            .withTotal(total)
+            .withSecurityDeposit(securityDeposit)
+            .build();
 
-        if (this.#verifyTotal(request, total, securityDeposit)) return left(new InvalidTotal());
-
-        await this.#requestRepository.save(request);
+        if (requestOrError.isLeft()) return left(requestOrError.value);
+        await this.#requestRepository.save(requestOrError.value);
 
         await this.#itemRepository.updateAll(items);
 
@@ -112,9 +109,5 @@ export class RequestService {
         }
 
         return right(requestItems);
-    }
-
-    #verifyTotal(request: Request, total: string, securityDeposit: string): boolean {
-        return !request.isSameTotal(total) || !request.isSameSecurityDeposit(securityDeposit);
     }
 }

@@ -8,6 +8,7 @@ type Options = {
     requestId: string;
     purpose: Purpose;
     user: User;
+    requestItems: RequestItem[];
     returnDate: string;
 };
 
@@ -39,14 +40,16 @@ export class Request {
     }
 
     static create(options: Options): Request {
-        const { requestId, purpose, user, returnDate } = options;
+        const { requestId, purpose, user, requestItems, returnDate } = options;
         const returnDateParsed = new Date(returnDate);
-        return new Request(ID.New(requestId), purpose, user, returnDateParsed);
+        const request = new Request(ID.New(requestId), purpose, user, returnDateParsed);
+        request.addItems(requestItems);
+        return request;
     }
 
     addItems(items: RequestItem[]): void {
-        for (const requestLine of items) {
-            this.addItem(requestLine);
+        for (const requestItem of items) {
+            this.addItem(requestItem);
         }
         this.#calculateSecurityDeposit();
     }
@@ -63,6 +66,10 @@ export class Request {
 
     isSameSecurityDeposit(securityDeposit: string): boolean {
         return this.securityDeposity.value === securityDeposit;
+    }
+
+    verifyTotal(total: string, securityDeposit: string) {
+        return !this.isSameTotal(total) || !this.isSameSecurityDeposit(securityDeposit);
     }
 
     getSecurityDeposit(): Decimal {
