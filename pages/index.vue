@@ -182,30 +182,35 @@ listPurposes();
 </script>
 
 <template>
-    <div class="w-full h-24 py-4 bg-primary flex justify-center items-center">
+    <div class="w-full h-20 sm:h-24 py-4 bg-primary flex justify-center items-center">
         <img src="/images/logo.png" alt="Logotipo da Raviish" class="h-full" />
     </div>
 
-    <section class="section-content mb-20">
-        <h1 class="flex-1 text-center mb-11 mt-4">Guia de Saída de Artigos</h1>
+    <section class="section-content md:mb-20 mb-36">
+        <h1 class="flex-1 text-center my-8 sm:my-10 text-xl sm:text-2xl">
+            Guia de Saída de Artigos
+        </h1>
 
         <section>
-            <form class="mb-6">
-                <div class="flex items-center gap-x-3 mb-4">
+            <form>
+                <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
                     <VInput placeholder="John Doe" :disabled="true" />
+
                     <VInput
                         v-model="returnData"
                         placeholder="Data prevista para a devolução[dd/mm/aaaa]"
                         type="date"
                     />
                 </div>
-                <div class="flex items-center gap-x-3 mb-4">
+
+                <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
                     <VSelect
                         placeholder="Finalidade"
                         :options="getPurposeNames()"
                         v-model="currentPurposeName"
                         @update:model-value="findSectionByPurpose"
                     />
+
                     <VSelect
                         placeholder="Secção"
                         :options="selectedSections"
@@ -214,11 +219,12 @@ listPurposes();
                         @update:model-value="updateCurrentSectionName"
                     />
                 </div>
+
                 <VInput
                     v-model="recipient"
                     :placeholder="selectedPlaceholder"
                     :disabled="complementaryDataIsDisabled"
-                    class="input-field"
+                    class="input-field mb-4"
                 />
             </form>
         </section>
@@ -238,18 +244,18 @@ listPurposes();
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Item</th>
-                                <th>QTD</th>
-                                <th>Preço Unid (Kz)</th>
-                                <th>Total (Kz)</th>
-                                <th></th>
+                                <th class="min-w-16 w-16">ID</th>
+                                <th class="min-w-52">Item</th>
+                                <th class="min-w-10 w-16">QTD</th>
+                                <th class="min-w-36 w-36">Preço Unid (Kz)</th>
+                                <th class="min-w-36 w-36">Total (Kz)</th>
+                                <th class="min-w-10 w-10"></th>
                             </tr>
                         </thead>
 
                         <tbody>
                             <tr v-for="(row, idx) in requestList" :key="idx" class="cursor-pointer">
-                                <td class="w-16">{{ row.id }}</td>
+                                <td>{{ row.id }}</td>
                                 <td @click="showDescribeItemStatusDialog">
                                     {{ row.name }}
                                     <br />
@@ -258,8 +264,8 @@ listPurposes();
                                     }}</span>
                                 </td>
                                 <td>{{ row.quantity }}</td>
-                                <td class="w-36">{{ row.price }}</td>
-                                <td class="w-36">{{ row.total }}</td>
+                                <td>{{ row.price }}</td>
+                                <td>{{ row.total }}</td>
                                 <td class="cursor-pointer" @click="removeRequestRow(row.id)">X</td>
                             </tr>
                         </tbody>
@@ -272,19 +278,21 @@ listPurposes();
     </section>
 
     <section class="w-full fixed mx-auto bottom-0 z-50 shadow-lg shadow-primary">
-        <div class="flex justify-between items-center section-content p-4 bg-white">
-            <div class="space-x-4">
-                <button class="btn-secondary" @click="request">Solicitar</button>
-                <button class="btn-light">Cancelar</button>
+        <div
+            class="flex justify-between items-center section-content p-4 bg-white flex-wrap md:flex-nowrap gap-4"
+        >
+            <div class="flex gap-4 w-full md:w-auto">
+                <button class="btn-secondary flex-1" @click="request">Solicitar</button>
+                <button class="btn-light flex-1">Cancelar</button>
             </div>
 
-            <div class="flex gap-4 flex-wrap">
-                <p class="text-right space-x-1">
+            <div class="flex gap-1 flex-wrap w-full md:w-auto pb-4 md:pb-0">
+                <p class="text-center w-full md:w-auto md:text-right space-x-1">
                     <span class="font-medium">Total Geral(kz):</span>
                     <span>{{ grandTotal }}</span>
                 </p>
 
-                <p class="text-right space-x-1">
+                <p class="text-center w-full md:w-auto md:text-right space-x-1">
                     <span class="font-medium">Caução(kz):</span>
                     <span>{{ securityDeposit }}</span>
                 </p>

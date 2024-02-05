@@ -119,73 +119,75 @@ onMounted(async () => {
             @update:model-value="searchItems"
         />
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th></th>
-                    <th></th>
-                </tr>
-            </thead>
+        <div class="overflow-x-auto w-full">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th class="min-w-16 w-16">ID</th>
+                        <th class="min-w-36 w-36">Nome</th>
+                        <th class="min-w-28 w-28">Stock</th>
+                        <th class="min-w-12 w-12 md:w-16">QTD</th>
+                    </tr>
+                </thead>
 
-            <tbody>
-                <tr
-                    v-if="items"
-                    v-for="(item, idx) in items"
-                    :key="item.id"
-                    class="hover:bg-gray-50"
-                >
-                    <td class="w-16 cursor-pointer">{{ item.id }}</td>
+                <tbody>
+                    <tr
+                        v-if="items"
+                        v-for="(item, idx) in items"
+                        :key="item.id"
+                        class="hover:bg-gray-50"
+                    >
+                        <td class="w-16 cursor-pointer">{{ item.id }}</td>
 
-                    <td class="min-w-[16rem] cursor-pointer" @click="emitItemAdded(item, idx)">
-                        {{ item.name }}
+                        <td class="cursor-pointer" @click="emitItemAdded(item, idx)">
+                            {{ item.name }}
 
-                        <br />
+                            <br />
 
-                        <span class="text-light-600 text-sm">
-                            {{ listVariations(item?.variations) }}
-                        </span>
-                    </td>
+                            <span class="text-light-600 text-sm">
+                                {{ listVariations(item?.variations) }}
+                            </span>
+                        </td>
 
-                    <td>
-                        <div
-                            class="min-w-[7rem] w-28 px-2 py-1 bg-secondary-600 rounded-3xl text-white text-center"
-                        >
-                            <span v-if="item.isUnique" class=""> Único </span>
-                            <span v-else> {{ item.stock }} em stock </span>
-                        </div>
-                    </td>
+                        <td>
+                            <div
+                                class="px-2 py-1 bg-secondary-600 rounded-3xl text-white text-center"
+                            >
+                                <span v-if="item.isUnique" class=""> Único </span>
+                                <span v-else> {{ item.stock }} em stock </span>
+                            </div>
+                        </td>
 
-                    <td class="text-xs min-w-[5rem] w-16">
-                        <input
-                            v-if="!item.isUnique"
-                            v-model="quantities[idx]"
-                            type="number"
-                            class="input-number"
-                            placeholder="QTD"
-                            min="0"
-                            :max="item.stock"
-                        />
+                        <td class="text-xs">
+                            <input
+                                v-if="!item.isUnique"
+                                v-model="quantities[idx]"
+                                type="number"
+                                class="input-number"
+                                placeholder="QTD"
+                                min="0"
+                                :max="item.stock"
+                            />
 
-                        <input
-                            v-else
-                            value="1"
-                            disabled
-                            type="number"
-                            class="input-number cursor-not-allowed bg-slate-200"
-                            placeholder="QTD"
-                            min="0"
-                            :max="item.stock"
-                        />
-                    </td>
-                </tr>
+                            <input
+                                v-else
+                                value="1"
+                                disabled
+                                type="number"
+                                class="input-number cursor-not-allowed bg-slate-200"
+                                placeholder="QTD"
+                                min="0"
+                                :max="item.stock"
+                            />
+                        </td>
+                    </tr>
 
-                <tr v-if="items.length === 0">
-                    <td colspan="3">Nenhum resultado encontrado</td>
-                </tr>
-            </tbody>
-        </table>
+                    <tr v-if="items.length === 0">
+                        <td colspan="3">Nenhum resultado encontrado</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
         <p>
             <ThePagination :total="pages" @changed="listItems" />
