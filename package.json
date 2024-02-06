@@ -16,6 +16,7 @@
     "devDependencies": {
         "@nuxt/devtools": "latest",
         "@tailwindcss/forms": "^0.5.7",
+        "@vite-pwa/nuxt": "^0.4.0",
         "autoprefixer": "^10.4.16",
         "nuxt": "^3.8.2",
         "postcss": "^8.4.32",

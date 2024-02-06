@@ -8,5 +8,8 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "editor.fontFamily": "'Fira Code', 'Ubuntu Mono', 'Droid Sans Mono', 'monospace', monospace",
-    "testing.automaticallyOpenPeekView": "never"
+    "testing.automaticallyOpenPeekView": "never",
+    "[markdown]": {
+        "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+    }
 }
