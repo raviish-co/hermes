@@ -1,13 +1,14 @@
 <script setup lang="ts">
 interface Propos {
-    modelValue: string;
+    value: string;
     options: string[];
     placeholder: string;
     selectedValue?: string;
+    isInvalid?: boolean;
 }
 
 interface Emits {
-    (e: "update:modelValue", value: string): void;
+    (e: "change", value: string): void;
 }
 
 const emits = defineEmits<Emits>();
@@ -15,7 +16,7 @@ const props = defineProps<Propos>();
 
 function emitSelectedOption(e: Event) {
     const selectedValue = (e.target as HTMLSelectElement).value;
-    emits("update:modelValue", selectedValue);
+    emits("change", selectedValue);
 }
 
 function isSelectedValue(option: string): boolean {
@@ -24,14 +25,19 @@ function isSelectedValue(option: string): boolean {
 
 onMounted(() => {
     if (props.options.includes(props.placeholder)) {
-        emits("update:modelValue", props.placeholder);
+        emits("change", props.placeholder);
     }
 });
 </script>
 
 <template>
-    <select :v-model="modelValue" class="input-field" @change="emitSelectedOption">
-        <option disabled selected>{{ placeholder }}</option>
+    <select
+        :value="value"
+        class="input-field"
+        :class="{ invalid: isInvalid }"
+        @change="emitSelectedOption"
+    >
+        <option selected>{{ placeholder }}</option>
         <option
             v-for="option in options"
             :selected="isSelectedValue(option)"

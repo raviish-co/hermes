@@ -11,7 +11,7 @@ export interface ProductData {
     condition?: Condition;
 }
 
-export interface RequestItems {
+export interface RequestItem {
     total: string;
     returnDate: string;
     securityDeposit: string;

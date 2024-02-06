@@ -112,10 +112,11 @@ onMounted(async () => {
 
 <template>
     <VDialog ref="dialogRef" title="Pesquisar Artigo" class="max-w-[36rem]">
-        <VInput
+        <input
             placeholder="Pesquisar por Nome ou ID"
             type="search"
             v-model="query"
+            class="input-field"
             @update:model-value="searchItems"
         />
 
@@ -125,7 +126,7 @@ onMounted(async () => {
                     <tr>
                         <th class="min-w-16 w-16 hidden sm:initial">ID</th>
                         <th class="min-w-36 w-36">Nome</th>
-                        <th class="min-w-16 w-16">Stock</th>
+                        <th class="min-w-16 w-16">Em estoque</th>
                         <th class="min-w-12 w-12 md:w-16">QTD</th>
                     </tr>
                 </thead>

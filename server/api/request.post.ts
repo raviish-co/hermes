@@ -1,8 +1,8 @@
 import { makeRequestService } from "../backend/main";
-import { RequestItems } from "~/lib/models/request";
+import { RequestItem } from "~/lib/models/request";
 
 export default defineEventHandler(async (event) => {
-    const { request }: { request: RequestItems } = await readBody(event);
+    const { request }: { request: RequestItem } = await readBody(event);
 
     const requestService = makeRequestService();
 

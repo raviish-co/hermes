@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import type { AddItemDialog, DescribeItemStateDialog } from "#build/components";
-import { type Variation, type RequestItem, ItemStateOption } from "~/lib/models/item";
+import { type Variation, type RequestItem as RequestItem } from "~/lib/models/item";
 import { formatCurrency } from "~/lib/helpers/format_currency";
 import type { Purpose } from "~/lib/models/purpose";
 import { RequestService } from "~/lib/services/request_service";
 import { convertToNumber } from "~/lib/helpers/convert_to_number";
-import type { ProductData, RequestItems } from "~/lib/models/request";
+import type { ProductData, RequestItem as Request } from "~/lib/models/request";
 
 const INNER_LAUNDRY = "Interna";
 const DISCARD = "Descartar";
+const PURPOSE = "Finalidade";
+const SECTION = "Secção";
 const addItemDialogRef = ref<typeof AddItemDialog>();
 const describeItemStateDialogRef = ref<typeof DescribeItemStateDialog>();
 const selectedSections = ref<string[]>([]);
 const selectedPlaceholder = ref<string>("Descrição");
-const complementaryDataIsDisabled = ref<boolean>(false);
+const recipientIsDisabled = ref<boolean>(false);
 const requestList = ref<RequestItem[]>([]);
 const currentPurposeName = ref<string>("Finalidade");
 const currentSectionName = ref<string>("");
@@ -27,7 +29,7 @@ const selectedRow = ref<RequestItem>({} as RequestItem);
 
 const requestService = new RequestService();
 
-function makeRequest(): RequestItems {
+function makeRequest(): Request {
     return {
         total: grandTotal.value,
         securityDeposit: securityDeposit.value,
@@ -42,6 +44,8 @@ function makeRequest(): RequestItems {
 }
 
 function makeProductData(): ProductData[] {
+    if (requestList.value.length === 0) return [];
+
     return requestList.value.map((row) => ({
         productId: row.productId,
         quantity: row.quantity,
@@ -53,8 +57,41 @@ function makeProductData(): ProductData[] {
     }));
 }
 
+const isValidPurpose = computed(() =>
+    purpouses.value.some((p) => p.name === currentPurposeName.value)
+);
+
+const isValidSection = computed(() => {
+    if (selectedSections.value.length > 0) {
+        return selectedSections.value.some((s) => s === currentSectionName.value);
+    }
+
+    return true;
+});
+
+const isValidRecipient = computed(() => {
+    if (recipient.value === "" && !recipientIsDisabled.value) return false;
+
+    return true;
+});
+
+const isValidRequest = computed(() => {
+    const isValidRequestList = requestList.value.length > 0;
+
+    if (
+        isValidPurpose.value &&
+        isValidSection.value &&
+        isValidRequestList &&
+        isValidRecipient.value
+    )
+        return true;
+
+    return false;
+});
+
 async function request() {
     const request = makeRequest();
+
     await requestService
         .requestItems(request)
         .then((res) => {
@@ -84,6 +121,12 @@ function getPurposeNames(): string[] {
 }
 
 function findSectionByPurpose(purposeName: string): void {
+    if (purposeName === PURPOSE) {
+        currentSectionName.value = SECTION;
+        selectedSections.value = [];
+        return;
+    }
+
     purpouses.value.find((purpose) => {
         if (purpose.name === purposeName) {
             changePlaceholder(purpose.placeholder!);
@@ -102,11 +145,11 @@ function changePlaceholder(placeholder: string): void {
 
 function disableComplementaryDataToThePurpose(purposeName: string): void {
     if (purposeName === DISCARD) {
-        complementaryDataIsDisabled.value = true;
+        recipientIsDisabled.value = true;
         return;
     }
 
-    complementaryDataIsDisabled.value = false;
+    recipientIsDisabled.value = false;
 }
 
 function updateSelectedSections(sections?: string[]) {
@@ -122,11 +165,11 @@ function updateCurrentSectionName(sectionName: string) {
     currentSectionName.value = sectionName;
 
     if (sectionName === INNER_LAUNDRY) {
-        complementaryDataIsDisabled.value = true;
+        recipientIsDisabled.value = true;
         return;
     }
 
-    complementaryDataIsDisabled.value = false;
+    recipientIsDisabled.value = false;
 
     disableComplementaryDataToThePurpose(currentPurposeName.value);
 }
@@ -186,6 +229,9 @@ function listVariations(itemVariation?: Variation[]) {
 
 function clearValues() {
     returnData.value = new Date();
+    currentPurposeName.value = PURPOSE;
+    currentSectionName.value = SECTION;
+    selectedSections.value = [];
     recipient.value = "";
     requestList.value = [];
     grandTotal.value = "0,00";
@@ -200,7 +246,7 @@ listPurposes();
         <img src="/images/logo.png" alt="Logotipo da Raviish" class="h-full" />
     </div>
 
-    <section class="section-content md:mb-20 mb-36">
+    <section class="section-content md:mb-20 mb-44 sm:mb-36">
         <h1 class="flex-1 text-center my-8 sm:my-10 text-xl sm:text-2xl">
             Guia de Saída de Artigos
         </h1>
@@ -208,37 +254,36 @@ listPurposes();
         <section>
             <form>
                 <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
-                    <VInput placeholder="John Doe" :disabled="true" />
+                    <input class="input-field" placeholder="John Doe" :disabled="true" />
 
-                    <VInput
-                        v-model="returnData"
-                        placeholder="Data prevista para a devolução[dd/mm/aaaa]"
-                        type="date"
-                    />
+                    <input v-model="returnData" type="date" class="input-field" />
                 </div>
 
                 <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
                     <VSelect
-                        v-model="currentPurposeName"
+                        :value="currentPurposeName"
                         placeholder="Finalidade"
                         :options="getPurposeNames()"
-                        @update:model-value="findSectionByPurpose"
+                        :is-invalid="!isValidPurpose"
+                        @change="findSectionByPurpose"
                     />
 
                     <VSelect
-                        v-model="currentSectionName"
+                        :value="currentSectionName"
                         placeholder="Secção"
                         :options="selectedSections"
                         :disabled="isDisabledSection"
-                        @update:model-value="updateCurrentSectionName"
+                        :is-invalid="!isValidSection"
+                        @change="updateCurrentSectionName"
                     />
                 </div>
 
                 <input
                     v-model="recipient"
                     :placeholder="selectedPlaceholder"
-                    :disabled="complementaryDataIsDisabled"
+                    :disabled="recipientIsDisabled"
                     class="input-field mb-4"
+                    :class="{ invalid: !isValidRecipient }"
                 />
             </form>
         </section>
@@ -296,7 +341,13 @@ listPurposes();
             class="flex justify-between items-center section-content p-4 bg-white flex-wrap flex-col-reverse md:flex-row md:flex-nowrap gap-4"
         >
             <div class="flex flex-wrap sm:flex-nowrap gap-4 w-full md:w-auto pb-4 md:pb-0">
-                <button class="btn-secondary w-full md:flex-1" @click="request">Solicitar</button>
+                <button
+                    class="btn-secondary w-full md:flex-1"
+                    @click="request"
+                    :disabled="!isValidRequest"
+                >
+                    Solicitar
+                </button>
                 <button class="btn-light w-full md:flex-1">Cancelar</button>
             </div>
 

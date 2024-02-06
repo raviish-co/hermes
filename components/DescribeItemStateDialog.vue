@@ -62,7 +62,7 @@ defineExpose({ show: showDialog, initializeItemState });
 
 <template>
     <VDialog ref="dialogRef" title="Descrever danos do artigo" class="max-w-[30rem]">
-        <VSelect v-model="status" placeholder="Estado" :options="Object.values(ItemStateOption)" />
+        <VSelect value="status" placeholder="Estado" :options="Object.values(ItemStateOption)" />
 
         <textarea
             v-model="comment"
