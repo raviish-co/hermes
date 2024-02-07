@@ -6,13 +6,8 @@ type PurposeData = {
     recipient?: string;
 };
 
-export type StockQuery = {
+export type ItemQuery = {
     itemId: ID;
-    quantity: number;
-};
-
-export type ProductQuery = {
-    productId: ID;
     variations?: ID[];
 };
 
@@ -21,8 +16,8 @@ export type Condition = {
     comment?: string;
 };
 
-export type ProductData = {
-    productId: string;
+export type ItemData = {
+    itemId: string;
     quantity: number;
     variations?: string[];
     condition?: Condition;
@@ -30,8 +25,15 @@ export type ProductData = {
 
 export type RequestData = {
     purposeData: PurposeData;
-    productsData: ProductData[];
+    productsData: ItemData[];
     total: string;
     returnDate: string;
     securityDeposit: string;
+};
+
+export type UploadData = {
+    department: string;
+    categoryName: string;
+    subcategoryName: string;
+    file: File;
 };

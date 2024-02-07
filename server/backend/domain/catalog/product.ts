@@ -1,22 +1,23 @@
-import { ID } from "../../shared/id";
+import { Subcategory } from "./subcategory";
 import { Decimal } from "../../shared/decimal";
+import { ID } from "../../shared/id";
 
 type Options = {
-    productId: string;
+    productId?: string;
     name: string;
     price: string;
     unique?: boolean;
-    subcategory: string;
+    subcategory: Subcategory;
 };
 
 export class Product {
     readonly productId: ID;
     readonly name: string;
     readonly price: Decimal;
-    readonly subcategory: string;
+    readonly subcategory: Subcategory;
     #unique?: boolean;
 
-    private constructor(productId: ID, name: string, price: Decimal, subcategory: string) {
+    private constructor(productId: ID, name: string, price: Decimal, subcategory: Subcategory) {
         this.productId = productId;
         this.name = name;
         this.price = price;
@@ -25,11 +26,11 @@ export class Product {
     }
 
     static create(options: Options): Product {
-        const { productId, name, unique, subcategory } = options;
-
-        const newID = ID.New(productId);
+        const { name, unique, subcategory, productId } = options;
 
         const price = Decimal.fromString(options.price);
+
+        const newID = productId ? ID.New(productId) : ID.RandomUUID();
 
         const product = new Product(newID, name, price, subcategory);
 

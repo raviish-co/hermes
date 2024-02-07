@@ -1,5 +1,5 @@
 import { Condition } from "../../shared/types";
-import { ItemStock } from "../item_stock";
+import { ItemStock } from "./item_stock";
 import { Variation } from "./variation";
 import { ID } from "../../shared/id";
 import { Product } from "./product";

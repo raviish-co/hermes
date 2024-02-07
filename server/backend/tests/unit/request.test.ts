@@ -4,7 +4,7 @@ import { Item, ItemStatus } from "../../domain/catalog/item";
 import { Product } from "../../domain/catalog/product";
 import { describe, expect, it } from "vitest";
 import { User } from "../../domain/user";
-import { ItemStock } from "../../domain/item_stock";
+import { ItemStock } from "../../domain/catalog/item_stock";
 import { ID } from "../../shared/id";
 
 describe("Test Request Products", () => {

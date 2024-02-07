@@ -1,11 +1,12 @@
+import { InsufficientStockItem } from "../domain/sequences/insufficient_item_stock_error";
 import { PurposeNotFound } from "../domain/purposes/purpose_not_found_error";
 import { RequestRepository } from "../domain/requests/request_repository";
-import { ProductData, ProductQuery, RequestData } from "../shared/types";
-import { InsufficientStockItem } from "../domain/sequences/insufficient_item_stock_error";
+import { ItemData, ItemQuery, RequestData } from "../shared/types";
+import { SequencePrefix } from "../domain/sequences/sequence_prefix";
+import { RequestBuilder } from "../domain/requests/request_builder";
 import { ItemRepository } from "../domain/catalog/item_repository";
 import { PurposeSource } from "../domain/purposes/purpose_source";
 import { RequestItem } from "../domain/requests/request_item";
-import { SequencePrefix } from "../domain/sequences/sequence_prefix";
 import { PurposeData } from "../domain/purposes/purpose_data";
 import { Generator } from "../domain/sequences/generator";
 import { Either, left, right } from "../shared/either";
@@ -13,7 +14,6 @@ import { RequestError } from "../shared/errors";
 import { Item } from "../domain/catalog/item";
 import { User } from "../domain/user";
 import { ID } from "../shared/id";
-import { RequestBuilder } from "../domain/requests/request_builder";
 
 export class RequestService {
     #purposeSource: PurposeSource;
@@ -73,12 +73,12 @@ export class RequestService {
         return right(undefined);
     }
 
-    #buildQueries(products: ProductData[]): ProductQuery[] {
-        const queries: ProductQuery[] = [];
-        for (const product of products) {
+    #buildQueries(items: ItemData[]): ItemQuery[] {
+        const queries: ItemQuery[] = [];
+        for (const item of items) {
             const query = {
-                productId: ID.New(product.productId),
-                variations: product.variations ? product.variations.map((v) => ID.New(v)) : [],
+                itemId: ID.New(item.itemId),
+                variations: item.variations ? item.variations.map((v) => ID.New(v)) : [],
             };
             queries.push(query);
         }
@@ -87,7 +87,7 @@ export class RequestService {
 
     #buildRequestItems(
         items: Item[],
-        itemData: ProductData[]
+        itemData: ItemData[]
     ): Either<InsufficientStockItem, RequestItem[]> {
         const requestItems: RequestItem[] = [];
 

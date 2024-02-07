@@ -58,7 +58,7 @@ describe("Test Purpose Source", () => {
 describe("Test RequestArticles Service", () => {
     it("Deve chamar o método **exists** para encontrar a finalidade", () => {
         const purposeName = "Aluguer";
-        const productsData = [{ productId: "1001", quantity: 1 }];
+        const productsData = [{ itemId: "1001", quantity: 1 }];
         const data = {
             ...requestData,
             purposeData: {
@@ -91,7 +91,7 @@ describe("Test RequestArticles Service", () => {
     });
 
     it("Deve chamar o método **getAll** no repositório de artigos", async () => {
-        const productsData = [{ productId: "1001", quantity: 1 }];
+        const productsData = [{ itemId: "1001", quantity: 1 }];
         const { service, itemRepository } = makeService();
         const spy = vi.spyOn(itemRepository, "getAll");
 
@@ -99,11 +99,11 @@ describe("Test RequestArticles Service", () => {
 
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledTimes(1);
-        expect(spy).toHaveBeenCalledWith([{ productId: ID.New("1001"), variations: [] }]);
+        expect(spy).toHaveBeenCalledWith([{ itemId: ID.New("1001"), variations: [] }]);
     });
 
     it("Deve retornar um erro **ArticleNotFound** se não existir", async () => {
-        const productsData = [{ productId: "1008", quantity: 1 }];
+        const productsData = [{ itemId: "1008", quantity: 1 }];
         const { service } = makeService();
 
         const error = await service.requestItems({
@@ -116,7 +116,7 @@ describe("Test RequestArticles Service", () => {
     });
 
     it("Deve chamar o método **save** no repositório de solicitações de artigos", async () => {
-        const productsData = [{ productId: "1001", quantity: 1 }];
+        const productsData = [{ itemId: "1001", quantity: 1 }];
         const total = "15,95";
         const { service, requestRepository } = makeService();
 
@@ -134,7 +134,7 @@ describe("Test RequestArticles Service", () => {
     });
 
     it("Deve efectuar a solicitação de um uníco artigo", async () => {
-        const productsData = [{ productId: "1001", quantity: 1 }];
+        const productsData = [{ itemId: "1001", quantity: 1 }];
         const { service, requestRepository } = makeService();
 
         await service.requestItems({
@@ -148,15 +148,15 @@ describe("Test RequestArticles Service", () => {
         const requestItem = request.items[0];
 
         expect(request.items.length).toBe(1);
-        expect(requestItem.item.product.productId.toString()).toEqual("1001");
+        expect(requestItem.item.itemId.toString()).toEqual("1001");
         expect(requestItem.getTotal().value).toEqual("15,95");
         expect(requestItem.quantity).toEqual(1);
     });
 
     it("Deve efectuar a solicitação de mais de um artigo", async () => {
         const productsData = [
-            { productId: "1001", quantity: 1 },
-            { productId: "1002", quantity: 1 },
+            { itemId: "1001", quantity: 1 },
+            { itemId: "1002", quantity: 1 },
         ];
         const total = "166,90";
         const securityDeposit = "333,80";
@@ -211,8 +211,8 @@ describe("Test RequestArticles Service", () => {
 
     it("Deve retornar **InsufficientStock** se a quantidade solicitada for maior que a quantidade em estoque", async () => {
         const productsData = [
-            { productId: "1001", quantity: 10 },
-            { productId: "1002", quantity: 15 },
+            { itemId: "1001", quantity: 10 },
+            { itemId: "1002", quantity: 15 },
         ];
 
         const { service } = makeService();
@@ -281,9 +281,9 @@ describe("Test RequestArticles Service", () => {
 
     it("Deve retornar **InsufficientStock** se a quantidade solicitada de uma variação não tiver estoque suficiente", async () => {
         const productsData = [
-            { productId: "1001", quantity: 2 },
-            { productId: "1002", quantity: 3 },
-            { productId: "1003", quantity: 14, variations: ["1004", "1005"] },
+            { itemId: "1001", quantity: 2 },
+            { itemId: "1002", quantity: 3 },
+            { itemId: "1003", quantity: 14, variations: ["1004", "1005"] },
         ];
         const { service } = makeService();
 
@@ -356,12 +356,12 @@ const requestData = {
     },
     productsData: [
         {
-            productId: "1001",
+            itemId: "1001",
             quantity: 2,
             condition: { status: "Bom" },
         },
         {
-            productId: "1002",
+            itemId: "1002",
             quantity: 3,
             condition: { status: "Mau", comment: "T-shirt rasgada" },
         },
