@@ -156,14 +156,18 @@ describe("Test Request Products", () => {
     });
 });
 
+const subcategory = {
+    subcategoryId: ID.RandomUUID(),
+    name: "some-subcategory",
+};
+
 const productOptions = {
-    productId: "some-id",
     name: "some-title",
     price: "150",
     unique: false,
-    subcategory: "some-subcategory",
+    subcategory,
 };
-const stock = new ItemStock(ID.Random(), 10);
+const stock = new ItemStock(10);
 const condition = { status: ItemStatus.Bad, comment: "Some comment" };
 const product = Product.create(productOptions);
 const item = Item.create({

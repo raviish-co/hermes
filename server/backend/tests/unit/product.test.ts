@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { Product } from "../../domain/catalog/product";
+import { describe, expect, it } from "vitest";
+import { ID } from "../../shared/id";
 
 describe("Test Product", () => {
     it("Deve criar um produto", () => {
@@ -29,10 +30,14 @@ describe("Test Product", () => {
     });
 });
 
+const subcategory = {
+    subcategoryId: ID.RandomUUID(),
+    name: "some-subcategory",
+};
+
 const options = {
-    productId: "1001",
     name: "some-name",
     price: "150",
     unique: false,
-    subcategory: "some-subcategory",
+    subcategory,
 };
