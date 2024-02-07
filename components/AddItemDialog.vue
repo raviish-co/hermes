@@ -34,7 +34,7 @@ function itemExist(itemId: string): boolean {
 }
 
 function validateQuantity(item: Item, quantity: number): boolean {
-    if (quantity <= 0 && !item.isUnique) return false;
+    if (quantity <= 0) return false;
 
     if (quantity > item.stock) return false;
 
@@ -42,7 +42,7 @@ function validateQuantity(item: Item, quantity: number): boolean {
 }
 
 function addItem(item: Item, idx: number) {
-    const quantity = quantities.value[idx];
+    const quantity = item.isUnique ? 1 : quantities.value[idx];
 
     if (!validateQuantity(item, quantity)) return;
 
