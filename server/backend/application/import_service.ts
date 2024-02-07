@@ -85,8 +85,6 @@ export class ImportService {
 
             const [name, price, isunique, quantity, comment] = l.split(",");
 
-            console.log(comment);
-
             if (!name || !price || !quantity || !isunique) return;
 
             const unique = Boolean(isunique);
