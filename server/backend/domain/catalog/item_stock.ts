@@ -6,7 +6,7 @@ export class ItemStock {
     }
 
     verify(quantity: number): boolean {
-        return this.#quantity > quantity;
+        return this.#quantity >= quantity;
     }
 
     reduce(quantity: number): void {

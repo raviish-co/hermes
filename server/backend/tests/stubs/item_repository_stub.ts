@@ -102,22 +102,26 @@ export class ItemRepositoryStub implements ItemRepository {
     }
 
     #populate() {
+        const subcategory = {
+            subcategoryId: ID.RandomUUID(),
+            name: "Some-subcategory",
+        };
         const product = Product.create({
             name: "Teste 1",
             price: "15,95",
-            subcategory: "some-subcategory",
+            subcategory,
         });
 
         const product2 = Product.create({
             name: "Teste 2",
             price: "150,95",
-            subcategory: "some-subcategory",
+            subcategory,
         });
 
         const product3 = Product.create({
             name: "Teste 2",
             price: "315,95",
-            subcategory: "some-subcategory",
+            subcategory,
         });
 
         const variation = Variation.create({
