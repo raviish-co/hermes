@@ -6,6 +6,7 @@ import { SequenceGenerator } from "./domain/sequences/sequence_generator";
 import { ItemRepositoryStub } from "./tests/stubs/item_repository_stub";
 import { RequestService } from "./application/request_service";
 import { CatalogService } from "./application/catalog_service";
+import { ImportService } from "./application/import_service";
 
 const jsonPurposeSource = new JsonPurposeSource();
 const itemRepository = new ItemRepositoryStub();
@@ -17,6 +18,7 @@ const categoryRepository = new InmemCategoryRepository();
 interface Services {
     requestService: RequestService;
     catalogService: CatalogService;
+    importService: ImportService;
 }
 
 export const makeServices = (): Services => {
@@ -29,8 +31,11 @@ export const makeServices = (): Services => {
 
     const catalogService = new CatalogService(itemRepository, categoryRepository);
 
+    const importService = new ImportService(categoryRepository, itemRepository, sequenceGenerator);
+
     return {
         requestService,
         catalogService,
+        importService,
     };
 };
