@@ -4,7 +4,7 @@ import { JsonPurposeSource } from "./persistense/data/json_purpouse_source";
 import { SequenceGenerator } from "./domain/sequences/sequence_generator";
 import { ItemRepositoryStub } from "./tests/stubs/item_repository_stub";
 import { RequestService } from "./application/request_service";
-import { ItemService } from "./application/item_service";
+import { CatalogService } from "./application/catalog_service";
 
 const jsonPurposeSource = new JsonPurposeSource();
 const itemRepository = new ItemRepositoryStub();
@@ -21,6 +21,6 @@ export const makeRequestService = (): RequestService => {
     );
 };
 
-export const makeItemService = (): ItemService => {
-    return new ItemService(itemRepository);
+export const makeItemService = (): CatalogService => {
+    return new CatalogService(itemRepository);
 };

@@ -1,7 +1,7 @@
+import { CategoryNotFound } from "../../domain/catalog/category_not_found_error";
+import { CategoryRepository } from "../../domain/catalog/category_repository";
 import { Either, left, right } from "../../shared/either";
 import { Category } from "../../domain/catalog/category";
-import { CategoryRepository } from "../../domain/catalog/category_repository";
-import { CategoryNotFound } from "../../domain/catalog/category_not_found_error";
 
 export class InmemCategoryRepository implements CategoryRepository {
     #categories: Record<string, Category> = {};
@@ -12,6 +12,10 @@ export class InmemCategoryRepository implements CategoryRepository {
         if (!category) return Promise.resolve(left(new CategoryNotFound()));
 
         return Promise.resolve(right(category));
+    }
+
+    getAll(): Promise<Category[]> {
+        return Promise.resolve(this.records);
     }
 
     save(category: Category): Promise<void> {

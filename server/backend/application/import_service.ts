@@ -1,17 +1,17 @@
-import { SequenceGenerator } from "../domain/sequences/sequence_generator";
-import { Item, ItemCondition, ItemStatus } from "../domain/catalog/item";
 import { InvalidFileHeader } from "../domain/readers/invalid_file_header_error";
 import { FileNotSupported } from "../domain/readers/file_not_supported_error";
+import { SequenceGenerator } from "../domain/sequences/sequence_generator";
+import { CategoryRepository } from "../domain/catalog/category_repository";
+import { Item, ItemCondition, ItemStatus } from "../domain/catalog/item";
+import { CsvReader, validCsvHeader } from "../domain/readers/csv_reader";
 import { SequencePrefix } from "../domain/sequences/sequence_prefix";
 import { ItemRepository } from "../domain/catalog/item_repository";
-import { CategoryRepository } from "../domain/catalog/category_repository";
-import { CsvReader, validCsvHeader } from "../domain/readers/csv_reader";
 import { FileEmpty } from "../domain/readers/file_empty_error";
-import { Either, left, right } from "../shared/either";
 import { Subcategory } from "../domain/catalog/subcategory";
-import { Product } from "../domain/catalog/product";
 import { ItemStock } from "../domain/catalog/item_stock";
+import { Either, left, right } from "../shared/either";
 import { Category } from "../domain/catalog/category";
+import { Product } from "../domain/catalog/product";
 import { UploadData } from "../shared/types";
 import { FileError } from "../shared/errors";
 import { ID } from "../shared/id";
@@ -40,10 +40,8 @@ export class ImportService {
 
         const reader = new CsvReader();
         const lines = await reader.read(file);
-        const validFileOrError = this.#isValidFile(lines);
-        if (validFileOrError.isLeft()) {
-            return Promise.resolve(left(validFileOrError.value));
-        }
+        const validOrError = this.#isValidFile(lines);
+        if (validOrError.isLeft()) return Promise.resolve(left(validOrError.value));
 
         const categoryOrError = await this.#categoryRepository.findByName(categoryName);
 

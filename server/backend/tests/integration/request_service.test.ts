@@ -1,11 +1,11 @@
+import { InsufficientStockItem } from "../../domain/sequences/insufficient_item_stock_error";
 import { InmemRequestRepository } from "../../persistense/inmem/inmem_request_repository";
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
 import { ProductNotFound } from "../../domain/catalog/product_not_found_error";
-import { InsufficientStockItem } from "../../domain/sequences/insufficient_item_stock_error";
+import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
 import { InvalidTotal } from "../../domain/requests/invalid_total_error";
 import { ItemRepository } from "../../domain/catalog/item_repository";
 import { PurposeSource } from "../../domain/purposes/purpose_source";
-import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
 import { RequestService } from "../../application/request_service";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { FakePurposeSource } from "../purpose_source_fake";
@@ -13,7 +13,7 @@ import { PurposeSourceStub } from "../purpose_source_stub";
 import { describe, expect, it, vi } from "vitest";
 import { ID } from "../../shared/id";
 
-describe("Test Purpose Source", () => {
+describe("Test List Purposes ", () => {
     it("should be return an  list void of purposes", async () => {
         const purposeSource = new FakePurposeSource();
         const { service } = makeService({ purposeSource });
@@ -55,7 +55,7 @@ describe("Test Purpose Source", () => {
     });
 });
 
-describe("Test RequestArticles Service", () => {
+describe("Test Request Items", () => {
     it("Deve chamar o método **exists** para encontrar a finalidade", () => {
         const purposeName = "Aluguer";
         const productsData = [{ itemId: "1001", quantity: 1 }];

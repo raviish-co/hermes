@@ -1,17 +1,17 @@
+import { InmemCategoryRepository } from "../../persistense/inmem/inmem_category_repository";
+import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
+import { InmemItemRepository } from "../../persistense/inmem/inmem_item_repository";
+import { InvalidFileHeader } from "../../domain/readers/invalid_file_header_error";
+import { FileNotSupported } from "../../domain/readers/file_not_supported_error";
+import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
+import { FileEmpty } from "../../domain/readers/file_empty_error";
+import { ImportService } from "../../application/import_service";
+import { Category } from "../../domain/catalog/category";
+import { ItemStatus } from "../../domain/catalog/item";
 import { describe, it, expect } from "vitest";
 import { ID } from "../../shared/id";
-import { InmemItemRepository } from "../../persistense/inmem/inmem_item_repository";
-import { ItemStatus } from "../../domain/catalog/item";
-import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
-import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
-import { Category } from "../../domain/catalog/category";
-import { InmemCategoryRepository } from "../../persistense/inmem/inmem_category_repository";
-import { ImportService } from "../../application/import_service";
-import { FileNotSupported } from "../../domain/readers/file_not_supported_error";
-import { FileEmpty } from "../../domain/readers/file_empty_error";
-import { InvalidFileHeader } from "../../domain/readers/invalid_file_header_error";
 
-describe("Test Import Service", async () => {
+describe("Test Upload Items", async () => {
     it("Deve criar uma categoria caso ela não exista", async () => {
         const storage = new InmemSequenceStorage();
         const sequenceGenerator = new SequenceGenerator(storage);
