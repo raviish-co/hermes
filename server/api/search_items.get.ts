@@ -1,12 +1,12 @@
 import { makeItemsDTO } from "../backend/application/item_dto";
-import { makeItemService } from "../backend/main";
+import { makeServices } from "../backend/main";
+
+const { catalogService } = makeServices();
 
 export default defineEventHandler(async (event) => {
-    const { query } = getQuery(event);
+    const { query } = getQuery<{ query: string }>(event);
 
-    const itemService = makeItemService();
-
-    const { result, pageToken, perPage, total } = await itemService.searchItems(query as string);
+    const { result, pageToken, perPage, total } = await catalogService.searchItems(query);
 
     const items = makeItemsDTO(result);
 

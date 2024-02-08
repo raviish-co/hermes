@@ -2,13 +2,14 @@ import { ProductNotFound } from "../backend/domain/catalog/product_not_found_err
 import { PurposeNotFound } from "../backend/domain/purposes/purpose_not_found_error";
 import { InvalidTotal } from "../backend/domain/requests/invalid_total_error";
 import { InsufficientStockItem } from "../backend/domain/sequences/insufficient_item_stock_error";
-import { makeRequestService } from "../backend/main";
+import { makeServices } from "../backend/main";
 import { RequestData } from "~/lib/models/request";
+
+const { requestService } = makeServices();
 
 export default defineEventHandler(async (event) => {
     const { request } = await readBody<{ request: RequestData }>(event);
 
-    const requestService = makeRequestService();
     const voidOrError = await requestService.requestItems(request);
 
     if (voidOrError.value instanceof PurposeNotFound) {
