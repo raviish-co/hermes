@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import cripto from "node:crypto";
 
 export class ID {
     #value: string;
@@ -11,12 +11,9 @@ export class ID {
         return new ID(raw);
     }
 
-    static Random(): ID {
-        return ID.New(Math.random().toString(36).substring(2, 15));
-    }
-
     static RandomUUID(): ID {
-        return new ID(randomUUID());
+        const uuid = cripto.randomUUID();
+        return new ID(uuid);
     }
 
     toString(): string {

@@ -26,7 +26,7 @@ describe("Test Product", () => {
         const product = Product.create(options);
 
         expect(product.subcategory).toBeDefined();
-        expect(product.subcategory).toEqual("some-subcategory");
+        expect(product.subcategory.name).toEqual("some-subcategory");
     });
 });
 
