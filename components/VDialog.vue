@@ -22,8 +22,11 @@ defineExpose({ show, close });
     <dialog ref="dialogRef" class="m-auto p-4 w-full bg-transparent fixed">
         <div class="bg-white py-8 px-6 flex flex-col items-center gap-8">
             <h2 class="font-medium text-lg">{{ title }}</h2>
-            <span @click="close" class="cursor-pointer absolute top-8 right-8">X</span>
-
+            <span
+                class="material-symbols-outlined cursor-pointer absolute top-8 right-8"
+                @click="close"
+                >close</span
+            >
             <slot />
         </div>
     </dialog>
