@@ -1,3 +1,4 @@
+import { InmemCategoryRepository } from "./persistense/inmem/inmem_category_repository";
 import { InmemRequestRepository } from "./persistense/inmem/inmem_request_repository";
 import { InmemSequenceStorage } from "./persistense/inmem/inmem_sequence_storage";
 import { JsonPurposeSource } from "./persistense/data/json_purpouse_source";
@@ -11,16 +12,25 @@ const itemRepository = new ItemRepositoryStub();
 const requestRepository = new InmemRequestRepository();
 const sequenceStore = new InmemSequenceStorage();
 const sequenceGenerator = new SequenceGenerator(sequenceStore);
+const categoryRepository = new InmemCategoryRepository();
 
-export const makeRequestService = (): RequestService => {
-    return new RequestService(
+interface Services {
+    requestService: RequestService;
+    catalogService: CatalogService;
+}
+
+export const makeServices = (): Services => {
+    const requestService = new RequestService(
         jsonPurposeSource,
         itemRepository,
         requestRepository,
         sequenceGenerator
     );
-};
 
-export const makeItemService = (): CatalogService => {
-    return new CatalogService(itemRepository);
+    const catalogService = new CatalogService(itemRepository, categoryRepository);
+
+    return {
+        requestService,
+        catalogService,
+    };
 };

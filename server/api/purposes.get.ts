@@ -1,6 +1,6 @@
-import { makeRequestService } from "../backend/main";
+import { makeServices } from "../backend/main";
 
 export default defineEventHandler(async () => {
-    const articleService = makeRequestService();
+    const articleService = makeServices();
     return await articleService.listPurposes();
 });
