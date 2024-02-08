@@ -1,4 +1,4 @@
-import { InmemItemRepository } from "../../persistense/inmem/inmem_article_repository";
+import { InmemItemRepository } from "../../persistense/inmem/inmem_item_repository";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { ItemService } from "../../application/item_service";
 import { describe, it, vi, expect } from "vitest";
@@ -22,7 +22,7 @@ describe("Test ListItems", () => {
         const { result: items } = await service.listItems();
 
         expect(items.length).toBeGreaterThanOrEqual(2);
-        expect(items[0].product.productId.toString()).toEqual("1001");
+        expect(items[0].itemId.toString()).toEqual("1001");
     });
 
     it("Deve retornar um array vazio se não existir artigos", async () => {
@@ -55,7 +55,7 @@ describe("Test Searchitems", () => {
         const { result: items } = await service.searchItems("Teste");
 
         expect(items.length).toBeGreaterThanOrEqual(2);
-        expect(items[0].product.productId.toString()).toEqual("1001");
+        expect(items[0].itemId.toString()).toEqual("1001");
     });
 
     it("Deve pesquisar o artigo pelo seu identificador", async () => {
@@ -65,7 +65,7 @@ describe("Test Searchitems", () => {
         const { result: items } = await service.searchItems("1002");
 
         expect(items.length).toBeGreaterThanOrEqual(1);
-        expect(items[0].product.productId.toString()).toEqual("1002");
+        expect(items[0].itemId.toString()).toEqual("1002");
     });
 
     it("Deve retornar um array vazio se não existir artigos", async () => {

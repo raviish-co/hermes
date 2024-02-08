@@ -1,13 +1,13 @@
 import { ProductNotFound } from "../../domain/catalog/product_not_found_error";
 import { ItemRepository } from "../../domain/catalog/item_repository";
-import { Product } from "../../domain/catalog/product";
-import { Either, left, right } from "../../shared/either";
-import { Pagination } from "../../shared/pagination";
-import { ProductQuery } from "../../shared/types";
 import { Item, ItemStatus } from "../../domain/catalog/item";
-import { ID } from "../../shared/id";
-import { ItemStock } from "../../domain/item_stock";
 import { Variation } from "../../domain/catalog/variation";
+import { Either, left, right } from "../../shared/either";
+import { Product } from "../../domain/catalog/product";
+import { Pagination } from "../../shared/pagination";
+import { ItemStock } from "../../domain/catalog/item_stock";
+import { ItemQuery } from "../../shared/types";
+import { ID } from "../../shared/id";
 
 export class ItemRepositoryStub implements ItemRepository {
     #items: Record<string, Item> = {};
@@ -20,17 +20,17 @@ export class ItemRepositoryStub implements ItemRepository {
         return Promise.resolve(this.#items[itemId.toString()]);
     }
 
-    getAll(queries: ProductQuery[]): Promise<Either<ProductNotFound, Item[]>> {
+    getAll(queries: ItemQuery[]): Promise<Either<ProductNotFound, Item[]>> {
         const items = Object.values(this.#items);
         const articles: Item[] = [];
 
         for (const query of queries) {
             const filtered = items.find(
-                (item) => item.product.productId.toString() === query.productId.toString()
+                (item) => item.itemId.toString() === query.itemId.toString()
             );
 
             if (!filtered)
-                return Promise.resolve(left(new ProductNotFound(query.productId.toString())));
+                return Promise.resolve(left(new ProductNotFound(query.itemId.toString())));
 
             articles.push(filtered);
         }
@@ -58,7 +58,7 @@ export class ItemRepositoryStub implements ItemRepository {
         const items = this.records.filter((i) => {
             return (
                 i.product.name.toLowerCase().includes(query.toLowerCase()) ||
-                i.product.productId.toString().includes(query)
+                i.itemId.toString().includes(query)
             );
         });
 
@@ -86,27 +86,35 @@ export class ItemRepositoryStub implements ItemRepository {
         return Promise.resolve(undefined);
     }
 
+    saveAll(items: Item[]): Promise<void> {
+        for (const item of items) {
+            this.#items[item.itemId.toString()] = item;
+        }
+        return Promise.resolve(undefined);
+    }
+
     get records(): Item[] {
         return Object.values(this.#items);
     }
 
+    last(): Promise<Item> {
+        return Promise.resolve(this.records[this.records.length - 1]);
+    }
+
     #populate() {
         const product = Product.create({
-            productId: "1001",
             name: "Teste 1",
             price: "15,95",
             subcategory: "some-subcategory",
         });
 
         const product2 = Product.create({
-            productId: "1002",
             name: "Teste 2",
             price: "150,95",
             subcategory: "some-subcategory",
         });
 
         const product3 = Product.create({
-            productId: "1003",
             name: "Teste 2",
             price: "315,95",
             subcategory: "some-subcategory",
@@ -124,9 +132,9 @@ export class ItemRepositoryStub implements ItemRepository {
             value: { value: "Nike" },
         });
 
-        const stock1 = new ItemStock(ID.Random(), 10);
-        const stock2 = new ItemStock(ID.Random(), 10);
-        const stock3 = new ItemStock(ID.Random(), 10);
+        const stock1 = new ItemStock(10);
+        const stock2 = new ItemStock(10);
+        const stock3 = new ItemStock(10);
 
         const item1 = Item.create({
             itemId: "1001",

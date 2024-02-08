@@ -9,6 +9,10 @@
             "placeholder": "Costureiro"
         },
         {
+            "name": "Arte / Cenografia",
+            "placeholder": "Descrição"
+        },
+        {
             "name": "Descartar"
         },
         {

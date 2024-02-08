@@ -1,11 +1,7 @@
-import { ID } from "../shared/id";
-
 export class ItemStock {
-    readonly stockId: ID;
     #quantity: number;
 
-    constructor(stockId: ID, quantity: number) {
-        this.stockId = stockId;
+    constructor(quantity: number) {
         this.#quantity = quantity;
     }
 

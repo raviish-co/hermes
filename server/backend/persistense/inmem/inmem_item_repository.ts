@@ -2,7 +2,7 @@ import { ProductNotFound } from "../../domain/catalog/product_not_found_error";
 import { ItemRepository } from "../../domain/catalog/item_repository";
 import { Either, left, right } from "../../shared/either";
 import { Pagination } from "../../shared/pagination";
-import { ProductQuery } from "../../shared/types";
+import { ItemQuery } from "../../shared/types";
 import { Item } from "../../domain/catalog/item";
 import { ID } from "../../shared/id";
 
@@ -13,19 +13,19 @@ export class InmemItemRepository implements ItemRepository {
         return Promise.resolve(this.#items[articleId.toString()]);
     }
 
-    getAll(queries: ProductQuery[]): Promise<Either<ProductNotFound, Item[]>> {
+    getAll(queries: ItemQuery[]): Promise<Either<ProductNotFound, Item[]>> {
         const items = Object.values(this.#items);
         const articles: Item[] = [];
 
         for (const query of queries) {
             const filtered = items.find(
                 (item) =>
-                    item.product.productId.toString() === query.productId.toString() &&
+                    item.product.productId.toString() === query.itemId.toString() &&
                     item.variations?.toString() === query.variations?.toString()
             );
 
             if (!filtered)
-                return Promise.resolve(left(new ProductNotFound(query.productId.toString())));
+                return Promise.resolve(left(new ProductNotFound(query.itemId.toString())));
 
             articles.push(filtered);
         }
@@ -78,6 +78,17 @@ export class InmemItemRepository implements ItemRepository {
             this.#items[item.itemId.toString()] = item;
         }
         return Promise.resolve(undefined);
+    }
+
+    saveAll(items: Item[]): Promise<void> {
+        for (const item of items) {
+            this.#items[item.itemId.toString()] = item;
+        }
+        return Promise.resolve(undefined);
+    }
+
+    last(): Promise<Item> {
+        return Promise.resolve(this.records[this.records.length - 1]);
     }
 
     get records(): Item[] {
