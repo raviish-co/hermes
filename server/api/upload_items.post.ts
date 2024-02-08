@@ -1,24 +1,17 @@
-import { FileEmpty } from "../backend/domain/readers/file_empty_error";
 import { FileNotSupported } from "../backend/domain/readers/file_not_supported_error";
 import { InvalidFileHeader } from "../backend/domain/readers/invalid_file_header_error";
+import { FileEmpty } from "../backend/domain/readers/file_empty_error";
+import { HttpStatusCode } from "../backend/shared/http_status";
 import { makeServices } from "../backend/main";
 
 const { importService } = makeServices();
-
-export enum HttpStatusCode {
-    OK = 200,
-    Created = 201,
-    BadRequest = 400,
-    NotFound = 404,
-    InternalServerError = 500,
-}
 
 export default defineEventHandler(async (event) => {
     const formData = await readFormData(event);
 
     const categoryName = formData.get("category") as string;
     const subcategoryName = formData.get("subcategory") as string;
-    const department = formData.get("department") as string;
+    const department = formData.get("departament") as string;
     const file = formData.get("file") as File;
 
     const resultOrError = await importService.uploadItems({
