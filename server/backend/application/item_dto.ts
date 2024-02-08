@@ -2,13 +2,12 @@ import { Item } from "../domain/catalog/item";
 import { Variation } from "../domain/catalog/variation";
 
 interface ItemDTO {
-    id: string;
+    itemId: string;
     name: string;
     price: string;
     isUnique: boolean;
     stock: number;
     variation?: VariationDTO;
-    productId: string;
     state: ItemStateDTO;
 }
 
@@ -30,9 +29,8 @@ export enum ItemStateOption {
 
 export function makeItemsDTO(items: Item[]): ItemDTO[] {
     return items.map((a) => ({
-        id: a.itemId.toString(),
+        itemId: a.itemId.toString(),
         name: a.product.name,
-        productId: a.product.productId.toString(),
         price: a.product.price.value.toString(),
         isUnique: a.product.isUnique(),
         stock: a.getStock().getQuantity(),

@@ -1,11 +1,10 @@
 export interface Item {
-    id: string;
     name: string;
     price: string;
     variations?: Variation[];
     isUnique: boolean;
     stock: number;
-    productId: string;
+    itemId: string;
     state: ItemState;
 }
 

@@ -2,7 +2,7 @@
 interface Propos {
     value: string;
     options: string[];
-    placeholder: string;
+    placeholder?: string;
     selectedValue?: string;
     isInvalid?: boolean;
 }
@@ -24,8 +24,8 @@ function isSelectedValue(option: string): boolean {
 }
 
 onMounted(() => {
-    if (props.options.includes(props.placeholder)) {
-        emits("change", props.placeholder);
+    if (props.options.includes(props?.placeholder!)) {
+        emits("change", props?.placeholder!);
     }
 });
 </script>

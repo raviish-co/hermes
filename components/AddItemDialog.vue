@@ -30,7 +30,7 @@ function emitItemAdded(item: Item, idx: number) {
 }
 
 function itemExist(itemId: string): boolean {
-    return props.requestList.some((row) => row.id === itemId);
+    return props.requestList.some((row) => row.itemId === itemId);
 }
 
 function validateQuantity(item: Item, quantity: number): boolean {
@@ -46,7 +46,7 @@ function addItem(item: Item, idx: number) {
 
     if (!validateQuantity(item, quantity)) return;
 
-    if (itemExist(item.id)) return;
+    if (itemExist(item.itemId)) return;
 
     total.value = calculateTotal(item, quantity);
 
@@ -135,10 +135,10 @@ onMounted(async () => {
                     <tr
                         v-if="items"
                         v-for="(item, idx) in items"
-                        :key="item.id"
+                        :key="item.itemId"
                         class="hover:bg-gray-50"
                     >
-                        <td class="w-16 cursor-pointer hidden sm:initial">{{ item.id }}</td>
+                        <td class="w-16 cursor-pointer hidden sm:initial">{{ item.itemId }}</td>
 
                         <td class="cursor-pointer" @click="emitItemAdded(item, idx)">
                             {{ item.name }}

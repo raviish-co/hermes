@@ -1,17 +1,19 @@
 <script setup lang="ts">
-import type { AddItemDialog, DescribeItemStateDialog } from "#build/components";
+import type { AddItemDialog, DescribeItemStateDialog, UploadItemsDialog } from "#build/components";
 import { type Variation, type RequestItem as RequestItem } from "~/lib/models/item";
 import { formatCurrency } from "~/lib/helpers/format_currency";
 import type { Purpose } from "~/lib/models/purpose";
 import { RequestService } from "~/lib/services/request_service";
 import { convertToNumber } from "~/lib/helpers/convert_to_number";
-import type { ProductData, RequestItem as Request } from "~/lib/models/request";
+import type { ItemData, RequestData } from "~/lib/models/request";
+import { handleException } from "~/lib/helpers/handler";
 
 const INNER_LAUNDRY = "Interna";
 const DISCARD = "Descartar";
 const PURPOSE = "Finalidade";
 const SECTION = "Secção";
 const addItemDialogRef = ref<typeof AddItemDialog>();
+const uploadItemDialogRef = ref<typeof UploadItemsDialog>();
 const describeItemStateDialogRef = ref<typeof DescribeItemStateDialog>();
 const selectedSections = ref<string[]>([]);
 const selectedPlaceholder = ref<string>("Descrição");
@@ -22,18 +24,18 @@ const currentSectionName = ref<string>("");
 const securityDeposit = ref<string>("0,00");
 const purpouses = ref<Purpose[]>([]);
 const grandTotal = ref<string>("0,00");
-const returnData = ref<Date>(new Date());
+const returnData = ref<string>("");
 const recipient = ref<string>("");
 const isDisabledSection = computed(() => selectedSections.value.length <= 0);
 const selectedRow = ref<RequestItem>({} as RequestItem);
 
 const requestService = new RequestService();
 
-function makeRequest(): Request {
+function makeRequest(): RequestData {
     return {
         total: grandTotal.value,
         securityDeposit: securityDeposit.value,
-        returnDate: returnData.value?.toISOString(),
+        returnDate: returnData.value,
         purposeData: {
             name: currentPurposeName.value,
             section: currentSectionName.value,
@@ -43,11 +45,11 @@ function makeRequest(): Request {
     };
 }
 
-function makeProductData(): ProductData[] {
+function makeProductData(): ItemData[] {
     if (requestList.value.length === 0) return [];
 
     return requestList.value.map((row) => ({
-        productId: row.productId,
+        itemId: row.itemId,
         quantity: row.quantity,
         condition: {
             comment: row.state.comment,
@@ -89,24 +91,22 @@ const isValidRequest = computed(() => {
     return false;
 });
 
-async function request() {
+function request() {
     const request = makeRequest();
 
-    await requestService
+    requestService
         .requestItems(request)
         .then((res) => {
-            if (res.value) {
-                alert("Aconteceu um erro durante a requisição.");
+            if (res.status !== 200) {
+                alert(res.message);
                 return;
             }
 
-            alert("Requisição feita com sucesso!");
+            alert(res.message);
+
             clearValues();
         })
-        .catch((err) => {
-            console.log(err);
-            alert("Aconteceu um erro durante a requisição.");
-        });
+        .catch(handleException);
 }
 
 function listPurposes() {
@@ -175,7 +175,7 @@ function updateCurrentSectionName(sectionName: string) {
 }
 
 function removeRequestRow(id: string): void {
-    requestList.value = requestList.value.filter((r) => r.id !== id);
+    requestList.value = requestList.value.filter((r) => r.itemId !== id);
     calculateGrandTotal();
 }
 
@@ -228,7 +228,7 @@ function listVariations(itemVariation?: Variation[]) {
 }
 
 function clearValues() {
-    returnData.value = new Date();
+    returnData.value = new Date().toISOString();
     currentPurposeName.value = PURPOSE;
     currentSectionName.value = SECTION;
     selectedSections.value = [];
@@ -236,6 +236,10 @@ function clearValues() {
     requestList.value = [];
     grandTotal.value = "0,00";
     securityDeposit.value = "0,00";
+}
+
+function showUploadItemDialog() {
+    uploadItemDialogRef.value?.show();
 }
 
 listPurposes();
@@ -247,16 +251,23 @@ listPurposes();
     </div>
 
     <section class="section-content md:mb-20 mb-44 sm:mb-36">
-        <h1 class="flex-1 text-center my-8 sm:my-10 text-xl sm:text-2xl">
-            Guia de Saída de Artigos
-        </h1>
+        <div class="flex justify-between items-center sm:my-10 my-8">
+            <h1 class="text-xl sm:text-2xl">Guia de Saída de Artigos</h1>
+
+            <span
+                class="material-symbols-outlined text-3xl p-2 cursor-pointer"
+                @click="showUploadItemDialog"
+            >
+                upload
+            </span>
+        </div>
 
         <section>
             <form>
                 <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
                     <input class="input-field" placeholder="John Doe" :disabled="true" />
 
-                    <input v-model="returnData" type="date" class="input-field" />
+                    <input v-model="returnData" type="datetime-local" class="input-field" />
                 </div>
 
                 <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
@@ -298,7 +309,6 @@ listPurposes();
                 >
                     delete
                 </span>
-                <!-- <button class="ms-auto p-2 hover:bg-red-500 hover:bg-opacity-25"></button> -->
 
                 <div class="flex-1 overflow-y-auto">
                     <table class="table">
@@ -315,7 +325,7 @@ listPurposes();
 
                         <tbody>
                             <tr v-for="(row, idx) in requestList" :key="idx" class="cursor-pointer">
-                                <td>{{ row.id }}</td>
+                                <td>{{ row.itemId }}</td>
                                 <td @click="showDescribeItemStatusDialog(row)">
                                     {{ row.name }}
                                     <br />
@@ -326,7 +336,9 @@ listPurposes();
                                 <td>{{ row.quantity }}</td>
                                 <td>{{ row.price }}</td>
                                 <td>{{ row.total }}</td>
-                                <td class="cursor-pointer" @click="removeRequestRow(row.id)">X</td>
+                                <td class="cursor-pointer" @click="removeRequestRow(row.itemId)">
+                                    <span class="material-symbols-outlined">close</span>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -373,4 +385,6 @@ listPurposes();
     />
 
     <DescribeItemStateDialog :row="selectedRow" ref="describeItemStateDialogRef" />
+
+    <UploadItemsDialog ref="uploadItemDialogRef" />
 </template>

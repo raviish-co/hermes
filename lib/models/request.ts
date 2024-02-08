@@ -4,19 +4,19 @@ export interface PurposeData {
     recipient?: string;
 }
 
-export interface ProductData {
-    productId: string;
+export interface ItemData {
+    itemId: string;
     quantity: number;
     variations?: string[];
     condition?: Condition;
 }
 
-export interface RequestItem {
+export interface RequestData {
     total: string;
     returnDate: string;
     securityDeposit: string;
     purposeData: PurposeData;
-    productsData: ProductData[];
+    productsData: ItemData[];
 }
 
 export interface Condition {
