@@ -85,7 +85,8 @@ export class ImportService {
 
             if (!name || !price || !quantity || !isunique) return;
 
-            const unique = Boolean(isunique);
+            const unique = isunique === "true" ? true : false;
+
             const product = Product.create({
                 name,
                 price,
