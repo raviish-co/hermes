@@ -292,12 +292,13 @@ listPurposes();
             <div
                 class="h-table-lg p-3 flex flex-col justify-between border border-light-500 overflow-hidden"
             >
-                <button
-                    class="ms-auto hover:bg-light-500 px-4 py-1 hover:bg-opacity-25 mb-2"
+                <span
+                    class="material-symbols-outlined hover:text-red-500 ms-auto p-2"
                     @click="clearRequestList"
                 >
-                    Limpar
-                </button>
+                    delete
+                </span>
+                <!-- <button class="ms-auto p-2 hover:bg-red-500 hover:bg-opacity-25"></button> -->
 
                 <div class="flex-1 overflow-y-auto">
                     <table class="table">
