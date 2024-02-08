@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { v4 as uuidv4 } from "uuid";
 
 export class ID {
     #value: string;
@@ -16,7 +16,7 @@ export class ID {
     }
 
     static RandomUUID(): ID {
-        return new ID(randomUUID());
+        return new ID(uuidv4());
     }
 
     toString(): string {

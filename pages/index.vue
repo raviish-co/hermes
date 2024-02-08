@@ -105,7 +105,7 @@ async function request() {
         })
         .catch((err) => {
             console.log(err);
-            alert("Aconteceu um erro durante a requisiçãoo.");
+            alert("Aconteceu um erro durante a requisição.");
         });
 }
 
