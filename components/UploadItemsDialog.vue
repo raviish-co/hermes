@@ -2,15 +2,14 @@
 import type { VDialog } from "#build/components";
 import { handleException } from "~/lib/helpers/handler";
 import { UploadService } from "~/lib/services/upload_service";
+import { departaments } from "~/lib/constants";
 
 const dialogRef = ref<typeof VDialog>();
-const departaments: string[] = ["Homem", "Mulher", "Criança"];
-const currentDepartament = ref<string>(departaments[0]);
-const currentCategory = ref<string>();
-const currentSubcategory = ref<string>();
+const currentDepartament = ref<string>("Homem");
+const currentCategory = ref<string>("");
+const currentSubcategory = ref<string>("");
 const subcategories = ref<string[]>([]);
 const currentFormData = ref<FormData | null>(null);
-
 const uploadService = new UploadService();
 
 function updateCategory(category: string) {
@@ -43,8 +42,14 @@ const isValidForm = computed(
 );
 
 function uploadFile() {
+    if (!currentFormData.value) return;
+
+    currentFormData.value.append("departament", currentDepartament.value);
+    currentFormData.value.append("category", currentCategory.value);
+    currentFormData.value.append("subcategory", currentSubcategory.value);
+
     uploadService
-        .upload(currentFormData.value!, currentCategory.value, currentSubcategory.value)
+        .upload(currentFormData.value)
         .then((res) => console.log(res))
         .catch(handleException);
 }
@@ -79,7 +84,12 @@ defineExpose({ show: showDialog });
 
             <UploadFile @uploaded="updateFile" />
 
-            <button class="btn btn-secondary" :disabled="!isValidForm" @click="uploadFile">
+            <button
+                type="button"
+                class="btn btn-secondary"
+                :disabled="!isValidForm"
+                @click="uploadFile"
+            >
                 Importar
             </button>
         </form>

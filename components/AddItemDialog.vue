@@ -152,12 +152,7 @@ onMounted(async () => {
 
                         <td>
                             <div>
-                                <span
-                                    v-if="item.isUnique"
-                                    class="px-2 py-1 bg-secondary-600 rounded-3xl text-white text-center w-fit"
-                                >
-                                    Único
-                                </span>
+                                <span v-if="item.isUnique">Único</span>
                                 <span v-else> {{ item.stock }}</span>
                             </div>
                         </td>
@@ -180,8 +175,6 @@ onMounted(async () => {
                                 type="number"
                                 class="input-number cursor-not-allowed bg-slate-200"
                                 placeholder="QTD"
-                                min="0"
-                                :max="item.stock"
                             />
                         </td>
                     </tr>
