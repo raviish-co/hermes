@@ -1,12 +1,9 @@
-import type { Result } from "../models/result";
-
 export class UploadService {
-    async upload(formData: FormData, category: Result, substring: Result) {
+    async upload(formData: FormData) {
         return await $fetch("/api/upload_items", {
-            method: "post",
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
+            method: "POST",
+            headers: useRequestHeaders(["Content-Type", "multipart/form-data"]),
+            body: formData,
         });
     }
 }
