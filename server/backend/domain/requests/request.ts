@@ -25,7 +25,7 @@ export class Request {
     readonly issuedAt: Date;
     status: RequestStatus;
     total: Decimal;
-    securityDeposity: Decimal;
+    securityDeposit: Decimal;
 
     private constructor(requestId: ID, purpose: Purpose, user: User, returnDate: Date) {
         this.requestId = requestId;
@@ -36,7 +36,7 @@ export class Request {
         this.returnDate = returnDate;
         this.total = Decimal.fromString("0");
         this.items = [];
-        this.securityDeposity = Decimal.fromString("0");
+        this.securityDeposit = Decimal.fromString("0");
     }
 
     static create(options: Options): Request {
@@ -65,7 +65,7 @@ export class Request {
     }
 
     isSameSecurityDeposit(securityDeposit: string): boolean {
-        return this.securityDeposity.value === securityDeposit;
+        return this.securityDeposit.value === securityDeposit;
     }
 
     verifyTotal(total: string, securityDeposit: string) {
@@ -73,7 +73,7 @@ export class Request {
     }
 
     getSecurityDeposit(): Decimal {
-        return this.securityDeposity;
+        return this.securityDeposit;
     }
 
     getStatus(): string {
@@ -90,6 +90,6 @@ export class Request {
 
     #calculateSecurityDeposit(): void {
         const factor = Decimal.fromString("2");
-        this.securityDeposity = this.total.multiply(factor);
+        this.securityDeposit = this.total.multiply(factor);
     }
 }
