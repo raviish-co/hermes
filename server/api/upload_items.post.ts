@@ -1,7 +1,7 @@
 import { FileNotSupported } from "../backend/domain/readers/file_not_supported_error";
 import { InvalidFileHeader } from "../backend/domain/readers/invalid_file_header_error";
 import { FileEmpty } from "../backend/domain/readers/file_empty_error";
-import { HttpStatusCode } from "../backend/shared/http_status";
+import { HttpStatus } from "../backend/shared/http_status";
 import { makeServices } from "../backend/main";
 
 const { importService } = makeServices();
@@ -23,26 +23,26 @@ export default defineEventHandler(async (event) => {
 
     if (resultOrError.value instanceof InvalidFileHeader) {
         throw createError({
-            statusCode: HttpStatusCode.BadRequest,
-            statusMessage: resultOrError.value.message,
+            statusCode: HttpStatus.BadRequest,
+            message: resultOrError.value.message,
         });
     }
 
     if (resultOrError.value instanceof FileEmpty) {
         throw createError({
-            statusCode: HttpStatusCode.BadRequest,
-            statusMessage: resultOrError.value.message,
+            statusCode: HttpStatus.BadRequest,
+            message: resultOrError.value.message,
         });
     }
 
     if (resultOrError.value instanceof FileNotSupported) {
         throw createError({
-            statusCode: HttpStatusCode.BadRequest,
-            statusMessage: resultOrError.value.message,
+            statusCode: HttpStatus.BadRequest,
+            message: resultOrError.value.message,
         });
     }
 
-    setResponseStatus(event, HttpStatusCode.Created);
+    setResponseStatus(event, HttpStatus.Created);
 
     return {
         message: "Items uploaded successfully",

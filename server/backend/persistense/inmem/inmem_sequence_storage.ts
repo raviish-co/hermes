@@ -1,17 +1,17 @@
 import { SequenceStorage } from "../../domain/sequences/sequence_storage";
 
 export class InmemSequenceStorage implements SequenceStorage {
-    #data: Record<string, number> = {};
+    #sequences: Record<string, number> = {};
 
     save(code: string, value: number): void {
-        this.#data[code] = value;
+        this.#sequences[code] = value;
     }
 
     get(code: string): number {
-        return this.#data[code];
+        return this.#sequences[code];
     }
 
     get records(): number[] {
-        return Object.values(this.#data);
+        return Object.values(this.#sequences);
     }
 }

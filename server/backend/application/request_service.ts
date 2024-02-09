@@ -2,7 +2,7 @@ import { InsufficientStockItem } from "../domain/sequences/insufficient_item_sto
 import { PurposeNotFound } from "../domain/purposes/purpose_not_found_error";
 import { RequestRepository } from "../domain/requests/request_repository";
 import { ItemData, ItemQuery, RequestData } from "../shared/types";
-import { SequencePrefix } from "../domain/sequences/sequence_prefix";
+import { Sequence } from "../domain/sequences/sequence";
 import { RequestBuilder } from "../domain/requests/request_builder";
 import { ItemRepository } from "../domain/catalog/item_repository";
 import { PurposeSource } from "../domain/purposes/purpose_source";
@@ -52,7 +52,7 @@ export class RequestService {
         const requestItemsOrError = this.#buildRequestItems(items, productsData);
         if (requestItemsOrError.isLeft()) return left(requestItemsOrError.value);
 
-        const requestId = this.#sequenceGenerator.generate(SequencePrefix.Request);
+        const requestId = this.#sequenceGenerator.generate(Sequence.Request);
         const requestItems = requestItemsOrError.value;
         const user = User.create("Teste");
         const requestOrError = new RequestBuilder()

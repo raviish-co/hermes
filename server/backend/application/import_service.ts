@@ -4,7 +4,7 @@ import { SequenceGenerator } from "../domain/sequences/sequence_generator";
 import { CategoryRepository } from "../domain/catalog/category_repository";
 import { Item, ItemCondition, ItemStatus } from "../domain/catalog/item";
 import { CsvReader, validCsvHeader } from "../domain/readers/csv_reader";
-import { SequencePrefix } from "../domain/sequences/sequence_prefix";
+import { Sequence } from "../domain/sequences/sequence";
 import { ItemRepository } from "../domain/catalog/item_repository";
 import { FileEmpty } from "../domain/readers/file_empty_error";
 import { Subcategory } from "../domain/catalog/subcategory";
@@ -101,7 +101,7 @@ export class ImportService {
                 condition.comment = comment;
             }
 
-            const itemId = this.#generator.generate(SequencePrefix.Item);
+            const itemId = this.#generator.generate(Sequence.Item);
             const item = Item.create({
                 itemId,
                 product,

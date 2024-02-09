@@ -1,4 +1,4 @@
-import { ProductNotFound } from "../../domain/catalog/product_not_found_error";
+import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import { ItemRepository } from "../../domain/catalog/item_repository";
 import { Either, left, right } from "../../shared/either";
 import { Pagination } from "../../shared/pagination";
@@ -13,7 +13,7 @@ export class InmemItemRepository implements ItemRepository {
         return Promise.resolve(this.#items[articleId.toString()]);
     }
 
-    getAll(queries: ItemQuery[]): Promise<Either<ProductNotFound, Item[]>> {
+    getAll(queries: ItemQuery[]): Promise<Either<ItemNotFound, Item[]>> {
         const items = Object.values(this.#items);
         const articles: Item[] = [];
 
@@ -24,8 +24,7 @@ export class InmemItemRepository implements ItemRepository {
                     item.variations?.toString() === query.variations?.toString()
             );
 
-            if (!filtered)
-                return Promise.resolve(left(new ProductNotFound(query.itemId.toString())));
+            if (!filtered) return Promise.resolve(left(new ItemNotFound(query.itemId.toString())));
 
             articles.push(filtered);
         }

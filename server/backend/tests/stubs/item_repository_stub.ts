@@ -1,4 +1,4 @@
-import { ProductNotFound } from "../../domain/catalog/product_not_found_error";
+import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import { ItemRepository } from "../../domain/catalog/item_repository";
 import { Item, ItemStatus } from "../../domain/catalog/item";
 import { Variation } from "../../domain/catalog/variation";
@@ -20,7 +20,7 @@ export class ItemRepositoryStub implements ItemRepository {
         return Promise.resolve(this.#items[itemId.toString()]);
     }
 
-    getAll(queries: ItemQuery[]): Promise<Either<ProductNotFound, Item[]>> {
+    getAll(queries: ItemQuery[]): Promise<Either<ItemNotFound, Item[]>> {
         const items = Object.values(this.#items);
         const articles: Item[] = [];
 
@@ -29,8 +29,7 @@ export class ItemRepositoryStub implements ItemRepository {
                 (item) => item.itemId.toString() === query.itemId.toString()
             );
 
-            if (!filtered)
-                return Promise.resolve(left(new ProductNotFound(query.itemId.toString())));
+            if (!filtered) return Promise.resolve(left(new ItemNotFound(query.itemId.toString())));
 
             articles.push(filtered);
         }

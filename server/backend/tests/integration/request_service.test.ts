@@ -1,7 +1,7 @@
 import { InsufficientStockItem } from "../../domain/sequences/insufficient_item_stock_error";
 import { InmemRequestRepository } from "../../persistense/inmem/inmem_request_repository";
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
-import { ProductNotFound } from "../../domain/catalog/product_not_found_error";
+import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
 import { InvalidTotal } from "../../domain/requests/invalid_total_error";
 import { ItemRepository } from "../../domain/catalog/item_repository";
@@ -112,7 +112,7 @@ describe("Test Request Items", () => {
         });
 
         expect(error.isLeft()).toBeTruthy();
-        expect(error.value).toBeInstanceOf(ProductNotFound);
+        expect(error.value).toBeInstanceOf(ItemNotFound);
     });
 
     it("Deve chamar o método **save** no repositório de solicitações de artigos", async () => {

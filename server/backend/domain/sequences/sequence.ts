@@ -1,4 +1,4 @@
-export enum SequencePrefix {
+export enum Sequence {
     Request = "GS",
     Item = "RVS",
 }
