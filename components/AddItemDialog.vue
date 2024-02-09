@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
-import { convertToNumber } from "~/lib/helpers/convert_to_number";
-import { formatCurrency } from "~/lib/helpers/format_currency";
+import { formatCurrency, convertToNumber } from "~/lib/helpers/format_price";
 import type { Item, RequestItem, Variation } from "~/lib/models/item";
 import { ItemService } from "~/lib/services/item_service";
 
@@ -54,7 +53,7 @@ function addItem(item: Item, idx: number) {
 
     props.requestList.push(newRow);
 
-    initializeQuantities();
+    quantities.value[idx] = 0;
 }
 
 function calculateTotal(item: Item, quantity: number): string {
@@ -69,20 +68,28 @@ function makeRequestItem(item: Item, quantity: number, total: string) {
     return { ...item, quantity, total };
 }
 
-async function searchItems() {
+async function searchItems(pageToken: number = 1) {
     if (query.value.length < 3) {
-        items.value = [];
+        listItems();
         return;
     }
 
-    items.value = await itemService.searchItems(query.value);
+    const { items: i, total } = await itemService.searchItems(query.value, pageToken);
+
+    items.value = i;
+    pages.value = total;
+
+    console.log(items);
+    console.log(i);
+
+    initializeQuantities();
 }
 
 async function listItems(pageToken: number = 1) {
-    const { items: i, total: t } = await itemService.listItems(pageToken);
+    const { items: i, total } = await itemService.listItems(pageToken);
 
     items.value = i;
-    pages.value = t;
+    pages.value = total;
 
     initializeQuantities();
 }
@@ -99,8 +106,18 @@ function listVariations(itemVariation?: Variation[]) {
     return values.join(" | ");
 }
 
+function changeListPage(pageToken: number) {
+    if (query.value.length > 0) {
+        searchItems(pageToken);
+        return;
+    }
+
+    listItems(pageToken);
+}
+
 function showDialog() {
     dialogRef.value?.show();
+    listItems();
 }
 
 defineExpose({ show: showDialog });
@@ -117,7 +134,7 @@ onMounted(async () => {
             type="search"
             v-model="query"
             class="input-field"
-            @update:model-value="searchItems"
+            @input="() => searchItems()"
         />
 
         <div class="overflow-x-auto w-full">
@@ -187,7 +204,7 @@ onMounted(async () => {
         </div>
 
         <p>
-            <ThePagination :total="pages" @changed="listItems" />
+            <ThePagination :total="pages" @changed="changeListPage" />
         </p>
     </VDialog>
 </template>
