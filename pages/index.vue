@@ -97,7 +97,7 @@ function request() {
     requestService
         .requestItems(request)
         .then((res) => {
-            if (res.status !== 200) {
+            if (res.statusCode !== 200) {
                 alert(res.message);
                 return;
             }

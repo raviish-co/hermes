@@ -43,5 +43,5 @@ export default defineEventHandler(async (event) => {
 
     setResponseStatus(event, HttpStatus.Created);
 
-    return { message: "Solicitação efetuada com sucesso" };
+    return { statusCode: 200, message: "Solicitação efetuada com sucesso" };
 });

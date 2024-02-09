@@ -50,7 +50,7 @@ function uploadFile() {
 
     uploadService
         .upload(currentFormData.value)
-        .then((res) => console.log(res))
+        .then((res) => alert(res.message))
         .catch(handleException);
 }
 
@@ -77,7 +77,7 @@ defineExpose({ show: showDialog });
             />
 
             <SearchSelect
-                placeholder="Categoria"
+                placeholder="Subcategoria"
                 :list="subcategories"
                 @selected="updateSubcategory"
             />
