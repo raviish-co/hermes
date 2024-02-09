@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import type { AddItemDialog, DescribeItemStateDialog, UploadItemsDialog } from "#build/components";
 import { type Variation, type RequestItem as RequestItem } from "~/lib/models/item";
-import { formatCurrency } from "~/lib/helpers/format_currency";
+import { formatCurrency, convertToNumber, removeSpaces } from "~/lib/helpers/format_price";
 import type { Purpose } from "~/lib/models/purpose";
 import { RequestService } from "~/lib/services/request_service";
-import { convertToNumber } from "~/lib/helpers/convert_to_number";
 import type { ItemData, RequestData } from "~/lib/models/request";
 import { handleException } from "~/lib/helpers/handler";
 
@@ -33,8 +32,8 @@ const requestService = new RequestService();
 
 function makeRequest(): RequestData {
     return {
-        total: grandTotal.value,
-        securityDeposit: securityDeposit.value,
+        total: removeSpaces(grandTotal.value),
+        securityDeposit: removeSpaces(securityDeposit.value),
         returnDate: returnData.value,
         purposeData: {
             name: currentPurposeName.value,
@@ -194,7 +193,7 @@ function calculateSecurityDeposit() {
 function calculateGrandTotal() {
     requestList.value.forEach((row, idx) => {
         if (idx === 0) {
-            grandTotal.value = row.total;
+            grandTotal.value = formatCurrency(convertToNumber(row.total) / 100);
             calculateSecurityDeposit();
             return;
         }
@@ -314,7 +313,7 @@ listPurposes();
                     <table class="table">
                         <thead>
                             <tr>
-                                <th class="min-w-16 w-16">ID</th>
+                                <th class="min-w-24 w-24">ID</th>
                                 <th class="min-w-52">Item</th>
                                 <th class="min-w-10 w-16">QTD</th>
                                 <th class="min-w-36 w-36">Preço Unid (Kz)</th>
@@ -334,8 +333,8 @@ listPurposes();
                                     }}</span>
                                 </td>
                                 <td>{{ row.quantity }}</td>
-                                <td>{{ row.price }}</td>
-                                <td>{{ row.total }}</td>
+                                <td class="text-right">{{ row.price }}</td>
+                                <td class="text-right">{{ row.total }}</td>
                                 <td class="cursor-pointer" @click="removeRequestRow(row.itemId)">
                                     <span class="material-symbols-outlined">close</span>
                                 </td>
