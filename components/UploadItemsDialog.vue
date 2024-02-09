@@ -50,7 +50,7 @@ function uploadFile() {
 
     uploadService
         .upload(currentFormData.value)
-        .then((res) => alert(res.message))
+        .then(() => alert("Artigos importados com sucesso!"))
         .catch(handleException);
 }
 
