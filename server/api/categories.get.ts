@@ -24,5 +24,5 @@ export default defineEventHandler(async () => {
 
     const categoryDTO = categories.map(makeCategoryDTO);
 
-    return categoryDTO;
+    return { categories: categoryDTO };
 });

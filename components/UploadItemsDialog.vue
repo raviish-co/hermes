@@ -2,7 +2,9 @@
 import type { VDialog } from "#build/components";
 import { handleException } from "~/lib/helpers/handler";
 import { UploadService } from "~/lib/services/upload_service";
+import { CatalogService } from "~/lib/services/catalog_service";
 import { departaments } from "~/lib/constants";
+import type { Category } from "~/lib/models/item";
 
 const dialogRef = ref<typeof VDialog>();
 const currentDepartament = ref<string>("Homem");
@@ -11,9 +13,26 @@ const currentSubcategory = ref<string>("");
 const subcategories = ref<string[]>([]);
 const currentFormData = ref<FormData | null>(null);
 const uploadService = new UploadService();
+const catalogService = new CatalogService();
+const categories = ref<Category[]>([]);
+const categorieNames = ref<string[]>([]);
 
 function updateCategory(category: string) {
     currentCategory.value = category;
+
+    subcategories.value = getSubcategoriesByCategory(category);
+}
+
+function getSubcategoriesByCategory(category: string): string[] {
+    const subcategories: string[] = [];
+
+    categories.value.forEach((c) => {
+        if (c.name === category) {
+            subcategories.push(...c.subcategories);
+        }
+    });
+
+    return subcategories;
 }
 
 function updateSubcategory(subcategory: string) {
@@ -30,8 +49,17 @@ function updateFile(file: File | null) {
     currentFormData.value.append("file", file);
 }
 
+function listCategories() {
+    catalogService.listCategories().then((res) => {
+        categories.value = res;
+        categorieNames.value = res.map((r) => r.name);
+    });
+}
+
 function searchCategory(query: string): string[] {
-    return [];
+    const lowerCategorieNames = categories.value.map((c) => c.name.toLocaleLowerCase());
+
+    return lowerCategorieNames.filter((c) => c.includes(query));
 }
 
 const isValidCategory = computed(() => currentCategory.value !== "");
@@ -55,6 +83,7 @@ function uploadFile() {
 }
 
 function showDialog() {
+    listCategories();
     dialogRef.value?.show();
 }
 
@@ -70,15 +99,16 @@ defineExpose({ show: showDialog });
                 </option>
             </select>
 
-            <SearchSelect
+            <InputSelect
                 placeholder="Categoria"
                 :search="searchCategory"
+                :options="categorieNames"
                 @selected="updateCategory"
             />
 
-            <SearchSelect
+            <InputSelect
                 placeholder="Subcategoria"
-                :list="subcategories"
+                :options="subcategories"
                 @selected="updateSubcategory"
             />
 

@@ -1,13 +1,8 @@
-import type { Item } from "../models/item";
+import type { Category, Item } from "../models/item";
 
 interface ItemList {
     items: Item[];
     total: number;
-}
-
-interface Category {
-    name: string;
-    id: string;
 }
 
 export class CatalogService {
@@ -32,5 +27,17 @@ export class CatalogService {
         });
 
         return { items: response.items, total: response.total };
+    }
+
+    async listCategories(): Promise<Category[]> {
+        const { categories } = await $fetch("/api/categories", {
+            method: "get",
+        });
+
+        return categories.map((category) => ({
+            name: category.name,
+            departament: category.department,
+            subcategories: category.subcategories,
+        }));
     }
 }

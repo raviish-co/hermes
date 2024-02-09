@@ -79,9 +79,6 @@ async function searchItems(pageToken: number = 1) {
     items.value = i;
     pages.value = total;
 
-    console.log(items);
-    console.log(i);
-
     initializeQuantities();
 }
 

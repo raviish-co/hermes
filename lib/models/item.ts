@@ -28,3 +28,9 @@ export enum ItemStateOption {
     Good = "Bom",
     Bad = "Mau",
 }
+
+export interface Category {
+    name: string;
+    departament: string;
+    subcategories: string[];
+}

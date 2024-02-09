@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 interface Props {
     placeholder: string;
-    search?: (query: string) => string[];
-    list?: string[];
+    options?: string[];
     isInvalid?: boolean;
 }
 
@@ -11,15 +10,10 @@ interface Emits {
 }
 
 const emits = defineEmits<Emits>();
-const props = defineProps<Props>();
+defineProps<Props>();
+const selectedValue = ref<string>("");
 
 const dropdownVisibility = ref<boolean>(false);
-const searchResult = ref<string[]>([]);
-const query = ref<string>("");
-
-async function search() {
-    searchResult.value = props.search!(query.value);
-}
 
 function showDropDown() {
     dropdownVisibility.value = true;
@@ -29,19 +23,8 @@ function hideDropDown() {
     dropdownVisibility.value = false;
 }
 
-function execute() {
-    if (!query.value) return;
-
-    if (props.search) {
-        search();
-    }
-
-    emits("selected", query.value);
-}
-
-function selectResult(result: string) {
-    query.value = result;
-
+function emitResult(result: string) {
+    selectedValue.value = result;
     emits("selected", result);
 
     hideDropDown();
@@ -51,29 +34,25 @@ function selectResult(result: string) {
 <template>
     <div class="relative">
         <input
+            v-model="selectedValue"
             :placeholder="placeholder"
-            v-model="query"
             class="input-field"
             :class="{ invalid: isInvalid }"
-            @input="execute"
+            @input="() => emitResult(selectedValue)"
             @focusin="showDropDown"
             @focusout="hideDropDown"
         />
 
         <div
-            class="absolute z-50 bg-white flex flex-col mt-2 shadow-md w-full"
+            class="absolute z-50 bg-white flex flex-col mt-2 shadow-md w-full h-36 overflow-y-auto"
             :class="{ hidden: !dropdownVisibility }"
         >
             <span
-                v-for="(result, idx) in searchResult"
+                v-for="(result, idx) in options"
                 :key="idx"
                 class="px-3 py-1 cursor-pointer hover:bg-opacity-20"
-                @mousedown="selectResult(result)"
+                @mousedown="emitResult(result)"
                 >{{ result }}</span
-            >
-
-            <span v-if="searchResult.length === 0" class="px-3 py-2"
-                >Nenhum valor encontrado...</span
             >
         </div>
     </div>
