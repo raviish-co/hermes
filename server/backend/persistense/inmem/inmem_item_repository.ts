@@ -38,7 +38,7 @@ export class InmemItemRepository implements ItemRepository {
 
         const result = this.records.slice(startIndex, endIndex);
 
-        const total = Math.ceil(result.length / perPage);
+        const total = Math.ceil(this.records.length / perPage);
 
         return Promise.resolve({
             pageToken,
@@ -62,7 +62,7 @@ export class InmemItemRepository implements ItemRepository {
 
         const result = items.slice(startIndex, endIndex);
 
-        const total = Math.ceil(result.length / perPage);
+        const total = Math.ceil(items.length / perPage);
 
         return Promise.resolve({
             pageToken,

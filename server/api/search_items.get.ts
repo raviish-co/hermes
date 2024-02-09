@@ -4,11 +4,19 @@ import { makeServices } from "../backend/main";
 const { catalogService } = makeServices();
 
 export default defineEventHandler(async (event) => {
-    const { query } = getQuery<{ query: string }>(event);
+    const { query, pageToken, perPage } = getQuery<{
+        query: string;
+        pageToken?: string;
+        perPage?: string;
+    }>(event);
 
-    const { result, pageToken, perPage, total } = await catalogService.searchItems(query);
+    const { result, total } = await catalogService.searchItems(
+        query,
+        Number(pageToken),
+        Number(perPage)
+    );
 
     const items = makeItemsDTO(result);
 
-    return { items, pageToken, perPage, total };
+    return { items, total };
 });
