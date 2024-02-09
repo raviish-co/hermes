@@ -5,7 +5,12 @@ interface ItemList {
     total: number;
 }
 
-export class ItemService {
+interface Category {
+    name: string;
+    id: string;
+}
+
+export class CatalogService {
     async searchItems(
         query: string,
         pageToken: number = 1,

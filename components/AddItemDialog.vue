@@ -2,7 +2,7 @@
 import type { VDialog } from "#build/components";
 import { formatCurrency, convertToNumber } from "~/lib/helpers/format_price";
 import type { Item, RequestItem, Variation } from "~/lib/models/item";
-import { ItemService } from "~/lib/services/item_service";
+import { CatalogService } from "~/lib/services/catalog_service";
 
 interface Props {
     requestList: RequestItem[];
@@ -19,7 +19,7 @@ const query = ref<string>("");
 const items = ref<Item[]>([]);
 const total = ref<string>("0,00");
 const pages = ref<number>(1);
-const itemService = new ItemService();
+const catalogService = new CatalogService();
 const quantities = ref<number[]>([]);
 
 function emitItemAdded(item: Item, idx: number) {
@@ -74,7 +74,7 @@ async function searchItems(pageToken: number = 1) {
         return;
     }
 
-    const { items: i, total } = await itemService.searchItems(query.value, pageToken);
+    const { items: i, total } = await catalogService.searchItems(query.value, pageToken);
 
     items.value = i;
     pages.value = total;
@@ -86,7 +86,7 @@ async function searchItems(pageToken: number = 1) {
 }
 
 async function listItems(pageToken: number = 1) {
-    const { items: i, total } = await itemService.listItems(pageToken);
+    const { items: i, total } = await catalogService.listItems(pageToken);
 
     items.value = i;
     pages.value = total;
@@ -113,6 +113,10 @@ function changeListPage(pageToken: number) {
     }
 
     listItems(pageToken);
+}
+
+function enableToEditQuantity(isUnique: boolean, quantity: number) {
+    return !isUnique && quantity > 0;
 }
 
 function showDialog() {
@@ -170,13 +174,15 @@ onMounted(async () => {
                         <td>
                             <div>
                                 <span v-if="item.isUnique">Único</span>
-                                <span v-else> {{ item.stock }}</span>
+                                <span v-else>
+                                    {{ item.stock === 0 ? "Esgotado" : item.stock }}</span
+                                >
                             </div>
                         </td>
 
                         <td class="text-xs">
                             <input
-                                v-if="!item.isUnique"
+                                v-if="enableToEditQuantity(item.isUnique, item.stock)"
                                 v-model="quantities[idx]"
                                 type="number"
                                 class="input-number"
@@ -187,7 +193,7 @@ onMounted(async () => {
 
                             <input
                                 v-else
-                                value="1"
+                                :value="item.stock"
                                 disabled
                                 type="number"
                                 class="input-number cursor-not-allowed bg-slate-200"
