@@ -1,12 +1,10 @@
 <script lang="ts" setup>
-import type { VDialog } from "#build/components";
 import { handleException } from "~/lib/helpers/handler";
 import { UploadService } from "~/lib/services/upload_service";
 import { CatalogService } from "~/lib/services/catalog_service";
 import { departaments } from "~/lib/constants";
 import type { Category } from "~/lib/models/item";
 
-const dialogRef = ref<typeof VDialog>();
 const currentDepartament = ref<string>("Homem");
 const currentCategory = ref<string>("");
 const currentSubcategory = ref<string>("");
@@ -82,46 +80,49 @@ function uploadFile() {
         .catch(handleException);
 }
 
-function showDialog() {
+onMounted(() => {
     listCategories();
-    dialogRef.value?.show();
-}
-
-defineExpose({ show: showDialog });
+});
 </script>
 
 <template>
-    <VDialog ref="dialogRef" title="Importar Itens" class="max-w-96">
-        <form class="w-full flex flex-1 flex-col gap-4">
-            <select v-model="currentDepartament" class="input-field">
-                <option v-for="departament in departaments" :key="departament">
-                    {{ departament }}
-                </option>
-            </select>
+    <section>
+        <div class="w-full h-20 sm:h-24 py-4 bg-primary flex justify-center items-center">
+            <NuxtLink to="/" class="h-16">
+                <img src="/images/logo.png" alt="Logotipo da Raviish" class="h-full" />
+            </NuxtLink>
+        </div>
 
-            <InputSelect
-                placeholder="Secção"
-                :search="searchCategory"
-                :options="categorieNames"
-                @selected="updateCategory"
-            />
+        <div class="section-content">
+            <h1 class="text-xl text-center sm:text-2xl sm:my-10 my-8">Importar Artigos</h1>
 
-            <InputSelect
-                placeholder="Subsecção"
-                :options="subcategories"
-                @selected="updateSubcategory"
-            />
-
-            <UploadFile @uploaded="updateFile" />
-
-            <button
-                type="button"
-                class="btn btn-secondary"
-                :disabled="!isValidForm"
-                @click="uploadFile"
-            >
-                Importar
-            </button>
-        </form>
-    </VDialog>
+            <form class="m-auto my-8 w-full flex flex-1 flex-col gap-4 max-w-96">
+                <select v-model="currentDepartament" class="input-field">
+                    <option v-for="departament in departaments" :key="departament">
+                        {{ departament }}
+                    </option>
+                </select>
+                <InputSelect
+                    placeholder="Secção"
+                    :search="searchCategory"
+                    :options="categorieNames"
+                    @selected="updateCategory"
+                />
+                <InputSelect
+                    placeholder="Subsecção"
+                    :options="subcategories"
+                    @selected="updateSubcategory"
+                />
+                <UploadFile @uploaded="updateFile" />
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    :disabled="!isValidForm"
+                    @click="uploadFile"
+                >
+                    Importar
+                </button>
+            </form>
+        </div>
+    </section>
 </template>

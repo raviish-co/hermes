@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AddItemDialog, DescribeItemStateDialog, UploadItemsDialog } from "#build/components";
+import type { AddItemDialog, DescribeItemStateDialog } from "#build/components";
 import { type Variation, type RequestItem as RequestItem } from "~/lib/models/item";
 import { formatCurrency, convertToNumber, removeSpaces } from "~/lib/helpers/format_price";
 import type { Purpose } from "~/lib/models/purpose";
@@ -12,7 +12,6 @@ const DISCARD = "Descartar";
 const PURPOSE = "Finalidade";
 const DETAIL = "Detalhes";
 const addItemDialogRef = ref<typeof AddItemDialog>();
-const uploadItemDialogRef = ref<typeof UploadItemsDialog>();
 const describeItemStateDialogRef = ref<typeof DescribeItemStateDialog>();
 const selectedSections = ref<string[]>([]);
 const selectedPlaceholder = ref<string>("Descrição");
@@ -237,29 +236,20 @@ function clearValues() {
     securityDeposit.value = "0,00";
 }
 
-function showUploadItemDialog() {
-    uploadItemDialogRef.value?.show();
-}
-
 listPurposes();
 </script>
 
 <template>
     <div class="w-full h-20 sm:h-24 py-4 bg-primary flex justify-center items-center">
-        <img src="/images/logo.png" alt="Logotipo da Raviish" class="h-full" />
+        <div class="w-full h-20 sm:h-24 py-4 bg-primary flex justify-center items-center">
+            <NuxtLink to="/" class="h-16">
+                <img src="/images/logo.png" alt="Logotipo da Raviish" class="h-full" />
+            </NuxtLink>
+        </div>
     </div>
 
     <section class="section-content md:mb-20 mb-44 sm:mb-36">
-        <div class="flex justify-between items-center sm:my-10 my-8">
-            <h1 class="text-xl sm:text-2xl">Guia de Saída de Artigos</h1>
-
-            <span
-                class="material-symbols-outlined text-3xl p-2 cursor-pointer"
-                @click="showUploadItemDialog"
-            >
-                upload
-            </span>
-        </div>
+        <h1 class="text-xl text-center sm:text-2xl sm:my-10 my-8">Guia de Saída de Artigos</h1>
 
         <section>
             <form>
