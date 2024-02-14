@@ -57,7 +57,8 @@ export class ItemRepositoryStub implements ItemRepository {
         const items = this.records.filter((i) => {
             return (
                 i.product.name.toLowerCase().includes(query.toLowerCase()) ||
-                i.itemId.toString().includes(query)
+                i.itemId.toString().includes(query) ||
+                i.fulltext.includes(query.toLowerCase())
             );
         });
 
@@ -105,20 +106,21 @@ export class ItemRepositoryStub implements ItemRepository {
             subcategoryId: ID.RandomUUID(),
             name: "Some-subcategory",
         };
+
         const product = Product.create({
-            name: "Teste 1",
+            name: "T-shirt desportiva",
             price: "15,95",
             subcategory,
         });
 
         const product2 = Product.create({
-            name: "Teste 2",
+            name: "T-shirt casual",
             price: "150,95",
             subcategory,
         });
 
         const product3 = Product.create({
-            name: "Teste 2",
+            name: "Calças de ganga",
             price: "315,95",
             subcategory,
         });
