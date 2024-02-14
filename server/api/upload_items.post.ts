@@ -22,29 +22,29 @@ export default defineEventHandler(async (event) => {
     });
 
     if (resultOrError.value instanceof InvalidFileHeader) {
-        throw createError({
+        return {
             statusCode: HttpStatus.BadRequest,
-            message: resultOrError.value.message,
-        });
+            message: "Erro: Cabeçalho inválido.",
+        };
     }
 
     if (resultOrError.value instanceof FileEmpty) {
-        throw createError({
+        return {
             statusCode: HttpStatus.BadRequest,
-            message: resultOrError.value.message,
-        });
+            message: "Erro: O ficheiro está vazio.",
+        };
     }
 
     if (resultOrError.value instanceof FileNotSupported) {
-        throw createError({
+        return {
             statusCode: HttpStatus.BadRequest,
-            message: resultOrError.value.message,
-        });
+            message: "Erro: Ficheiro não suportado.",
+        };
     }
 
     setResponseStatus(event, HttpStatus.Created);
 
     return {
-        message: "Items uploaded successfully",
+        message: "Artigos importados com sucesso!",
     };
 });
