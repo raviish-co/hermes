@@ -144,7 +144,7 @@ onMounted(async () => {
                     <tr>
                         <th class="min-w-16 w-16 hidden sm:initial">ID</th>
                         <th class="min-w-36 w-36">Nome</th>
-                        <th class="min-w-16 w-16">Em estoque</th>
+                        <th class="min-w-16 w-16">Stock</th>
                         <th class="min-w-12 w-12 md:w-16">QTD</th>
                     </tr>
                 </thead>
@@ -193,8 +193,7 @@ onMounted(async () => {
                                 :value="item.stock"
                                 disabled
                                 type="number"
-                                class="input-number cursor-not-allowed bg-slate-200"
-                                placeholder="QTD"
+                                class="input-number"
                             />
                         </td>
                     </tr>

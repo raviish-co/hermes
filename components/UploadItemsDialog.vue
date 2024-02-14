@@ -100,14 +100,14 @@ defineExpose({ show: showDialog });
             </select>
 
             <InputSelect
-                placeholder="Categoria"
+                placeholder="Secção"
                 :search="searchCategory"
                 :options="categorieNames"
                 @selected="updateCategory"
             />
 
             <InputSelect
-                placeholder="Subcategoria"
+                placeholder="Subsecção"
                 :options="subcategories"
                 @selected="updateSubcategory"
             />

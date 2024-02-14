@@ -66,7 +66,7 @@ h1 {
 }
 
 .input-number {
-    @apply appearance-none w-full py-2 px-3 leading-tight overflow-hidden focus:ring-0 focus:border-secondary-600 border-0 border-b border-light-500;
+    @apply appearance-none w-full py-2 px-3 leading-tight overflow-hidden focus:ring-0 focus:border-secondary-600 border-0 border-b border-light-500 disabled:cursor-not-allowed disabled:bg-slate-200;
 }
 .input-number:invalid {
     @apply border-red-500 border;

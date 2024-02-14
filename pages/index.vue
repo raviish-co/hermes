@@ -10,7 +10,7 @@ import { handleException } from "~/lib/helpers/handler";
 const INNER_LAUNDRY = "Interna";
 const DISCARD = "Descartar";
 const PURPOSE = "Finalidade";
-const SECTION = "Secção";
+const DETAIL = "Detalhes";
 const addItemDialogRef = ref<typeof AddItemDialog>();
 const uploadItemDialogRef = ref<typeof UploadItemsDialog>();
 const describeItemStateDialogRef = ref<typeof DescribeItemStateDialog>();
@@ -121,7 +121,7 @@ function getPurposeNames(): string[] {
 
 function findSectionByPurpose(purposeName: string): void {
     if (purposeName === PURPOSE) {
-        currentSectionName.value = SECTION;
+        currentSectionName.value = DETAIL;
         selectedSections.value = [];
         return;
     }
@@ -229,7 +229,7 @@ function listVariations(itemVariation?: Variation[]) {
 function clearValues() {
     returnData.value = new Date().toISOString();
     currentPurposeName.value = PURPOSE;
-    currentSectionName.value = SECTION;
+    currentSectionName.value = DETAIL;
     selectedSections.value = [];
     recipient.value = "";
     requestList.value = [];
@@ -280,7 +280,7 @@ listPurposes();
 
                     <VSelect
                         :value="currentSectionName"
-                        placeholder="Secção"
+                        :placeholder="DETAIL"
                         :options="selectedSections"
                         :disabled="isDisabledSection"
                         :is-invalid="!isValidSection"
