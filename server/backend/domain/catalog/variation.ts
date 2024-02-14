@@ -29,4 +29,8 @@ export class Variation {
         const { variationId, attribute, value } = options;
         return new Variation(ID.New(variationId), attribute, value);
     }
+
+    getFullTextName(): string {
+        return this.attribute.name + ": " + this.value.value;
+    }
 }

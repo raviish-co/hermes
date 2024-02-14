@@ -41,7 +41,7 @@ describe("Test ListItems", () => {
     });
 });
 
-describe("Test Searchitems", () => {
+describe("Test SearchItems", () => {
     it("Deve chamar o método **search** no repositório de artigos", async () => {
         const itemRepository = new ItemRepositoryStub();
         const categoryRepoistory = new InmemCategoryRepository();
@@ -60,7 +60,7 @@ describe("Test Searchitems", () => {
         const categoryRepoistory = new InmemCategoryRepository();
         const service = new CatalogService(itemRepository, categoryRepoistory);
 
-        const { result: items } = await service.searchItems("Teste");
+        const { result: items } = await service.searchItems("T-shirt");
 
         expect(items.length).toBeGreaterThanOrEqual(2);
         expect(items[0].itemId.toString()).toEqual("1001");
@@ -131,7 +131,7 @@ describe("Test Searchitems", () => {
         const categoryRepoistory = new InmemCategoryRepository();
         const service = new CatalogService(itemRepository, categoryRepoistory);
 
-        const items = await service.searchItems("Teste");
+        const items = await service.searchItems("T-shirt");
 
         expect(items.result.length).toBeGreaterThanOrEqual(1);
         expect(items.pageToken).toEqual(1);
@@ -144,7 +144,7 @@ describe("Test Searchitems", () => {
         const categoryRepoistory = new InmemCategoryRepository();
         const service = new CatalogService(itemRepository, categoryRepoistory);
 
-        const items = await service.searchItems("Teste", 1, perPage);
+        const items = await service.searchItems("T-shirt", 1, perPage);
 
         expect(items.result.length).toBeGreaterThanOrEqual(1);
         expect(items.pageToken).toEqual(1);
@@ -162,6 +162,32 @@ describe("Test Searchitems", () => {
         expect(items.result.length).toEqual(0);
         expect(items.pageToken).toEqual(2);
         expect(items.perPage).toEqual(12);
+    });
+
+    it("Deve pesquisar os items pelo campo fulltext", async () => {
+        const query = "Azul";
+
+        const itemRepository = new ItemRepositoryStub();
+        const categoryRepoistory = new InmemCategoryRepository();
+        const service = new CatalogService(itemRepository, categoryRepoistory);
+
+        const items = await service.searchItems(query);
+
+        expect(items.result.length).toBeGreaterThanOrEqual(1);
+        expect(items.result[0].product.name).toEqual("T-shirt desportiva");
+    });
+
+    it("Deve pesquisar os items pelo campo fulltext com letras minúsculas", async () => {
+        const query = "azul";
+
+        const itemRepository = new ItemRepositoryStub();
+        const categoryRepoistory = new InmemCategoryRepository();
+        const service = new CatalogService(itemRepository, categoryRepoistory);
+
+        const items = await service.searchItems(query);
+
+        expect(items.result.length).toBeGreaterThanOrEqual(1);
+        expect(items.result[0].product.name).toEqual("T-shirt desportiva");
     });
 });
 

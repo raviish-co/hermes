@@ -28,6 +28,7 @@ export class Item {
     readonly #stock: ItemStock;
     #condition: ItemCondition;
     variations?: Variation[];
+    fulltext: string = "";
 
     private constructor(
         itemId: ID,
@@ -53,6 +54,10 @@ export class Item {
         if (!variations) return item;
 
         item.variations = variations;
+
+        const variationsNames = variations.map((v) => v.getFullTextName());
+
+        item.fulltext = variationsNames.join(" ").toLowerCase();
 
         return item;
     }

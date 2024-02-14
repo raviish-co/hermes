@@ -1,5 +1,5 @@
-import { Subcategory } from "./subcategory";
 import { Decimal } from "../../shared/decimal";
+import { Subcategory } from "./subcategory";
 import { ID } from "../../shared/id";
 
 type Options = {
