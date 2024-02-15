@@ -129,7 +129,7 @@ function findSectionByPurpose(purposeName: string): void {
         if (purpose.name === purposeName) {
             changePlaceholder(purpose.placeholder!);
             disableComplementaryDataToThePurpose(purposeName);
-            updateSelectedSections(purpose.sections);
+            updateSelectedSections(purpose.details);
         }
     });
 
@@ -240,15 +240,7 @@ listPurposes();
 </script>
 
 <template>
-    <div class="w-full h-20 sm:h-24 py-4 bg-primary flex justify-center items-center">
-        <div class="w-full h-20 sm:h-24 py-4 bg-primary flex justify-center items-center">
-            <NuxtLink to="/" class="h-16">
-                <img src="/images/logo.png" alt="Logotipo da Raviish" class="h-full" />
-            </NuxtLink>
-        </div>
-    </div>
-
-    <section class="section-content md:mb-20 mb-44 sm:mb-36">
+    <section class="section-content">
         <h1 class="text-xl text-center sm:text-2xl sm:my-10 my-8">Guia de Saída de Artigos</h1>
 
         <section>
@@ -292,12 +284,21 @@ listPurposes();
             <div
                 class="h-table-lg p-3 flex flex-col justify-between border border-light-500 overflow-hidden"
             >
-                <span
-                    class="material-symbols-outlined hover:text-red-500 ms-auto p-2"
-                    @click="clearRequestList"
-                >
-                    delete
-                </span>
+                <div class="w-full flex items-center justify-between">
+                    <span
+                        class="material-symbols-outlined hover:text-secondary-600 p-2 cursor-pointer"
+                        @click="showAddItemDialog"
+                    >
+                        add
+                    </span>
+
+                    <span
+                        class="material-symbols-outlined hover:text-red-500 p-2 cursor-pointer"
+                        @click="clearRequestList"
+                    >
+                        delete
+                    </span>
+                </div>
 
                 <div class="flex-1 overflow-y-auto">
                     <table class="table">
@@ -332,13 +333,11 @@ listPurposes();
                         </tbody>
                     </table>
                 </div>
-
-                <button class="btn-secondary w-full" @click="showAddItemDialog">Adicionar</button>
             </div>
         </section>
     </section>
 
-    <section class="w-full fixed mx-auto bottom-0 z-50 shadow-lg shadow-primary">
+    <section class="w-full mx-auto shadow-md shadow-light-500">
         <div
             class="flex justify-between items-center section-content p-4 bg-white flex-wrap flex-col-reverse md:flex-row md:flex-nowrap gap-4"
         >
@@ -374,6 +373,4 @@ listPurposes();
     />
 
     <DescribeItemStateDialog :row="selectedRow" ref="describeItemStateDialogRef" />
-
-    <UploadItemsDialog ref="uploadItemDialogRef" />
 </template>

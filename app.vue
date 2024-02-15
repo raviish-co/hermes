@@ -1,5 +1,7 @@
 <template>
-    <title>Raviish - Solicitação de Artigos</title>
-    <NuxtPwaManifest></NuxtPwaManifest>
-    <NuxtPage />
+    <NuxtLayout>
+        <title>Raviish - Solicitação de Artigos</title>
+        <NuxtPwaManifest></NuxtPwaManifest>
+        <NuxtPage />
+    </NuxtLayout>
 </template>
