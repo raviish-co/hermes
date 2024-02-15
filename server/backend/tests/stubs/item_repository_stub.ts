@@ -2,10 +2,9 @@ import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import { ItemRepository } from "../../domain/catalog/item_repository";
 import { Item, ItemStatus } from "../../domain/catalog/item";
 import { Variation } from "../../domain/catalog/variation";
-import { Either, left, right } from "../../shared/either";
-import { Product } from "../../domain/catalog/product";
-import { Pagination } from "../../shared/pagination";
 import { ItemStock } from "../../domain/catalog/item_stock";
+import { Either, left, right } from "../../shared/either";
+import { Pagination } from "../../shared/pagination";
 import { ItemQuery } from "../../shared/types";
 import { ID } from "../../shared/id";
 
@@ -21,19 +20,18 @@ export class ItemRepositoryStub implements ItemRepository {
     }
 
     getAll(queries: ItemQuery[]): Promise<Either<ItemNotFound, Item[]>> {
-        const items = Object.values(this.#items);
-        const articles: Item[] = [];
+        const items: Item[] = [];
 
         for (const query of queries) {
-            const filtered = items.find(
+            const filtered = this.records.find(
                 (item) => item.itemId.toString() === query.itemId.toString()
             );
 
             if (!filtered) return Promise.resolve(left(new ItemNotFound(query.itemId.toString())));
 
-            articles.push(filtered);
+            items.push(filtered);
         }
-        return Promise.resolve(right(articles));
+        return Promise.resolve(right(items));
     }
 
     list(pageToken: number, perPage: number): Promise<Pagination<Item>> {
@@ -56,7 +54,7 @@ export class ItemRepositoryStub implements ItemRepository {
     search(query: string, pageToken: number, perPage: number): Promise<Pagination<Item>> {
         const items = this.records.filter((i) => {
             return (
-                i.product.name.toLowerCase().includes(query.toLowerCase()) ||
+                i.name.toLowerCase().includes(query.toLowerCase()) ||
                 i.itemId.toString().includes(query) ||
                 i.fulltext.includes(query.toLowerCase())
             );
@@ -102,33 +100,10 @@ export class ItemRepositoryStub implements ItemRepository {
     }
 
     #populate() {
-        const subcategory = {
-            subcategoryId: ID.RandomUUID(),
-            name: "Some-subcategory",
-        };
-
-        const product = Product.create({
-            name: "T-shirt desportiva",
-            price: "15,95",
-            subcategory,
-        });
-
-        const product2 = Product.create({
-            name: "T-shirt casual",
-            price: "150,95",
-            subcategory,
-        });
-
-        const product3 = Product.create({
-            name: "Calças de ganga",
-            price: "315,95",
-            subcategory,
-        });
-
         const variation = Variation.create({
-            variationId: "9999",
+            variationId: "1",
             attribute: { name: "Cor" },
-            value: { value: "Azul" },
+            value: { value: "Preto" },
         });
 
         const variation1 = Variation.create({
@@ -143,7 +118,9 @@ export class ItemRepositoryStub implements ItemRepository {
 
         const item1 = Item.create({
             itemId: "1001",
-            product,
+            name: "T-shirt desportiva gola redonda",
+            price: "4500,00",
+            categoryId: ID.RandomUUID(),
             condition: { status: ItemStatus.Good },
             stock: stock1,
             variations: [variation, variation1],
@@ -151,7 +128,9 @@ export class ItemRepositoryStub implements ItemRepository {
 
         const item2 = Item.create({
             itemId: "1002",
-            product: product2,
+            name: "Sapato social",
+            price: "15500,00",
+            categoryId: ID.RandomUUID(),
             condition: { status: ItemStatus.Good },
             stock: stock2,
             variations: [variation],
@@ -159,7 +138,9 @@ export class ItemRepositoryStub implements ItemRepository {
 
         const item3 = Item.create({
             itemId: "1003",
-            product: product3,
+            name: "Calça jeans",
+            price: "5500,00",
+            categoryId: ID.RandomUUID(),
             condition: { status: ItemStatus.Good },
             stock: stock3,
         });

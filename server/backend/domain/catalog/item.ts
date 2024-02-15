@@ -1,14 +1,23 @@
 import { Condition } from "../../shared/types";
+import { Decimal } from "../../shared/decimal";
 import { ItemStock } from "./item_stock";
 import { Variation } from "./variation";
 import { ID } from "../../shared/id";
-import { Product } from "./product";
+
+type Section = {
+    name: string;
+    department?: string;
+};
 
 type Options = {
     itemId: string;
-    product: Product;
+    name: string;
+    price: string;
+    unique?: boolean;
+    categoryId: ID;
     condition: ItemCondition;
     stock: ItemStock;
+    section?: Section;
     variations?: Variation[];
 };
 
@@ -24,40 +33,57 @@ export type ItemCondition = {
 
 export class Item {
     readonly itemId: ID;
-    readonly product: Product;
+    readonly name: string;
+    readonly categoryId: ID;
     readonly #stock: ItemStock;
     #condition: ItemCondition;
+    price: Decimal;
+    section?: Section;
+    unique?: boolean;
     variations?: Variation[];
     fulltext: string = "";
 
     private constructor(
         itemId: ID,
-        product: Product,
+        name: string,
+        price: Decimal,
+        categoryId: ID,
         condition: ItemCondition,
         stockItem: ItemStock,
         variations?: Variation[]
     ) {
         this.itemId = itemId;
-        this.product = product;
+        this.name = name;
+        this.price = price;
+        this.categoryId = categoryId;
         this.#condition = condition;
         this.#stock = stockItem;
         this.variations = variations;
     }
 
     static create(options: Options): Item {
-        const { itemId, product, condition, stock, variations } = options;
+        const { itemId, name, price, unique, categoryId, condition, stock, section, variations } =
+            options;
 
         const newID = ID.New(itemId);
 
-        const item = new Item(newID, product, condition, stock);
+        const priceDecimal = Decimal.fromString(price);
 
-        if (!variations) return item;
+        const item = new Item(newID, name, priceDecimal, categoryId, condition, stock, variations);
 
-        item.variations = variations;
+        if (variations) {
+            item.variations = variations;
+            const variationsNames = variations.map((v) => v.getFullTextName());
+            item.fulltext = variationsNames.join(" ").toLowerCase();
+        }
 
-        const variationsNames = variations.map((v) => v.getFullTextName());
+        if (unique) {
+            item.unique = unique;
+        }
 
-        item.fulltext = variationsNames.join(" ").toLowerCase();
+        if (section) {
+            item.section = section;
+        }
 
         return item;
     }

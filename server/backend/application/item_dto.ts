@@ -30,9 +30,9 @@ export enum ItemStateOption {
 export function makeItemsDTO(items: Item[]): ItemDTO[] {
     return items.map((a) => ({
         itemId: a.itemId.toString(),
-        name: a.product.name,
-        price: a.product.price.value.toString(),
-        isUnique: a.product.isUnique(),
+        name: a.category.name,
+        price: a.category.price.value.toString(),
+        isUnique: a.category.isUnique(),
         stock: a.getStock().getQuantity(),
         variations: makeVariationDTO(a.variations),
         state: {

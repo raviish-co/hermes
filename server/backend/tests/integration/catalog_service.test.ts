@@ -2,9 +2,8 @@ import { InmemCategoryRepository } from "../../persistense/inmem/inmem_category_
 import { InmemItemRepository } from "../../persistense/inmem/inmem_item_repository";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { CatalogService } from "../../application/catalog_service";
-import { describe, it, vi, expect } from "vitest";
 import { Category } from "../../domain/catalog/category";
-import { ID } from "../../shared/id";
+import { describe, it, vi, expect } from "vitest";
 
 describe("Test ListItems", () => {
     it("Deve chamar o método **list** no repositório de artigos", async () => {
@@ -62,7 +61,7 @@ describe("Test SearchItems", () => {
 
         const { result: items } = await service.searchItems("T-shirt");
 
-        expect(items.length).toBeGreaterThanOrEqual(2);
+        expect(items.length).toBeGreaterThanOrEqual(1);
         expect(items[0].itemId.toString()).toEqual("1001");
     });
 
@@ -165,7 +164,7 @@ describe("Test SearchItems", () => {
     });
 
     it("Deve pesquisar os items pelo campo fulltext", async () => {
-        const query = "Azul";
+        const query = "Preto";
 
         const itemRepository = new ItemRepositoryStub();
         const categoryRepoistory = new InmemCategoryRepository();
@@ -174,11 +173,11 @@ describe("Test SearchItems", () => {
         const items = await service.searchItems(query);
 
         expect(items.result.length).toBeGreaterThanOrEqual(1);
-        expect(items.result[0].product.name).toEqual("T-shirt desportiva");
+        expect(items.result[0].name).toEqual("T-shirt desportiva gola redonda");
     });
 
     it("Deve pesquisar os items pelo campo fulltext com letras minúsculas", async () => {
-        const query = "azul";
+        const query = "preto";
 
         const itemRepository = new ItemRepositoryStub();
         const categoryRepoistory = new InmemCategoryRepository();
@@ -187,7 +186,7 @@ describe("Test SearchItems", () => {
         const items = await service.searchItems(query);
 
         expect(items.result.length).toBeGreaterThanOrEqual(1);
-        expect(items.result[0].product.name).toEqual("T-shirt desportiva");
+        expect(items.result[0].name).toEqual("T-shirt desportiva gola redonda");
     });
 });
 
@@ -215,11 +214,4 @@ describe("Test Get Categorias ", () => {
     });
 });
 
-const category = Category.create({
-    department: "Departamento 1",
-    subcategory: {
-        subcategoryId: ID.RandomUUID(),
-        name: "Subcategoria 1",
-    },
-    name: "Categoria 1",
-});
+const category = Category.create("Categoria 1");

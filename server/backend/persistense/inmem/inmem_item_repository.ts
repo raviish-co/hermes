@@ -20,7 +20,7 @@ export class InmemItemRepository implements ItemRepository {
         for (const query of queries) {
             const filtered = items.find(
                 (item) =>
-                    item.product.productId.toString() === query.itemId.toString() &&
+                    item.itemId.toString() === query.itemId.toString() &&
                     item.variations?.toString() === query.variations?.toString()
             );
 
@@ -49,10 +49,11 @@ export class InmemItemRepository implements ItemRepository {
     }
 
     search(query: string, pageToken: number, perPage: number): Promise<Pagination<Item>> {
-        const items = this.records.filter((item) => {
+        const items = this.records.filter((i) => {
             return (
-                item.product.name.toLowerCase().includes(query.toLowerCase()) ||
-                item.product.productId.toString().includes(query)
+                i.name.toLowerCase().includes(query.toLowerCase()) ||
+                i.itemId.toString().includes(query) ||
+                i.fulltext.includes(query.toLowerCase())
             );
         });
 

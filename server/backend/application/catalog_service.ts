@@ -2,7 +2,7 @@ import { CategoryRepository } from "../domain/catalog/category_repository";
 import { ItemRepository } from "../domain/catalog/item_repository";
 import { Pagination } from "../shared/pagination";
 import { Item } from "../domain/catalog/item";
-import { Category } from "../domain/catalog/category";
+import { Category } from "../domain/catalog/section";
 
 export class CatalogService {
     #itemRepository: ItemRepository;

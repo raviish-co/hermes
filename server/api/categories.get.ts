@@ -1,4 +1,4 @@
-import { Category } from "../backend/domain/catalog/category";
+import { Category } from "../backend/domain/catalog/section";
 import { Subcategory } from "../backend/domain/catalog/subcategory";
 import { makeServices } from "../backend/main";
 
