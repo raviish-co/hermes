@@ -22,12 +22,12 @@
         {
             "name": "Gravação",
             "placeholder": "Título",
-            "sections": ["Fashion Filme", "Filme", "Novela", "Publicidade", "Video Clip"]
+            "details": ["Fashion Filme", "Filme", "Novela", "Publicidade", "Video Clip"]
         },
         {
             "name": "Lavandaria",
             "placeholder": "Nome",
-            "sections": ["Interna", "Externa"]
+            "details": ["Interna", "Externa"]
         },
         {
             "name": "Photo Shoot",

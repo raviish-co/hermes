@@ -8,7 +8,7 @@ export class PurposeSourceStub implements PurposeSource {
         this.#purposes = [
             {
                 name: "Lavandaria",
-                sections: ["Interna", "Externa"],
+                details: ["Interna", "Externa"],
             },
             {
                 name: "Arranjo",

@@ -41,17 +41,17 @@ describe("Test List Purposes ", () => {
 
         expect(purposes.length).toBeGreaterThanOrEqual(1);
         expect(purposes[0].name).toEqual("Lavandaria");
-        expect(purposes[0].sections).toEqual(["Interna", "Externa"]);
+        expect(purposes[0].details).toEqual(["Interna", "Externa"]);
     });
 
-    it("should retrieve a purpose without sections", async () => {
+    it("should retrieve a purpose without details", async () => {
         const { service } = makeService();
 
         const purposes = await service.listPurposes();
 
         expect(purposes.length).toBeGreaterThanOrEqual(2);
         expect(purposes[1].name).toEqual("Arranjo");
-        expect(purposes[1].sections).toBeUndefined();
+        expect(purposes[1].details).toBeUndefined();
     });
 });
 
@@ -255,8 +255,8 @@ describe("Test Request Items", () => {
 
         const request = await requestRepository.last();
 
-        expect(request.purpose.section).toBeDefined();
-        expect(request.purpose.section).toEqual("Interna");
+        expect(request.purpose.detail).toBeDefined();
+        expect(request.purpose.detail).toEqual("Interna");
     });
 
     it("Deve ser adicionada a solicitação caso a finalidade tenha um destino", async () => {
@@ -264,7 +264,7 @@ describe("Test Request Items", () => {
             ...requestData,
             purposeData: {
                 name: "Lavandaria",
-                section: "Externa",
+                detail: "Externa",
                 recipient: "John Doe",
             },
         };
@@ -352,7 +352,7 @@ describe("Test Request Items", () => {
 const requestData = {
     purposeData: {
         name: "Lavandaria",
-        section: "Interna",
+        detail: "Interna",
     },
     productsData: [
         {
