@@ -2,7 +2,7 @@ import { ID } from "./id";
 
 type PurposeData = {
     name: string;
-    section?: string;
+    detail?: string;
     recipient?: string;
 };
 

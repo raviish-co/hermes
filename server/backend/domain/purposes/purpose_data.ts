@@ -1,5 +1,5 @@
 export interface PurposeData {
     name: string;
-    sections?: string[];
+    details?: string[];
     placeholder?: string;
 }

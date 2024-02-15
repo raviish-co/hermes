@@ -15,7 +15,7 @@ describe("Test Request Products", () => {
     });
 
     it("Deve garantir que a seção será definida caso a finalidade tenha seções", () => {
-        const purpose = { name: "Lavandaria", section: "Interna" };
+        const purpose = { name: "Lavandaria", detail: "Interna" };
         const options = {
             ...requestOptions,
             purpose: purpose,
@@ -24,7 +24,7 @@ describe("Test Request Products", () => {
         const request = Request.create(options);
 
         expect(request.purpose).toEqual(purpose);
-        expect(request.purpose.section).toBeDefined();
+        expect(request.purpose.detail).toBeDefined();
     });
 
     it("Deve garantir que a seção não será definida caso a finalidade não tenha seções", () => {
@@ -33,7 +33,7 @@ describe("Test Request Products", () => {
         const request = Request.create(requestOptions);
 
         expect(request.purpose).toEqual(purpose);
-        expect(request.purpose.section).toBeUndefined();
+        expect(request.purpose.detail).toBeUndefined();
     });
 
     it("Deve definir um destino a solicitação de saída de artigos", () => {
