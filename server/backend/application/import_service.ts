@@ -4,16 +4,13 @@ import { SequenceGenerator } from "../domain/sequences/sequence_generator";
 import { CategoryRepository } from "../domain/catalog/category_repository";
 import { Item, ItemCondition, ItemStatus } from "../domain/catalog/item";
 import { CsvReader, validCsvHeader } from "../domain/readers/csv_reader";
-import { SectionRepository } from "../domain/catalog/section_repository";
 import { ItemRepository } from "../domain/catalog/item_repository";
 import { FileEmpty } from "../domain/readers/file_empty_error";
 import { ItemStock } from "../domain/catalog/item_stock";
 import { Sequence } from "../domain/sequences/sequence";
 import { Either, left, right } from "../shared/either";
 import { Category } from "../domain/catalog/category";
-import { Section } from "../domain/catalog/section";
 import { FileError } from "../shared/errors";
-import { ID } from "../shared/id";
 
 export class ImportService {
     #itemRepository: ItemRepository;

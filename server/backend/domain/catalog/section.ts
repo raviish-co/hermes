@@ -1,17 +1,13 @@
-import { ID } from "../../shared/id";
-
-export type Options = {
+type Options = {
     name: string;
     department?: string;
 };
 
 export class Section {
-    readonly sectionId: ID;
     readonly name: string;
     readonly department?: string;
 
-    private constructor(sectionId: ID, name: string, department?: string) {
-        this.sectionId = sectionId;
+    private constructor(name: string, department?: string) {
         this.name = name;
         this.department = department;
     }
@@ -19,9 +15,7 @@ export class Section {
     static create(options: Options) {
         const { name, department } = options;
 
-        const newID = ID.RandomUUID();
-
-        const section = new Section(newID, name, department);
+        const section = new Section(name, department);
 
         return section;
     }

@@ -1,5 +1,4 @@
 import { InmemCategoryRepository } from "../../persistense/inmem/inmem_category_repository";
-import { InmemSectionRepository } from "../../persistense/inmem/inmem_section_repository";
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
 import { InmemItemRepository } from "../../persistense/inmem/inmem_item_repository";
 import { InvalidFileHeader } from "../../domain/readers/invalid_file_header_error";
@@ -10,8 +9,6 @@ import { ImportService } from "../../application/import_service";
 import { Category } from "../../domain/catalog/category";
 import { ItemStatus } from "../../domain/catalog/item";
 import { describe, it, expect } from "vitest";
-import { ID } from "../../shared/id";
-import { Section } from "../../domain/catalog/section";
 
 describe("Test Upload Items", async () => {
     it("Deve retornar **FileNotSupported** caso o ficheiro não seja .csv", async () => {
@@ -194,85 +191,3 @@ const emptyFile = new File(
         type: "text/csv",
     }
 );
-
-// it("Deve criar uma categoria caso ela não exista", async () => {
-//     const storage = new InmemSequenceStorage();
-//     const sequenceGenerator = new SequenceGenerator(storage);
-//     const repoistory = new InmemCategoryRepository();
-//     const itemRepository = new InmemItemRepository();
-//     const service = new ImportService(repoistory, itemRepository, sequenceGenerator);
-//     await service.uploadItems(data);
-//     const categoryOrError = await repoistory.findByName("Categoria 1");
-//     const category = <Category>categoryOrError.value;
-//     expect(category.name).toEqual(data.categoryName);
-//     expect(category.department).toEqual(data.department);
-// });
-// it("Deve criar a subcategoria da categoria caso ela não exista", async () => {
-//     const storage = new InmemSequenceStorage();
-//     const sequenceGenerator = new SequenceGenerator(storage);
-//     const repoistory = new InmemCategoryRepository();
-//     const itemRepository = new InmemItemRepository();
-//     const service = new ImportService(repoistory, itemRepository, sequenceGenerator);
-//     await service.uploadItems(data);
-//     const categoryOrError = await repoistory.findByName("Categoria 1");
-//     const category = <Category>categoryOrError.value;
-//     expect(category.subcategories.length).toEqual(1);
-//     expect(category.subcategories[0].name).toEqual(data.subcategoryName);
-// });
-// it("Deve adicionar uma subcategoria a categoria existente", async () => {
-//     const subcategoryName = "Subcategoria 2";
-//     const storage = new InmemSequenceStorage();
-//     const sequenceGenerator = new SequenceGenerator(storage);
-//     const repoistory = new InmemCategoryRepository();
-//     const itemRepository = new InmemItemRepository();
-//     await repoistory.save(category);
-//     const service = new ImportService(repoistory, itemRepository, sequenceGenerator);
-//     await service.uploadItems({ ...data, subcategoryName });
-//     const categoryOrError = await repoistory.findByName("Categoria 1");
-//     const categoryResult = <Category>categoryOrError.value;
-//     expect(categoryResult.subcategories.length).toEqual(2);
-//     expect(categoryResult.subcategories[1].name).toEqual(subcategoryName);
-// });
-// it("Deve carregar os artigos apartir do ficheiro .csv", async () => {
-//     const data = {
-//         department: "Departamento 1",
-//         categoryName: "Categoria 1",
-//         subcategoryName: "Subcategoria 1",
-//         file,
-//     };
-//     const storage = new InmemSequenceStorage();
-//     const sequenceGenerator = new SequenceGenerator(storage);
-//     const repoistory = new InmemCategoryRepository();
-//     const itemRepository = new InmemItemRepository();
-//     const service = new ImportService(repoistory, itemRepository, sequenceGenerator);
-//     await service.uploadItems(data);
-//     const { result: items } = await itemRepository.list(1, 12);
-//     expect(items.length).toEqual(5);
-//     expect(items[0].product.name).toEqual("Produto 1");
-// });
-// it("Deve associar a subcategoria aos artigos a serem importados", async () => {
-//     const storage = new InmemSequenceStorage();
-//     const sequenceGenerator = new SequenceGenerator(storage);
-//     const repoistory = new InmemCategoryRepository();
-//     const itemRepository = new InmemItemRepository();
-//     const service = new ImportService(repoistory, itemRepository, sequenceGenerator);
-//     await service.uploadItems(data);
-//     const item = await itemRepository.last();
-//     expect(item.product.subcategory.subcategoryId).toBeDefined();
-//     expect(item.product.subcategory.name).toEqual("Subcategoria 1");
-// });
-
-// it("Deve salvar os artigos com subcategoria existente na base de dados", async () => {
-//     const storage = new InmemSequenceStorage();
-//     const sequenceGenerator = new SequenceGenerator(storage);
-//     const repoistory = new InmemCategoryRepository();
-//     const itemRepository = new InmemItemRepository();
-//     await repoistory.save(category);
-//     const service = new ImportService(repoistory, itemRepository, sequenceGenerator);
-//     await service.uploadItems(data);
-//     const { result: items } = await itemRepository.list(1, 12);
-//     expect(items.length).toEqual(5);
-//     expect(items[0].product.name).toEqual("Produto 1");
-//     expect(items[0].product.subcategory.subcategoryId).toBeDefined();
-//     expect(items[0].product.subcategory.name).toEqual("Subcategoria 1");
-// });

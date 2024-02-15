@@ -14,16 +14,7 @@ export class InmemCategoryRepository implements CategoryRepository {
         return Promise.resolve(right(category));
     }
 
-    getAll(): Promise<Category[]> {
-        return Promise.resolve(this.records);
-    }
-
     save(category: Category): Promise<void> {
-        this.#categories[category.name] = category;
-        return Promise.resolve(undefined);
-    }
-
-    update(category: Category): Promise<void> {
         this.#categories[category.name] = category;
         return Promise.resolve(undefined);
     }

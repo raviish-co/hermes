@@ -88,6 +88,10 @@ export class Item {
         return item;
     }
 
+    isUnique(): boolean {
+        return this.unique == true;
+    }
+
     updateCondition(condition: Condition): void {
         const { status, comment } = condition;
         if (ItemStatus.Good == status) {
