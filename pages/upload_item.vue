@@ -35,12 +35,6 @@ function updateFile(e: Event) {
 
 <template>
     <section>
-        <div class="w-full h-20 sm:h-24 py-4 bg-primary flex justify-center items-center">
-            <NuxtLink to="/" class="h-16">
-                <img src="/images/logo.png" alt="Logotipo da Raviish" class="h-full" />
-            </NuxtLink>
-        </div>
-
         <div class="section-content">
             <h1 class="text-xl text-center sm:text-2xl sm:my-10 my-8">Importar Artigos</h1>
 
