@@ -2,77 +2,71 @@
 import { handleException } from "~/lib/helpers/handler";
 import { UploadService } from "~/lib/services/upload_service";
 import { CatalogService } from "~/lib/services/catalog_service";
-import { departaments } from "~/lib/constants";
 import type { Category } from "~/lib/models/item";
 
 const currentDepartament = ref<string>("Homem");
+const currentSection = ref<string>("");
 const currentCategory = ref<string>("");
-const currentSubcategory = ref<string>("");
-const subcategories = ref<string[]>([]);
+const categories = ref<string[]>([]);
 const currentFormData = ref<FormData | null>(null);
 const uploadService = new UploadService();
 const catalogService = new CatalogService();
-const categories = ref<Category[]>([]);
-const categorieNames = ref<string[]>([]);
+const sections = ref<Category[]>([]);
+const sectionNames = ref<string[]>([]);
+const currentFileName = ref<string>("");
+const departaments: string[] = ["Homem", "Mulher", "Criança"];
 
-function updateCategory(category: string) {
-    currentCategory.value = category;
+function updateSection(section: string) {
+    currentSection.value = section;
 
-    subcategories.value = getSubcategoriesByCategory(category);
+    categories.value = getCategoriesBySection(section);
 }
 
-function getSubcategoriesByCategory(category: string): string[] {
-    const subcategories: string[] = [];
+function getCategoriesBySection(section: string): string[] {
+    const categories: string[] = [];
 
-    categories.value.forEach((c) => {
-        if (c.name === category) {
-            subcategories.push(...c.subcategories);
+    sections.value.forEach((s) => {
+        if (s.name === section) {
+            categories.push(...s.subcategories);
         }
     });
 
-    return subcategories;
+    return categories;
 }
 
-function updateSubcategory(subcategory: string) {
-    currentSubcategory.value = subcategory;
+function updateCategory(category: string) {
+    currentCategory.value = category;
 }
 
-function updateFile(file: File | null) {
-    if (!file) {
-        currentFormData.value = null;
-        return;
-    }
-
-    currentFormData.value = new FormData();
-    currentFormData.value.append("file", file);
-}
-
-function listCategories() {
+function listSections() {
     catalogService.listCategories().then((res) => {
-        categories.value = res;
-        categorieNames.value = res.map((r) => r.name);
+        sections.value = res;
+        sectionNames.value = res.map((r) => r.name);
     });
 }
 
-function searchCategory(query: string): string[] {
-    const lowerCategorieNames = categories.value.map((c) => c.name.toLocaleLowerCase());
+function searchSection(query: string): string[] {
+    const lowerSectionNames = sections.value.map((s) => s.name.toLocaleLowerCase());
 
-    return lowerCategorieNames.filter((c) => c.includes(query));
+    return lowerSectionNames.filter((s) => s.includes(query));
 }
 
+const isValidSection = computed(() => currentSection.value !== "");
 const isValidCategory = computed(() => currentCategory.value !== "");
-const isValidSubcategory = computed(() => currentSubcategory.value !== "");
 const isValidFile = computed(() => currentFormData.value !== null);
 const isValidForm = computed(
-    () => isValidFile.value && isValidSubcategory.value && isValidCategory.value
+    () => isValidFile.value && isValidCategory.value && isValidSection.value
 );
 
 function uploadFile() {
     if (!currentFormData.value) return;
 
-    currentFormData.value.append("departament", currentDepartament.value);
+    if (departaments.includes(currentDepartament.value)) {
+        currentFormData.value.append("departament", currentDepartament.value);
+    }
+
+    currentFormData.value.append("section", currentSection.value);
     currentFormData.value.append("category", currentCategory.value);
-    currentFormData.value.append("subcategory", currentSubcategory.value);
 
     uploadService
         .upload(currentFormData.value)
@@ -80,8 +74,23 @@ function uploadFile() {
         .catch(handleException);
 }
 
+function updateFile(e: Event) {
+    const target = e.target as HTMLInputElement;
+    const file = target.files?.[0] as File;
+
+    if (!file) {
+        currentFormData.value = null;
+        currentFileName.value = "";
+        return;
+    }
+
+    currentFormData.value = new FormData();
+    currentFormData.value.append("file", file);
+    currentFileName.value = file.name;
+}
+
 onMounted(() => {
-    listCategories();
+    listSections();
 });
 </script>
 
@@ -98,22 +107,50 @@ onMounted(() => {
 
             <form class="m-auto my-8 w-full flex flex-1 flex-col gap-4 max-w-96">
                 <select v-model="currentDepartament" class="input-field">
+                    <option selected>Departamento</option>
                     <option v-for="departament in departaments" :key="departament">
                         {{ departament }}
                     </option>
                 </select>
                 <InputSelect
                     placeholder="Secção"
-                    :search="searchCategory"
-                    :options="categorieNames"
+                    :search="searchSection"
+                    :options="sectionNames"
+                    @selected="updateSection"
+                />
+
+                <InputSelect
+                    placeholder="Categoria"
+                    :options="categories"
                     @selected="updateCategory"
                 />
-                <InputSelect
-                    placeholder="Subsecção"
-                    :options="subcategories"
-                    @selected="updateSubcategory"
-                />
-                <UploadFile @uploaded="updateFile" />
+
+                <div>
+                    <div class="flex flex-1">
+                        <label for="file" class="flex items-center justify-center border">
+                            <span
+                                class="material-symbols-outlined text-3xl text-light-600 cursor-pointer"
+                            >
+                                attach_file
+                            </span>
+                        </label>
+
+                        <span
+                            class="input-field overflow-hidden truncate text-light-600 text-sm"
+                            :class="{ invalid: !isValidFile }"
+                            >{{ currentFileName }}</span
+                        >
+                    </div>
+
+                    <input
+                        type="file"
+                        id="file"
+                        accept="text/csv"
+                        class="hidden"
+                        @change="updateFile"
+                    />
+                </div>
+
                 <button
                     type="button"
                     class="btn btn-secondary"
