@@ -29,7 +29,7 @@ export enum ItemStateOption {
     Bad = "Mau",
 }
 
-export interface Category {
+export interface Section {
     name: string;
     departament: string;
     subcategories: string[];
