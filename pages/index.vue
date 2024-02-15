@@ -129,7 +129,7 @@ function findSectionByPurpose(purposeName: string): void {
         if (purpose.name === purposeName) {
             changePlaceholder(purpose.placeholder!);
             disableComplementaryDataToThePurpose(purposeName);
-            updateSelectedSections(purpose.sections);
+            updateSelectedSections(purpose.details);
         }
     });
 
