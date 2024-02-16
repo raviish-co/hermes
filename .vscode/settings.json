@@ -11,5 +11,8 @@
     "[markdown]": {
         "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
     },
-    "testing.automaticallyOpenPeekView": "never"
+    "testing.automaticallyOpenPeekView": "never",
+    "[dotenv]": {
+        "editor.defaultFormatter": "foxundermoon.shell-format"
+    }
 }

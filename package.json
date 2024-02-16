@@ -13,9 +13,6 @@
         "preview": "nuxt preview",
         "postinstall": "nuxt prepare"
     },
-    "prisma": {
-        "schema": "server/backend/persistense/prisma/schema.prisma"
-    },
     "devDependencies": {
         "@nuxt/devtools": "latest",
         "@tailwindcss/forms": "^0.5.7",
