@@ -4,26 +4,22 @@ import { SequenceGenerator } from "../domain/sequences/sequence_generator";
 import { CategoryRepository } from "../domain/catalog/category_repository";
 import { Item, ItemCondition, ItemStatus } from "../domain/catalog/item";
 import { CsvReader, validCsvHeader } from "../domain/readers/csv_reader";
-import { Sequence } from "../domain/sequences/sequence";
 import { ItemRepository } from "../domain/catalog/item_repository";
 import { FileEmpty } from "../domain/readers/file_empty_error";
-import { Subcategory } from "../domain/catalog/subcategory";
 import { ItemStock } from "../domain/catalog/item_stock";
+import { Sequence } from "../domain/sequences/sequence";
 import { Either, left, right } from "../shared/either";
 import { Category } from "../domain/catalog/category";
-import { Product } from "../domain/catalog/product";
-import { UploadData } from "../shared/types";
 import { FileError } from "../shared/errors";
-import { ID } from "../shared/id";
 
 export class ImportService {
-    #categoryRepository: CategoryRepository;
     #itemRepository: ItemRepository;
+    #categoryRepository: CategoryRepository;
     #generator: SequenceGenerator;
 
     constructor(
-        categoryRepository: CategoryRepository,
         itemRepository: ItemRepository,
+        categoryRepository: CategoryRepository,
         generator: SequenceGenerator
     ) {
         this.#categoryRepository = categoryRepository;
@@ -31,86 +27,103 @@ export class ImportService {
         this.#generator = generator;
     }
 
-    async uploadItems(uploadData: UploadData): Promise<Either<FileError, void>> {
-        const { categoryName, department, subcategoryName, file } = uploadData;
+    async uploadItems(file: File): Promise<Either<FileError, void>> {
+        if (!this.#isCsvFile(file)) return Promise.resolve(left(new FileNotSupported()));
 
-        if (!this.#isCsvFile(file)) {
-            return Promise.resolve(left(new FileNotSupported()));
-        }
+        const csvReader = new CsvReader();
+        const lines = await csvReader.read(file);
 
-        const reader = new CsvReader();
-        const lines = await reader.read(file);
         const validOrError = this.#isValidFile(lines);
         if (validOrError.isLeft()) return Promise.resolve(left(validOrError.value));
 
-        const categoryOrError = await this.#categoryRepository.findByName(categoryName);
-
-        const subcategory = { subcategoryId: ID.RandomUUID(), name: subcategoryName };
-
-        if (categoryOrError.isLeft()) {
-            const category = Category.create({
-                department,
-                subcategory,
-                name: categoryName,
-            });
-
-            await this.#categoryRepository.save(category);
-
-            const items = this.#buildItems(lines, subcategory);
-
-            await this.#itemRepository.saveAll(items);
-
-            return Promise.resolve(right(undefined));
-        }
-
-        const category = categoryOrError.value;
-
-        category.addSubcategory(subcategory);
-
-        await this.#categoryRepository.update(category);
-
-        const items = this.#buildItems(lines, subcategory);
+        const items = await this.#buildItems(lines);
 
         await this.#itemRepository.saveAll(items);
 
         return Promise.resolve(right(undefined));
     }
 
-    #buildItems(lines: string[], subcategory: Subcategory): Item[] {
+    async #buildItems(lines: string[]): Promise<Item[]> {
         const items: Item[] = [];
-        lines.forEach((l, idx) => {
-            if (idx === 0) return;
 
-            const [name, price, isunique, quantity, comment] = l.split(",");
-
-            if (!name || !price || !quantity || !isunique) return;
-
-            const unique = isunique === "true" ? true : false;
-
-            const product = Product.create({
+        for (let i = 1; i < lines.length; i++) {
+            const [
                 name,
                 price,
-                unique,
-                subcategory,
-            });
+                isunique,
+                quantity,
+                comment,
+                categoryName,
+                sectionName,
+                departmentName,
+            ] = lines[i].split(",");
 
-            const stock = new ItemStock(Number(quantity));
-            const condition: ItemCondition = { status: ItemStatus.Good };
-            if (comment) {
-                condition.status = ItemStatus.Bad;
-                condition.comment = comment;
+            const categoryOrError = await this.#categoryRepository.findByName(categoryName);
+            const section = { name: sectionName, department: departmentName };
+
+            if (categoryOrError.isLeft()) {
+                const category = Category.create(categoryName);
+                const categoryId = category.categoryId;
+
+                await this.#categoryRepository.save(category);
+
+                const itemId = this.#generator.generate(Sequence.Item);
+
+                const stock = new ItemStock(Number(quantity));
+
+                const unique = isunique === "true" ? true : false;
+
+                const condition: ItemCondition = { status: ItemStatus.Good };
+
+                if (comment) {
+                    condition.status = ItemStatus.Bad;
+                    condition.comment = comment;
+                }
+
+                const item = Item.create({
+                    itemId,
+                    name,
+                    price,
+                    unique,
+                    categoryId,
+                    condition,
+                    stock,
+                    section,
+                });
+
+                items.push(item);
             }
 
-            const itemId = this.#generator.generate(Sequence.Item);
-            const item = Item.create({
-                itemId,
-                product,
-                stock,
-                condition,
-            });
+            if (categoryOrError.isRight()) {
+                const category = categoryOrError.value;
+                const categoryId = category.categoryId;
+                const itemId = this.#generator.generate(Sequence.Item);
 
-            items.push(item);
-        });
+                const stock = new ItemStock(Number(quantity));
+
+                const unique = isunique === "true" ? true : false;
+
+                const condition: ItemCondition = { status: ItemStatus.Good };
+
+                if (comment) {
+                    condition.status = ItemStatus.Bad;
+                    condition.comment = comment;
+                }
+
+                const item = Item.create({
+                    itemId,
+                    name,
+                    price,
+                    unique,
+                    categoryId,
+                    condition,
+                    stock,
+                    section,
+                });
+
+                items.push(item);
+            }
+        }
 
         return items;
     }

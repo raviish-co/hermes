@@ -117,16 +117,16 @@ describe("Test Request Items", () => {
 
     it("Deve chamar o método **save** no repositório de solicitações de artigos", async () => {
         const productsData = [{ itemId: "1001", quantity: 1 }];
-        const total = "15,95";
+        const total = "4500,00";
         const { service, requestRepository } = makeService();
 
         const spy = vi.spyOn(requestRepository, "save");
 
-        await service.requestItems({
+        const error = await service.requestItems({
             ...requestData,
             productsData,
             total,
-            securityDeposit: "31,90",
+            securityDeposit: "9000,00",
         });
 
         expect(spy).toHaveBeenCalled();
@@ -140,8 +140,8 @@ describe("Test Request Items", () => {
         await service.requestItems({
             ...requestData,
             productsData,
-            total: "15,95",
-            securityDeposit: "31,90",
+            total: "4500,00",
+            securityDeposit: "9000,00",
         });
 
         const request = await requestRepository.last();
@@ -149,7 +149,7 @@ describe("Test Request Items", () => {
 
         expect(request.items.length).toBe(1);
         expect(requestItem.item.itemId.toString()).toEqual("1001");
-        expect(requestItem.getTotal().value).toEqual("15,95");
+        expect(requestItem.getTotal().value).toEqual("4500,00");
         expect(requestItem.quantity).toEqual(1);
     });
 
@@ -158,8 +158,8 @@ describe("Test Request Items", () => {
             { itemId: "1001", quantity: 1 },
             { itemId: "1002", quantity: 1 },
         ];
-        const total = "166,90";
-        const securityDeposit = "333,80";
+        const total = "20000,00";
+        const securityDeposit = "40000,00";
         const { service, requestRepository } = makeService();
 
         await service.requestItems({
@@ -206,7 +206,7 @@ describe("Test Request Items", () => {
         const request = await requestRepository.last();
 
         expect(request.items.length).toBe(2);
-        expect(request.getTotal().value).toEqual("484,75");
+        expect(request.getTotal().value).toEqual("55500,00");
     });
 
     it("Deve retornar **InsufficientStock** se a quantidade solicitada for maior que a quantidade em estoque", async () => {
@@ -366,8 +366,8 @@ const requestData = {
             condition: { status: "Mau", comment: "T-shirt rasgada" },
         },
     ],
-    total: "484,75",
-    securityDeposit: "969,50",
+    total: "55500,00",
+    securityDeposit: "111000,00",
     returnDate: "2021-01-01T16:40:00",
 };
 

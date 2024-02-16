@@ -9,37 +9,29 @@ const { importService } = makeServices();
 export default defineEventHandler(async (event) => {
     const formData = await readFormData(event);
 
-    const categoryName = formData.get("category") as string;
-    const subcategoryName = formData.get("subcategory") as string;
-    const department = formData.get("departament") as string;
     const file = formData.get("file") as File;
 
-    const resultOrError = await importService.uploadItems({
-        categoryName,
-        subcategoryName,
-        department,
-        file,
-    });
+    const resultOrError = await importService.uploadItems(file);
 
     if (resultOrError.value instanceof InvalidFileHeader) {
-        return {
+        return createError({
             statusCode: HttpStatus.BadRequest,
-            message: "Erro: Cabeçalho inválido.",
-        };
+            message: resultOrError.value.message,
+        });
     }
 
     if (resultOrError.value instanceof FileEmpty) {
-        return {
+        return createError({
             statusCode: HttpStatus.BadRequest,
-            message: "Erro: O ficheiro está vazio.",
-        };
+            message: resultOrError.value.message,
+        });
     }
 
     if (resultOrError.value instanceof FileNotSupported) {
-        return {
+        return createError({
             statusCode: HttpStatus.BadRequest,
-            message: "Erro: Ficheiro não suportado.",
-        };
+            message: resultOrError.value.message,
+        });
     }
 
     setResponseStatus(event, HttpStatus.Created);

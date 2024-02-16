@@ -1,9 +1,6 @@
 import { Reader } from "./reader";
 
-export const validCsvHeader = [
-    "name,price,isunique,quantity",
-    "name,price,isunique,quantity,comment",
-];
+export const validCsvHeader = ["nome,preco,unico,quantidade,estado,categoria,secao,departamento"];
 
 export class CsvReader implements Reader {
     async read(file: File): Promise<string[]> {

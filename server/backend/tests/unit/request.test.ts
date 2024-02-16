@@ -1,7 +1,7 @@
 import { Request, RequestStatus } from "../../domain/requests/request";
 import { RequestItem } from "../../domain/requests/request_item";
 import { Item, ItemStatus } from "../../domain/catalog/item";
-import { Product } from "../../domain/catalog/product";
+import { Category } from "../../domain/catalog/category";
 import { describe, expect, it } from "vitest";
 import { User } from "../../domain/user";
 import { ItemStock } from "../../domain/catalog/item_stock";
@@ -99,8 +99,15 @@ describe("Test Request Products", () => {
     });
 
     it("Deve calcular o valor total da linha com base num preço com casas decimais", () => {
-        const product = Product.create({ ...productOptions, price: "1150,50" });
-        const item = Item.create({ itemId: "some-id", product, condition, stock });
+        const product = Category.create("some-category");
+        const item = Item.create({
+            itemId: "some-id",
+            name: "some",
+            price: "1150,50",
+            category: product,
+            stock,
+            condition,
+        });
         const requestItems = [
             RequestItem.create({
                 item,
@@ -115,8 +122,15 @@ describe("Test Request Products", () => {
     });
 
     it("Deve calcular o valor total da solicitação de uma linha, onde o total da linha tem casas decimais", () => {
-        const product = Product.create({ ...productOptions, price: "1150,50" });
-        const item = Item.create({ itemId: "some-id", product: product, condition, stock });
+        const category = Category.create("some-category");
+        const item = Item.create({
+            itemId: "some-id",
+            name: "some",
+            price: "1150,50",
+            category: category,
+            stock,
+            condition,
+        });
         const requestItems = [
             RequestItem.create({
                 item,
@@ -129,10 +143,23 @@ describe("Test Request Products", () => {
     });
 
     it("Deve calcular o valor total de uma solicitação com várias linhas, onde o total de cada linha tem casas decimais", () => {
-        const product1 = Product.create({ ...productOptions, price: "1150,50" });
-        const product2 = Product.create({ ...productOptions, price: "1150,50" });
-        const item1 = Item.create({ itemId: "some-id", product: product1, condition, stock });
-        const item2 = Item.create({ itemId: "some-id", product: product2, condition, stock });
+        const product = Category.create("some-category");
+        const item1 = Item.create({
+            itemId: "some-id",
+            name: "some",
+            price: "1150,50",
+            category: product,
+            stock,
+            condition,
+        });
+        const item2 = Item.create({
+            itemId: "some-id",
+            name: "some",
+            price: "1150,50",
+            category: product,
+            stock,
+            condition,
+        });
         const requestItems = [
             RequestItem.create({
                 item: item1,
@@ -156,25 +183,16 @@ describe("Test Request Products", () => {
     });
 });
 
-const subcategory = {
-    subcategoryId: ID.RandomUUID(),
-    name: "some-subcategory",
-};
-
-const productOptions = {
-    name: "some-title",
-    price: "150",
-    unique: false,
-    subcategory,
-};
 const stock = new ItemStock(10);
 const condition = { status: ItemStatus.Bad, comment: "Some comment" };
-const product = Product.create(productOptions);
+const category = Category.create("some-category");
 const item = Item.create({
     itemId: "some-id",
-    product,
-    condition,
+    name: "some",
+    price: "150,00",
+    category: category,
     stock,
+    condition,
 });
 
 const requestItemOptions = {

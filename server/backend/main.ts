@@ -29,9 +29,9 @@ export const makeServices = (): Services => {
         sequenceGenerator
     );
 
-    const catalogService = new CatalogService(itemRepository, categoryRepository);
+    const catalogService = new CatalogService(itemRepository);
 
-    const importService = new ImportService(categoryRepository, itemRepository, sequenceGenerator);
+    const importService = new ImportService(itemRepository, categoryRepository, sequenceGenerator);
 
     return {
         requestService,

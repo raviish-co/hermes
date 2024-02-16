@@ -26,7 +26,7 @@ export class RequestItem {
 
     #calculateTotal(): void {
         const factor = Decimal.fromString(this.quantity.toString());
-        this.#total = this.item.product.price.multiply(factor);
+        this.#total = this.item.price.multiply(factor);
     }
 
     getTotal(): Decimal {

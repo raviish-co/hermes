@@ -1,26 +1,19 @@
-import { Subcategory, Options } from "./subcategory";
+import { ID } from "../../shared/id";
 
 export class Category {
-    readonly department: string;
-    name: string;
-    subcategories: Subcategory[] = [];
+    readonly categoryId: ID;
+    readonly name: string;
 
-    private constructor(name: string, department: string) {
+    private constructor(category: ID, name: string) {
+        this.categoryId = category;
         this.name = name;
-        this.department = department;
     }
 
-    static create(options: Options) {
-        const { name, subcategory, department } = options;
+    static create(name: string): Category {
+        const categoryId = ID.RandomUUID();
 
-        const category = new Category(name, department);
-
-        category.addSubcategory(subcategory);
+        const category = new Category(categoryId, name);
 
         return category;
-    }
-
-    addSubcategory(subcategory: Subcategory) {
-        this.subcategories.push(subcategory);
     }
 }
