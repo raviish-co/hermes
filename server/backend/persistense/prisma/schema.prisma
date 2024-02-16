@@ -1,11 +1,23 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = "file:raviish.db"
+  url      = "file:./raviish.db"
+}
+
+model Category {
+  id   String @id
+  name String
+  itemCategory ItemCategory[]
+}
+
+model ItemCategory {
+  id String @id
+  category Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+  price String
+  isUnique Boolean
+  quantity Int
 }
