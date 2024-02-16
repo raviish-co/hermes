@@ -1,10 +1,10 @@
-import { InsufficientStockItem } from "../backend/domain/sequences/insufficient_item_stock_error";
-import { PurposeNotFound } from "../backend/domain/purposes/purpose_not_found_error";
-import { ItemNotFound } from "../backend/domain/catalog/item_not_found_error";
-import { InvalidTotal } from "../backend/domain/requests/invalid_total_error";
-import { HttpStatus } from "../backend/shared/http_status";
+import { InsufficientStockItem } from "@backend/domain/sequences/insufficient_item_stock_error";
+import { PurposeNotFound } from "@backend/domain/requests/purpose_not_found_error";
+import { ItemNotFound } from "@backend/domain/catalog/item_not_found_error";
+import { InvalidTotal } from "@backend/domain/requests/invalid_total_error";
+import { HttpStatus } from "@backend/shared/http_status";
 import { RequestModel } from "~/lib/models/request";
-import { makeServices } from "../backend/main";
+import { makeServices } from "@backend/main";
 
 const { requestService } = makeServices();
 

@@ -1,0 +1,47 @@
+[
+    {
+        "description": "Alugel",
+        "notesType": "Cliente",
+        "detailsConstraint": []
+    },
+    {
+        "description": "Arranjo",
+        "notesType": "Costureiro",
+        "detailsConstraint": []
+    },
+    {
+        "description": "Arte / Cenografia",
+        "notesType": "Descrição",
+        "detailsConstraint": []
+    },
+    {
+        "description": "Descartar",
+        "notesType": "Notas",
+        "detailsConstraint": []
+    },
+    {
+        "description": "Doação",
+        "notesType": "Descrição",
+        "detailsConstraint": []
+    },
+    {
+        "description": "Gravação",
+        "notesType": "Título",
+        "detailsConstraint": ["Fashion Filme", "Filme", "Novela", "Publicidade", "Video Clip"]
+    },
+    {
+        "description": "Lavandaria",
+        "notesType": "Nome",
+        "detailsConstraint": ["Interna", "Externa"]
+    },
+    {
+        "description": "Photo Shoot",
+        "notesType": "Descrição",
+        "detailsConstraint": []
+    },
+    {
+        "description": "Uso Pessoal",
+        "notesType": "Técnico",
+        "detailsConstraint": []
+    }
+]

@@ -1,5 +1,5 @@
-import { makeItemsDTO } from "../backend/application/item_dto";
-import { makeServices } from "../backend/main";
+import { makeItemsDTO } from "@backend/application/item_dto";
+import { makeServices } from "@backend/main";
 export interface Pagination {
     pageToken?: number;
     perPage?: number;
