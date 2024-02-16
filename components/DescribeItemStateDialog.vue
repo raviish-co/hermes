@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
 import { ItemStateOption, type RequestItem } from "~/lib/models/item";
-import { ItemStatus } from "~/server/backend/domain/catalog/item";
 
 interface Props {
     row: RequestItem;
@@ -17,7 +16,7 @@ const options = Object.values(ItemStateOption);
 const isGoodState = computed(() => status.value !== ItemStateOption.Bad);
 
 function showDialog() {
-    status.value = ItemStatus.Good;
+    status.value = ItemStateOption.Good;
     comment.value = "";
     dialogRef.value?.show();
 }
