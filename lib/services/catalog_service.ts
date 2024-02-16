@@ -1,7 +1,7 @@
-import type { Item } from "../models/item";
+import type { ItemModel } from "../models/item";
 
 interface ItemList {
-    items: Item[];
+    items: ItemModel[];
     total: number;
 }
 

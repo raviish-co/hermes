@@ -112,6 +112,12 @@ export class ItemRepositoryStub implements ItemRepository {
             value: { value: "Nike" },
         });
 
+        const variation2 = Variation.create({
+            variationId: "9992",
+            attribute: { name: "Marca" },
+            value: { value: "Rebock" },
+        });
+
         const stock1 = new ItemStock(10);
         const stock2 = new ItemStock(10);
         const stock3 = new ItemStock(10);

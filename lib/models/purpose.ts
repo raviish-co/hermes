@@ -1,5 +1,5 @@
-export interface Purpose {
-    name: string;
-    placeholder?: string;
-    details?: string[];
+export interface PurposeModel {
+    description: string;
+    detailsConstraint: string[];
+    notesType?: string;
 }

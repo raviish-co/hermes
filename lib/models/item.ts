@@ -1,36 +1,21 @@
-export interface Item {
+export interface VariationValue {
+    variationId: string;
+    value: string;
+}
+
+export interface ItemModel {
+    itemId: string;
     name: string;
     price: string;
-    variations?: Variation[];
+    categoryId: string;
+    variationsValues: VariationValue[];
     isUnique: boolean;
     stock: number;
-    itemId: string;
-    state: ItemState;
+    state: "Bom" | "Mau";
 }
 
 export interface Variation {
     id: string;
     value: string;
     name: string;
-}
-
-export interface RequestItem extends Item {
-    total: string;
-    quantity: number;
-}
-
-export interface ItemState {
-    status: ItemStateOption;
-    comment?: string;
-}
-
-export enum ItemStateOption {
-    Good = "Bom",
-    Bad = "Mau",
-}
-
-export interface Section {
-    name: string;
-    departament: string;
-    subcategories: string[];
 }

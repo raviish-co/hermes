@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import type { AddItemDialog, DescribeItemStateDialog } from "#build/components";
-import { type Variation, type RequestItem as RequestItem } from "~/lib/models/item";
+import type { Variation, ItemModel } from "~/lib/models/item";
 import { formatCurrency, convertToNumber, removeSpaces } from "~/lib/helpers/format_price";
-import type { Purpose } from "~/lib/models/purpose";
 import { RequestService } from "~/lib/services/request_service";
 import type { ItemData, RequestData } from "~/lib/models/request";
 import { handleException } from "~/lib/helpers/handler";
+
+export interface Purpose {
+    name: string;
+    placeholder?: string;
+    details?: string[];
+}
 
 const INNER_LAUNDRY = "Interna";
 const DISCARD = "Descartar";
@@ -16,7 +21,7 @@ const describeItemStateDialogRef = ref<typeof DescribeItemStateDialog>();
 const selectedSections = ref<string[]>([]);
 const selectedPlaceholder = ref<string>("Descrição");
 const recipientIsDisabled = ref<boolean>(false);
-const requestList = ref<RequestItem[]>([]);
+const requestList = ref<ItemModel[]>([]);
 const currentPurposeName = ref<string>("Finalidade");
 const currentSectionName = ref<string>("");
 const securityDeposit = ref<string>("0,00");
@@ -25,7 +30,7 @@ const grandTotal = ref<string>("0,00");
 const returnData = ref<string>("");
 const recipient = ref<string>("");
 const isDisabledSection = computed(() => selectedSections.value.length <= 0);
-const selectedRow = ref<RequestItem>({} as RequestItem);
+const selectedRow = ref<ItemModel>({} as ItemModel);
 
 const requestService = new RequestService();
 
@@ -211,7 +216,7 @@ function showAddItemDialog() {
     addItemDialogRef.value?.show();
 }
 
-function showDescribeItemStatusDialog(row: RequestItem) {
+function showDescribeItemStatusDialog(row: ItemModel) {
     selectedRow.value = row;
     describeItemStateDialogRef.value?.initializeItemState(row.state.status, row.state.comment);
     describeItemStateDialogRef.value?.show();

@@ -3,13 +3,13 @@ import { PurposeNotFound } from "../backend/domain/purposes/purpose_not_found_er
 import { ItemNotFound } from "../backend/domain/catalog/item_not_found_error";
 import { InvalidTotal } from "../backend/domain/requests/invalid_total_error";
 import { HttpStatus } from "../backend/shared/http_status";
-import { RequestData } from "~/lib/models/request";
+import { RequestModel } from "~/lib/models/request";
 import { makeServices } from "../backend/main";
 
 const { requestService } = makeServices();
 
 export default defineEventHandler(async (event) => {
-    const { request } = await readBody<{ request: RequestData }>(event);
+    const { request } = await readBody<{ request: RequestModel }>(event);
 
     const voidOrError = await requestService.requestItems(request);
 
