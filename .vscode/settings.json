@@ -10,6 +10,5 @@
     "editor.fontFamily": "'Fira Code', 'Ubuntu Mono', 'Droid Sans Mono', 'monospace', monospace",
     "[markdown]": {
         "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
-    },
-    "testing.automaticallyOpenPeekView": "never"
+    }
 }

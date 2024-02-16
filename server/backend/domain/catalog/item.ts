@@ -79,6 +79,7 @@ export class Item {
 
         if (unique) {
             item.unique = unique;
+            item.#stock.update(1);
         }
 
         if (section) {

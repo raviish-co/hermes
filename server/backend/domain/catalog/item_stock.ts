@@ -13,6 +13,10 @@ export class ItemStock {
         this.#quantity -= quantity;
     }
 
+    update(quantity: number): void {
+        this.#quantity = quantity;
+    }
+
     getQuantity(): number {
         return this.#quantity;
     }
