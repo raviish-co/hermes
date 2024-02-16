@@ -31,7 +31,7 @@ export type ItemCondition = {
     comment?: string;
 };
 
-export class Item {
+export class ItemCategory {
     readonly itemId: ID;
     readonly name: string;
     readonly categoryId: ID;
@@ -61,7 +61,7 @@ export class Item {
         this.variations = variations;
     }
 
-    static create(options: Options): Item {
+    static create(options: Options): ItemCategory {
         const { itemId, name, price, unique, categoryId, condition, stock, section, variations } =
             options;
 
@@ -69,7 +69,15 @@ export class Item {
 
         const priceDecimal = Decimal.fromString(price);
 
-        const item = new Item(newID, name, priceDecimal, categoryId, condition, stock, variations);
+        const item = new ItemCategory(
+            newID,
+            name,
+            priceDecimal,
+            categoryId,
+            condition,
+            stock,
+            variations
+        );
 
         if (variations) {
             item.variations = variations;

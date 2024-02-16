@@ -1,4 +1,4 @@
-import { Item } from "../domain/catalog/item";
+import { ItemCategory } from "../domain/catalog/item";
 import { Variation } from "../domain/catalog/variation";
 
 interface ItemDTO {
@@ -27,7 +27,7 @@ export enum ItemStateOption {
     Bad = "Mau",
 }
 
-export function makeItemsDTO(items: Item[]): ItemDTO[] {
+export function makeItemsDTO(items: ItemCategory[]): ItemDTO[] {
     return items.map((i) => ({
         itemId: i.itemId.toString(),
         name: i.name,

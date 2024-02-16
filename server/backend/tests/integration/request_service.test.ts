@@ -95,7 +95,7 @@ describe("Test Request Items", () => {
         const { service, itemRepository } = makeService();
         const spy = vi.spyOn(itemRepository, "getAll");
 
-        await service.requestItems({ ...requestData, productsData });
+        await service.requestItems({ ...requestData, itemsData: productsData });
 
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledTimes(1);
@@ -108,7 +108,7 @@ describe("Test Request Items", () => {
 
         const error = await service.requestItems({
             ...requestData,
-            productsData,
+            itemsData: productsData,
         });
 
         expect(error.isLeft()).toBeTruthy();
@@ -124,7 +124,7 @@ describe("Test Request Items", () => {
 
         const error = await service.requestItems({
             ...requestData,
-            productsData,
+            itemsData: productsData,
             total,
             securityDeposit: "9000,00",
         });
@@ -139,7 +139,7 @@ describe("Test Request Items", () => {
 
         await service.requestItems({
             ...requestData,
-            productsData,
+            itemsData: productsData,
             total: "4500,00",
             securityDeposit: "9000,00",
         });
@@ -164,7 +164,7 @@ describe("Test Request Items", () => {
 
         await service.requestItems({
             ...requestData,
-            productsData,
+            itemsData: productsData,
             total,
             securityDeposit,
         });
@@ -218,7 +218,7 @@ describe("Test Request Items", () => {
         const { service } = makeService();
         const error = await service.requestItems({
             ...requestData,
-            productsData,
+            itemsData: productsData,
         });
 
         expect(error.isLeft()).toBeTruthy();
@@ -289,7 +289,7 @@ describe("Test Request Items", () => {
 
         const error = await service.requestItems({
             ...requestData,
-            productsData,
+            itemsData: productsData,
         });
 
         expect(error.isLeft()).toBeTruthy();
@@ -354,7 +354,7 @@ const requestData = {
         name: "Lavandaria",
         detail: "Interna",
     },
-    productsData: [
+    itemsData: [
         {
             itemId: "1001",
             quantity: 2,

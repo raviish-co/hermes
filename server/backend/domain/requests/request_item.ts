@@ -1,17 +1,17 @@
 import { Decimal } from "../../shared/decimal";
-import { Item } from "../catalog/item";
+import { ItemCategory } from "../catalog/item";
 
 type Options = {
-    item: Item;
+    item: ItemCategory;
     quantity: number;
 };
 
 export class RequestItem {
-    readonly item: Item;
+    readonly item: ItemCategory;
     readonly quantity: number;
     #total: Decimal;
 
-    private constructor(item: Item, quantity: number) {
+    private constructor(item: ItemCategory, quantity: number) {
         this.item = item;
         this.quantity = quantity;
         this.#total = Decimal.fromString("0");

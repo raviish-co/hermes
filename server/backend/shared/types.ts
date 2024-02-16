@@ -25,15 +25,8 @@ export type ItemData = {
 
 export type RequestData = {
     purposeData: PurposeData;
-    productsData: ItemData[];
+    itemsData: ItemData[];
     total: string;
     returnDate: string;
     securityDeposit: string;
-};
-
-export type UploadData = {
-    department: string;
-    categoryName: string;
-    subcategoryName: string;
-    file: File;
 };

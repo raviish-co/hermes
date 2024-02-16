@@ -11,7 +11,7 @@ import { PurposeData } from "../domain/purposes/purpose_data";
 import { Generator } from "../domain/sequences/generator";
 import { Either, left, right } from "../shared/either";
 import { RequestError } from "../shared/errors";
-import { Item } from "../domain/catalog/item";
+import { ItemCategory } from "../domain/catalog/item";
 import { User } from "../domain/user";
 import { ID } from "../shared/id";
 
@@ -39,7 +39,7 @@ export class RequestService {
     }
 
     async requestItems(data: RequestData): Promise<Either<RequestError, void>> {
-        const { purposeData, productsData, total, returnDate, securityDeposit } = data;
+        const { purposeData, itemsData: productsData, total, returnDate, securityDeposit } = data;
 
         const purposeExists = await this.#purposeSource.exists(purposeData.name);
         if (!purposeExists) return left(new PurposeNotFound(purposeData.name));
@@ -86,7 +86,7 @@ export class RequestService {
     }
 
     #buildRequestItems(
-        items: Item[],
+        items: ItemCategory[],
         itemData: ItemData[]
     ): Either<InsufficientStockItem, RequestItem[]> {
         const requestItems: RequestItem[] = [];

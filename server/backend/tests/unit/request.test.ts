@@ -1,6 +1,6 @@
 import { Request, RequestStatus } from "../../domain/requests/request";
 import { RequestItem } from "../../domain/requests/request_item";
-import { Item, ItemStatus } from "../../domain/catalog/item";
+import { ItemCategory, ItemStatus } from "../../domain/catalog/item";
 import { Category } from "../../domain/catalog/category";
 import { describe, expect, it } from "vitest";
 import { User } from "../../domain/user";
@@ -100,7 +100,7 @@ describe("Test Request Products", () => {
 
     it("Deve calcular o valor total da linha com base num preço com casas decimais", () => {
         const product = Category.create("some-category");
-        const item = Item.create({
+        const item = ItemCategory.create({
             itemId: "some-id",
             name: "some",
             price: "1150,50",
@@ -123,7 +123,7 @@ describe("Test Request Products", () => {
 
     it("Deve calcular o valor total da solicitação de uma linha, onde o total da linha tem casas decimais", () => {
         const category = Category.create("some-category");
-        const item = Item.create({
+        const item = ItemCategory.create({
             itemId: "some-id",
             name: "some",
             price: "1150,50",
@@ -144,7 +144,7 @@ describe("Test Request Products", () => {
 
     it("Deve calcular o valor total de uma solicitação com várias linhas, onde o total de cada linha tem casas decimais", () => {
         const product = Category.create("some-category");
-        const item1 = Item.create({
+        const item1 = ItemCategory.create({
             itemId: "some-id",
             name: "some",
             price: "1150,50",
@@ -152,7 +152,7 @@ describe("Test Request Products", () => {
             stock,
             condition,
         });
-        const item2 = Item.create({
+        const item2 = ItemCategory.create({
             itemId: "some-id",
             name: "some",
             price: "1150,50",
@@ -186,7 +186,7 @@ describe("Test Request Products", () => {
 const stock = new ItemStock(10);
 const condition = { status: ItemStatus.Bad, comment: "Some comment" };
 const category = Category.create("some-category");
-const item = Item.create({
+const item = ItemCategory.create({
     itemId: "some-id",
     name: "some",
     price: "150,00",

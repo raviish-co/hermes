@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
 import { ItemStateOption, type RequestItem } from "~/lib/models/item";
-import { Item } from "~/server/backend/domain/catalog/item";
+import { ItemCategory } from "~/server/backend/domain/catalog/item";
 
 interface Props {
     row: RequestItem;

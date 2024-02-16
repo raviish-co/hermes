@@ -1,6 +1,6 @@
 import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import { ItemRepository } from "../../domain/catalog/item_repository";
-import { Item, ItemStatus } from "../../domain/catalog/item";
+import { ItemCategory, ItemStatus } from "../../domain/catalog/item";
 import { Variation } from "../../domain/catalog/variation";
 import { ItemStock } from "../../domain/catalog/item_stock";
 import { Either, left, right } from "../../shared/either";
@@ -9,18 +9,18 @@ import { ItemQuery } from "../../shared/types";
 import { ID } from "../../shared/id";
 
 export class ItemRepositoryStub implements ItemRepository {
-    #items: Record<string, Item> = {};
+    #items: Record<string, ItemCategory> = {};
 
     constructor() {
         this.#populate();
     }
 
-    getById(itemId: ID): Promise<Item> {
+    getById(itemId: ID): Promise<ItemCategory> {
         return Promise.resolve(this.#items[itemId.toString()]);
     }
 
-    getAll(queries: ItemQuery[]): Promise<Either<ItemNotFound, Item[]>> {
-        const items: Item[] = [];
+    getAll(queries: ItemQuery[]): Promise<Either<ItemNotFound, ItemCategory[]>> {
+        const items: ItemCategory[] = [];
 
         for (const query of queries) {
             const filtered = this.records.find(
@@ -34,7 +34,7 @@ export class ItemRepositoryStub implements ItemRepository {
         return Promise.resolve(right(items));
     }
 
-    list(pageToken: number, perPage: number): Promise<Pagination<Item>> {
+    list(pageToken: number, perPage: number): Promise<Pagination<ItemCategory>> {
         const startIndex = (pageToken - 1) * perPage;
 
         const endIndex = startIndex + perPage;
@@ -51,7 +51,7 @@ export class ItemRepositoryStub implements ItemRepository {
         });
     }
 
-    search(query: string, pageToken: number, perPage: number): Promise<Pagination<Item>> {
+    search(query: string, pageToken: number, perPage: number): Promise<Pagination<ItemCategory>> {
         const items = this.records.filter((i) => {
             return (
                 i.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -76,7 +76,7 @@ export class ItemRepositoryStub implements ItemRepository {
         });
     }
 
-    updateAll(items: Item[]): Promise<void> {
+    updateAll(items: ItemCategory[]): Promise<void> {
         for (const item of items) {
             this.#items[item.itemId.toString()] = item;
         }
@@ -84,18 +84,18 @@ export class ItemRepositoryStub implements ItemRepository {
         return Promise.resolve(undefined);
     }
 
-    saveAll(items: Item[]): Promise<void> {
+    saveAll(items: ItemCategory[]): Promise<void> {
         for (const item of items) {
             this.#items[item.itemId.toString()] = item;
         }
         return Promise.resolve(undefined);
     }
 
-    get records(): Item[] {
+    get records(): ItemCategory[] {
         return Object.values(this.#items);
     }
 
-    last(): Promise<Item> {
+    last(): Promise<ItemCategory> {
         return Promise.resolve(this.records[this.records.length - 1]);
     }
 
@@ -116,7 +116,7 @@ export class ItemRepositoryStub implements ItemRepository {
         const stock2 = new ItemStock(10);
         const stock3 = new ItemStock(10);
 
-        const item1 = Item.create({
+        const item1 = ItemCategory.create({
             itemId: "1001",
             name: "T-shirt desportiva gola redonda",
             price: "4500,00",
@@ -126,7 +126,7 @@ export class ItemRepositoryStub implements ItemRepository {
             variations: [variation, variation1],
         });
 
-        const item2 = Item.create({
+        const item2 = ItemCategory.create({
             itemId: "1002",
             name: "Sapato social",
             price: "15500,00",
@@ -136,7 +136,7 @@ export class ItemRepositoryStub implements ItemRepository {
             variations: [variation],
         });
 
-        const item3 = Item.create({
+        const item3 = ItemCategory.create({
             itemId: "1003",
             name: "Calça jeans",
             price: "5500,00",

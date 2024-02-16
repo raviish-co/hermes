@@ -2,7 +2,7 @@ import { InvalidFileHeader } from "../domain/readers/invalid_file_header_error";
 import { FileNotSupported } from "../domain/readers/file_not_supported_error";
 import { SequenceGenerator } from "../domain/sequences/sequence_generator";
 import { CategoryRepository } from "../domain/catalog/category_repository";
-import { Item, ItemCondition, ItemStatus } from "../domain/catalog/item";
+import { ItemCategory, ItemCondition, ItemStatus } from "../domain/catalog/item";
 import { CsvReader, validCsvHeader } from "../domain/readers/csv_reader";
 import { ItemRepository } from "../domain/catalog/item_repository";
 import { FileEmpty } from "../domain/readers/file_empty_error";
@@ -43,8 +43,8 @@ export class ImportService {
         return Promise.resolve(right(undefined));
     }
 
-    async #buildItems(lines: string[]): Promise<Item[]> {
-        const items: Item[] = [];
+    async #buildItems(lines: string[]): Promise<ItemCategory[]> {
+        const items: ItemCategory[] = [];
 
         for (let i = 1; i < lines.length; i++) {
             const [
@@ -80,7 +80,7 @@ export class ImportService {
                     condition.comment = comment;
                 }
 
-                const item = Item.create({
+                const item = ItemCategory.create({
                     itemId,
                     name,
                     price,
@@ -110,7 +110,7 @@ export class ImportService {
                     condition.comment = comment;
                 }
 
-                const item = Item.create({
+                const item = ItemCategory.create({
                     itemId,
                     name,
                     price,
