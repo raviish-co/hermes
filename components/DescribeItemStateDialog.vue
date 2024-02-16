@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
 import { ItemStateOption, type RequestItem } from "~/lib/models/item";
-import { ItemCategory } from "~/server/backend/domain/catalog/item";
+import { ItemStatus } from "~/server/backend/domain/catalog/item";
 
 interface Props {
     row: RequestItem;
@@ -12,25 +12,18 @@ const pros = defineProps<Props>();
 const dialogRef = ref<typeof VDialog>();
 const status = ref<string>("");
 const comment = ref<string>("");
+const options = Object.values(ItemStateOption);
 
 const isGoodState = computed(() => status.value !== ItemStateOption.Bad);
 
 function showDialog() {
+    status.value = ItemStatus.Good;
+    comment.value = "";
     dialogRef.value?.show();
 }
 
 function canUpdateState(): boolean {
-    const options = Object.values(ItemStateOption);
-
-    if (!options.includes(status.value as ItemStateOption)) {
-        alert("Selecione um estado!");
-        return false;
-    }
-
-    if (
-        status.value === ItemStateOption.Bad &&
-        (comment.value === undefined || comment.value === "")
-    ) {
+    if (status.value === ItemStateOption.Bad && !comment.value) {
         alert("Descreva o estado do artigo.");
         return false;
     }
@@ -53,6 +46,11 @@ function updateItemState() {
     dialogRef.value?.close();
 }
 
+function updateStatus(e: Event) {
+    const s = (e.target as HTMLSelectElement).value;
+    status.value = s;
+}
+
 function initializeItemState(state: ItemStateOption, note: string) {
     (status.value = state as ItemStateOption), (comment.value = note);
 }
@@ -62,7 +60,9 @@ defineExpose({ show: showDialog, initializeItemState });
 
 <template>
     <VDialog ref="dialogRef" title="Descrever danos do artigo" class="max-w-[30rem]">
-        <VSelect value="status" placeholder="Estado" :options="Object.values(ItemStateOption)" />
+        <select class="input-field" @change="updateStatus">
+            <option v-for="opt in options">{{ opt }}</option>
+        </select>
 
         <textarea
             v-model="comment"

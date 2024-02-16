@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id           String         @id
+  name         String
+  itemCategory ItemCategory[]
+}
+
+model ItemCategory {
+  id                  String                    @id
+  price               String
+  isUnique            Boolean
+  quantity            Int
+  category            Category                  @relation(fields: [categoryId], references: [id])
+  categoryId          String
+  section             String
+  department          String
+  variation           VariationOnItemCategory[]
+  requestItemCategory RequestItemCategory[]
+}
+
+model Attribute {
+  id          String    @id
+  name        String
+  variation   Variation @relation(fields: [variationId], references: [id])
+  variationId String
+}
+
+model Variation {
+  id           String                    @id
+  attribute    Attribute[]
+  attributeId  String
+  value        String
+  itemCategory VariationOnItemCategory[]
+}
+
+model VariationOnItemCategory {
+  itemCategory   ItemCategory @relation(fields: [itemCategoryId], references: [id])
+  itemCategoryId String
+  variation      Variation    @relation(fields: [variationId], references: [id])
+  variationId    String
+
+  @@id([itemCategoryId, variationId])
+}
+
+model RequestItemCategory {
+  id              String       @id
+  total           String
+  securityDeposit String
+  quantity        Int
+  itemCategory    ItemCategory @relation(fields: [itemCategoryId], references: [id])
+  itemCategoryId  String
+  request         Request      @relation(fields: [requestId], references: [id])
+  requestId       String
+}
+
+model Request {
+  id                  String                @id
+  purpose             String
+  returnDate          DateTime
+  details             String
+  recipient           String
+  requestItemCategory RequestItemCategory[]
+}
