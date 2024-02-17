@@ -16,6 +16,7 @@ const sequenceStore = new InmemSequenceStorage();
 const sequenceGenerator = new SequenceGenerator(sequenceStore);
 const categoryRepository = new InmemCategoryRepository();
 const variationRepository = new VariationsRepositoryStub();
+const purposeSpec = new DefaultPurposeSpecification();
 
 interface Services {
     requestService: GoodsIssueService;
@@ -29,17 +30,19 @@ export const makeServices = (): Services => {
         itemRepository,
         requestRepository,
         sequenceGenerator,
-        new DefaultPurposeSpecification()
+        purposeSpec
     );
 
     const catalogService = new CatalogService(itemRepository, variationRepository);
 
     const importService = new ImportService(itemRepository, categoryRepository, sequenceGenerator);
 
+    const purposeService = new PurposeService();
+
     return {
         requestService,
         catalogService,
         importService,
-        purposeService: new PurposeService(),
+        purposeService,
     };
 };
