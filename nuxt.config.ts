@@ -1,6 +1,11 @@
+import { fileURLToPath } from "url";
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
 export default defineNuxtConfig({
+    alias: {
+        "@backend": fileURLToPath(new URL("./lib/backend", import.meta.url)),
+    },
     modules: ["@vite-pwa/nuxt"],
     app: {
         head: {

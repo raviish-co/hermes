@@ -1,17 +1,16 @@
-import { InsufficientStockItem } from "../backend/domain/sequences/insufficient_item_stock_error";
-import { PurposeNotFound } from "../backend/domain/purposes/purpose_not_found_error";
-import { ItemNotFound } from "../backend/domain/catalog/item_not_found_error";
-import { InvalidTotal } from "../backend/domain/requests/invalid_total_error";
-import { HttpStatus } from "../backend/shared/http_status";
-import { RequestModel } from "~/lib/models/request";
-import { makeServices } from "../backend/main";
+import { InsufficientStockItem } from "@backend/domain/sequences/insufficient_item_stock_error";
+import { ItemCategoryNotFound } from "@backend/domain/catalog/item_category_not_found_error";
+import { PurposeNotFound } from "@backend/domain/requests/purpose_not_found_error";
+import { InvalidTotal } from "@backend/domain/requests/invalid_total_error";
+import { HttpStatus } from "~/server/api/http_status";
+import { makeServices } from "@backend/main";
 
-const { requestService } = makeServices();
+const { goodsIssueService } = makeServices();
 
 export default defineEventHandler(async (event) => {
-    const { request } = await readBody<{ request: RequestModel }>(event);
+    const { request } = await readBody(event);
 
-    const voidOrError = await requestService.requestItems(request);
+    const voidOrError = await goodsIssueService.requestItems(request);
 
     if (voidOrError.value instanceof PurposeNotFound) {
         throw createError({
@@ -20,7 +19,7 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    if (voidOrError.value instanceof ItemNotFound) {
+    if (voidOrError.value instanceof ItemCategoryNotFound) {
         throw createError({
             statusCode: HttpStatus.NotFound,
             message: voidOrError.value.message,
@@ -43,5 +42,5 @@ export default defineEventHandler(async (event) => {
 
     setResponseStatus(event, HttpStatus.Created);
 
-    return { statusCode: 200, message: "Solicitação efetuada com sucesso" };
+    return { message: "Saída de Artigos efetuada com sucesso" };
 });
