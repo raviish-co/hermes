@@ -1,14 +1,14 @@
-import { handleException } from "~/lib/helpers/error_handler";
-import type { PurposeModel } from "~/lib/models/purpose";
-import { RequestService } from "~/lib/services/request_service";
+import { handleException } from "@frontend/helpers/error_handler";
+import type { PurposeModel } from "@frontend/models/purpose";
+import { PurposeService } from "@frontend/services/purpose_service";
 
 export default function () {
-    const requestService = new RequestService();
+    const purposeService = new PurposeService();
 
     const purposes = ref<PurposeModel[]>([]);
 
     async function refresh() {
-        const purposesOrVoid = await requestService.listPurposes().catch(handleException);
+        const purposesOrVoid = await purposeService.listPurposes().catch(handleException);
 
         purposes.value = purposesOrVoid || [];
     }

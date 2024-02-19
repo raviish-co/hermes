@@ -1,4 +1,4 @@
-import { ConditionStatus, ItemModel } from "~/lib/models/item";
+import { ItemModel } from "~/lib/frontend/models/item";
 import { ItemCategory } from "@backend/domain/catalog/item_category";
 
 import { makeServices } from "@backend/main";
@@ -6,6 +6,8 @@ export interface Pagination {
     pageToken?: number;
     perPage?: number;
 }
+
+export type ConditionStatus = "Bom" | "Mau";
 
 const { catalogService } = makeServices();
 
@@ -35,7 +37,5 @@ function makeItems(result: ItemCategory[]): ItemModel[] {
             status: r.getCondition().status as ConditionStatus,
             comment: r.getCondition()?.comment,
         },
-        total: "0,00",
-        securityDeposit: "00,0",
     }));
 }

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { handleException } from "~/lib/helpers/handler";
-import { UploadService } from "~/lib/services/upload_service";
+import { handleException } from "@frontend/helpers/error_handler";
+import { UploadService } from "@frontend/services/upload_service";
 
 const currentFormData = ref<FormData | null>(null);
 const uploadService = new UploadService();

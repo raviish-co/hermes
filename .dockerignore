@@ -4,4 +4,7 @@ node_modules
 .vscode
 .git
 .prettierrc
-
+.env
+.raviish.db
+.raviish.db-journal
+.README.md

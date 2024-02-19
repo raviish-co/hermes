@@ -1,6 +1,6 @@
-import { handleException } from "~/lib/helpers/error_handler";
-import type { VariationModel } from "~/lib/models/variation";
-import { CatalogService } from "~/lib/services/catalog_service";
+import { handleException } from "@frontend/helpers/error_handler";
+import type { VariationModel } from "@frontend/models/variation";
+import { CatalogService } from "@frontend/services/catalog_service";
 
 export default () => {
     const catalogService = new CatalogService();

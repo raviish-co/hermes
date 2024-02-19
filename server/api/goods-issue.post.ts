@@ -10,6 +10,8 @@ const { goodsIssueService } = makeServices();
 export default defineEventHandler(async (event) => {
     const { request } = await readBody(event);
 
+    console.log(request);
+
     const voidOrError = await goodsIssueService.new(request);
 
     if (voidOrError.value instanceof PurposeNotFound) {

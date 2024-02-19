@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 export default defineNuxtConfig({
     alias: {
         "@backend": fileURLToPath(new URL("./lib/backend", import.meta.url)),
+        "@frontend": fileURLToPath(new URL("./lib/frontend", import.meta.url)),
     },
     modules: ["@vite-pwa/nuxt"],
     app: {
@@ -56,13 +57,13 @@ export default defineNuxtConfig({
                 },
             ],
         },
-        workbox: {
-            navigateFallback: "/",
-        },
-        devOptions: {
-            enabled: true,
-            type: "module",
-        },
+        // workbox: {
+        //     navigateFallback: "/",
+        // },
+        // devOptions: {
+        //     enabled: true,
+        //     type: "module",
+        // },
     },
     devtools: { enabled: false },
     css: ["~/assets/css/main.css"],

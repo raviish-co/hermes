@@ -1,34 +1,31 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
-import { type ConditionStatus, type ItemModel } from "~/lib/models/item";
+import type { GoodsIssueItem } from "~/lib/frontend/models/goods_issue_item";
+
+export type ConditionStatus = "Bom" | "Mau";
 
 interface Props {
-    row: ItemModel;
-}
-
-enum ItemStatus {
-    Good = "Bom",
-    Bad = "Mau",
+    row: GoodsIssueItem;
 }
 
 const pros = defineProps<Props>();
 
 const dialogRef = ref<typeof VDialog>();
-const status = ref<string>("");
-const comment = ref<string>("");
-const options = Object.values(ItemStatus);
+const newStatus = ref<string>("");
+const newComment = ref<string>("");
+const options = ["Bom", "Mau"];
+const BAD = "Mau";
+const GOOD = "Bom";
 
-const isGoodState = computed(() => status.value !== ItemStatus.Bad);
+const isGoodState = computed(() => newStatus.value !== BAD);
 
 function showDialog() {
-    status.value = ItemStatus.Good;
-    comment.value = "";
     dialogRef.value?.show();
 }
 
-function canUpdateState(): boolean {
-    if (status.value === ItemStatus.Bad && !comment.value) {
-        alert("Descreva o estado do artigo.");
+function verifyComment(): boolean {
+    if (newStatus.value === BAD && !newComment.value) {
+        alert("Escreva uma nota relacionada ao estado do artigo.");
         return false;
     }
 
@@ -36,15 +33,15 @@ function canUpdateState(): boolean {
 }
 
 function updateItemState() {
-    if (!canUpdateState()) return;
+    if (!verifyComment()) return;
 
-    if (status.value === ItemStatus.Good) {
-        comment.value = "";
+    if (newStatus.value === GOOD) {
+        newComment.value = "";
     }
 
     pros.row.condition = {
-        status: status.value as ConditionStatus,
-        comment: comment.value,
+        status: newStatus.value as ConditionStatus,
+        comment: newComment.value,
     };
 
     dialogRef.value?.close();
@@ -52,12 +49,12 @@ function updateItemState() {
 
 function updateStatus(e: Event) {
     const s = (e.target as HTMLSelectElement).value;
-    status.value = s;
+    newStatus.value = s;
 }
 
-function initializeItemState(s: ConditionStatus, note: string) {
-    status.value = s;
-    comment.value = note;
+function initializeItemState(status: ConditionStatus, comment: string) {
+    newStatus.value = status;
+    newComment.value = comment;
 }
 
 defineExpose({ show: showDialog, initializeItemState });
@@ -70,7 +67,7 @@ defineExpose({ show: showDialog, initializeItemState });
         </select>
 
         <textarea
-            v-model="comment"
+            v-model="newComment"
             placeholder="Descrever o estado do artigo"
             :rows="3"
             :disabled="isGoodState"
@@ -80,3 +77,4 @@ defineExpose({ show: showDialog, initializeItemState });
         <button class="btn-secondary" @click="updateItemState">Salvar</button>
     </VDialog>
 </template>
+~/lib/frontend/models/item

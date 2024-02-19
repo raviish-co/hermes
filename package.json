@@ -6,6 +6,9 @@
         "node": "^18 || >=20",
         "npm": ">=9.6.3"
     },
+    "prisma": {
+        "schema": "./lib/backend/persistense/prisma/schema.prisma"
+    },
     "scripts": {
         "build": "nuxt build",
         "dev": "nuxt dev",
