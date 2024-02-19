@@ -7,7 +7,7 @@ import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
 import { FileEmpty } from "../../domain/readers/file_empty_error";
 import { ImportService } from "../../application/import_service";
 import { Category } from "../../domain/catalog/category";
-import { ItemStatus } from "../../domain/catalog/item_category";
+import { Status } from "../../domain/catalog/item";
 import { describe, it, expect } from "vitest";
 
 describe("Test Upload Items", async () => {
@@ -159,9 +159,9 @@ describe("Test Upload Items", async () => {
 
         const { result: items } = await itemRepository.list(1, 12);
 
-        expect(items[0].getCondition().status).toEqual(ItemStatus.Bad);
+        expect(items[0].getCondition().status).toEqual(Status.Bad);
         expect(items[0].getCondition().comment).toEqual("some-comment");
-        expect(items[1].getCondition().status).toEqual(ItemStatus.Bad);
+        expect(items[1].getCondition().status).toEqual(Status.Bad);
         expect(items[1].getCondition().comment).toEqual("some-comment");
     });
 });

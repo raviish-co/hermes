@@ -1,6 +1,6 @@
-import { ItemCategoryStock } from "../../domain/catalog/item_category_stock";
+import { ItemStock } from "../../domain/catalog/item_stock";
 import { GoodsIssue, GoodsIssueStatus } from "../../domain/goods_issue/goods_issue";
-import { ItemCategory, ItemStatus } from "../../domain/catalog/item_category";
+import { Item, Status } from "../../domain/catalog/item";
 import { GoodsIssueLine } from "../../domain/goods_issue/goods_issue_line";
 import { Category } from "../../domain/catalog/category";
 import { describe, expect, it } from "vitest";
@@ -92,7 +92,7 @@ describe("Test Goods Issue", () => {
 
     it("Deve calcular o valor total da linha com base num preço com casas decimais", () => {
         const category = Category.create("some-category");
-        const item = ItemCategory.create({
+        const item = Item.create({
             itemId: "some-id",
             name: "some",
             price: "1150,50",
@@ -118,7 +118,7 @@ describe("Test Goods Issue", () => {
 
     it("Deve calcular o valor total da solicitação de uma linha, onde o total da linha tem casas decimais", () => {
         const category = Category.create("some-category");
-        const item = ItemCategory.create({
+        const item = Item.create({
             itemId: "some-id",
             name: "some",
             price: "1150,50",
@@ -142,7 +142,7 @@ describe("Test Goods Issue", () => {
 
     it("Deve calcular o valor total de uma solicitação com várias linhas, onde o total de cada linha tem casas decimais", () => {
         const category = Category.create("some-category");
-        const item1 = ItemCategory.create({
+        const item1 = Item.create({
             itemId: "some-id",
             name: "some",
             price: "1150,50",
@@ -150,7 +150,7 @@ describe("Test Goods Issue", () => {
             stock,
             condition,
         });
-        const item2 = ItemCategory.create({
+        const item2 = Item.create({
             itemId: "some-id",
             name: "some",
             price: "1150,50",
@@ -184,9 +184,9 @@ describe("Test Goods Issue", () => {
     });
 });
 
-const stock = new ItemCategoryStock(10);
-const condition = { status: ItemStatus.Bad, comment: "Some comment" };
-const item = ItemCategory.create({
+const stock = new ItemStock(10);
+const condition = { status: Status.Bad, comment: "Some comment" };
+const item = Item.create({
     itemId: "some-id",
     name: "some",
     price: "150,00",

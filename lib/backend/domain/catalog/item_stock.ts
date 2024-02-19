@@ -1,4 +1,4 @@
-export class ItemCategoryStock {
+export class ItemStock {
     #quantity: number;
 
     constructor(quantity: number) {
@@ -9,15 +9,7 @@ export class ItemCategoryStock {
         return this.#quantity >= quantity;
     }
 
-    reduce(quantity: number): void {
-        this.#quantity -= quantity;
-    }
-
-    update(quantity: number): void {
-        this.#quantity = quantity;
-    }
-
-    getQuantity(): number {
+    get quantity(): number {
         return this.#quantity;
     }
 }

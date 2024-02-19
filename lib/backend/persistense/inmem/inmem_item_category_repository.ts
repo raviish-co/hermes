@@ -1,35 +1,34 @@
-import type { ItemCategoryRepository } from "../../domain/catalog/item_category_repository";
-import { ItemCategoryNotFound } from "../../domain/catalog/item_category_not_found_error";
-import { ItemCategory } from "../../domain/catalog/item_category";
+import type { ItemCategoryRepository } from "../../domain/catalog/item_repository";
+import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
+import { Item } from "../../domain/catalog/item";
 import { type Either, left, right } from "../../shared/either";
 import type { Pagination } from "../../shared/pagination";
 import type { ItemQuery } from "../../shared/types";
 import { ID } from "../../shared/id";
 
 export class InmemItemCategoryRepository implements ItemCategoryRepository {
-    #items: Record<string, ItemCategory> = {};
+    #items: Record<string, Item> = {};
 
-    getById(itemCategoryId: ID): Promise<ItemCategory> {
+    getById(itemCategoryId: ID): Promise<Item> {
         return Promise.resolve(this.#items[itemCategoryId.toString()]);
     }
 
-    getAll(queries: ItemQuery[]): Promise<Either<ItemCategoryNotFound, ItemCategory[]>> {
-        const items: ItemCategory[] = [];
+    findAll(queries: ItemQuery[]): Promise<Either<ItemNotFound, Item[]>> {
+        const items: Item[] = [];
 
         for (const query of queries) {
             const filtered = this.records.find(
                 (item) => item.itemId.toString() === query.itemId.toString()
             );
 
-            if (!filtered)
-                return Promise.resolve(left(new ItemCategoryNotFound(query.itemId.toString())));
+            if (!filtered) return Promise.resolve(left(new ItemNotFound(query.itemId.toString())));
 
             items.push(filtered);
         }
         return Promise.resolve(right(items));
     }
 
-    list(pageToken: number, perPage: number): Promise<Pagination<ItemCategory>> {
+    list(pageToken: number, perPage: number): Promise<Pagination<Item>> {
         const startIndex = (pageToken - 1) * perPage;
 
         const endIndex = startIndex + perPage;
@@ -46,7 +45,7 @@ export class InmemItemCategoryRepository implements ItemCategoryRepository {
         });
     }
 
-    search(query: string, pageToken: number, perPage: number): Promise<Pagination<ItemCategory>> {
+    search(query: string, pageToken: number, perPage: number): Promise<Pagination<Item>> {
         const items = this.records.filter((i) => {
             return (
                 i.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -71,25 +70,25 @@ export class InmemItemCategoryRepository implements ItemCategoryRepository {
         });
     }
 
-    updateAll(items: ItemCategory[]): Promise<void> {
+    updateAll(items: Item[]): Promise<void> {
         for (const item of items) {
             this.#items[item.itemId.toString()] = item;
         }
         return Promise.resolve(undefined);
     }
 
-    saveAll(items: ItemCategory[]): Promise<void> {
+    saveAll(items: Item[]): Promise<void> {
         for (const item of items) {
             this.#items[item.itemId.toString()] = item;
         }
         return Promise.resolve(undefined);
     }
 
-    last(): Promise<ItemCategory> {
+    last(): Promise<Item> {
         return Promise.resolve(this.records[this.records.length - 1]);
     }
 
-    get records(): ItemCategory[] {
+    get records(): Item[] {
         return Object.values(this.#items);
     }
 }

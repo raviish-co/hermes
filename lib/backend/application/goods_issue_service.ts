@@ -1,11 +1,11 @@
-import { InsufficientStockItem } from "../domain/catalog/insufficient_item_stock_error";
-import type { ItemCategoryRepository } from "../domain/catalog/item_category_repository";
+import { InsufficientStock } from "../domain/catalog/insufficient_stock_error";
+import type { ItemCategoryRepository } from "../domain/catalog/item_repository";
 import type { GoodsIssueRepository } from "../domain/goods_issue/goods_issue_repository";
 import type { PurposeSpecification } from "../domain/goods_issue/purpose_specification";
 import type { GoodsIssueDTO, GoodIssueLineDTO, ItemQuery } from "../shared/types";
 import { PurposeNotFound } from "../domain/goods_issue/purpose_not_found_error";
 import type { SequenceGenerator } from "../domain/sequences/sequence_generator";
-import type { ItemCategory } from "~/lib/backend/domain/catalog/item_category";
+import type { Item } from "~/lib/backend/domain/catalog/item_category";
 import { GoodsIssueBuilder } from "../domain/goods_issue/goods_issue_builder";
 import { GoodsIssueLine } from "../domain/goods_issue/goods_issue_line";
 import { type Either, left, right } from "../shared/either";
@@ -42,7 +42,7 @@ export class GoodsIssueService {
 
         const itemsQueries = this.#buildQueries(lines);
 
-        const itemsCategoriesOrError = await this.#itemCategoryRepository.getAll(itemsQueries);
+        const itemsCategoriesOrError = await this.#itemCategoryRepository.findAll(itemsQueries);
         if (itemsCategoriesOrError.isLeft()) return left(itemsCategoriesOrError.value);
 
         const itemsCategories = itemsCategoriesOrError.value;
@@ -74,16 +74,16 @@ export class GoodsIssueService {
     #buildQueries(lines: GoodIssueLineDTO[]): ItemQuery[] {
         const queries: ItemQuery[] = [];
         for (const line of lines) {
-            const query = { itemId: ID.New(line.itemId) };
+            const query = { itemId: ID.fromString(line.itemId) };
             queries.push(query);
         }
         return queries;
     }
 
     #buildGoodsIssueLines(
-        items: ItemCategory[],
+        items: Item[],
         lines: GoodIssueLineDTO[]
-    ): Either<InsufficientStockItem, GoodsIssueLine[]> {
+    ): Either<InsufficientStock, GoodsIssueLine[]> {
         const goodsIssueLines: GoodsIssueLine[] = [];
 
         for (const idx in items) {
@@ -92,7 +92,7 @@ export class GoodsIssueService {
             const item = items[idx];
 
             if (!item.canBeReducedStock(quantity))
-                return left(new InsufficientStockItem(item.itemId.toString()));
+                return left(new InsufficientStock(item.itemId.toString()));
 
             item.reduceStock(quantity);
 

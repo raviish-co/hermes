@@ -42,7 +42,12 @@ export class GoodsIssue {
     static create(options: Options): GoodsIssue {
         const { goodsIssueId, purpose, user, goodsIssueLines, returnDate } = options;
         const returnDateParsed = new Date(returnDate);
-        const goodsIssue = new GoodsIssue(ID.New(goodsIssueId), purpose, user, returnDateParsed);
+        const goodsIssue = new GoodsIssue(
+            ID.fromString(goodsIssueId),
+            purpose,
+            user,
+            returnDateParsed
+        );
         goodsIssue.addGoodsIssueLines(goodsIssueLines);
         return goodsIssue;
     }

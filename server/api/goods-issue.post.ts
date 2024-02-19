@@ -1,9 +1,9 @@
-import { InsufficientStockItem } from "../../domain/catalog/insufficient_item_stock_error";
-import { ItemCategoryNotFound } from "../../domain/catalog/item_category_not_found_error";
-import { PurposeNotFound } from "../../domain/goods_issue/purpose_not_found_error";
-import { InvalidTotal } from "../../domain/goods_issue/invalid_total_error";
+import { InsufficientStock } from "@backend/domain/catalog/insufficient_item_stock_error";
+import { ItemCategoryNotFound } from "@backend/domain/catalog/item_category_not_found_error";
+import { PurposeNotFound } from "@backend/domain/goods_issue/purpose_not_found_error";
+import { InvalidTotal } from "@backend/domain/goods_issue/invalid_total_error";
 import { HttpStatus } from "~/server/api/http_status";
-import { makeServices } from "../../main";
+import { makeServices } from "@backend/main";
 
 const { goodsIssueService } = makeServices();
 
@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    if (voidOrError.value instanceof InsufficientStockItem) {
+    if (voidOrError.value instanceof InsufficientStock) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
             message: voidOrError.value.message,

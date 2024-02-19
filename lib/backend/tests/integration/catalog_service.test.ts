@@ -3,23 +3,10 @@ import { InmemVariationRepository } from "../../persistense/inmem/inmem_variatio
 import { CatalogService } from "../../application/catalog_service";
 import { ItemCategoryRepositoryStub } from "../stubs/item_repository_stub";
 import { Variation } from "../../domain/catalog/variation";
-import { describe, it, vi, expect } from "vitest";
+import { describe, it, expect } from "vitest";
 import { ID } from "../../shared/id";
 
 describe("Test ListItems", () => {
-    it("Deve chamar o método **list** no repositório de artigos", async () => {
-        const itemRepository = new ItemCategoryRepositoryStub();
-        const variationRepository = new InmemVariationRepository();
-        const service = new CatalogService(itemRepository, variationRepository);
-
-        const spy = vi.spyOn(itemRepository, "list");
-
-        await service.listItems();
-
-        expect(spy).toHaveBeenCalled();
-        expect(spy).toHaveBeenCalledTimes(1);
-    });
-
     it("Deve buscar os artigos no repositório", async () => {
         const itemRepository = new ItemCategoryRepositoryStub();
         const variationRepository = new InmemVariationRepository();
@@ -43,20 +30,6 @@ describe("Test ListItems", () => {
 });
 
 describe("Test SearchItems", () => {
-    it("Deve chamar o método **search** no repositório de artigos", async () => {
-        const itemRepository = new ItemCategoryRepositoryStub();
-        const variationRepository = new InmemVariationRepository();
-        const service = new CatalogService(itemRepository, variationRepository);
-
-        const spy = vi.spyOn(itemRepository, "search");
-
-        await service.searchItems("Teste");
-
-        expect(spy).toHaveBeenCalled();
-        expect(spy).toHaveBeenCalledTimes(1);
-        expect(spy).toHaveBeenCalledWith("Teste", 1, 12);
-    });
-
     it("Deve pesquisar o artigo pelo seu nome", async () => {
         const itemRepository = new ItemCategoryRepositoryStub();
         const variationRepository = new InmemVariationRepository();
@@ -205,4 +178,4 @@ describe("Test Get All Variations", () => {
     });
 });
 
-const variation = new Variation(ID.New("1"), "Cor", ["Preto", "Branco", "Vermelho"]);
+const variation = new Variation(ID.fromString("1"), "Cor", ["Preto", "Branco", "Vermelho"]);

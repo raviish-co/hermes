@@ -1,22 +1,13 @@
-type Options = {
-    name: string;
-    department?: string;
-};
+import type { ID } from "../../shared/id";
 
-export class Section {
-    readonly name: string;
-    readonly department?: string;
+class Section {
+    readonly id: ID;
+    #name: string;
+    #departmentId: ID;
 
-    private constructor(name: string, department?: string) {
-        this.name = name;
-        this.department = department;
-    }
-
-    static create(options: Options) {
-        const { name, department } = options;
-
-        const section = new Section(name, department);
-
-        return section;
+    constructor(id: ID, name: string, departmentId: ID) {
+        this.id = id;
+        this.#name = name;
+        this.#departmentId = departmentId;
     }
 }

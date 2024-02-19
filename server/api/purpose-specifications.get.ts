@@ -1,4 +1,4 @@
-import { makeServices } from "../../main";
+import { makeServices } from "@backend/main";
 
 const { purposeService } = makeServices();
 

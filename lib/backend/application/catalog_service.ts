@@ -1,6 +1,6 @@
-import type { ItemCategoryRepository } from "../domain/catalog/item_category_repository";
+import type { ItemCategoryRepository } from "../domain/catalog/item_repository";
 import type { VariationRepository } from "../domain/catalog/variation_repository";
-import { ItemCategory } from "../domain/catalog/item_category";
+import { Item } from "../domain/catalog/item";
 import { Variation } from "../domain/catalog/variation";
 import type { Pagination } from "../shared/pagination";
 
@@ -13,10 +13,7 @@ export class CatalogService {
         this.#variationRepository = variationRepository;
     }
 
-    async listItems(
-        pageToken: number = 1,
-        perPage: number = 12
-    ): Promise<Pagination<ItemCategory>> {
+    async listItems(pageToken: number = 1, perPage: number = 12): Promise<Pagination<Item>> {
         return await this.#itemRepository.list(pageToken, perPage);
     }
 
@@ -24,7 +21,7 @@ export class CatalogService {
         query: string,
         pageToken: number = 1,
         perPage: number = 12
-    ): Promise<Pagination<ItemCategory>> {
+    ): Promise<Pagination<Item>> {
         return await this.#itemRepository.search(query, pageToken, perPage);
     }
 

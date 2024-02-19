@@ -1,8 +1,8 @@
 import { InmemGoodsIssueRepository } from "../../persistense/inmem/inmem_goods_issue_repository";
-import type { ItemCategoryRepository } from "../../domain/catalog/item_category_repository";
-import { InsufficientStockItem } from "../../domain/catalog/insufficient_item_stock_error";
+import type { ItemCategoryRepository } from "../../domain/catalog/item_repository";
+import { InsufficientStock } from "../../domain/catalog/insufficient_stock_error";
 import { DefaultPurposeSpecification } from "../../adapters/default_purpose_specification";
-import { ItemCategoryNotFound } from "../../domain/catalog/item_category_not_found_error";
+import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
 import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
 import { InvalidTotal } from "../../domain/goods_issue/invalid_total_error";
@@ -33,7 +33,7 @@ describe("Test Goods Issue", () => {
 
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledTimes(1);
-        expect(spy).toHaveBeenCalledWith([{ itemId: ID.New("1001") }]);
+        expect(spy).toHaveBeenCalledWith([{ itemId: ID.fromString("1001") }]);
     });
 
     it("Deve retornar um erro **ItemNotFound** se não existir", async () => {
@@ -46,7 +46,7 @@ describe("Test Goods Issue", () => {
         });
 
         expect(error.isLeft()).toBeTruthy();
-        expect(error.value).toBeInstanceOf(ItemCategoryNotFound);
+        expect(error.value).toBeInstanceOf(ItemNotFound);
     });
 
     it("Deve chamar o método **save** no repositório de solicitações de artigos", async () => {
@@ -156,7 +156,7 @@ describe("Test Goods Issue", () => {
         });
 
         expect(error.isLeft()).toBeTruthy();
-        expect(error.value).toBeInstanceOf(InsufficientStockItem);
+        expect(error.value).toBeInstanceOf(InsufficientStock);
     });
 
     it("Deve atualizar o estoque dos artigos solicitados no repositório", async () => {
@@ -175,11 +175,11 @@ describe("Test Goods Issue", () => {
 
         await service.new(goodsIssueData);
 
-        const item = await itemCategoryRepository.getById(ID.New("1001"));
+        const item = await itemCategoryRepository.getById(ID.fromString("1001"));
 
         const stock = item.getStock();
 
-        expect(stock.getQuantity()).toEqual(8);
+        expect(stock.quantity).toEqual(8);
     });
 
     it("Deve ser adicionada a solicitação, caso a finalidade tenha uma seção", async () => {
@@ -227,7 +227,7 @@ describe("Test Goods Issue", () => {
         });
 
         expect(error.isLeft()).toBeTruthy();
-        expect(error.value).toBeInstanceOf(InsufficientStockItem);
+        expect(error.value).toBeInstanceOf(InsufficientStock);
     });
 
     it("Deve retornar **InvalidTotal** se o total da çaução não foi igual ao valor calculado", async () => {
@@ -247,7 +247,7 @@ describe("Test Goods Issue", () => {
 
         await service.new(goodsIssueData);
 
-        const goodsIssue = await goodsIssuerepository.get(ID.New("GS - 1000"));
+        const goodsIssue = await goodsIssuerepository.get(ID.fromString("GS - 1000"));
 
         expect(goodsIssue.goodsIssueId).toBeDefined();
         expect(goodsIssue.goodsIssueId).toBeInstanceOf(ID);
@@ -261,8 +261,8 @@ describe("Test Goods Issue", () => {
 
         await service.new(goodsIssueData);
 
-        const goodsIssue1 = await goodsIssuerepository.get(ID.New("GS - 1000"));
-        const goodsIssue2 = await goodsIssuerepository.get(ID.New("GS - 1001"));
+        const goodsIssue1 = await goodsIssuerepository.get(ID.fromString("GS - 1000"));
+        const goodsIssue2 = await goodsIssuerepository.get(ID.fromString("GS - 1001"));
 
         expect(goodsIssue1.goodsIssueId.toString()).toEqual("GS - 1000");
         expect(goodsIssue2.goodsIssueId.toString()).toEqual("GS - 1001");
@@ -273,8 +273,8 @@ describe("Test Goods Issue", () => {
 
         await service.new(goodsIssueData);
 
-        const item1 = await itemCategoryRepository.getById(ID.New("1001"));
-        const item2 = await itemCategoryRepository.getById(ID.New("1002"));
+        const item1 = await itemCategoryRepository.getById(ID.fromString("1001"));
+        const item2 = await itemCategoryRepository.getById(ID.fromString("1002"));
 
         expect(item1.getCondition().status).toEqual("Bom");
         expect(item2.getCondition().status).toEqual("Mau");

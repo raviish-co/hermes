@@ -1,17 +1,17 @@
-import { ItemCategory } from "../../domain/catalog/item_category";
+import { Item } from "../catalog/item";
 import { Decimal } from "../../shared/decimal";
 
 type Options = {
-    item: ItemCategory;
+    item: Item;
     quantity: number;
 };
 
 export class GoodsIssueLine {
-    readonly item: ItemCategory;
+    readonly item: Item;
     readonly quantity: number;
     #netTotal: Decimal;
 
-    private constructor(item: ItemCategory, quantity: number) {
+    private constructor(item: Item, quantity: number) {
         this.item = item;
         this.quantity = quantity;
         this.#netTotal = Decimal.fromString("0");

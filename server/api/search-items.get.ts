@@ -1,6 +1,6 @@
-import { ItemCategory } from "../../domain/catalog/item_category";
+import { Item } from "@backend/domain/catalog/item_category";
 import { ItemModel } from "~/lib/frontend/models/item";
-import { makeServices } from "../../main";
+import { makeServices } from "@backend/main";
 
 const { catalogService } = makeServices();
 
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     return { items, total };
 });
 
-function makeItems(result: ItemCategory[]): ItemModel[] {
+function makeItems(result: Item[]): ItemModel[] {
     return result.map((r) => ({
         itemId: r.itemId.toString(),
         name: r.name,
