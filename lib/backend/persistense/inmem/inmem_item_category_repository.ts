@@ -1,34 +1,34 @@
-import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
-import { ItemRepository } from "../../domain/catalog/item_repository";
-import { Either, left, right } from "../../shared/either";
-import { Pagination } from "../../shared/pagination";
-import { ItemQuery } from "../../shared/types";
-import { ItemCategory } from "../../domain/catalog/item";
-import { ID } from "../../shared/id";
+import type { ItemCategoryRepository } from "@backend/domain/catalog/item_category_repository";
+import { ItemCategoryNotFound } from "@backend/domain/catalog/item_category_not_found_error";
+import { ItemCategory } from "@backend/domain/catalog/item_category";
+import { type Either, left, right } from "@backend/shared/either";
+import type { Pagination } from "@backend/shared/pagination";
+import type { ItemQuery } from "@backend/shared/types";
+import { ID } from "@backend/shared/id";
 
-export class InmemItemRepository implements ItemRepository {
+export class InmemItemCategoryRepository implements ItemCategoryRepository {
     #items: Record<string, ItemCategory> = {};
 
-    getById(articleId: ID): Promise<ItemCategory> {
-        return Promise.resolve(this.#items[articleId.toString()]);
+    getById(itemCategoryId: ID): Promise<ItemCategory> {
+        return Promise.resolve(this.#items[itemCategoryId.toString()]);
     }
 
-    getAll(queries: ItemQuery[]): Promise<Either<ItemNotFound, ItemCategory[]>> {
-        const items = Object.values(this.#items);
-        const articles: ItemCategory[] = [];
+    getAll(queries: ItemQuery[]): Promise<Either<ItemCategoryNotFound, ItemCategory[]>> {
+        const items: ItemCategory[] = [];
 
         for (const query of queries) {
-            const filtered = items.find(
+            const filtered = this.records.find(
                 (item) =>
                     item.itemId.toString() === query.itemId.toString() &&
                     item.variations?.toString() === query.variations?.toString()
             );
 
-            if (!filtered) return Promise.resolve(left(new ItemNotFound(query.itemId.toString())));
+            if (!filtered)
+                return Promise.resolve(left(new ItemCategoryNotFound(query.itemId.toString())));
 
-            articles.push(filtered);
+            items.push(filtered);
         }
-        return Promise.resolve(right(articles));
+        return Promise.resolve(right(items));
     }
 
     list(pageToken: number, perPage: number): Promise<Pagination<ItemCategory>> {

@@ -1,6 +1,6 @@
+import type { PurposeSpecification } from "../domain/requests/purpose_specification";
 import type { Purpose } from "../domain/requests/purpose";
 import definitions from "@/data/purposes.json";
-import type { PurposeSpecification } from "../domain/requests/purpose_specification";
 
 export class DefaultPurposeSpecification implements PurposeSpecification {
     isSatisfiedBy(purpose: Purpose): boolean {

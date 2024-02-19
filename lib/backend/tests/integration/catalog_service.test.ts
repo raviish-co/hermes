@@ -1,4 +1,4 @@
-import { InmemItemRepository } from "../../persistense/inmem/inmem_item_repository";
+import { InmemItemCategoryRepository } from "../../persistense/inmem/inmem_item_category_repository";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { CatalogService } from "../../application/catalog_service";
 import { describe, it, vi, expect } from "vitest";
@@ -31,7 +31,7 @@ describe("Test ListItems", () => {
     });
 
     it("Deve retornar um array vazio se não existir artigos", async () => {
-        const itemRepository = new InmemItemRepository();
+        const itemRepository = new InmemItemCategoryRepository();
         const variationRepository = new InmemVariationRepository();
         const service = new CatalogService(itemRepository, variationRepository);
 

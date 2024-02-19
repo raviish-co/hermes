@@ -1,35 +1,35 @@
-import type { ItemCategory } from "../domain/catalog/item";
-import type { ItemRepository } from "../domain/catalog/item_repository";
-import { PurposeNotFound } from "../domain/requests/purpose_not_found_error";
-import type { PurposeSpecification } from "../domain/requests/purpose_specification";
-import { GoodsIssueBuilder } from "../domain/requests/request_builder";
-import { RequestItem } from "../domain/requests/request_item";
-import type { GoodsIssueRepository } from "../domain/requests/request_repository";
-import { InsufficientStockItem } from "../domain/sequences/insufficient_item_stock_error";
-import { Sequence } from "../domain/sequences/sequence";
-import { User } from "../domain/user";
-import { type Either, left, right } from "../shared/either";
-import type { RequestError } from "../shared/errors";
-import { ID } from "../shared/id";
-import type { GoodsIssueDTO, GoodIssueLine, ItemQuery } from "../shared/types";
-import type { Generator } from "../domain/sequences/generator";
+import { InsufficientStockItem } from "@backend/domain/sequences/insufficient_item_stock_error";
+import type { ItemCategoryRepository } from "@backend/domain/catalog/item_category_repository";
+import type { GoodsIssueRepository } from "@backend/domain/requests/goods_issue_repository";
+import type { PurposeSpecification } from "@backend/domain/requests/purpose_specification";
+import type { GoodsIssueDTO, GoodIssueLineDTO, ItemQuery } from "@backend/shared/types";
+import { PurposeNotFound } from "@backend/domain/requests/purpose_not_found_error";
+import { GoodsIssueBuilder } from "@backend/domain/requests/goods_issue_builder";
+import type { ItemCategory } from "~/lib/backend/domain/catalog/item_category";
+import { GoodsIssueLine } from "@backend/domain/requests/goods_issue_line";
+import type { Generator } from "@backend/domain/sequences/generator";
+import { type Either, left, right } from "@backend/shared/either";
+import { Sequence } from "@backend/domain/sequences/sequence";
+import type { RequestError } from "@backend/shared/errors";
+import { User } from "@backend/domain/user";
+import { ID } from "@backend/shared/id";
 
 export class GoodsIssueService {
-    #itemRepository: ItemRepository;
-    #requestRepository: GoodsIssueRepository;
+    #itemCategoryRepository: ItemCategoryRepository;
+    #goodsIssueRepository: GoodsIssueRepository;
     #sequenceGenerator: Generator;
     #purposeSpecification: PurposeSpecification;
 
     constructor(
-        itemRepository: ItemRepository,
-        requestRepository: GoodsIssueRepository,
+        itemCategoryRepository: ItemCategoryRepository,
+        goodsIssueRepository: GoodsIssueRepository,
         sequenceGenerator: Generator,
-        PurposeSpecification: PurposeSpecification
+        purposeSpecification: PurposeSpecification
     ) {
-        this.#itemRepository = itemRepository;
-        this.#requestRepository = requestRepository;
+        this.#itemCategoryRepository = itemCategoryRepository;
+        this.#goodsIssueRepository = goodsIssueRepository;
         this.#sequenceGenerator = sequenceGenerator;
-        this.#purposeSpecification = PurposeSpecification;
+        this.#purposeSpecification = purposeSpecification;
     }
 
     async requestItems(data: GoodsIssueDTO): Promise<Either<RequestError, void>> {
@@ -39,35 +39,36 @@ export class GoodsIssueService {
             return left(new PurposeNotFound(purpose.description));
 
         const itemsQueries = this.#buildQueries(lines);
-        const itemsOrError = await this.#itemRepository.getAll(itemsQueries);
-        if (itemsOrError.isLeft()) return left(itemsOrError.value);
+        const itemsCategoriesOrError = await this.#itemCategoryRepository.getAll(itemsQueries);
+        if (itemsCategoriesOrError.isLeft()) return left(itemsCategoriesOrError.value);
 
-        const items = itemsOrError.value;
-        const requestItemsOrError = this.#buildGoodsIssueLines(items, lines);
-        if (requestItemsOrError.isLeft()) return left(requestItemsOrError.value);
+        const itemsCategories = itemsCategoriesOrError.value;
+        const goodsIssueLinesOrError = this.#buildGoodsIssueLines(itemsCategories, lines);
+        if (goodsIssueLinesOrError.isLeft()) return left(goodsIssueLinesOrError.value);
 
-        const requestId = this.#sequenceGenerator.generate(Sequence.Request);
-        const requestItems = requestItemsOrError.value;
+        const goodsIssueId = this.#sequenceGenerator.generate(Sequence.Request);
+        const goodsIssueLines = goodsIssueLinesOrError.value;
         const user = User.create("Teste");
-        const requestOrError = new GoodsIssueBuilder()
-            .withGoodsIssueId(requestId)
-            .withPurpose(purpose)
-            .withRequestItems(requestItems)
+        const goodsIssueOrError = new GoodsIssueBuilder()
             .withUser(user)
-            .withReturnDate(returnDate)
             .withTotal(total)
+            .withPurpose(purpose)
+            .withReturnDate(returnDate)
+            .withGoodsIssueId(goodsIssueId)
+            .withGoodsIssueLines(goodsIssueLines)
             .withSecurityDeposit(securityDeposit)
             .build();
 
-        if (requestOrError.isLeft()) return left(requestOrError.value);
-        await this.#requestRepository.save(requestOrError.value);
+        if (goodsIssueOrError.isLeft()) return left(goodsIssueOrError.value);
 
-        await this.#itemRepository.updateAll(items);
+        await this.#goodsIssueRepository.save(goodsIssueOrError.value);
+
+        await this.#itemCategoryRepository.updateAll(itemsCategories);
 
         return right(undefined);
     }
 
-    #buildQueries(lines: GoodIssueLine[]): ItemQuery[] {
+    #buildQueries(lines: GoodIssueLineDTO[]): ItemQuery[] {
         const queries: ItemQuery[] = [];
         for (const line of lines) {
             const query = {
@@ -81,9 +82,9 @@ export class GoodsIssueService {
 
     #buildGoodsIssueLines(
         items: ItemCategory[],
-        lines: GoodIssueLine[]
-    ): Either<InsufficientStockItem, RequestItem[]> {
-        const requestItems: RequestItem[] = [];
+        lines: GoodIssueLineDTO[]
+    ): Either<InsufficientStockItem, GoodsIssueLine[]> {
+        const goodsIssueLines: GoodsIssueLine[] = [];
 
         for (const idx in items) {
             const { quantity, condition } = lines[idx];
@@ -97,11 +98,11 @@ export class GoodsIssueService {
 
             if (condition) item.updateCondition(condition);
 
-            const requestItem = RequestItem.create({ item, quantity });
+            const goodsIssueLine = GoodsIssueLine.create({ item, quantity });
 
-            requestItems.push(requestItem);
+            goodsIssueLines.push(goodsIssueLine);
         }
 
-        return right(requestItems);
+        return right(goodsIssueLines);
     }
 }

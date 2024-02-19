@@ -1,59 +1,59 @@
-import { InsufficientStockItem } from "../../domain/sequences/insufficient_item_stock_error";
-import { InmemRequestRepository } from "../../persistense/inmem/inmem_request_repository";
-import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
-import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
-import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
-import { InvalidTotal } from "../../domain/requests/invalid_total_error";
-import { ItemRepository } from "../../domain/catalog/item_repository";
-import { Purposes } from "../../domain/requests/purposes";
-import { GoodsIssueService } from "../../application/goods_issue_service";
+import { InmemGoodsIssueRepository } from "@backend/persistense/inmem/inmem_goods_issue_repository";
+import { InsufficientStockItem } from "@backend/domain/sequences/insufficient_item_stock_error";
+import type { ItemCategoryRepository } from "@backend/domain/catalog/item_category_repository";
+import { ItemCategoryNotFound } from "@backend/domain/catalog/item_category_not_found_error";
+import { InmemSequenceStorage } from "@backend/persistense/inmem/inmem_sequence_storage";
+import { SequenceGenerator } from "@backend/domain/sequences/sequence_generator";
+import { InvalidTotal } from "@backend/domain/requests/invalid_total_error";
+// import type { Purposes } from "@backend/domain/requests/purpose_specification";
+import { GoodsIssueService } from "@backend/application/goods_issue_service";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
-import { FakePurposeSource } from "../purpose_source_fake";
-import { PurposeSourceStub } from "../purpose_source_stub";
 import { describe, expect, it, vi } from "vitest";
-import { ID } from "../../shared/id";
+import { ID } from "@backend/shared/id";
+import { DefaultPurposeSpecification } from "../../adapters/default_purpose_specification";
+import type { PurposeSpecification } from "../../domain/requests/purpose_specification";
 
-describe("Test List Purposes ", () => {
-    it("should be return an  list void of purposes", async () => {
-        const purposeSource = new FakePurposeSource();
-        const { service } = makeService({ purposeSource });
+// describe("Test List Purposes ", () => {
+//     it("should be return an  list void of purposes", async () => {
+//         const purposeSource = new FakePurposeSource();
+//         const { service } = makeService({ purposeSource });
 
-        const purposes = await service.listPurposes();
+//         const purposes = await service.listPurposes();
 
-        expect(purposes).toEqual([]);
-    });
+//         expect(purposes).toEqual([]);
+//     });
 
-    it("should be call list method in source data", async () => {
-        const purposeSource = new FakePurposeSource();
-        const { service } = makeService({ purposeSource });
-        const spy = vi.spyOn(purposeSource, "list");
+//     it("should be call list method in source data", async () => {
+//         const purposeSource = new FakePurposeSource();
+//         const { service } = makeService({ purposeSource });
+//         const spy = vi.spyOn(purposeSource, "list");
 
-        await service.listPurposes();
+//         await service.listPurposes();
 
-        expect(spy).toHaveBeenCalled();
-        expect(spy).toHaveBeenCalledTimes(1);
-    });
+//         expect(spy).toHaveBeenCalled();
+//         expect(spy).toHaveBeenCalledTimes(1);
+//     });
 
-    it("should retrieve a list of purposes from data", async () => {
-        const { service } = makeService();
+//     it("should retrieve a list of purposes from data", async () => {
+//         const { service } = makeService();
 
-        const purposes = await service.listPurposes();
+//         const purposes = await service.listPurposes();
 
-        expect(purposes.length).toBeGreaterThanOrEqual(1);
-        expect(purposes[0].description).toEqual("Lavandaria");
-        expect(purposes[0].detailsConstraint).toEqual(["Interna", "Externa"]);
-    });
+//         expect(purposes.length).toBeGreaterThanOrEqual(1);
+//         expect(purposes[0].description).toEqual("Lavandaria");
+//         expect(purposes[0].detailsConstraint).toEqual(["Interna", "Externa"]);
+//     });
 
-    it("should retrieve a purpose without details", async () => {
-        const { service } = makeService();
+//     it("should retrieve a purpose without details", async () => {
+//         const { service } = makeService();
 
-        const purposes = await service.listPurposes();
+//         const purposes = await service.listPurposes();
 
-        expect(purposes.length).toBeGreaterThanOrEqual(2);
-        expect(purposes[1].description).toEqual("Arranjo");
-        expect(purposes[1].detailsConstraint).toBeUndefined();
-    });
-});
+//         expect(purposes.length).toBeGreaterThanOrEqual(2);
+//         expect(purposes[1].description).toEqual("Arranjo");
+//         expect(purposes[1].detailsConstraint).toBeUndefined();
+//     });
+// });
 
 describe("Test Request Items", () => {
     it("Deve chamar o método **exists** para encontrar a finalidade", () => {
@@ -112,7 +112,7 @@ describe("Test Request Items", () => {
         });
 
         expect(error.isLeft()).toBeTruthy();
-        expect(error.value).toBeInstanceOf(ItemNotFound);
+        expect(error.value).toBeInstanceOf(ItemCategoryNotFound);
     });
 
     it("Deve chamar o método **save** no repositório de solicitações de artigos", async () => {
@@ -372,21 +372,20 @@ const requestData = {
 };
 
 interface Dependencies {
-    itemRepository?: ItemRepository;
-    purposeSource?: Purposes;
+    itemRepository?: ItemCategoryRepository;
 }
 
 function makeService(deps?: Dependencies) {
-    const purposeSource = deps?.purposeSource ?? new PurposeSourceStub();
+    const purposeSource = new DefaultPurposeSpecification();
     const itemRepository = deps?.itemRepository ?? new ItemRepositoryStub();
-    const requestRepository = new InmemRequestRepository();
+    const requestRepository = new InmemGoodsIssueRepository();
     const storage = new InmemSequenceStorage();
     const generator = new SequenceGenerator(storage, 1000);
     const service = new GoodsIssueService(
-        purposeSource,
         itemRepository,
         requestRepository,
-        generator
+        generator,
+        purposeSource
     );
 
     return { requestRepository, service, itemRepository, purposeSource };

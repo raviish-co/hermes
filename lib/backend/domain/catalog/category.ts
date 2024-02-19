@@ -1,4 +1,4 @@
-import { ID } from "../../shared/id";
+import { ID } from "@backend/shared/id";
 
 export class Category {
     readonly categoryId: ID;

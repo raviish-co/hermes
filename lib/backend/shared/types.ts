@@ -1,6 +1,6 @@
 import { ID } from "./id";
 
-export type PurposeData = {
+export type PurposeDTO = {
     description: string;
     detailConstraint?: string;
     notes?: string;
@@ -16,7 +16,7 @@ export type Condition = {
     comment?: string;
 };
 
-export type GoodIssueLine = {
+export type GoodIssueLineDTO = {
     itemId: string;
     quantity: number;
     variations?: string[];
@@ -24,8 +24,8 @@ export type GoodIssueLine = {
 };
 
 export type GoodsIssueDTO = {
-    purpose: PurposeData;
-    goodIssueLines: GoodIssueLine[];
+    purpose: PurposeDTO;
+    goodIssueLines: GoodIssueLineDTO[];
     total: string;
     returnDate: string;
     securityDeposit: string;

@@ -1,18 +1,14 @@
-import { ItemRepository } from "../domain/catalog/item_repository";
-import { Variation } from "../domain/catalog/variation";
-import { ItemCategory } from "../domain/catalog/item";
-import { Pagination } from "../shared/pagination";
-
-export interface VariationRepository {
-    save(variation: Variation): Promise<void>;
-    getVariations(): Promise<Variation[]>;
-}
+import type { ItemCategoryRepository } from "@backend/domain/catalog/item_category_repository";
+import type { VariationRepository } from "@backend/domain/catalog/variation_repository";
+import { ItemCategory } from "~/lib/backend/domain/catalog/item_category";
+import { Variation } from "@backend/domain/catalog/variation";
+import type { Pagination } from "@backend/shared/pagination";
 
 export class CatalogService {
-    #itemRepository: ItemRepository;
+    #itemRepository: ItemCategoryRepository;
     #variationRepository: VariationRepository;
 
-    constructor(itemRepository: ItemRepository, variationRepository: VariationRepository) {
+    constructor(itemRepository: ItemCategoryRepository, variationRepository: VariationRepository) {
         this.#itemRepository = itemRepository;
         this.#variationRepository = variationRepository;
     }

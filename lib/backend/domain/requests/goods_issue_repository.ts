@@ -1,5 +1,5 @@
-import { ID } from "../../shared/id";
-import { GoodsIssue } from "./request";
+import { GoodsIssue } from "@backend/domain/requests/goods_issue";
+import { ID } from "@backend/shared/id";
 
 export interface GoodsIssueRepository {
     save(goodsIssue: GoodsIssue): Promise<void>;

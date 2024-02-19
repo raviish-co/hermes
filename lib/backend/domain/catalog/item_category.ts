@@ -1,10 +1,8 @@
-import { Condition } from "../../shared/types";
-import { Decimal } from "../../shared/decimal";
-import { ItemStock } from "./item_stock";
-import { Variation } from "./variation";
-import { ID } from "../../shared/id";
+import { ItemCategoryStock } from "@backend/domain/catalog/item_category_stock";
+import { Decimal } from "@backend/shared/decimal";
+import { ID } from "@backend/shared/id";
 
-type VariationValue = {
+type Variation = {
     variationId: string;
     value: string;
 };
@@ -21,9 +19,9 @@ type Options = {
     unique?: boolean;
     categoryId: ID;
     condition: ItemCondition;
-    stock: ItemStock;
+    stock: ItemCategoryStock;
     section?: Section;
-    variations?: VariationValue[];
+    variations?: Variation[];
 };
 
 export enum ItemStatus {
@@ -40,12 +38,12 @@ export class ItemCategory {
     readonly itemId: ID;
     readonly name: string;
     readonly categoryId: ID;
-    readonly #stock: ItemStock;
+    readonly #stock: ItemCategoryStock;
     #condition: ItemCondition;
     price: Decimal;
     section?: Section;
     unique?: boolean;
-    variations?: VariationValue[];
+    variations?: Variation[];
     fulltext: string = "";
 
     private constructor(
@@ -54,8 +52,8 @@ export class ItemCategory {
         price: Decimal,
         categoryId: ID,
         condition: ItemCondition,
-        stockItem: ItemStock,
-        variations?: VariationValue[]
+        stockItem: ItemCategoryStock,
+        variations?: Variation[]
     ) {
         this.itemId = itemId;
         this.name = name;
@@ -127,7 +125,7 @@ export class ItemCategory {
         return this.#condition;
     }
 
-    getStock(): ItemStock {
+    getStock(): ItemCategoryStock {
         return this.#stock;
     }
 }

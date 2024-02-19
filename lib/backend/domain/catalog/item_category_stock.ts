@@ -1,4 +1,4 @@
-export class ItemStock {
+export class ItemCategoryStock {
     #quantity: number;
 
     constructor(quantity: number) {

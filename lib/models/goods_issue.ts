@@ -21,5 +21,5 @@ export interface GoodsIssueModel {
     returnDate: string;
     securityDeposit: string;
     purposeData: Purpose;
-    productsData: GoodsIssueLine[];
+    goodsIssueLines: GoodsIssueLine[];
 }

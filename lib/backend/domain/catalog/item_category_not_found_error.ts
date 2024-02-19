@@ -1,4 +1,4 @@
-export class ItemNotFound extends Error {
+export class ItemCategoryNotFound extends Error {
     constructor(itemId: string) {
         super(`Item ${itemId} not found`);
     }

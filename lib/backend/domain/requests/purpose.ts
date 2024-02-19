@@ -15,9 +15,13 @@ export class Purpose implements Options {
 
     static fromOptions(options: Options): Purpose {
         const purpose = new Purpose(options.description);
+
         if (!options.details && !options.notes) return purpose;
+
         purpose.details = options.details;
+
         purpose.notes = options.notes;
+
         return purpose;
     }
 }

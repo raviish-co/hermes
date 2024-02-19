@@ -1,11 +1,11 @@
-import { GoodsIssue, RequestStatus } from "../../domain/requests/request";
-import { RequestItem } from "../../domain/requests/request_item";
-import { ItemCategory, ItemStatus } from "../../domain/catalog/item";
-import { Category } from "../../domain/catalog/category";
+import { ItemCategoryStock } from "@backend/domain/catalog/item_category_stock";
+import { GoodsIssue, RequestStatus } from "@backend/domain/requests/goods_issue";
+import { ItemCategory, ItemStatus } from "@backend/domain/catalog/item_category";
+import { GoodsIssueLine } from "@backend/domain/requests/goods_issue_line";
+import { Category } from "@backend/domain/catalog/category";
 import { describe, expect, it } from "vitest";
-import { User } from "../../domain/user";
-import { ItemStock } from "../../domain/catalog/item_stock";
-import { ID } from "../../shared/id";
+import { User } from "@backend/domain/user";
+import { ID } from "@backend/shared/id";
 
 describe("Test Request Products", () => {
     it("should create the request products", () => {
@@ -84,7 +84,7 @@ describe("Test Request Products", () => {
     it("Deve calcular o valor total da linha com base na quantidade de artigos solicitados", () => {
         const request = GoodsIssue.create(requestOptions);
 
-        request.addItems(requestItems);
+        request.addItems(goodsIssueLines);
 
         const requestLine = request.items[0];
         expect(requestLine.getTotal().value).toEqual("450,00");
@@ -101,12 +101,12 @@ describe("Test Request Products", () => {
             condition,
         });
         const requestItems = [
-            RequestItem.create({
+            GoodsIssueLine.create({
                 item,
                 quantity: 3,
             }),
         ];
-        const request = GoodsIssue.create({ ...requestOptions, requestItems });
+        const request = GoodsIssue.create({ ...requestOptions, goodsIssueLines: requestItems });
 
         const requestItem = request.items[0];
 
@@ -124,12 +124,15 @@ describe("Test Request Products", () => {
             condition,
         });
         const requestItems = [
-            RequestItem.create({
+            GoodsIssueLine.create({
                 item,
                 quantity: 3,
             }),
         ];
-        const requestedArticles = GoodsIssue.create({ ...requestOptions, requestItems });
+        const requestedArticles = GoodsIssue.create({
+            ...requestOptions,
+            goodsIssueLines: requestItems,
+        });
 
         expect(requestedArticles.getTotal().value).toEqual("3451,50");
     });
@@ -153,16 +156,16 @@ describe("Test Request Products", () => {
             condition,
         });
         const requestItems = [
-            RequestItem.create({
+            GoodsIssueLine.create({
                 item: item1,
                 quantity: 3,
             }),
-            RequestItem.create({
+            GoodsIssueLine.create({
                 item: item2,
                 quantity: 2,
             }),
         ];
-        const request = GoodsIssue.create({ ...requestOptions, requestItems });
+        const request = GoodsIssue.create({ ...requestOptions, goodsIssueLines: requestItems });
 
         expect(request.getTotal().value).toEqual("5752,50");
     });
@@ -175,9 +178,8 @@ describe("Test Request Products", () => {
     });
 });
 
-const stock = new ItemStock(10);
+const stock = new ItemCategoryStock(10);
 const condition = { status: ItemStatus.Bad, comment: "Some comment" };
-const category = Category.create("some-category");
 const item = ItemCategory.create({
     itemId: "some-id",
     name: "some",
@@ -192,17 +194,17 @@ const requestItemOptions = {
     quantity: 3,
 };
 
-const requestItems: RequestItem[] = [
-    RequestItem.create(requestItemOptions),
-    RequestItem.create({ ...requestItemOptions, quantity: 2 }),
-    RequestItem.create({ ...requestItemOptions, quantity: 2 }),
+const goodsIssueLines: GoodsIssueLine[] = [
+    GoodsIssueLine.create(requestItemOptions),
+    GoodsIssueLine.create({ ...requestItemOptions, quantity: 2 }),
+    GoodsIssueLine.create({ ...requestItemOptions, quantity: 2 }),
 ];
 
 const requestOptions = {
-    requestId: "some-id",
+    goodsIssueId: "some-id",
     purpose: { description: "Aluguer" },
     user: User.create("John Doe"),
     returnDate: "2024-01-21T00:00:00.000Z",
     total: "1050",
-    requestItems,
+    goodsIssueLines: goodsIssueLines,
 };

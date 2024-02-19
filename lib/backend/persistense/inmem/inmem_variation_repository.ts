@@ -1,7 +1,9 @@
-import { VariationRepository } from "../../application/catalog_service";
-import { Variation } from "../../domain/catalog/variation";
+import type { VariationRepository } from "@backend/domain/catalog/variation_repository";
+import { Variation } from "@backend/domain/catalog/variation";
 
 export class InmemVariationRepository implements VariationRepository {
+    #variations: Record<string, Variation> = {};
+
     constructor(variations?: Variation[]) {
         if (variations) {
             variations.forEach((variation) => {
@@ -9,8 +11,6 @@ export class InmemVariationRepository implements VariationRepository {
             });
         }
     }
-
-    #variations: Record<string, Variation> = {};
 
     save(variation: Variation): Promise<void> {
         this.#variations[variation.variationId.toString()] = variation;

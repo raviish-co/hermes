@@ -1,6 +1,6 @@
 import { InmemCategoryRepository } from "./persistense/inmem/inmem_category_repository";
 import { DefaultPurposeSpecification } from "./adapters/default_purpose_specification";
-import { InmemRequestRepository } from "./persistense/inmem/inmem_request_repository";
+import { InmemGoodsIssueRepository } from "./persistense/inmem/inmem_goods_issue_repository";
 import { VariationsRepositoryStub } from "./tests/stubs/variations_repository_stub";
 import { InmemSequenceStorage } from "./persistense/inmem/inmem_sequence_storage";
 import { SequenceGenerator } from "./domain/sequences/sequence_generator";
@@ -11,7 +11,7 @@ import { ImportService } from "./application/import_service";
 import { PurposeService } from "./application/purpose_service";
 
 const itemRepository = new ItemRepositoryStub();
-const requestRepository = new InmemRequestRepository();
+const requestRepository = new InmemGoodsIssueRepository();
 const sequenceStore = new InmemSequenceStorage();
 const sequenceGenerator = new SequenceGenerator(sequenceStore);
 const categoryRepository = new InmemCategoryRepository();
@@ -19,14 +19,14 @@ const variationRepository = new VariationsRepositoryStub();
 const purposeSpec = new DefaultPurposeSpecification();
 
 interface Services {
-    requestService: GoodsIssueService;
+    goodsIssueService: GoodsIssueService;
     catalogService: CatalogService;
     importService: ImportService;
     purposeService: PurposeService;
 }
 
 export const makeServices = (): Services => {
-    const requestService = new GoodsIssueService(
+    const goodsIssueService = new GoodsIssueService(
         itemRepository,
         requestRepository,
         sequenceGenerator,
@@ -40,7 +40,7 @@ export const makeServices = (): Services => {
     const purposeService = new PurposeService();
 
     return {
-        requestService,
+        goodsIssueService,
         catalogService,
         importService,
         purposeService,

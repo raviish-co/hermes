@@ -1,14 +1,14 @@
 import { Decimal } from "../../shared/decimal";
 import { Purpose } from "./purpose";
-import { RequestItem } from "./request_item";
+import { GoodsIssueLine } from "./goods_issue_line";
 import { User } from "../user";
 import { ID } from "../../shared/id";
 
 type Options = {
-    requestId: string;
+    goodsIssueId: string;
     purpose: Purpose;
     user: User;
-    requestItems: RequestItem[];
+    goodsIssueLines: GoodsIssueLine[];
     returnDate: string;
 };
 
@@ -20,7 +20,7 @@ export class GoodsIssue {
     readonly requestId: ID;
     readonly purpose: Purpose;
     readonly user: User;
-    readonly items: RequestItem[];
+    readonly items: GoodsIssueLine[];
     readonly returnDate: Date;
     readonly issuedAt: Date;
     status: RequestStatus;
@@ -40,21 +40,27 @@ export class GoodsIssue {
     }
 
     static create(options: Options): GoodsIssue {
-        const { requestId, purpose, user, requestItems, returnDate } = options;
+        const {
+            goodsIssueId: requestId,
+            purpose,
+            user,
+            goodsIssueLines: requestItems,
+            returnDate,
+        } = options;
         const returnDateParsed = new Date(returnDate);
         const request = new GoodsIssue(ID.New(requestId), purpose, user, returnDateParsed);
         request.addItems(requestItems);
         return request;
     }
 
-    addItems(items: RequestItem[]): void {
+    addItems(items: GoodsIssueLine[]): void {
         for (const requestItem of items) {
             this.addItem(requestItem);
         }
         this.#calculateSecurityDeposit();
     }
 
-    addItem(requestedItem: RequestItem): void {
+    addItem(requestedItem: GoodsIssueLine): void {
         const total = requestedItem.getTotal();
         this.items.push(requestedItem);
         this.#calculateTotal(total);

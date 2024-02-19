@@ -1,14 +1,14 @@
-import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
-import { ItemRepository } from "../../domain/catalog/item_repository";
-import { ItemCategory, ItemStatus } from "../../domain/catalog/item";
+import { ItemCategoryNotFound } from "../../domain/catalog/item_category_not_found_error";
+import { ItemCategoryRepository } from "../../domain/catalog/item_category_repository";
+import { ItemCategory, ItemStatus } from "../../domain/catalog/item_category";
 import { Variation } from "../../domain/catalog/variation";
-import { ItemStock } from "../../domain/catalog/item_stock";
+import { ItemCategoryStock } from "../../domain/catalog/item_category_stock";
 import { Either, left, right } from "../../shared/either";
 import { Pagination } from "../../shared/pagination";
 import { ItemQuery } from "../../shared/types";
 import { ID } from "../../shared/id";
 
-export class ItemRepositoryStub implements ItemRepository {
+export class ItemRepositoryStub implements ItemCategoryRepository {
     #items: Record<string, ItemCategory> = {};
 
     constructor() {
@@ -19,7 +19,7 @@ export class ItemRepositoryStub implements ItemRepository {
         return Promise.resolve(this.#items[itemId.toString()]);
     }
 
-    getAll(queries: ItemQuery[]): Promise<Either<ItemNotFound, ItemCategory[]>> {
+    getAll(queries: ItemQuery[]): Promise<Either<ItemCategoryNotFound, ItemCategory[]>> {
         const items: ItemCategory[] = [];
 
         for (const query of queries) {
@@ -27,7 +27,8 @@ export class ItemRepositoryStub implements ItemRepository {
                 (item) => item.itemId.toString() === query.itemId.toString()
             );
 
-            if (!filtered) return Promise.resolve(left(new ItemNotFound(query.itemId.toString())));
+            if (!filtered)
+                return Promise.resolve(left(new ItemCategoryNotFound(query.itemId.toString())));
 
             items.push(filtered);
         }
@@ -103,9 +104,9 @@ export class ItemRepositoryStub implements ItemRepository {
         const variation1 = new Variation(ID.random(), "Cor", ["Preto"]);
         const variation2 = new Variation(ID.random(), "Marca", ["Nike", "Adidas", "Rebock"]);
 
-        const stock1 = new ItemStock(10);
-        const stock2 = new ItemStock(10);
-        const stock3 = new ItemStock(10);
+        const stock1 = new ItemCategoryStock(10);
+        const stock2 = new ItemCategoryStock(10);
+        const stock3 = new ItemCategoryStock(10);
 
         const item1 = ItemCategory.create({
             itemId: "1001",

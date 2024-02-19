@@ -4,14 +4,14 @@ const { purposeService } = makeServices();
 
 interface PurposeDTO {
     description: string;
-    detailsConstraints: string[];
+    detailsConstraint: string[];
     notesType: string;
 }
 
 function toPurposeDTO(p: any): PurposeDTO {
     return {
         description: p.description,
-        detailsConstraints: p.detailsConstraints,
+        detailsConstraint: p.detailsConstraint,
         notesType: p.notesType,
     };
 }

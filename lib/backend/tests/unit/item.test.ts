@@ -1,7 +1,7 @@
-import { ItemCategory, ItemStatus } from "../../domain/catalog/item";
-import { ItemStock } from "../../domain/catalog/item_stock";
+import { ItemCategory, ItemStatus } from "@backend/domain/catalog/item_category";
+import { ItemCategoryStock } from "@backend/domain/catalog/item_category_stock";
 import { describe, expect, it } from "vitest";
-import { ID } from "../../shared/id";
+import { ID } from "@backend/shared/id";
 
 describe("Test item", () => {
     it("Deve criar um item", () => {
@@ -30,5 +30,5 @@ const itemData = {
         status: ItemStatus.Good,
         comment: undefined,
     },
-    stock: new ItemStock(10),
+    stock: new ItemCategoryStock(10),
 };

@@ -1,24 +1,28 @@
-import { InvalidFileHeader } from "../domain/readers/invalid_file_header_error";
-import { FileNotSupported } from "../domain/readers/file_not_supported_error";
-import { SequenceGenerator } from "../domain/sequences/sequence_generator";
-import { CategoryRepository } from "../domain/catalog/category_repository";
-import { ItemCategory, ItemCondition, ItemStatus } from "../domain/catalog/item";
-import { CsvReader, validCsvHeader } from "../domain/readers/csv_reader";
-import { ItemRepository } from "../domain/catalog/item_repository";
-import { FileEmpty } from "../domain/readers/file_empty_error";
-import { ItemStock } from "../domain/catalog/item_stock";
-import { Sequence } from "../domain/sequences/sequence";
-import { Either, left, right } from "../shared/either";
-import { Category } from "../domain/catalog/category";
-import { FileError } from "../shared/errors";
+import {
+    ItemCategory,
+    type ItemCondition,
+    ItemStatus,
+} from "@backend/domain/catalog/item_category";
+import type { ItemCategoryRepository } from "@backend/domain/catalog/item_category_repository";
+import type { CategoryRepository } from "@backend/domain/catalog/category_repository";
+import { InvalidFileHeader } from "@backend/domain/readers/invalid_file_header_error";
+import { FileNotSupported } from "@backend/domain/readers/file_not_supported_error";
+import { CsvReader, VALID_CSV_HEADER } from "@backend/domain/readers/csv_reader";
+import { SequenceGenerator } from "@backend/domain/sequences/sequence_generator";
+import { ItemCategoryStock } from "@backend/domain/catalog/item_category_stock";
+import { FileEmpty } from "@backend/domain/readers/file_empty_error";
+import { left, right, type Either } from "@backend/shared/either";
+import { Sequence } from "@backend/domain/sequences/sequence";
+import { Category } from "@backend/domain/catalog/category";
+import type { FileError } from "@backend/shared/errors";
 
 export class ImportService {
-    #itemRepository: ItemRepository;
+    #itemRepository: ItemCategoryRepository;
     #categoryRepository: CategoryRepository;
     #generator: SequenceGenerator;
 
     constructor(
-        itemRepository: ItemRepository,
+        itemRepository: ItemCategoryRepository,
         categoryRepository: CategoryRepository,
         generator: SequenceGenerator
     ) {
@@ -69,7 +73,7 @@ export class ImportService {
 
                 const itemId = this.#generator.generate(Sequence.Item);
 
-                const stock = new ItemStock(Number(quantity));
+                const stock = new ItemCategoryStock(Number(quantity));
 
                 const unique = isunique === "true" ? true : false;
 
@@ -99,7 +103,7 @@ export class ImportService {
                 const categoryId = category.categoryId;
                 const itemId = this.#generator.generate(Sequence.Item);
 
-                const stock = new ItemStock(Number(quantity));
+                const stock = new ItemCategoryStock(Number(quantity));
 
                 const unique = isunique === "true" ? true : false;
 
@@ -133,7 +137,7 @@ export class ImportService {
     }
 
     #isValidFile(lines: string[]): Either<FileError, void> {
-        if (!validCsvHeader.includes(lines[0])) {
+        if (!VALID_CSV_HEADER.includes(lines[0])) {
             return left(new InvalidFileHeader());
         }
 

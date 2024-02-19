@@ -1,15 +1,15 @@
-import { type Either, left, right } from "@backend/shared/either";
 import { InvalidTotal } from "@backend/domain/requests/invalid_total_error";
-import { RequestItem } from "@backend/domain/requests/request_item";
-import { GoodsIssue } from "@backend/domain/requests/request";
+import { GoodsIssueLine } from "@backend/domain/requests/goods_issue_line";
+import { type Either, left, right } from "@backend/shared/either";
+import { GoodsIssue } from "@backend/domain/requests/goods_issue";
 import { Purpose } from "@backend/domain/requests/purpose";
-import type { PurposeData } from "@backend/shared/types";
+import type { PurposeDTO } from "@backend/shared/types";
 import type { User } from "@backend/domain/user";
 
 export class GoodsIssueBuilder {
     #goodsIssueId: string = "";
     #purpose: Purpose = {} as Purpose;
-    #requestItems: RequestItem[] = [];
+    #goodsIssueLines: GoodsIssueLine[] = [];
     #user: User = {} as User;
     #returnDate: string = "";
     #total: string = "";
@@ -22,7 +22,7 @@ export class GoodsIssueBuilder {
         return this;
     }
 
-    withPurpose(purpose: PurposeData): GoodsIssueBuilder {
+    withPurpose(purpose: PurposeDTO): GoodsIssueBuilder {
         this.#purpose = Purpose.fromOptions({
             description: purpose.description,
             details: purpose.detailConstraint,
@@ -31,8 +31,8 @@ export class GoodsIssueBuilder {
         return this;
     }
 
-    withRequestItems(requestItems: RequestItem[]): GoodsIssueBuilder {
-        this.#requestItems = requestItems;
+    withGoodsIssueLines(goodsIssueLines: GoodsIssueLine[]): GoodsIssueBuilder {
+        this.#goodsIssueLines = goodsIssueLines;
         return this;
     }
 
@@ -57,17 +57,17 @@ export class GoodsIssueBuilder {
     }
 
     build(): Either<InvalidTotal, GoodsIssue> {
-        const request = GoodsIssue.create({
-            requestId: this.#goodsIssueId,
+        const goodsIssue = GoodsIssue.create({
+            goodsIssueId: this.#goodsIssueId,
             purpose: this.#purpose,
-            requestItems: this.#requestItems,
+            goodsIssueLines: this.#goodsIssueLines,
             user: this.#user,
             returnDate: this.#returnDate,
         });
 
-        const isInvalidTotal = request.verifyTotal(this.#total, this.#securityDeposit);
+        const isInvalidTotal = goodsIssue.verifyTotal(this.#total, this.#securityDeposit);
         if (isInvalidTotal) return left(new InvalidTotal());
 
-        return right(request);
+        return right(goodsIssue);
     }
 }
