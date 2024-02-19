@@ -1,13 +1,10 @@
+import type { Condition } from "./condition";
+
 export interface VariationValue {
     variationId: string;
     value: string;
 }
 
-export type ConditionStatus = "Bom" | "Mau";
-interface Condition {
-    status: ConditionStatus;
-    comment?: string;
-}
 export interface ItemModel {
     itemId: string;
     name: string;

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
-import { type ConditionStatus, type ItemModel } from "~/lib/models/item";
+import type { ItemModel } from "@frontend/models/item";
+
+export type ConditionStatus = "Bom" | "Mau";
 
 interface Props {
     row: ItemModel;
@@ -80,3 +82,4 @@ defineExpose({ show: showDialog, initializeItemState });
         <button class="btn-secondary" @click="updateItemState">Salvar</button>
     </VDialog>
 </template>
+~/lib/frontend/models/item

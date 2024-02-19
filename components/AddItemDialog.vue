@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
-import { formatCurrency, convertToNumber } from "~/lib/helpers/number_format";
-import type { GoodsIssueLine } from "~/lib/models/goods_issue";
-import type { ItemModel, VariationValue } from "~/lib/models/item";
-import { CatalogService } from "~/lib/services/catalog_service";
+import { formatCurrency, convertToNumber } from "@frontend/helpers/number_format";
+import type { GoodsIssueLine } from "@frontend/models/goods_issue";
+import type { ItemModel, VariationValue } from "@frontend/models/item";
+import { CatalogService } from "@frontend/services/catalog_service";
 
 interface Props {
     requestList: GoodsIssueLine[];
@@ -207,3 +207,4 @@ defineExpose({ show: showDialog });
         </p>
     </VDialog>
 </template>
+~/lib/frontend/helpers/number_format ~/lib/frontend/models/goods_issue~/lib/frontend/models/item

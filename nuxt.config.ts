@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 export default defineNuxtConfig({
     alias: {
         "@backend": fileURLToPath(new URL("./lib/backend", import.meta.url)),
+        "@frontend": fileURLToPath(new URL("./lib/frontend", import.meta.url)),
     },
     modules: ["@vite-pwa/nuxt"],
     app: {

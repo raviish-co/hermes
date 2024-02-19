@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { AddItemDialog, DescribeItemStateDialog } from "#build/components";
-import type { ItemModel, VariationValue } from "~/lib/models/item";
-import { formatCurrency, convertToNumber, removeSpaces } from "~/lib/helpers/number_format";
-import { RequestService } from "~/lib/services/request_service";
-import type { GoodsIssueLine, GoodsIssueModel } from "~/lib/models/goods_issue";
-import { handleException } from "~/lib/helpers/error_handler";
+import type { ItemModel, VariationValue } from "@frontend/models/item";
+import { formatCurrency, convertToNumber, removeSpaces } from "@frontend/helpers/number_format";
+import { RequestService } from "@frontend/services/request_service";
+import type { GoodsIssueLine, GoodsIssueModel } from "@frontend/models/goods_issue";
+import { handleException } from "@frontend/helpers/error_handler";
 
 export interface Purpose {
     name: string;
@@ -368,3 +368,5 @@ function clearValues() {
 
     <DescribeItemStateDialog :row="selectedRow" ref="describeItemStateDialogRef" />
 </template>
+~/lib/frontend/helpers/number_format~/lib/frontend/helpers/error_handler
+~/lib/frontend/models/item~/lib/frontend/models/goods_issue

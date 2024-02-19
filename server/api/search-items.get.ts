@@ -1,5 +1,5 @@
 import { ItemCategory } from "@backend/domain/catalog/item_category";
-import { ConditionStatus, ItemModel } from "~/lib/models/item";
+import { ConditionStatus, ItemModel } from "~/lib/frontend/models/item";
 import { makeServices } from "@backend/main";
 
 const { catalogService } = makeServices();

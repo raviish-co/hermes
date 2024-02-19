@@ -1,7 +1,4 @@
-export interface Condition {
-    status: "Bom" | "Mau";
-    comment?: string;
-}
+import type { Condition } from "./condition";
 
 export interface Purpose {
     description: string;
