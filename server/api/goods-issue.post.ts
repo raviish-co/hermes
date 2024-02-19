@@ -1,9 +1,9 @@
-import { InsufficientStockItem } from "@backend/domain/catalog/insufficient_item_stock_error";
-import { ItemCategoryNotFound } from "@backend/domain/catalog/item_category_not_found_error";
-import { PurposeNotFound } from "@backend/domain/goods_issue/purpose_not_found_error";
-import { InvalidTotal } from "@backend/domain/goods_issue/invalid_total_error";
+import { InsufficientStockItem } from "../../domain/catalog/insufficient_item_stock_error";
+import { ItemCategoryNotFound } from "../../domain/catalog/item_category_not_found_error";
+import { PurposeNotFound } from "../../domain/goods_issue/purpose_not_found_error";
+import { InvalidTotal } from "../../domain/goods_issue/invalid_total_error";
 import { HttpStatus } from "~/server/api/http_status";
-import { makeServices } from "@backend/main";
+import { makeServices } from "../../main";
 
 const { goodsIssueService } = makeServices();
 

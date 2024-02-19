@@ -1,7 +1,7 @@
 import { ItemCategory, ItemStatus } from "../../domain/catalog/item_category";
 import { ItemCategoryStock } from "../../domain/catalog/item_category_stock";
-import { ID } from "../../shared/id";
 import { describe, expect, it } from "vitest";
+import { ID } from "../../shared/id";
 
 describe("Test item", () => {
     it("Deve criar um item", () => {

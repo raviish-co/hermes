@@ -1,5 +1,5 @@
-import { ItemCategory } from "@backend/domain/catalog/item_category";
-import { Decimal } from "@backend/shared/decimal";
+import { ItemCategory } from "../../domain/catalog/item_category";
+import { Decimal } from "../../shared/decimal";
 
 type Options = {
     item: ItemCategory;

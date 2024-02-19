@@ -1,14 +1,14 @@
-import { InmemItemCategoryRepository } from "@backend/persistense/inmem/inmem_item_category_repository";
-import { InmemVariationRepository } from "@backend/persistense/inmem/inmem_variation_repository";
-import { CatalogService } from "@backend/application/catalog_service";
-import { ItemRepositoryStub } from "../stubs/item_repository_stub";
-import { Variation } from "@backend/domain/catalog/variation";
+import { InmemItemCategoryRepository } from "../../persistense/inmem/inmem_item_category_repository";
+import { InmemVariationRepository } from "../../persistense/inmem/inmem_variation_repository";
+import { CatalogService } from "../../application/catalog_service";
+import { ItemCategoryRepositoryStub } from "../stubs/item_repository_stub";
+import { Variation } from "../../domain/catalog/variation";
 import { describe, it, vi, expect } from "vitest";
-import { ID } from "@backend/shared/id";
+import { ID } from "../../shared/id";
 
 describe("Test ListItems", () => {
     it("Deve chamar o método **list** no repositório de artigos", async () => {
-        const itemRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemCategoryRepositoryStub();
         const variationRepository = new InmemVariationRepository();
         const service = new CatalogService(itemRepository, variationRepository);
 
@@ -21,7 +21,7 @@ describe("Test ListItems", () => {
     });
 
     it("Deve buscar os artigos no repositório", async () => {
-        const itemRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemCategoryRepositoryStub();
         const variationRepository = new InmemVariationRepository();
         const service = new CatalogService(itemRepository, variationRepository);
 
@@ -44,7 +44,7 @@ describe("Test ListItems", () => {
 
 describe("Test SearchItems", () => {
     it("Deve chamar o método **search** no repositório de artigos", async () => {
-        const itemRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemCategoryRepositoryStub();
         const variationRepository = new InmemVariationRepository();
         const service = new CatalogService(itemRepository, variationRepository);
 
@@ -58,7 +58,7 @@ describe("Test SearchItems", () => {
     });
 
     it("Deve pesquisar o artigo pelo seu nome", async () => {
-        const itemRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemCategoryRepositoryStub();
         const variationRepository = new InmemVariationRepository();
         const service = new CatalogService(itemRepository, variationRepository);
 
@@ -69,7 +69,7 @@ describe("Test SearchItems", () => {
     });
 
     it("Deve pesquisar o artigo pelo seu identificador", async () => {
-        const itemRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemCategoryRepositoryStub();
         const variationRepository = new InmemVariationRepository();
         const service = new CatalogService(itemRepository, variationRepository);
 
@@ -80,7 +80,7 @@ describe("Test SearchItems", () => {
     });
 
     it("Deve retornar um array vazio se não existir artigos", async () => {
-        const itemRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemCategoryRepositoryStub();
         const variationRepository = new InmemVariationRepository();
         const service = new CatalogService(itemRepository, variationRepository);
 
@@ -90,7 +90,7 @@ describe("Test SearchItems", () => {
     });
 
     it("Deve paginar o resultado da listagem de artigos por 12 artigos por página", async () => {
-        const itemRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemCategoryRepositoryStub();
         const variationRepository = new InmemVariationRepository();
         const service = new CatalogService(itemRepository, variationRepository);
 
@@ -103,7 +103,7 @@ describe("Test SearchItems", () => {
 
     it("Deve buscar os artigos pela página", async () => {
         const pageToken = 2;
-        const itemRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemCategoryRepositoryStub();
         const variationRepository = new InmemVariationRepository();
         const service = new CatalogService(itemRepository, variationRepository);
 
@@ -117,7 +117,7 @@ describe("Test SearchItems", () => {
     it("Deve buscar por um tamanho de página diferente de 12", async () => {
         const pageToken = 1;
         const perPage = 30;
-        const itemRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemCategoryRepositoryStub();
         const variationRepository = new InmemVariationRepository();
         const service = new CatalogService(itemRepository, variationRepository);
 
@@ -129,7 +129,7 @@ describe("Test SearchItems", () => {
     });
 
     it("Deve paginar o resultado da pesquisa de artigos por 12 artigos por página", async () => {
-        const itemRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemCategoryRepositoryStub();
         const variationRepository = new InmemVariationRepository();
         const service = new CatalogService(itemRepository, variationRepository);
 
@@ -142,7 +142,7 @@ describe("Test SearchItems", () => {
 
     it("Deve paginar o resultado da pesquisa por um tamanho de página diferente de 12", async () => {
         const perPage = 30;
-        const itemRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemCategoryRepositoryStub();
         const variationRepository = new InmemVariationRepository();
         const service = new CatalogService(itemRepository, variationRepository);
 
@@ -155,7 +155,7 @@ describe("Test SearchItems", () => {
 
     it("Deve paginar o resultado da pesquisa pelo número da página", async () => {
         const pageToken = 2;
-        const itemRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemCategoryRepositoryStub();
         const variationRepository = new InmemVariationRepository();
         const service = new CatalogService(itemRepository, variationRepository);
 
@@ -168,7 +168,7 @@ describe("Test SearchItems", () => {
 
     it("Deve pesquisar os items pelo campo fulltext", async () => {
         const query = "Preto";
-        const itemRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemCategoryRepositoryStub();
         const variationRepository = new InmemVariationRepository();
         const service = new CatalogService(itemRepository, variationRepository);
 
@@ -180,7 +180,7 @@ describe("Test SearchItems", () => {
 
     it("Deve pesquisar os items pelo campo fulltext com letras minúsculas", async () => {
         const query = "preto";
-        const itemRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemCategoryRepositoryStub();
         const variationRepository = new InmemVariationRepository();
         const service = new CatalogService(itemRepository, variationRepository);
 
@@ -193,7 +193,7 @@ describe("Test SearchItems", () => {
 
 describe("Test Get All Variations", () => {
     it("Deve recuperar as variações da base de dados", async () => {
-        const itemRepository = new ItemRepositoryStub();
+        const itemRepository = new ItemCategoryRepositoryStub();
         const variationRepository = new InmemVariationRepository();
         variationRepository.save(variation);
 

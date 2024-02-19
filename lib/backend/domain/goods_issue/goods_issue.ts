@@ -1,8 +1,8 @@
-import { GoodsIssueLine } from "@backend/domain/goods_issue/goods_issue_line";
-import { Purpose } from "@backend/domain/goods_issue/purpose";
-import { Decimal } from "@backend/shared/decimal";
-import { User } from "@backend/domain/user";
-import { ID } from "@backend/shared/id";
+import { GoodsIssueLine } from "../../domain/goods_issue/goods_issue_line";
+import { Purpose } from "../../domain/goods_issue/purpose";
+import { Decimal } from "../../shared/decimal";
+import { User } from "../../domain/user";
+import { ID } from "../../shared/id";
 
 type Options = {
     goodsIssueId: string;

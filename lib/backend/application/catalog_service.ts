@@ -1,8 +1,8 @@
-import type { ItemCategoryRepository } from "@backend/domain/catalog/item_category_repository";
-import type { VariationRepository } from "@backend/domain/catalog/variation_repository";
-import { ItemCategory } from "~/lib/backend/domain/catalog/item_category";
-import { Variation } from "@backend/domain/catalog/variation";
-import type { Pagination } from "@backend/shared/pagination";
+import type { ItemCategoryRepository } from "../domain/catalog/item_category_repository";
+import type { VariationRepository } from "../domain/catalog/variation_repository";
+import { ItemCategory } from "../domain/catalog/item_category";
+import { Variation } from "../domain/catalog/variation";
+import type { Pagination } from "../shared/pagination";
 
 export class CatalogService {
     #itemRepository: ItemCategoryRepository;

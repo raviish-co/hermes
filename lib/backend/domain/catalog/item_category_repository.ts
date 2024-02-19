@@ -1,9 +1,9 @@
-import { ItemCategoryNotFound } from "@backend/domain/catalog/item_category_not_found_error";
-import { ItemCategory } from "@backend/domain/catalog/item_category";
-import type { Pagination } from "@backend/shared/pagination";
-import type { ItemQuery } from "@backend/shared/types";
-import type { Either } from "@backend/shared/either";
-import { ID } from "@backend/shared/id";
+import { ItemCategoryNotFound } from "../../domain/catalog/item_category_not_found_error";
+import { ItemCategory } from "../../domain/catalog/item_category";
+import type { Pagination } from "../../shared/pagination";
+import type { ItemQuery } from "../../shared/types";
+import type { Either } from "../../shared/either";
+import { ID } from "../../shared/id";
 
 export interface ItemCategoryRepository {
     getAll(queries: ItemQuery[]): Promise<Either<ItemCategoryNotFound, ItemCategory[]>>;

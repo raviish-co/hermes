@@ -1,7 +1,7 @@
-import { ItemCategoryStock } from "@backend/domain/catalog/item_category_stock";
-import type { Condition } from "@backend/shared/types";
-import { Decimal } from "@backend/shared/decimal";
-import { ID } from "@backend/shared/id";
+import { ItemCategoryStock } from "../../domain/catalog/item_category_stock";
+import type { Condition } from "../../shared/types";
+import { Decimal } from "../../shared/decimal";
+import { ID } from "../../shared/id";
 
 type Variation = {
     variationId: string;

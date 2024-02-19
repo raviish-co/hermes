@@ -1,4 +1,4 @@
-import { ItemCategory } from "@backend/domain/catalog/item_category";
+import { ItemCategory } from "../../domain/catalog/item_category";
 
 interface ItemDTO {
     itemId: string;

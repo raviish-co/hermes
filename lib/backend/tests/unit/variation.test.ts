@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
 import { Variation } from "../../domain/catalog/variation";
+import { describe, expect, it } from "vitest";
 import { ID } from "../../shared/id";
 
 describe("Test Variation", () => {
@@ -16,8 +16,3 @@ describe("Test Variation", () => {
         expect(variation.variationId).toBeDefined();
     });
 });
-
-const options = {
-    name: "Cor",
-    values: ["Vermelha", "Azul"],
-};

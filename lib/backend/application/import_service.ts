@@ -1,20 +1,16 @@
-import {
-    ItemCategory,
-    type ItemCondition,
-    ItemStatus,
-} from "@backend/domain/catalog/item_category";
-import type { ItemCategoryRepository } from "@backend/domain/catalog/item_category_repository";
-import type { CategoryRepository } from "@backend/domain/catalog/category_repository";
-import { InvalidFileHeader } from "@backend/domain/readers/invalid_file_header_error";
-import { FileNotSupported } from "@backend/domain/readers/file_not_supported_error";
-import { CsvReader, VALID_CSV_HEADER } from "@backend/domain/readers/csv_reader";
-import { SequenceGenerator } from "@backend/domain/sequences/sequence_generator";
-import { ItemCategoryStock } from "@backend/domain/catalog/item_category_stock";
-import { FileEmpty } from "@backend/domain/readers/file_empty_error";
-import { left, right, type Either } from "@backend/shared/either";
-import { Sequence } from "@backend/domain/sequences/sequence";
-import { Category } from "@backend/domain/catalog/category";
-import type { FileError } from "@backend/shared/errors";
+import { ItemCategory, type ItemCondition, ItemStatus } from "../domain/catalog/item_category";
+import type { ItemCategoryRepository } from "../domain/catalog/item_category_repository";
+import type { CategoryRepository } from "../domain/catalog/category_repository";
+import { InvalidFileHeader } from "../domain/readers/invalid_file_header_error";
+import { FileNotSupported } from "../domain/readers/file_not_supported_error";
+import { CsvReader, VALID_CSV_HEADER } from "../domain/readers/csv_reader";
+import { SequenceGenerator } from "../domain/sequences/sequence_generator";
+import { ItemCategoryStock } from "../domain/catalog/item_category_stock";
+import { FileEmpty } from "../domain/readers/file_empty_error";
+import { left, right, type Either } from "../shared/either";
+import { Sequence } from "../domain/sequences/sequence";
+import { Category } from "../domain/catalog/category";
+import type { FileError } from "../shared/errors";
 
 export class ImportService {
     #itemRepository: ItemCategoryRepository;

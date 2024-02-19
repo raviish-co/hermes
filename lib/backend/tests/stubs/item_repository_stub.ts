@@ -1,14 +1,14 @@
-import { ItemCategoryNotFound } from "@backend/domain/catalog/item_category_not_found_error";
-import type { ItemCategoryRepository } from "@backend/domain/catalog/item_category_repository";
-import { ItemCategory, ItemStatus } from "@backend/domain/catalog/item_category";
-import { Variation } from "@backend/domain/catalog/variation";
-import { ItemCategoryStock } from "@backend/domain/catalog/item_category_stock";
-import { type Either, left, right } from "@backend/shared/either";
-import type { Pagination } from "@backend/shared/pagination";
-import type { ItemQuery } from "@backend/shared/types";
-import { ID } from "@backend/shared/id";
+import { ItemCategoryNotFound } from "../../domain/catalog/item_category_not_found_error";
+import type { ItemCategoryRepository } from "../../domain/catalog/item_category_repository";
+import { ItemCategory, ItemStatus } from "../../domain/catalog/item_category";
+import { ItemCategoryStock } from "../../domain/catalog/item_category_stock";
+import { Variation } from "../../domain/catalog/variation";
+import { type Either, left, right } from "../../shared/either";
+import type { Pagination } from "../../shared/pagination";
+import type { ItemQuery } from "../../shared/types";
+import { ID } from "../../shared/id";
 
-export class ItemRepositoryStub implements ItemCategoryRepository {
+export class ItemCategoryRepositoryStub implements ItemCategoryRepository {
     #items: Record<string, ItemCategory> = {};
 
     constructor() {

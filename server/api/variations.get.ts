@@ -1,5 +1,5 @@
-import { Variation } from "@backend/domain/catalog/variation";
-import { makeServices } from "@backend/main";
+import { Variation } from "../../domain/catalog/variation";
+import { makeServices } from "../../main";
 
 const { catalogService } = makeServices();
 

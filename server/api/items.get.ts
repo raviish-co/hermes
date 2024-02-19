@@ -1,7 +1,7 @@
 import { ItemModel } from "~/lib/frontend/models/item";
-import { ItemCategory } from "@backend/domain/catalog/item_category";
+import { ItemCategory } from "../../domain/catalog/item_category";
 
-import { makeServices } from "@backend/main";
+import { makeServices } from "../../main";
 export interface Pagination {
     pageToken?: number;
     perPage?: number;

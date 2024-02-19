@@ -1,6 +1,6 @@
-import { ItemCategory } from "@backend/domain/catalog/item_category";
+import { ItemCategory } from "../../domain/catalog/item_category";
 import { ItemModel } from "~/lib/frontend/models/item";
-import { makeServices } from "@backend/main";
+import { makeServices } from "../../main";
 
 const { catalogService } = makeServices();
 

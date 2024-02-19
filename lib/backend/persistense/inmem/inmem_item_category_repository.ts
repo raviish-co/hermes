@@ -1,10 +1,10 @@
-import type { ItemCategoryRepository } from "@backend/domain/catalog/item_category_repository";
-import { ItemCategoryNotFound } from "@backend/domain/catalog/item_category_not_found_error";
-import { ItemCategory } from "@backend/domain/catalog/item_category";
-import { type Either, left, right } from "@backend/shared/either";
-import type { Pagination } from "@backend/shared/pagination";
-import type { ItemQuery } from "@backend/shared/types";
-import { ID } from "@backend/shared/id";
+import type { ItemCategoryRepository } from "../../domain/catalog/item_category_repository";
+import { ItemCategoryNotFound } from "../../domain/catalog/item_category_not_found_error";
+import { ItemCategory } from "../../domain/catalog/item_category";
+import { type Either, left, right } from "../../shared/either";
+import type { Pagination } from "../../shared/pagination";
+import type { ItemQuery } from "../../shared/types";
+import { ID } from "../../shared/id";
 
 export class InmemItemCategoryRepository implements ItemCategoryRepository {
     #items: Record<string, ItemCategory> = {};
