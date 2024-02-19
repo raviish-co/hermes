@@ -1,9 +1,10 @@
-import { InmemItemCategoryRepository } from "../../persistense/inmem/inmem_item_category_repository";
+import { InmemItemCategoryRepository } from "@backend/persistense/inmem/inmem_item_category_repository";
+import { InmemVariationRepository } from "@backend/persistense/inmem/inmem_variation_repository";
+import { CatalogService } from "@backend/application/catalog_service";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
-import { CatalogService } from "../../application/catalog_service";
+import { Variation } from "@backend/domain/catalog/variation";
 import { describe, it, vi, expect } from "vitest";
-import { InmemVariationRepository } from "../../persistense/inmem/inmem_variation_repository";
-import { Variation } from "../../domain/catalog/variation";
+import { ID } from "@backend/shared/id";
 
 describe("Test ListItems", () => {
     it("Deve chamar o método **list** no repositório de artigos", async () => {
@@ -204,4 +205,4 @@ describe("Test Get All Variations", () => {
     });
 });
 
-const variation = Variation.create({ name: "Cor", values: ["Preto", "Branco", "Vermelho"] });
+const variation = new Variation(ID.New("1"), "Cor", ["Preto", "Branco", "Vermelho"]);

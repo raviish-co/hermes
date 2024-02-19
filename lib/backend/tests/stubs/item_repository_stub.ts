@@ -1,12 +1,12 @@
-import { ItemCategoryNotFound } from "../../domain/catalog/item_category_not_found_error";
-import { ItemCategoryRepository } from "../../domain/catalog/item_category_repository";
-import { ItemCategory, ItemStatus } from "../../domain/catalog/item_category";
-import { Variation } from "../../domain/catalog/variation";
-import { ItemCategoryStock } from "../../domain/catalog/item_category_stock";
-import { Either, left, right } from "../../shared/either";
-import { Pagination } from "../../shared/pagination";
-import { ItemQuery } from "../../shared/types";
-import { ID } from "../../shared/id";
+import { ItemCategoryNotFound } from "@backend/domain/catalog/item_category_not_found_error";
+import type { ItemCategoryRepository } from "@backend/domain/catalog/item_category_repository";
+import { ItemCategory, ItemStatus } from "@backend/domain/catalog/item_category";
+import { Variation } from "@backend/domain/catalog/variation";
+import { ItemCategoryStock } from "@backend/domain/catalog/item_category_stock";
+import { type Either, left, right } from "@backend/shared/either";
+import type { Pagination } from "@backend/shared/pagination";
+import type { ItemQuery } from "@backend/shared/types";
+import { ID } from "@backend/shared/id";
 
 export class ItemRepositoryStub implements ItemCategoryRepository {
     #items: Record<string, ItemCategory> = {};
