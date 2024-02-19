@@ -1,6 +1,6 @@
 export interface Condition {
     status: "Bom" | "Mau";
-    comment?: string | undefined;
+    comment?: string;
 }
 
 export interface Purpose {
@@ -20,6 +20,6 @@ export interface GoodsIssueModel {
     total: string;
     returnDate: string;
     securityDeposit: string;
-    purposeData: Purpose;
-    goodsIssueLines: GoodsIssueLine[];
+    purpose: Purpose;
+    lines: GoodsIssueLine[];
 }

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
-import { formatCurrency, convertToNumber } from "~/lib/helpers/format_price";
-import type { Item, RequestItem, Variation } from "~/lib/models/item";
+import { formatCurrency, convertToNumber } from "~/lib/helpers/number_format";
+import type { GoodsIssueLine } from "~/lib/models/goods_issue";
+import type { ItemModel, VariationValue } from "~/lib/models/item";
 import { CatalogService } from "~/lib/services/catalog_service";
 
 interface Props {
-    requestList: RequestItem[];
+    requestList: GoodsIssueLine[];
 }
 
 interface Emits {
@@ -16,13 +17,13 @@ const props = defineProps<Props>();
 const emits = defineEmits<Emits>();
 const dialogRef = ref<typeof VDialog>();
 const query = ref<string>("");
-const items = ref<Item[]>([]);
+const items = ref<ItemModel[]>([]);
 const total = ref<string>("0,00");
 const pages = ref<number>(1);
 const catalogService = new CatalogService();
 const quantities = ref<number[]>([]);
 
-function emitItemAdded(item: Item, idx: number) {
+function emitItemAdded(item: ItemModel, idx: number) {
     addItem(item, idx);
 
     emits("added");
@@ -32,15 +33,15 @@ function itemExist(itemId: string): boolean {
     return props.requestList.some((row) => row.itemId === itemId);
 }
 
-function validateQuantity(item: Item, quantity: number): boolean {
+function validateQuantity(item: ItemModel, quantity: number): boolean {
     if (quantity <= 0) return false;
 
-    if (quantity > item.stock) return false;
+    if (quantity > item.quantity) return false;
 
     return true;
 }
 
-function addItem(item: Item, idx: number) {
+function addItem(item: ItemModel, idx: number) {
     const quantity = item.isUnique ? 1 : quantities.value[idx];
 
     if (!validateQuantity(item, quantity)) return;
@@ -56,7 +57,7 @@ function addItem(item: Item, idx: number) {
     quantities.value[idx] = 0;
 }
 
-function calculateTotal(item: Item, quantity: number): string {
+function calculateTotal(item: ItemModel, quantity: number): string {
     if (item.isUnique) return item.price;
 
     const price = convertToNumber(item.price);
@@ -64,7 +65,7 @@ function calculateTotal(item: Item, quantity: number): string {
     return formatCurrency(total);
 }
 
-function makeRequestItem(item: Item, quantity: number, total: string) {
+function makeRequestItem(item: ItemModel, quantity: number, total: string) {
     return { ...item, quantity, total };
 }
 
@@ -95,10 +96,10 @@ function initializeQuantities() {
     items.value.forEach((_, idx) => (quantities.value[idx] = 0));
 }
 
-function listVariations(itemVariation?: Variation[]) {
-    if (!itemVariation) return "";
+function listVariations(variationValues?: VariationValue[]) {
+    if (!variationValues) return "";
 
-    const values = itemVariation.map((v) => `${v.name}: ${v.value}`);
+    const values = variationValues.map((v) => v.value);
 
     return values.join(" | ");
 }
@@ -122,10 +123,6 @@ function showDialog() {
 }
 
 defineExpose({ show: showDialog });
-
-onMounted(async () => {
-    await listItems();
-});
 </script>
 
 <template>
@@ -164,7 +161,7 @@ onMounted(async () => {
                             <br />
 
                             <span class="text-light-600 text-xs sm:text-sm">
-                                {{ listVariations(item?.variations) }}
+                                {{ listVariations(item?.variationsValues) }}
                             </span>
                         </td>
 
@@ -172,25 +169,25 @@ onMounted(async () => {
                             <div>
                                 <span v-if="item.isUnique">Único</span>
                                 <span v-else>
-                                    {{ item.stock === 0 ? "Esgotado" : item.stock }}</span
+                                    {{ item.quantity === 0 ? "Esgotado" : item.quantity }}</span
                                 >
                             </div>
                         </td>
 
                         <td class="text-xs">
                             <input
-                                v-if="enableToEditQuantity(item.isUnique, item.stock)"
+                                v-if="enableToEditQuantity(item.isUnique, item.quantity)"
                                 v-model="quantities[idx]"
                                 type="number"
                                 class="input-number"
                                 placeholder="QTD"
                                 min="0"
-                                :max="item.stock"
+                                :max="item.quantity"
                             />
 
                             <input
                                 v-else
-                                :value="item.stock"
+                                :value="item.quantity"
                                 disabled
                                 type="number"
                                 class="input-number"

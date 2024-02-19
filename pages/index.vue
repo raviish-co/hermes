@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { AddItemDialog, DescribeItemStateDialog } from "#build/components";
-import type { Variation, ItemModel } from "~/lib/models/item";
-import { formatCurrency, convertToNumber, removeSpaces } from "~/lib/helpers/format_price";
+import type { ItemModel, VariationValue } from "~/lib/models/item";
+import { formatCurrency, convertToNumber, removeSpaces } from "~/lib/helpers/number_format";
 import { RequestService } from "~/lib/services/request_service";
-import type { ItemData, RequestData } from "~/lib/models/request";
-import { handleException } from "~/lib/helpers/handler";
+import type { GoodsIssueLine, GoodsIssueModel } from "~/lib/models/goods_issue";
+import { handleException } from "~/lib/helpers/error_handler";
 
 export interface Purpose {
     name: string;
@@ -16,89 +16,86 @@ const INNER_LAUNDRY = "Interna";
 const DISCARD = "Descartar";
 const PURPOSE = "Finalidade";
 const DETAIL = "Detalhes";
+
+const purposes = usePurpose().purposes;
+
 const addItemDialogRef = ref<typeof AddItemDialog>();
 const describeItemStateDialogRef = ref<typeof DescribeItemStateDialog>();
 const selectedSections = ref<string[]>([]);
-const selectedPlaceholder = ref<string>("Descrição");
-const recipientIsDisabled = ref<boolean>(false);
-const requestList = ref<ItemModel[]>([]);
-const currentPurposeName = ref<string>("Finalidade");
-const currentSectionName = ref<string>("");
+const currentNotesType = ref<string>("Descrição");
+const purposeDetailsIsDisabled = ref<boolean>(false);
+const items = ref<ItemModel[]>([]);
+const currentPurposeDescription = ref<string>("Finalidade");
+const currentDetails = ref<string>("");
 const securityDeposit = ref<string>("0,00");
-const purpouses = ref<Purpose[]>([]);
 const grandTotal = ref<string>("0,00");
-const returnData = ref<string>("");
+const returnDate = ref<string>("");
 const recipient = ref<string>("");
 const isDisabledSection = computed(() => selectedSections.value.length <= 0);
 const selectedRow = ref<ItemModel>({} as ItemModel);
 
 const requestService = new RequestService();
 
-function makeRequest(): RequestData {
+function makeGoodsIssue(): GoodsIssueModel {
     return {
         total: removeSpaces(grandTotal.value),
         securityDeposit: removeSpaces(securityDeposit.value),
-        returnDate: returnData.value,
-        purposeData: {
-            name: currentPurposeName.value,
-            section: currentSectionName.value,
-            recipient: recipient.value,
+        returnDate: returnDate.value,
+        purpose: {
+            description: currentPurposeDescription.value,
+            details: currentDetails.value,
+            notes: recipient.value,
         },
-        productsData: makeProductData(),
+        lines: makeProductData(),
     };
 }
 
-function makeProductData(): ItemData[] {
-    if (requestList.value.length === 0) return [];
+function makeProductData(): GoodsIssueLine[] {
+    if (items.value.length === 0) return [];
 
-    return requestList.value.map((row) => ({
+    return items.value.map((row) => ({
         itemId: row.itemId,
         quantity: row.quantity,
         condition: {
-            comment: row.state.comment,
-            status: row.state.status,
+            comment: row?.condition?.comment,
+            status: row?.condition!.status,
         },
-        variations: row.variations?.map((v) => v.id),
+        variations: row.variationsValues?.map((v) => v.variationId),
     }));
 }
 
 const isValidPurpose = computed(() =>
-    purpouses.value.some((p) => p.name === currentPurposeName.value)
+    purposes.value.some((p) => p.description === currentPurposeDescription.value)
 );
 
 const isValidSection = computed(() => {
     if (selectedSections.value.length > 0) {
-        return selectedSections.value.some((s) => s === currentSectionName.value);
+        return selectedSections.value.some((s) => s === currentDetails.value);
     }
 
     return true;
 });
 
 const isValidRecipient = computed(() => {
-    if (recipient.value === "" && !recipientIsDisabled.value) return false;
+    if (recipient.value === "" && !purposeDetailsIsDisabled.value) return false;
 
     return true;
 });
 
-const isValidRequest = computed(() => {
-    const isValidRequestList = requestList.value.length > 0;
+const isValidGoodsIssue = computed(() => {
+    const isValidGoodsLines = items.value.length > 0;
 
-    if (
-        isValidPurpose.value &&
-        isValidSection.value &&
-        isValidRequestList &&
-        isValidRecipient.value
-    )
+    if (isValidPurpose.value && isValidSection.value && isValidGoodsLines && isValidRecipient.value)
         return true;
 
     return false;
 });
 
-function request() {
-    const request = makeRequest();
+function requestArticles() {
+    const goodsIssue = makeGoodsIssue();
 
     requestService
-        .requestItems(request)
+        .requestArticles(goodsIssue)
         .then((res) => {
             if (res.statusCode !== 200) {
                 alert(res.message);
@@ -112,47 +109,40 @@ function request() {
         .catch(handleException);
 }
 
-function listPurposes() {
-    requestService
-        .listPurposes()
-        .then((p) => purpouses.value.push(...p))
-        .catch((err) => console.log(err));
+function getPurposeDescriptions(): string[] {
+    return purposes.value.map((p) => p.description);
 }
 
-function getPurposeNames(): string[] {
-    return purpouses.value.map((p) => p.name);
-}
-
-function findSectionByPurpose(purposeName: string): void {
-    if (purposeName === PURPOSE) {
-        currentSectionName.value = DETAIL;
+function findSectionByPurpose(purposeDescription: string): void {
+    if (purposeDescription === PURPOSE) {
+        currentDetails.value = DETAIL;
         selectedSections.value = [];
         return;
     }
 
-    purpouses.value.find((purpose) => {
-        if (purpose.name === purposeName) {
-            changePlaceholder(purpose.placeholder!);
-            disableComplementaryDataToThePurpose(purposeName);
-            updateSelectedSections(purpose.details);
+    purposes.value.find((p) => {
+        if (p.description === purposeDescription) {
+            changeNotesType(p.notesType!);
+            disableNotesType(purposeDescription);
+            updateSelectedSections(p.detailsConstraint);
         }
     });
 
-    currentPurposeName.value = purposeName;
+    currentPurposeDescription.value = purposeDescription;
     updateCurrentSectionName("Secção");
 }
 
-function changePlaceholder(placeholder: string): void {
-    selectedPlaceholder.value = placeholder || "";
+function changeNotesType(notesType: string): void {
+    currentNotesType.value = notesType || "";
 }
 
-function disableComplementaryDataToThePurpose(purposeName: string): void {
+function disableNotesType(purposeName: string): void {
     if (purposeName === DISCARD) {
-        recipientIsDisabled.value = true;
+        purposeDetailsIsDisabled.value = true;
         return;
     }
 
-    recipientIsDisabled.value = false;
+    purposeDetailsIsDisabled.value = false;
 }
 
 function updateSelectedSections(sections?: string[]) {
@@ -165,25 +155,25 @@ function updateSelectedSections(sections?: string[]) {
 }
 
 function updateCurrentSectionName(sectionName: string) {
-    currentSectionName.value = sectionName;
+    currentDetails.value = sectionName;
 
     if (sectionName === INNER_LAUNDRY) {
-        recipientIsDisabled.value = true;
+        purposeDetailsIsDisabled.value = true;
         return;
     }
 
-    recipientIsDisabled.value = false;
+    purposeDetailsIsDisabled.value = false;
 
-    disableComplementaryDataToThePurpose(currentPurposeName.value);
+    disableNotesType(currentPurposeDescription.value);
 }
 
 function removeRequestRow(id: string): void {
-    requestList.value = requestList.value.filter((r) => r.itemId !== id);
+    items.value = items.value.filter((r) => r.itemId !== id);
     calculateGrandTotal();
 }
 
 function clearRequestList() {
-    requestList.value = [];
+    items.value = [];
     grandTotal.value = "0,00";
     securityDeposit.value = "0,00";
 }
@@ -195,7 +185,7 @@ function calculateSecurityDeposit() {
 }
 
 function calculateGrandTotal() {
-    requestList.value.forEach((row, idx) => {
+    items.value.forEach((row, idx) => {
         if (idx === 0) {
             grandTotal.value = formatCurrency(convertToNumber(row.total) / 100);
             calculateSecurityDeposit();
@@ -218,30 +208,33 @@ function showAddItemDialog() {
 
 function showDescribeItemStatusDialog(row: ItemModel) {
     selectedRow.value = row;
-    describeItemStateDialogRef.value?.initializeItemState(row.state.status, row.state.comment);
+
+    describeItemStateDialogRef.value?.initializeItemState(
+        row?.condition!.status,
+        row?.condition?.comment
+    );
+
     describeItemStateDialogRef.value?.show();
 }
 
-function listVariations(itemVariation?: Variation[]) {
+function listVariations(itemVariation?: VariationValue[]) {
     if (!itemVariation) return "";
 
-    const values = itemVariation.map((v) => `${v.name}: ${v.value}`);
+    const values = itemVariation.map((v) => v.value);
 
     return values.join(" | ");
 }
 
 function clearValues() {
-    returnData.value = new Date().toISOString();
-    currentPurposeName.value = PURPOSE;
-    currentSectionName.value = DETAIL;
+    returnDate.value = new Date().toISOString();
+    currentPurposeDescription.value = PURPOSE;
+    currentDetails.value = DETAIL;
     selectedSections.value = [];
     recipient.value = "";
-    requestList.value = [];
+    items.value = [];
     grandTotal.value = "0,00";
     securityDeposit.value = "0,00";
 }
-
-listPurposes();
 </script>
 
 <template>
@@ -253,20 +246,20 @@ listPurposes();
                 <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
                     <input class="input-field" placeholder="John Doe" :disabled="true" />
 
-                    <input v-model="returnData" type="datetime-local" class="input-field" />
+                    <input v-model="returnDate" type="datetime-local" class="input-field" />
                 </div>
 
                 <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
                     <VSelect
-                        :value="currentPurposeName"
+                        :value="currentPurposeDescription"
                         placeholder="Finalidade"
-                        :options="getPurposeNames()"
+                        :options="getPurposeDescriptions()"
                         :is-invalid="!isValidPurpose"
                         @change="findSectionByPurpose"
                     />
 
                     <VSelect
-                        :value="currentSectionName"
+                        :value="currentDetails"
                         :placeholder="DETAIL"
                         :options="selectedSections"
                         :disabled="isDisabledSection"
@@ -277,8 +270,8 @@ listPurposes();
 
                 <input
                     v-model="recipient"
-                    :placeholder="selectedPlaceholder"
-                    :disabled="recipientIsDisabled"
+                    :placeholder="currentNotesType"
+                    :disabled="purposeDetailsIsDisabled"
                     class="input-field mb-4"
                     :class="{ invalid: !isValidRecipient }"
                 />
@@ -319,13 +312,13 @@ listPurposes();
                         </thead>
 
                         <tbody>
-                            <tr v-for="(row, idx) in requestList" :key="idx" class="cursor-pointer">
+                            <tr v-for="(row, idx) in items" :key="idx" class="cursor-pointer">
                                 <td>{{ row.itemId }}</td>
                                 <td @click="showDescribeItemStatusDialog(row)">
                                     {{ row.name }}
                                     <br />
                                     <span class="text-light-600 text-sm">{{
-                                        listVariations(row?.variations)
+                                        listVariations(row?.variationsValues)
                                     }}</span>
                                 </td>
                                 <td>{{ row.quantity }}</td>
@@ -349,8 +342,8 @@ listPurposes();
             <div class="flex flex-wrap sm:flex-nowrap gap-4 w-full md:w-auto pb-4 md:pb-0">
                 <button
                     class="btn-secondary w-full md:flex-1"
-                    @click="request"
-                    :disabled="!isValidRequest"
+                    @click="requestArticles"
+                    :disabled="!isValidGoodsIssue"
                 >
                     Solicitar
                 </button>
@@ -371,11 +364,7 @@ listPurposes();
         </div>
     </section>
 
-    <AddItemDialog
-        ref="addItemDialogRef"
-        @added="calculateGrandTotal"
-        :request-list="requestList"
-    />
+    <AddItemDialog ref="addItemDialogRef" @added="calculateGrandTotal" :request-list="items" />
 
     <DescribeItemStateDialog :row="selectedRow" ref="describeItemStateDialogRef" />
 </template>
