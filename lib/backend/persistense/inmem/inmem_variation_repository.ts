@@ -17,7 +17,7 @@ export class InmemVariationRepository implements VariationRepository {
         return Promise.resolve(undefined);
     }
 
-    getVariations(): Promise<Variation[]> {
+    getAll(): Promise<Variation[]> {
         return Promise.resolve(this.records);
     }
 

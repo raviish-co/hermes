@@ -8,7 +8,6 @@ export type PurposeDTO = {
 
 export type ItemQuery = {
     itemId: ID;
-    variations?: ID[];
 };
 
 export type Condition = {
@@ -25,7 +24,7 @@ export type GoodIssueLineDTO = {
 
 export type GoodsIssueDTO = {
     purpose: PurposeDTO;
-    goodIssueLines: GoodIssueLineDTO[];
+    lines: GoodIssueLineDTO[];
     total: string;
     returnDate: string;
     securityDeposit: string;

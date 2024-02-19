@@ -1,4 +1,5 @@
 import { ItemCategoryStock } from "@backend/domain/catalog/item_category_stock";
+import type { Condition } from "@backend/shared/types";
 import { Decimal } from "@backend/shared/decimal";
 import { ID } from "@backend/shared/id";
 

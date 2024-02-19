@@ -1,8 +1,8 @@
-import { Decimal } from "../../shared/decimal";
-import { Purpose } from "./purpose";
-import { GoodsIssueLine } from "./goods_issue_line";
-import { User } from "../user";
-import { ID } from "../../shared/id";
+import { GoodsIssueLine } from "@backend/domain/goods_issue/goods_issue_line";
+import { Purpose } from "@backend/domain/goods_issue/purpose";
+import { Decimal } from "@backend/shared/decimal";
+import { User } from "@backend/domain/user";
+import { ID } from "@backend/shared/id";
 
 type Options = {
     goodsIssueId: string;
@@ -12,57 +12,51 @@ type Options = {
     returnDate: string;
 };
 
-export enum RequestStatus {
+export enum GoodsIssueStatus {
     PENDING = "Por Devolver",
 }
 
 export class GoodsIssue {
-    readonly requestId: ID;
+    readonly goodsIssueId: ID;
     readonly purpose: Purpose;
     readonly user: User;
-    readonly items: GoodsIssueLine[];
+    readonly goodsIssueLines: GoodsIssueLine[];
     readonly returnDate: Date;
     readonly issuedAt: Date;
-    status: RequestStatus;
+    status: GoodsIssueStatus;
     total: Decimal;
     securityDeposit: Decimal;
 
     private constructor(requestId: ID, purpose: Purpose, user: User, returnDate: Date) {
-        this.requestId = requestId;
+        this.goodsIssueId = requestId;
         this.purpose = purpose;
         this.user = user;
-        this.status = RequestStatus.PENDING;
+        this.status = GoodsIssueStatus.PENDING;
         this.issuedAt = new Date();
         this.returnDate = returnDate;
         this.total = Decimal.fromString("0");
-        this.items = [];
+        this.goodsIssueLines = [];
         this.securityDeposit = Decimal.fromString("0");
     }
 
     static create(options: Options): GoodsIssue {
-        const {
-            goodsIssueId: requestId,
-            purpose,
-            user,
-            goodsIssueLines: requestItems,
-            returnDate,
-        } = options;
+        const { goodsIssueId, purpose, user, goodsIssueLines, returnDate } = options;
         const returnDateParsed = new Date(returnDate);
-        const request = new GoodsIssue(ID.New(requestId), purpose, user, returnDateParsed);
-        request.addItems(requestItems);
-        return request;
+        const goodsIssue = new GoodsIssue(ID.New(goodsIssueId), purpose, user, returnDateParsed);
+        goodsIssue.addGoodsIssueLines(goodsIssueLines);
+        return goodsIssue;
     }
 
-    addItems(items: GoodsIssueLine[]): void {
-        for (const requestItem of items) {
-            this.addItem(requestItem);
+    addGoodsIssueLines(goodsIssueLines: GoodsIssueLine[]): void {
+        for (const line of goodsIssueLines) {
+            this.addGoodsIssueLine(line);
         }
         this.#calculateSecurityDeposit();
     }
 
-    addItem(requestedItem: GoodsIssueLine): void {
-        const total = requestedItem.getTotal();
-        this.items.push(requestedItem);
+    addGoodsIssueLine(goodsIssueLine: GoodsIssueLine): void {
+        const total = goodsIssueLine.getTotal();
+        this.goodsIssueLines.push(goodsIssueLine);
         this.#calculateTotal(total);
     }
 
