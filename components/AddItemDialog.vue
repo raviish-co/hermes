@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
 import { formatCurrency, convertToNumber } from "@frontend/helpers/number_format";
-import type { GoodsIssueLine } from "@frontend/models/goods_issue";
+import type { GoodsIssueItem } from "@frontend/models/goods_issue_item";
 import type { ItemModel, VariationValue } from "@frontend/models/item";
 import { CatalogService } from "@frontend/services/catalog_service";
 
 interface Props {
-    requestList: GoodsIssueLine[];
+    goodsIssueLines: GoodsIssueItem[];
 }
 
 interface Emits {
@@ -30,7 +30,7 @@ function emitItemAdded(item: ItemModel, idx: number) {
 }
 
 function itemExist(itemId: string): boolean {
-    return props.requestList.some((row) => row.itemId === itemId);
+    return props.goodsIssueLines.some((row) => row.itemId === itemId);
 }
 
 function validateQuantity(item: ItemModel, quantity: number): boolean {
@@ -50,9 +50,9 @@ function addItem(item: ItemModel, idx: number) {
 
     total.value = calculateTotal(item, quantity);
 
-    const newRow = makeRequestItem(item, quantity, total.value);
+    const newRow = toGoodsIssueLine(item, quantity, total.value);
 
-    props.requestList.push(newRow);
+    props.goodsIssueLines.push(newRow);
 
     quantities.value[idx] = 0;
 }
@@ -65,7 +65,7 @@ function calculateTotal(item: ItemModel, quantity: number): string {
     return formatCurrency(total);
 }
 
-function makeRequestItem(item: ItemModel, quantity: number, total: string) {
+function toGoodsIssueLine(item: ItemModel, quantity: number, total: string): GoodsIssueItem {
     return { ...item, quantity, total };
 }
 

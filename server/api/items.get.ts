@@ -37,7 +37,5 @@ function makeItems(result: ItemCategory[]): ItemModel[] {
             status: r.getCondition().status as ConditionStatus,
             comment: r.getCondition()?.comment,
         },
-        total: "0,00",
-        securityDeposit: "00,0",
     }));
 }

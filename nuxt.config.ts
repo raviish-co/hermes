@@ -57,13 +57,13 @@ export default defineNuxtConfig({
                 },
             ],
         },
-        workbox: {
-            navigateFallback: "/",
-        },
-        devOptions: {
-            enabled: true,
-            type: "module",
-        },
+        // workbox: {
+        //     navigateFallback: "/",
+        // },
+        // devOptions: {
+        //     enabled: true,
+        //     type: "module",
+        // },
     },
     devtools: { enabled: false },
     css: ["~/assets/css/main.css"],

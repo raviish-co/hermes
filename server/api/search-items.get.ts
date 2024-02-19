@@ -1,5 +1,5 @@
 import { ItemCategory } from "@backend/domain/catalog/item_category";
-import { ConditionStatus, ItemModel } from "~/lib/frontend/models/item";
+import { ItemModel } from "~/lib/frontend/models/item";
 import { makeServices } from "@backend/main";
 
 const { catalogService } = makeServices();
@@ -32,10 +32,8 @@ function makeItems(result: ItemCategory[]): ItemModel[] {
         isUnique: r.isUnique(),
         quantity: r.getStock().getQuantity(),
         condition: {
-            status: r.getCondition().status as ConditionStatus,
+            status: r.getCondition().status,
             comment: r.getCondition()?.comment,
         },
-        total: "0,00",
-        securityDeposit: "00,0",
     }));
 }

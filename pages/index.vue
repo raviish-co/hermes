@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { AddItemDialog, DescribeItemStateDialog } from "#build/components";
-import type { ItemModel, VariationValue } from "@frontend/models/item";
+import type { VariationValue } from "@frontend/models/item";
 import { formatCurrency, convertToNumber, removeSpaces } from "@frontend/helpers/number_format";
-import { RequestService } from "@frontend/services/request_service";
-import type { GoodsIssueLine, GoodsIssueModel } from "@frontend/models/goods_issue";
+import { GoodsIssueService } from "@frontend/services/goods_issue_service";
+import type { GoodsIssueModel, GoodsIssueLine } from "@frontend/models/goods_issue";
 import { handleException } from "@frontend/helpers/error_handler";
+import type { GoodsIssueItem } from "@frontend/models/goods_issue_item";
 
 export interface Purpose {
     name: string;
@@ -24,19 +25,22 @@ const describeItemStateDialogRef = ref<typeof DescribeItemStateDialog>();
 const selectedSections = ref<string[]>([]);
 const currentNotesType = ref<string>("Descrição");
 const purposeDetailsIsDisabled = ref<boolean>(false);
-const items = ref<ItemModel[]>([]);
-const currentPurposeDescription = ref<string>("Finalidade");
+const goodsIssueItems = ref<GoodsIssueItem[]>([]);
+const currentPurposeDescription = ref<string>(PURPOSE);
 const currentDetails = ref<string>("");
 const securityDeposit = ref<string>("0,00");
 const grandTotal = ref<string>("0,00");
 const returnDate = ref<string>("");
 const recipient = ref<string>("");
+const selectedRow = ref<GoodsIssueItem>({} as GoodsIssueItem);
+
 const isDisabledSection = computed(() => selectedSections.value.length <= 0);
-const selectedRow = ref<ItemModel>({} as ItemModel);
 
-const requestService = new RequestService();
+const goodsIssueService = new GoodsIssueService();
 
-function makeGoodsIssue(): GoodsIssueModel {
+function toGoodsIssue(): GoodsIssueModel {
+    currentDetails.value = currentDetails.value === DETAIL ? "" : currentDetails.value;
+
     return {
         total: removeSpaces(grandTotal.value),
         securityDeposit: removeSpaces(securityDeposit.value),
@@ -46,14 +50,14 @@ function makeGoodsIssue(): GoodsIssueModel {
             details: currentDetails.value,
             notes: recipient.value,
         },
-        lines: makeProductData(),
+        lines: toGoodsIssueLine(),
     };
 }
 
-function makeProductData(): GoodsIssueLine[] {
-    if (items.value.length === 0) return [];
+function toGoodsIssueLine(): GoodsIssueLine[] {
+    if (goodsIssueItems.value.length === 0) return [];
 
-    return items.value.map((row) => ({
+    return goodsIssueItems.value.map((row) => ({
         itemId: row.itemId,
         quantity: row.quantity,
         condition: {
@@ -83,7 +87,7 @@ const isValidRecipient = computed(() => {
 });
 
 const isValidGoodsIssue = computed(() => {
-    const isValidGoodsLines = items.value.length > 0;
+    const isValidGoodsLines = goodsIssueItems.value.length > 0;
 
     if (isValidPurpose.value && isValidSection.value && isValidGoodsLines && isValidRecipient.value)
         return true;
@@ -92,18 +96,12 @@ const isValidGoodsIssue = computed(() => {
 });
 
 function requestArticles() {
-    const goodsIssue = makeGoodsIssue();
+    const goodsIssue = toGoodsIssue();
 
-    requestService
+    goodsIssueService
         .requestArticles(goodsIssue)
-        .then((res) => {
-            if (res.statusCode !== 200) {
-                alert(res.message);
-                return;
-            }
-
-            alert(res.message);
-
+        .then((msg) => {
+            alert(msg);
             clearValues();
         })
         .catch(handleException);
@@ -129,7 +127,7 @@ function findSectionByPurpose(purposeDescription: string): void {
     });
 
     currentPurposeDescription.value = purposeDescription;
-    updateCurrentSectionName("Secção");
+    updateCurrentSectionName(DETAIL);
 }
 
 function changeNotesType(notesType: string): void {
@@ -168,12 +166,12 @@ function updateCurrentSectionName(sectionName: string) {
 }
 
 function removeRequestRow(id: string): void {
-    items.value = items.value.filter((r) => r.itemId !== id);
+    goodsIssueItems.value = goodsIssueItems.value.filter((r) => r.itemId !== id);
     calculateGrandTotal();
 }
 
 function clearRequestList() {
-    items.value = [];
+    goodsIssueItems.value = [];
     grandTotal.value = "0,00";
     securityDeposit.value = "0,00";
 }
@@ -185,14 +183,14 @@ function calculateSecurityDeposit() {
 }
 
 function calculateGrandTotal() {
-    items.value.forEach((row, idx) => {
+    goodsIssueItems.value.forEach((item, idx) => {
         if (idx === 0) {
-            grandTotal.value = formatCurrency(convertToNumber(row.total) / 100);
+            grandTotal.value = formatCurrency(convertToNumber(item.total) / 100);
             calculateSecurityDeposit();
             return;
         }
 
-        const value = convertToNumber(row.total);
+        const value = convertToNumber(item.total);
         const total = convertToNumber(grandTotal.value);
 
         const result = (value + total) / 100;
@@ -206,12 +204,12 @@ function showAddItemDialog() {
     addItemDialogRef.value?.show();
 }
 
-function showDescribeItemStatusDialog(row: ItemModel) {
-    selectedRow.value = row;
+function showDescribeItemStatusDialog(item: GoodsIssueItem) {
+    selectedRow.value = item;
 
     describeItemStateDialogRef.value?.initializeItemState(
-        row?.condition!.status,
-        row?.condition?.comment
+        item?.condition!.status,
+        item?.condition?.comment
     );
 
     describeItemStateDialogRef.value?.show();
@@ -231,7 +229,7 @@ function clearValues() {
     currentDetails.value = DETAIL;
     selectedSections.value = [];
     recipient.value = "";
-    items.value = [];
+    goodsIssueItems.value = [];
     grandTotal.value = "0,00";
     securityDeposit.value = "0,00";
 }
@@ -252,7 +250,7 @@ function clearValues() {
                 <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
                     <VSelect
                         :value="currentPurposeDescription"
-                        placeholder="Finalidade"
+                        :placeholder="PURPOSE"
                         :options="getPurposeDescriptions()"
                         :is-invalid="!isValidPurpose"
                         @change="findSectionByPurpose"
@@ -312,7 +310,11 @@ function clearValues() {
                         </thead>
 
                         <tbody>
-                            <tr v-for="(row, idx) in items" :key="idx" class="cursor-pointer">
+                            <tr
+                                v-for="(row, idx) in goodsIssueItems"
+                                :key="idx"
+                                class="cursor-pointer"
+                            >
                                 <td>{{ row.itemId }}</td>
                                 <td @click="showDescribeItemStatusDialog(row)">
                                     {{ row.name }}
@@ -364,9 +366,11 @@ function clearValues() {
         </div>
     </section>
 
-    <AddItemDialog ref="addItemDialogRef" @added="calculateGrandTotal" :request-list="items" />
+    <AddItemDialog
+        ref="addItemDialogRef"
+        @added="calculateGrandTotal"
+        :goods-issue-lines="goodsIssueItems"
+    />
 
     <DescribeItemStateDialog :row="selectedRow" ref="describeItemStateDialogRef" />
 </template>
-~/lib/frontend/helpers/number_format~/lib/frontend/helpers/error_handler
-~/lib/frontend/models/item~/lib/frontend/models/goods_issue

@@ -5,13 +5,13 @@ export interface VariationValue {
     value: string;
 }
 
-export interface ItemModel {
+export interface GoodsIssueItem {
     itemId: string;
     name: string;
     price: string;
-    categoryId: string;
-    variationsValues?: VariationValue[];
     isUnique: boolean;
     quantity: number;
+    total: string;
+    variationsValues?: VariationValue[];
     condition?: Condition;
 }
