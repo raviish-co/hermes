@@ -1,16 +1,16 @@
-import { InsufficientStockItem } from "@backend/domain/sequences/insufficient_item_stock_error";
+import { InsufficientStockItem } from "@backend/domain/catalog/insufficient_item_stock_error";
 import type { ItemCategoryRepository } from "@backend/domain/catalog/item_category_repository";
-import type { GoodsIssueRepository } from "@backend/domain/requests/goods_issue_repository";
-import type { PurposeSpecification } from "@backend/domain/requests/purpose_specification";
+import type { GoodsIssueRepository } from "@backend/domain/goods_issue/goods_issue_repository";
+import type { PurposeSpecification } from "@backend/domain/goods_issue/purpose_specification";
 import type { GoodsIssueDTO, GoodIssueLineDTO, ItemQuery } from "@backend/shared/types";
-import { PurposeNotFound } from "@backend/domain/requests/purpose_not_found_error";
-import { GoodsIssueBuilder } from "@backend/domain/requests/goods_issue_builder";
+import { PurposeNotFound } from "@backend/domain/goods_issue/purpose_not_found_error";
+import { GoodsIssueBuilder } from "@backend/domain/goods_issue/goods_issue_builder";
 import type { ItemCategory } from "~/lib/backend/domain/catalog/item_category";
-import { GoodsIssueLine } from "@backend/domain/requests/goods_issue_line";
+import { GoodsIssueLine } from "@backend/domain/goods_issue/goods_issue_line";
 import type { Generator } from "@backend/domain/sequences/generator";
 import { type Either, left, right } from "@backend/shared/either";
 import { Sequence } from "@backend/domain/sequences/sequence";
-import type { RequestError } from "@backend/shared/errors";
+import type { GoodsIssueError } from "@backend/shared/errors";
 import { User } from "@backend/domain/user";
 import { ID } from "@backend/shared/id";
 
@@ -32,8 +32,8 @@ export class GoodsIssueService {
         this.#purposeSpecification = purposeSpecification;
     }
 
-    async requestItems(data: GoodsIssueDTO): Promise<Either<RequestError, void>> {
-        const { purpose, goodIssueLines: lines, total, returnDate, securityDeposit } = data;
+    async new(data: GoodsIssueDTO): Promise<Either<GoodsIssueError, void>> {
+        const { purpose, lines, total, returnDate, securityDeposit } = data;
 
         if (!this.#purposeSpecification.isSatisfiedBy(purpose))
             return left(new PurposeNotFound(purpose.description));
@@ -71,10 +71,7 @@ export class GoodsIssueService {
     #buildQueries(lines: GoodIssueLineDTO[]): ItemQuery[] {
         const queries: ItemQuery[] = [];
         for (const line of lines) {
-            const query = {
-                itemId: ID.New(line.itemId),
-                variations: line.variations ? line.variations.map((v) => ID.New(v)) : [],
-            };
+            const query = { itemId: ID.New(line.itemId) };
             queries.push(query);
         }
         return queries;

@@ -1,12 +1,12 @@
-import type { GoodsIssueRepository } from "@backend/domain/requests/request_repository";
-import { GoodsIssue } from "@backend/domain/requests/request";
+import type { GoodsIssueRepository } from "@backend/domain/goods_issue/goods_issue_repository";
+import { GoodsIssue } from "@backend/domain/goods_issue/goods_issue";
 import { ID } from "@backend/shared/id";
 
 export class InmemGoodsIssueRepository implements GoodsIssueRepository {
     #goodsIssues: Record<string, GoodsIssue> = {};
 
     save(goodsIssue: GoodsIssue): Promise<void> {
-        this.#goodsIssues[goodsIssue.requestId.toString()] = goodsIssue;
+        this.#goodsIssues[goodsIssue.goodsIssueId.toString()] = goodsIssue;
         return Promise.resolve(undefined);
     }
 

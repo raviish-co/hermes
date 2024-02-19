@@ -1,5 +1,5 @@
 import { ItemCategoryStock } from "@backend/domain/catalog/item_category_stock";
-import { GoodsIssue, RequestStatus } from "@backend/domain/requests/goods_issue";
+import { GoodsIssue, GoodsIssueStatus } from "@backend/domain/requests/goods_issue";
 import { ItemCategory, ItemStatus } from "@backend/domain/catalog/item_category";
 import { GoodsIssueLine } from "@backend/domain/requests/goods_issue_line";
 import { Category } from "@backend/domain/catalog/category";
@@ -11,7 +11,7 @@ describe("Test Request Products", () => {
     it("should create the request products", () => {
         const request = GoodsIssue.create(requestOptions);
 
-        expect(request.getStatus()).toEqual(RequestStatus.PENDING);
+        expect(request.getStatus()).toEqual(GoodsIssueStatus.PENDING);
     });
 
     it("Deve garantir que a seção será definida caso a finalidade tenha seções", () => {
@@ -70,7 +70,7 @@ describe("Test Request Products", () => {
     it("Deve adicionar os artigos a solicitação", () => {
         const request = GoodsIssue.create(requestOptions);
 
-        expect(request.items.length).toEqual(3);
+        expect(request.goodsIssueLines.length).toEqual(3);
     });
 
     it("Deve calcular o valor total da solicitação", () => {
@@ -84,9 +84,9 @@ describe("Test Request Products", () => {
     it("Deve calcular o valor total da linha com base na quantidade de artigos solicitados", () => {
         const request = GoodsIssue.create(requestOptions);
 
-        request.addItems(goodsIssueLines);
+        request.addGoodsIssueLines(goodsIssueLines);
 
-        const requestLine = request.items[0];
+        const requestLine = request.goodsIssueLines[0];
         expect(requestLine.getTotal().value).toEqual("450,00");
     });
 
@@ -108,7 +108,7 @@ describe("Test Request Products", () => {
         ];
         const request = GoodsIssue.create({ ...requestOptions, goodsIssueLines: requestItems });
 
-        const requestItem = request.items[0];
+        const requestItem = request.goodsIssueLines[0];
 
         expect(requestItem.getTotal().value).toEqual("3451,50");
     });

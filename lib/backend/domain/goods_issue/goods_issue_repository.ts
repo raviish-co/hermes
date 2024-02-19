@@ -1,4 +1,4 @@
-import { GoodsIssue } from "@backend/domain/requests/goods_issue";
+import { GoodsIssue } from "@backend/domain/goods_issue/goods_issue";
 import { ID } from "@backend/shared/id";
 
 export interface GoodsIssueRepository {

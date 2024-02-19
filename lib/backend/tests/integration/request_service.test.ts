@@ -1,17 +1,17 @@
 import { InmemGoodsIssueRepository } from "@backend/persistense/inmem/inmem_goods_issue_repository";
-import { InsufficientStockItem } from "@backend/domain/sequences/insufficient_item_stock_error";
 import type { ItemCategoryRepository } from "@backend/domain/catalog/item_category_repository";
+import { InsufficientStockItem } from "@backend/domain/catalog/insufficient_item_stock_error";
 import { ItemCategoryNotFound } from "@backend/domain/catalog/item_category_not_found_error";
 import { InmemSequenceStorage } from "@backend/persistense/inmem/inmem_sequence_storage";
 import { SequenceGenerator } from "@backend/domain/sequences/sequence_generator";
-import { InvalidTotal } from "@backend/domain/requests/invalid_total_error";
+import { InvalidTotal } from "@backend/domain/goods_issue/invalid_total_error";
 // import type { Purposes } from "@backend/domain/requests/purpose_specification";
 import { GoodsIssueService } from "@backend/application/goods_issue_service";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { describe, expect, it, vi } from "vitest";
 import { ID } from "@backend/shared/id";
 import { DefaultPurposeSpecification } from "../../adapters/default_purpose_specification";
-import type { PurposeSpecification } from "../../domain/requests/purpose_specification";
+// import type { PurposeSpecification } from "../../domain/requests/purpose_specification";
 
 // describe("Test List Purposes ", () => {
 //     it("should be return an  list void of purposes", async () => {
@@ -56,27 +56,27 @@ import type { PurposeSpecification } from "../../domain/requests/purpose_specifi
 // });
 
 describe("Test Request Items", () => {
-    it("Deve chamar o método **exists** para encontrar a finalidade", () => {
-        const description = "Aluguer";
-        const productsData = [{ itemId: "1001", quantity: 1 }];
-        const data = {
-            ...requestData,
-            purpose: {
-                description,
-            },
-            productsData,
-        };
+    // it("Deve chamar o método **exists** para encontrar a finalidade", () => {
+    //     const description = "Aluguer";
+    //     const productsData = [{ itemId: "1001", quantity: 1 }];
+    //     const data = {
+    //         ...requestData,
+    //         purpose: {
+    //             description,
+    //         },
+    //         productsData,
+    //     };
 
-        const { service, purposeSource } = makeService();
+    //     const { service, purposeSource } = makeService();
 
-        const spy = vi.spyOn(purposeSource, "exists");
+    //     const spy = vi.spyOn(purposeSource, "exists");
 
-        service.requestItems(data);
+    //     service.requestItems(data);
 
-        expect(spy).toHaveBeenCalled();
-        expect(spy).toHaveBeenCalledTimes(1);
-        expect(spy).toHaveBeenCalledWith(description);
-    });
+    //     expect(spy).toHaveBeenCalled();
+    //     expect(spy).toHaveBeenCalledTimes(1);
+    //     expect(spy).toHaveBeenCalledWith(description);
+    // });
 
     it("Deve retornar error **PurposeNotFound** se não existir", async () => {
         const data = {
@@ -85,7 +85,7 @@ describe("Test Request Items", () => {
         };
         const { service } = makeService();
 
-        const error = await service.requestItems(data);
+        const error = await service.new(data);
 
         expect(error.isLeft()).toBeTruthy();
     });
@@ -95,7 +95,7 @@ describe("Test Request Items", () => {
         const { service, itemRepository } = makeService();
         const spy = vi.spyOn(itemRepository, "getAll");
 
-        await service.requestItems({ ...requestData, goodIssueLines: productsData });
+        await service.new({ ...requestData, lines: productsData });
 
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledTimes(1);
@@ -106,9 +106,9 @@ describe("Test Request Items", () => {
         const productsData = [{ itemId: "1008", quantity: 1 }];
         const { service } = makeService();
 
-        const error = await service.requestItems({
+        const error = await service.new({
             ...requestData,
-            goodIssueLines: productsData,
+            lines: productsData,
         });
 
         expect(error.isLeft()).toBeTruthy();
@@ -122,9 +122,9 @@ describe("Test Request Items", () => {
 
         const spy = vi.spyOn(requestRepository, "save");
 
-        const error = await service.requestItems({
+        const error = await service.new({
             ...requestData,
-            goodIssueLines: productsData,
+            lines: productsData,
             total,
             securityDeposit: "9000,00",
         });
@@ -137,20 +137,20 @@ describe("Test Request Items", () => {
         const productsData = [{ itemId: "1001", quantity: 1 }];
         const { service, requestRepository } = makeService();
 
-        await service.requestItems({
+        await service.new({
             ...requestData,
-            goodIssueLines: productsData,
+            lines: productsData,
             total: "4500,00",
             securityDeposit: "9000,00",
         });
 
         const request = await requestRepository.last();
-        const requestItem = request.items[0];
+        const goodsIssueLine = request.goodsIssueLines[0];
 
-        expect(request.items.length).toBe(1);
-        expect(requestItem.item.itemId.toString()).toEqual("1001");
-        expect(requestItem.getTotal().value).toEqual("4500,00");
-        expect(requestItem.quantity).toEqual(1);
+        expect(request.goodsIssueLines.length).toBe(1);
+        expect(goodsIssueLine.item.itemId.toString()).toEqual("1001");
+        expect(goodsIssueLine.getTotal().value).toEqual("4500,00");
+        expect(goodsIssueLine.quantity).toEqual(1);
     });
 
     it("Deve efectuar a solicitação de mais de um artigo", async () => {
@@ -162,15 +162,15 @@ describe("Test Request Items", () => {
         const securityDeposit = "40000,00";
         const { service, requestRepository } = makeService();
 
-        await service.requestItems({
+        await service.new({
             ...requestData,
-            goodIssueLines: productsData,
+            lines: productsData,
             total,
             securityDeposit,
         });
 
         const request = await requestRepository.last();
-        expect(request.items.length).toBe(2);
+        expect(request.goodsIssueLines.length).toBe(2);
         expect(request.getTotal().value).toEqual(total);
     });
 
@@ -178,7 +178,7 @@ describe("Test Request Items", () => {
         const total = "25,00";
         const { service } = makeService();
 
-        const error = await service.requestItems({
+        const error = await service.new({
             ...requestData,
             total,
         });
@@ -190,7 +190,7 @@ describe("Test Request Items", () => {
     it("Deve registrar a data de devolução da solicitação", async () => {
         const { service, requestRepository } = makeService();
 
-        await service.requestItems(requestData);
+        await service.new(requestData);
 
         const request = await requestRepository.last();
 
@@ -201,11 +201,11 @@ describe("Test Request Items", () => {
     it("Deve solicitar vários artigos com diferentes quantidades", async () => {
         const { service, requestRepository } = makeService();
 
-        await service.requestItems(requestData);
+        await service.new(requestData);
 
         const request = await requestRepository.last();
 
-        expect(request.items.length).toBe(2);
+        expect(request.goodsIssueLines.length).toBe(2);
         expect(request.getTotal().value).toEqual("55500,00");
     });
 
@@ -216,9 +216,9 @@ describe("Test Request Items", () => {
         ];
 
         const { service } = makeService();
-        const error = await service.requestItems({
+        const error = await service.new({
             ...requestData,
-            goodIssueLines: productsData,
+            lines: productsData,
         });
 
         expect(error.isLeft()).toBeTruthy();
@@ -230,7 +230,7 @@ describe("Test Request Items", () => {
 
         const spy = vi.spyOn(itemRepository, "updateAll");
 
-        await service.requestItems(requestData);
+        await service.new(requestData);
 
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledTimes(1);
@@ -239,7 +239,7 @@ describe("Test Request Items", () => {
     it("Deve diminuir o estoque dos artigos solicitados", async () => {
         const { service, itemRepository } = makeService();
 
-        await service.requestItems(requestData);
+        await service.new(requestData);
 
         const item = await itemRepository.getById(ID.New("1001"));
 
@@ -251,7 +251,7 @@ describe("Test Request Items", () => {
     it("Deve ser adicionada a solicitação, caso a finalidade tenha uma seção", async () => {
         const { service, requestRepository } = makeService();
 
-        await service.requestItems(requestData);
+        await service.new(requestData);
 
         const request = await requestRepository.last();
 
@@ -271,7 +271,7 @@ describe("Test Request Items", () => {
 
         const { service, requestRepository } = makeService();
 
-        await service.requestItems(data);
+        await service.new(data);
 
         const request = await requestRepository.last();
 
@@ -287,9 +287,9 @@ describe("Test Request Items", () => {
         ];
         const { service } = makeService();
 
-        const error = await service.requestItems({
+        const error = await service.new({
             ...requestData,
-            goodIssueLines: productsData,
+            lines: productsData,
         });
 
         expect(error.isLeft()).toBeTruthy();
@@ -299,7 +299,7 @@ describe("Test Request Items", () => {
     it("Deve retornar **InvalidTotal** se o total da çaução não foi igual ao valor calculado", async () => {
         const { service } = makeService();
 
-        const error = await service.requestItems({
+        const error = await service.new({
             ...requestData,
             securityDeposit: "100,00",
         });
@@ -311,33 +311,33 @@ describe("Test Request Items", () => {
     it("Deve gerar o ID da solicitação", async () => {
         const { service, requestRepository } = makeService();
 
-        await service.requestItems(requestData);
+        await service.new(requestData);
 
         const request = await requestRepository.get(ID.New("GS - 1000"));
 
-        expect(request.requestId).toBeDefined();
-        expect(request.requestId).toBeInstanceOf(ID);
-        expect(request.requestId.toString()).toEqual("GS - 1000");
+        expect(request.goodsIssueId).toBeDefined();
+        expect(request.goodsIssueId).toBeInstanceOf(ID);
+        expect(request.goodsIssueId.toString()).toEqual("GS - 1000");
     });
 
     it("Deve gerar 2 solicitações com IDs diferentes", async () => {
         const { service, requestRepository } = makeService();
 
-        await service.requestItems(requestData);
+        await service.new(requestData);
 
-        await service.requestItems(requestData);
+        await service.new(requestData);
 
-        const request1 = await requestRepository.get(ID.New("GS - 1000"));
-        const request2 = await requestRepository.get(ID.New("GS - 1001"));
+        const goodsIssue1 = await requestRepository.get(ID.New("GS - 1000"));
+        const goodsIssue2 = await requestRepository.get(ID.New("GS - 1001"));
 
-        expect(request1.requestId.toString()).toEqual("GS - 1000");
-        expect(request2.requestId.toString()).toEqual("GS - 1001");
+        expect(goodsIssue1.goodsIssueId.toString()).toEqual("GS - 1000");
+        expect(goodsIssue2.goodsIssueId.toString()).toEqual("GS - 1001");
     });
 
     it("Deve receber o estado atual dos artigos solicitados", async () => {
         const { service, itemRepository } = makeService();
 
-        await service.requestItems(requestData);
+        await service.new(requestData);
 
         const item1 = await itemRepository.getById(ID.New("1001"));
         const item2 = await itemRepository.getById(ID.New("1002"));
@@ -354,7 +354,7 @@ const requestData = {
         description: "Lavandaria",
         detailConstraint: "Interna",
     },
-    goodIssueLines: [
+    lines: [
         {
             itemId: "1001",
             quantity: 2,

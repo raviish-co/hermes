@@ -1,8 +1,8 @@
-import { InvalidTotal } from "@backend/domain/requests/invalid_total_error";
-import { GoodsIssueLine } from "@backend/domain/requests/goods_issue_line";
+import { InvalidTotal } from "@backend/domain/goods_issue/invalid_total_error";
+import { GoodsIssueLine } from "@backend/domain/goods_issue/goods_issue_line";
+import { GoodsIssue } from "@backend/domain/goods_issue/goods_issue";
 import { type Either, left, right } from "@backend/shared/either";
-import { GoodsIssue } from "@backend/domain/requests/goods_issue";
-import { Purpose } from "@backend/domain/requests/purpose";
+import { Purpose } from "@backend/domain/goods_issue/purpose";
 import type { PurposeDTO } from "@backend/shared/types";
 import type { User } from "@backend/domain/user";
 

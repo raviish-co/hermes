@@ -11,9 +11,9 @@ import { ImportService } from "./application/import_service";
 import { PurposeService } from "./application/purpose_service";
 
 const itemRepository = new ItemRepositoryStub();
-const requestRepository = new InmemGoodsIssueRepository();
-const sequenceStore = new InmemSequenceStorage();
-const sequenceGenerator = new SequenceGenerator(sequenceStore);
+const goodsIssueRepository = new InmemGoodsIssueRepository();
+const sequenceStorage = new InmemSequenceStorage();
+const sequenceGenerator = new SequenceGenerator(sequenceStorage);
 const categoryRepository = new InmemCategoryRepository();
 const variationRepository = new VariationsRepositoryStub();
 const purposeSpec = new DefaultPurposeSpecification();
@@ -28,7 +28,7 @@ interface Services {
 export const makeServices = (): Services => {
     const goodsIssueService = new GoodsIssueService(
         itemRepository,
-        requestRepository,
+        goodsIssueRepository,
         sequenceGenerator,
         purposeSpec
     );

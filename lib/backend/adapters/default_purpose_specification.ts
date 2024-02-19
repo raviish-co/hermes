@@ -1,5 +1,5 @@
-import type { PurposeSpecification } from "../domain/requests/purpose_specification";
-import type { Purpose } from "../domain/requests/purpose";
+import type { PurposeSpecification } from "../domain/goods_issue/purpose_specification";
+import type { Purpose } from "../domain/goods_issue/purpose";
 import definitions from "@/data/purposes.json";
 
 export class DefaultPurposeSpecification implements PurposeSpecification {

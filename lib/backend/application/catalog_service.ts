@@ -29,6 +29,6 @@ export class CatalogService {
     }
 
     async getVariations(): Promise<Variation[]> {
-        return await this.#variationRepository.getVariations();
+        return await this.#variationRepository.getAll();
     }
 }

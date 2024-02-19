@@ -19,9 +19,9 @@ export class GoodsIssueLine {
 
     static create(options: Options): GoodsIssueLine {
         const { item, quantity } = options;
-        const requestItem = new GoodsIssueLine(item, quantity);
-        requestItem.#calculateTotal();
-        return requestItem;
+        const goodsIssueLine = new GoodsIssueLine(item, quantity);
+        goodsIssueLine.#calculateTotal();
+        return goodsIssueLine;
     }
 
     #calculateTotal(): void {
