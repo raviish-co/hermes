@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
-import { formatCurrency, convertToNumber } from "@frontend/helpers/number_format";
+import { convertToNumber } from "@frontend/helpers/convert_to_number";
 import type { GoodsIssueItem } from "@frontend/models/goods_issue_item";
 import type { ItemModel, VariationValue } from "@frontend/models/item";
 import { CatalogService } from "@frontend/services/catalog_service";
+import { formatCurrency } from "@frontend/helpers/format_currency";
 
 interface Props {
-    goodsIssueLines: GoodsIssueItem[];
+    goodsIssueItems: GoodsIssueItem[];
 }
 
 interface Emits {
@@ -20,8 +21,9 @@ const query = ref<string>("");
 const items = ref<ItemModel[]>([]);
 const total = ref<string>("0,00");
 const pages = ref<number>(1);
-const catalogService = new CatalogService();
 const quantities = ref<number[]>([]);
+
+const catalogService = new CatalogService();
 
 function emitItemAdded(item: ItemModel, idx: number) {
     addItem(item, idx);
@@ -30,7 +32,7 @@ function emitItemAdded(item: ItemModel, idx: number) {
 }
 
 function itemExist(itemId: string): boolean {
-    return props.goodsIssueLines.some((row) => row.itemId === itemId);
+    return props.goodsIssueItems.some((row) => row.itemId === itemId);
 }
 
 function validateQuantity(item: ItemModel, quantity: number): boolean {
@@ -42,7 +44,7 @@ function validateQuantity(item: ItemModel, quantity: number): boolean {
 }
 
 function addItem(item: ItemModel, idx: number) {
-    const quantity = item.isUnique ? 1 : quantities.value[idx];
+    const quantity = quantities.value[idx];
 
     if (!validateQuantity(item, quantity)) return;
 
@@ -52,7 +54,7 @@ function addItem(item: ItemModel, idx: number) {
 
     const newRow = toGoodsIssueLine(item, quantity, total.value);
 
-    props.goodsIssueLines.push(newRow);
+    props.goodsIssueItems.push(newRow);
 
     quantities.value[idx] = 0;
 }
@@ -96,7 +98,7 @@ function initializeQuantities() {
     items.value.forEach((_, idx) => (quantities.value[idx] = 0));
 }
 
-function listVariations(variationValues?: VariationValue[]) {
+function listVariationValues(variationValues?: VariationValue[]) {
     if (!variationValues) return "";
 
     const values = variationValues.map((v) => v.value);
@@ -118,8 +120,8 @@ function enableToEditQuantity(isUnique: boolean, quantity: number) {
 }
 
 function showDialog() {
-    dialogRef.value?.show();
     listItems();
+    dialogRef.value?.show();
 }
 
 defineExpose({ show: showDialog });
@@ -161,7 +163,7 @@ defineExpose({ show: showDialog });
                             <br />
 
                             <span class="text-light-600 text-xs sm:text-sm">
-                                {{ listVariations(item?.variationsValues) }}
+                                {{ listVariationValues(item?.variationsValues) }}
                             </span>
                         </td>
 

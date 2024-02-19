@@ -1,11 +1,12 @@
-<script setup lang="ts">
-import type { AddItemDialog, DescribeItemStateDialog } from "#build/components";
-import type { VariationValue } from "@frontend/models/item";
-import { formatCurrency, convertToNumber, removeSpaces } from "@frontend/helpers/number_format";
+<script lang="ts" setup>
+import type { AddItemDialog, DescribeItemStatusDialog } from "#build/components";
+import type { VariationValue } from "@frontend/models/goods_issue_item";
+import { convertToNumber } from "@frontend/helpers/convert_to_number";
 import { GoodsIssueService } from "@frontend/services/goods_issue_service";
 import type { GoodsIssueModel, GoodsIssueLine } from "@frontend/models/goods_issue";
 import { handleException } from "@frontend/helpers/error_handler";
 import type { GoodsIssueItem } from "@frontend/models/goods_issue_item";
+import { formatCurrency } from "@frontend/helpers/format_currency";
 
 export interface Purpose {
     name: string;
@@ -16,42 +17,30 @@ export interface Purpose {
 const INNER_LAUNDRY = "Interna";
 const DISCARD = "Descartar";
 const PURPOSE = "Finalidade";
-const DETAIL = "Detalhes";
+const DETAILS = "Detalhes";
 
 const purposes = usePurpose().purposes;
 
 const addItemDialogRef = ref<typeof AddItemDialog>();
-const describeItemStateDialogRef = ref<typeof DescribeItemStateDialog>();
-const selectedSections = ref<string[]>([]);
-const currentNotesType = ref<string>("Descrição");
+const describeItemStatusDialogRef = ref<typeof DescribeItemStatusDialog>();
+const currentPurposeDetail = ref<string[]>([]);
+const currentPurposeNotesType = ref<string>("");
+const currentPurposeDetails = ref<string>("");
+const currentPurposeDescription = ref<string>("");
 const purposeDetailsIsDisabled = ref<boolean>(false);
 const goodsIssueItems = ref<GoodsIssueItem[]>([]);
-const currentPurposeDescription = ref<string>(PURPOSE);
-const currentDetails = ref<string>("");
 const securityDeposit = ref<string>("0,00");
 const grandTotal = ref<string>("0,00");
 const returnDate = ref<string>("");
-const recipient = ref<string>("");
 const selectedRow = ref<GoodsIssueItem>({} as GoodsIssueItem);
+const currentPurposeNotesTypePlaceholder = ref<string>("Descrição");
 
-const isDisabledSection = computed(() => selectedSections.value.length <= 0);
+const isDisabledSection = computed(() => currentPurposeDetail.value.length <= 0);
 
 const goodsIssueService = new GoodsIssueService();
 
-function toGoodsIssue(): GoodsIssueModel {
-    currentDetails.value = currentDetails.value === DETAIL ? "" : currentDetails.value;
-
-    return {
-        total: removeSpaces(grandTotal.value),
-        securityDeposit: removeSpaces(securityDeposit.value),
-        returnDate: returnDate.value,
-        purpose: {
-            description: currentPurposeDescription.value,
-            details: currentDetails.value,
-            notes: recipient.value,
-        },
-        lines: toGoodsIssueLine(),
-    };
+function removeSpaces(value: string): string {
+    return value.replace(/\s/g, "");
 }
 
 function toGoodsIssueLine(): GoodsIssueLine[] {
@@ -68,40 +57,63 @@ function toGoodsIssueLine(): GoodsIssueLine[] {
     }));
 }
 
-const isValidPurpose = computed(() =>
+function toGoodsIssue(): GoodsIssueModel {
+    return {
+        total: removeSpaces(grandTotal.value),
+        securityDeposit: removeSpaces(securityDeposit.value),
+        returnDate: returnDate.value,
+        purpose: {
+            description: currentPurposeDescription.value,
+            details: currentPurposeDetails.value,
+            notes: currentPurposeNotesType.value,
+        },
+        lines: toGoodsIssueLine(),
+    };
+}
+
+const isValidPurposeDescription = computed(() =>
     purposes.value.some((p) => p.description === currentPurposeDescription.value)
 );
 
-const isValidSection = computed(() => {
-    if (selectedSections.value.length > 0) {
-        return selectedSections.value.some((s) => s === currentDetails.value);
+const isValidDetails = computed(() => {
+    if (currentPurposeDetail.value.length > 0) {
+        return currentPurposeDetail.value.some((s) => s === currentPurposeDetails.value);
     }
 
     return true;
 });
 
-const isValidRecipient = computed(() => {
-    if (recipient.value === "" && !purposeDetailsIsDisabled.value) return false;
+const isValidNotesType = computed(() => {
+    if (currentPurposeNotesType.value === "" && !purposeDetailsIsDisabled.value) return false;
 
     return true;
 });
 
 const isValidGoodsIssue = computed(() => {
-    const isValidGoodsLines = goodsIssueItems.value.length > 0;
+    const isValidGoodsItems = goodsIssueItems.value.length > 0;
 
-    if (isValidPurpose.value && isValidSection.value && isValidGoodsLines && isValidRecipient.value)
+    if (
+        isValidPurposeDescription.value &&
+        isValidDetails.value &&
+        isValidGoodsItems &&
+        isValidNotesType.value
+    ) {
         return true;
+    }
 
     return false;
 });
 
-function requestArticles() {
+function newGoodsIssue() {
+    currentPurposeDetails.value =
+        currentPurposeDetails.value === DETAILS ? "" : currentPurposeDetails.value;
+
     const goodsIssue = toGoodsIssue();
 
     goodsIssueService
-        .requestArticles(goodsIssue)
-        .then((msg) => {
-            alert(msg);
+        .new(goodsIssue)
+        .then(({ message }) => {
+            alert(message);
             clearValues();
         })
         .catch(handleException);
@@ -111,27 +123,23 @@ function getPurposeDescriptions(): string[] {
     return purposes.value.map((p) => p.description);
 }
 
-function findSectionByPurpose(purposeDescription: string): void {
-    if (purposeDescription === PURPOSE) {
-        currentDetails.value = DETAIL;
-        selectedSections.value = [];
+function findDetailsByPurposeDescription(description: string): void {
+    if (description === PURPOSE) {
+        currentPurposeDetails.value = DETAILS;
+        currentPurposeDetail.value = [];
         return;
     }
 
     purposes.value.find((p) => {
-        if (p.description === purposeDescription) {
-            changeNotesType(p.notesType!);
-            disableNotesType(purposeDescription);
-            updateSelectedSections(p.detailsConstraint);
+        if (p.description === description) {
+            currentPurposeNotesTypePlaceholder.value = p.notesType!;
+            disableNotesType(description);
+            updateCurrentPurposeDetails(p.detailsConstraint);
         }
     });
 
-    currentPurposeDescription.value = purposeDescription;
-    updateCurrentSectionName(DETAIL);
-}
-
-function changeNotesType(notesType: string): void {
-    currentNotesType.value = notesType || "";
+    currentPurposeDescription.value = description;
+    updateCurrentPurposeNotesType("");
 }
 
 function disableNotesType(purposeName: string): void {
@@ -143,17 +151,17 @@ function disableNotesType(purposeName: string): void {
     purposeDetailsIsDisabled.value = false;
 }
 
-function updateSelectedSections(sections?: string[]) {
+function updateCurrentPurposeDetails(sections?: string[]) {
     if (!sections) {
-        selectedSections.value = [];
+        currentPurposeDetail.value = [];
         return;
     }
 
-    selectedSections.value = sections;
+    currentPurposeDetail.value = sections;
 }
 
-function updateCurrentSectionName(sectionName: string) {
-    currentDetails.value = sectionName;
+function updateCurrentPurposeNotesType(sectionName: string) {
+    currentPurposeDetails.value = sectionName;
 
     if (sectionName === INNER_LAUNDRY) {
         purposeDetailsIsDisabled.value = true;
@@ -207,15 +215,15 @@ function showAddItemDialog() {
 function showDescribeItemStatusDialog(item: GoodsIssueItem) {
     selectedRow.value = item;
 
-    describeItemStateDialogRef.value?.initializeItemState(
+    describeItemStatusDialogRef.value?.initializeItemState(
         item?.condition!.status,
         item?.condition?.comment
     );
 
-    describeItemStateDialogRef.value?.show();
+    describeItemStatusDialogRef.value?.show();
 }
 
-function listVariations(itemVariation?: VariationValue[]) {
+function listVariationValues(itemVariation?: VariationValue[]) {
     if (!itemVariation) return "";
 
     const values = itemVariation.map((v) => v.value);
@@ -226,9 +234,9 @@ function listVariations(itemVariation?: VariationValue[]) {
 function clearValues() {
     returnDate.value = new Date().toISOString();
     currentPurposeDescription.value = PURPOSE;
-    currentDetails.value = DETAIL;
-    selectedSections.value = [];
-    recipient.value = "";
+    currentPurposeDetails.value = DETAILS;
+    currentPurposeNotesType.value = "";
+    currentPurposeDetail.value = [];
     goodsIssueItems.value = [];
     grandTotal.value = "0,00";
     securityDeposit.value = "0,00";
@@ -252,26 +260,26 @@ function clearValues() {
                         :value="currentPurposeDescription"
                         :placeholder="PURPOSE"
                         :options="getPurposeDescriptions()"
-                        :is-invalid="!isValidPurpose"
-                        @change="findSectionByPurpose"
+                        :is-invalid="!isValidPurposeDescription"
+                        @change="findDetailsByPurposeDescription"
                     />
 
                     <VSelect
-                        :value="currentDetails"
-                        :placeholder="DETAIL"
-                        :options="selectedSections"
+                        :value="currentPurposeDetails"
+                        :placeholder="DETAILS"
+                        :options="currentPurposeDetail"
                         :disabled="isDisabledSection"
-                        :is-invalid="!isValidSection"
-                        @change="updateCurrentSectionName"
+                        :is-invalid="!isValidDetails"
+                        @change="updateCurrentPurposeNotesType"
                     />
                 </div>
 
                 <input
-                    v-model="recipient"
-                    :placeholder="currentNotesType"
+                    v-model="currentPurposeNotesType"
+                    :placeholder="currentPurposeNotesTypePlaceholder"
                     :disabled="purposeDetailsIsDisabled"
                     class="input-field mb-4"
-                    :class="{ invalid: !isValidRecipient }"
+                    :class="{ invalid: !isValidNotesType }"
                 />
             </form>
         </section>
@@ -320,7 +328,7 @@ function clearValues() {
                                     {{ row.name }}
                                     <br />
                                     <span class="text-light-600 text-sm">{{
-                                        listVariations(row?.variationsValues)
+                                        listVariationValues(row?.variationsValues)
                                     }}</span>
                                 </td>
                                 <td>{{ row.quantity }}</td>
@@ -344,7 +352,7 @@ function clearValues() {
             <div class="flex flex-wrap sm:flex-nowrap gap-4 w-full md:w-auto pb-4 md:pb-0">
                 <button
                     class="btn-secondary w-full md:flex-1"
-                    @click="requestArticles"
+                    @click="newGoodsIssue"
                     :disabled="!isValidGoodsIssue"
                 >
                     Solicitar
@@ -369,8 +377,8 @@ function clearValues() {
     <AddItemDialog
         ref="addItemDialogRef"
         @added="calculateGrandTotal"
-        :goods-issue-lines="goodsIssueItems"
+        :goods-issue-items="goodsIssueItems"
     />
 
-    <DescribeItemStateDialog :row="selectedRow" ref="describeItemStateDialogRef" />
+    <DescribeItemStatusDialog :row="selectedRow" ref="describeItemStatusDialogRef" />
 </template>
