@@ -1,83 +1,17 @@
-import { InmemGoodsIssueRepository } from "@backend/persistense/inmem/inmem_goods_issue_repository";
-import type { ItemCategoryRepository } from "@backend/domain/catalog/item_category_repository";
-import { InsufficientStockItem } from "@backend/domain/catalog/insufficient_item_stock_error";
-import { ItemCategoryNotFound } from "@backend/domain/catalog/item_category_not_found_error";
-import { InmemSequenceStorage } from "@backend/persistense/inmem/inmem_sequence_storage";
-import { SequenceGenerator } from "@backend/domain/sequences/sequence_generator";
-import { InvalidTotal } from "@backend/domain/goods_issue/invalid_total_error";
-// import type { Purposes } from "@backend/domain/requests/purpose_specification";
-import { GoodsIssueService } from "@backend/application/goods_issue_service";
+import { InmemGoodsIssueRepository } from "../../persistense/inmem/inmem_goods_issue_repository";
+import type { ItemCategoryRepository } from "../../domain/catalog/item_category_repository";
+import { InsufficientStockItem } from "../../domain/catalog/insufficient_item_stock_error";
+import { ItemCategoryNotFound } from "../../domain/catalog/item_category_not_found_error";
+import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
+import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
+import { InvalidTotal } from "../../domain/goods_issue/invalid_total_error";
+import { GoodsIssueService } from "../../application/goods_issue_service";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { describe, expect, it, vi } from "vitest";
-import { ID } from "@backend/shared/id";
+import { ID } from "../../shared/id";
 import { DefaultPurposeSpecification } from "../../adapters/default_purpose_specification";
-// import type { PurposeSpecification } from "../../domain/requests/purpose_specification";
-
-// describe("Test List Purposes ", () => {
-//     it("should be return an  list void of purposes", async () => {
-//         const purposeSource = new FakePurposeSource();
-//         const { service } = makeService({ purposeSource });
-
-//         const purposes = await service.listPurposes();
-
-//         expect(purposes).toEqual([]);
-//     });
-
-//     it("should be call list method in source data", async () => {
-//         const purposeSource = new FakePurposeSource();
-//         const { service } = makeService({ purposeSource });
-//         const spy = vi.spyOn(purposeSource, "list");
-
-//         await service.listPurposes();
-
-//         expect(spy).toHaveBeenCalled();
-//         expect(spy).toHaveBeenCalledTimes(1);
-//     });
-
-//     it("should retrieve a list of purposes from data", async () => {
-//         const { service } = makeService();
-
-//         const purposes = await service.listPurposes();
-
-//         expect(purposes.length).toBeGreaterThanOrEqual(1);
-//         expect(purposes[0].description).toEqual("Lavandaria");
-//         expect(purposes[0].detailsConstraint).toEqual(["Interna", "Externa"]);
-//     });
-
-//     it("should retrieve a purpose without details", async () => {
-//         const { service } = makeService();
-
-//         const purposes = await service.listPurposes();
-
-//         expect(purposes.length).toBeGreaterThanOrEqual(2);
-//         expect(purposes[1].description).toEqual("Arranjo");
-//         expect(purposes[1].detailsConstraint).toBeUndefined();
-//     });
-// });
 
 describe("Test Request Items", () => {
-    // it("Deve chamar o método **exists** para encontrar a finalidade", () => {
-    //     const description = "Aluguer";
-    //     const productsData = [{ itemId: "1001", quantity: 1 }];
-    //     const data = {
-    //         ...requestData,
-    //         purpose: {
-    //             description,
-    //         },
-    //         productsData,
-    //     };
-
-    //     const { service, purposeSource } = makeService();
-
-    //     const spy = vi.spyOn(purposeSource, "exists");
-
-    //     service.requestItems(data);
-
-    //     expect(spy).toHaveBeenCalled();
-    //     expect(spy).toHaveBeenCalledTimes(1);
-    //     expect(spy).toHaveBeenCalledWith(description);
-    // });
-
     it("Deve retornar error **PurposeNotFound** se não existir", async () => {
         const data = {
             ...requestData,

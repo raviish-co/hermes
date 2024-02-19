@@ -18,9 +18,7 @@ export class InmemItemCategoryRepository implements ItemCategoryRepository {
 
         for (const query of queries) {
             const filtered = this.records.find(
-                (item) =>
-                    item.itemId.toString() === query.itemId.toString() &&
-                    item.variations?.toString() === query.variations?.toString()
+                (item) => item.itemId.toString() === query.itemId.toString()
             );
 
             if (!filtered)
