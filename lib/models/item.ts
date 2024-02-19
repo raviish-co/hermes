@@ -3,19 +3,20 @@ export interface VariationValue {
     value: string;
 }
 
+export type ConditionStatus = "Bom" | "Mau";
+interface Condition {
+    status: ConditionStatus;
+    comment?: string;
+}
 export interface ItemModel {
     itemId: string;
     name: string;
     price: string;
     categoryId: string;
-    variationsValues: VariationValue[];
+    variationsValues?: VariationValue[];
     isUnique: boolean;
-    stock: number;
-    state: "Bom" | "Mau";
-}
-
-export interface Variation {
-    id: string;
-    value: string;
-    name: string;
+    quantity: number;
+    condition?: Condition;
+    total: string;
+    securityDeposit: string;
 }

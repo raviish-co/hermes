@@ -1,5 +1,5 @@
 export interface PurposeModel {
     description: string;
-    detailsConstraint: string[];
+    detailsConstraint?: string[];
     notesType?: string;
 }

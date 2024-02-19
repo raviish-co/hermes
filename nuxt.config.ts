@@ -67,4 +67,5 @@ export default defineNuxtConfig({
             autoprefixer: {},
         },
     },
+    plugins: ["~/plugins/app_created"],
 });

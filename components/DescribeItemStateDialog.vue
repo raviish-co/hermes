@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
-import { ItemStateOption, type RequestItem } from "~/lib/models/item";
+import { type ConditionStatus, type ItemModel } from "~/lib/models/item";
 
 interface Props {
-    row: RequestItem;
+    row: ItemModel;
+}
+
+enum ItemStatus {
+    Good = "Bom",
+    Bad = "Mau",
 }
 
 const pros = defineProps<Props>();
@@ -11,18 +16,18 @@ const pros = defineProps<Props>();
 const dialogRef = ref<typeof VDialog>();
 const status = ref<string>("");
 const comment = ref<string>("");
-const options = Object.values(ItemStateOption);
+const options = Object.values(ItemStatus);
 
-const isGoodState = computed(() => status.value !== ItemStateOption.Bad);
+const isGoodState = computed(() => status.value !== ItemStatus.Bad);
 
 function showDialog() {
-    status.value = ItemStateOption.Good;
+    status.value = ItemStatus.Good;
     comment.value = "";
     dialogRef.value?.show();
 }
 
 function canUpdateState(): boolean {
-    if (status.value === ItemStateOption.Bad && !comment.value) {
+    if (status.value === ItemStatus.Bad && !comment.value) {
         alert("Descreva o estado do artigo.");
         return false;
     }
@@ -33,12 +38,12 @@ function canUpdateState(): boolean {
 function updateItemState() {
     if (!canUpdateState()) return;
 
-    if (status.value === ItemStateOption.Good) {
+    if (status.value === ItemStatus.Good) {
         comment.value = "";
     }
 
-    pros.row.state = {
-        status: status.value as ItemStateOption,
+    pros.row.condition = {
+        status: status.value as ConditionStatus,
         comment: comment.value,
     };
 
@@ -50,8 +55,9 @@ function updateStatus(e: Event) {
     status.value = s;
 }
 
-function initializeItemState(state: ItemStateOption, note: string) {
-    (status.value = state as ItemStateOption), (comment.value = note);
+function initializeItemState(s: ConditionStatus, note: string) {
+    status.value = s;
+    comment.value = note;
 }
 
 defineExpose({ show: showDialog, initializeItemState });

@@ -1,12 +1,12 @@
-import type { Purpose } from "../models/purpose";
-import type { RequestModel } from "~/lib/models/request";
+import type { GoodsIssueModel } from "../models/goods_issue";
+import type { PurposeModel } from "../models/purpose";
 
 export class RequestService {
-    async listPurposes(): Promise<Purpose[]> {
+    async listPurposes(): Promise<PurposeModel[]> {
         return await $fetch("/api/purposes", { method: "get" });
     }
 
-    async requestItems(request: RequestModel) {
+    async requestArticles(request: GoodsIssueModel) {
         return await $fetch("/api/request", {
             method: "post",
             body: { request },
