@@ -187,7 +187,7 @@ function updateIsValidPurpose(value: boolean) {
             </form>
         </section>
 
-        <section>
+        <section class="pb-16 sm:pb-5 md:pb-[4.5rem]">
             <div
                 class="h-table-lg p-3 flex flex-col justify-between border border-light-500 overflow-hidden"
             >
@@ -200,22 +200,22 @@ function updateIsValidPurpose(value: boolean) {
                     </span>
 
                     <span
-                        class="material-symbols-outlined hover:text-red-500 p-2 cursor-pointer"
+                        class="hover:text-red-500 hover:bg-red-500 hover:bg-opacity-10 p-2 cursor-pointer"
                         @click="clearGoodsIssueItems"
                     >
-                        delete
+                        Limpar
                     </span>
                 </div>
 
                 <div class="flex-1 overflow-y-auto">
                     <table class="table">
                         <thead>
-                            <tr>
+                            <tr class="text-left">
                                 <th class="min-w-24 w-24">ID</th>
                                 <th class="min-w-52">Item</th>
                                 <th class="min-w-10 w-16">QTD</th>
-                                <th class="min-w-36 w-36">Preço Unid (Kz)</th>
-                                <th class="min-w-36 w-36">Total (Kz)</th>
+                                <th class="min-w-36 w-36 text-right">Preço Unid (Kz)</th>
+                                <th class="min-w-36 w-36 text-right">Total (Kz)</th>
                                 <th class="min-w-10 w-10"></th>
                             </tr>
                         </thead>
@@ -251,7 +251,7 @@ function updateIsValidPurpose(value: boolean) {
         </section>
     </section>
 
-    <section class="w-full mx-auto shadow-md shadow-light-500">
+    <section class="fixed bottom-0 w-full mx-auto shadow-md shadow-light-500">
         <div
             class="flex justify-between items-center section-content p-4 bg-white flex-wrap flex-col-reverse md:flex-row md:flex-nowrap gap-4"
         >
