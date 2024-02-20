@@ -1,5 +1,5 @@
-import { InsufficientStock } from "@backend/domain/catalog/insufficient_item_stock_error";
-import { ItemCategoryNotFound } from "@backend/domain/catalog/item_category_not_found_error";
+import { InsufficientStock } from "@backend/domain/catalog/insufficient_stock_error";
+import { ItemNotFound } from "@backend/domain/catalog/item_not_found_error";
 import { PurposeNotFound } from "@backend/domain/goods_issue/purpose_not_found_error";
 import { InvalidTotal } from "@backend/domain/goods_issue/invalid_total_error";
 import { HttpStatus } from "~/server/api/http_status";
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    if (voidOrError.value instanceof ItemCategoryNotFound) {
+    if (voidOrError.value instanceof ItemNotFound) {
         throw createError({
             statusCode: HttpStatus.NotFound,
             message: voidOrError.value.message,
