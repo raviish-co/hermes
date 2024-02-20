@@ -12,7 +12,7 @@ function toggleMenu() {
     <section class="h-screen flex flex-col">
         <div class="w-full h-20 sm:h-24 py-4 bg-primary flex justify-center items-center relative">
             <span
-                class="material-symbols-outlined absolute hidden md:inline-block text-white text-3xl my-auto left-8 cursor-pointer"
+                class="material-symbols-outlined absolute text-white text-3xl my-auto left-8 cursor-pointer"
                 @click="toggleMenu"
             >
                 menu
@@ -32,10 +32,10 @@ function toggleMenu() {
         </main>
 
         <div
-            class="z-50 fixed bottom-0 bg-white p-4 w-full flex gap-4 items-center justify-between text-sm md:fixed md:w-80 md:h-screen md:flex-col md:justify-start md:items-start md:p-0 md:top-0 menu-shadow"
-            :class="{ 'md:hidden': !menuVisibility }"
+            class="z-50 fixed shadow-lg bottom-0 bg-white flex gap-2 text-sm w-80 h-screen flex-col justify-start items-start p-0 top-0"
+            :class="{ hidden: !menuVisibility }"
         >
-            <div class="w-full h-24 bg-primary relative hidden md:inline-block">
+            <div class="w-full h-24 bg-primary relative">
                 <span
                     class="material-symbols-outlined text-white absolute top-6 right-6 cursor-pointer"
                     @click="toggleMenu"
@@ -44,29 +44,23 @@ function toggleMenu() {
                 </span>
             </div>
 
-            <NuxtLink
-                to="/"
-                class="flex flex-col gap-3 items-center flex-1 md:flex-initial md:flex-row md:hover:bg-black md:hover:text-white md:w-full"
-            >
-                <span
-                    class="material-symbols-outlined text-xl h-12 w-12 flex items-center justify-center text-white bg-primary rounded-full md:bg-transparent md:text-inherit"
+            <div class="flex flex-col w-full">
+                <NuxtLink
+                    to="/"
+                    class="flex gap-3 items-center p-2 hover:bg-black hover:text-white w-full"
                 >
-                    shopping_cart_checkout
-                </span>
-                <span>Guia de saída</span>
-            </NuxtLink>
+                    <span class="material-symbols-outlined text-xl"> shopping_cart_checkout </span>
+                    <span>Guia de saída</span>
+                </NuxtLink>
 
-            <NuxtLink
-                to="/upload_item"
-                class="flex flex-col gap-3 items-center flex-1 md:flex-initial md:flex-row md:hover:bg-black md:hover:text-white md:w-full"
-            >
-                <span
-                    class="material-symbols-outlined text-xl h-12 w-12 flex items-center justify-center text-white bg-primary rounded-full md:bg-transparent md:text-inherit"
+                <NuxtLink
+                    to="/upload_item"
+                    class="flex gap-3 items-center p-2 hover:bg-black hover:text-white w-full"
                 >
-                    upload
-                </span>
-                <span>Importar</span>
-            </NuxtLink>
+                    <span class="material-symbols-outlined text-xl"> upload </span>
+                    <span>Importar</span>
+                </NuxtLink>
+            </div>
         </div>
     </section>
 </template>
