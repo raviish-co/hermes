@@ -52,13 +52,13 @@ export class GoodsIssueBuilder {
     }
 
     build(): Either<InvalidTotal, GoodsIssue> {
-        const goodsIssue = GoodsIssue.create({
-            goodsIssueId: this.#goodsIssueId,
-            purpose: this.#purpose,
-            goodsIssueLines: this.#goodsIssueLines,
-            user: this.#user,
-            returnDate: this.#returnDate,
-        });
+        const goodsIssue = GoodsIssue.create(
+            this.#goodsIssueId,
+            this.#goodsIssueLines,
+            this.#purpose,
+            this.#user,
+            this.#returnDate
+        );
 
         const isInvalidTotal = goodsIssue.verifyTotal(this.#total, this.#securityDeposit);
         if (isInvalidTotal) return left(new InvalidTotal());

@@ -1,6 +1,6 @@
 import type { ID } from "../../shared/id";
 
-class Section {
+export class Section {
     readonly id: ID;
     #name: string;
     #departmentId: ID;

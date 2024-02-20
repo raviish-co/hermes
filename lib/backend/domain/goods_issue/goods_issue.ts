@@ -4,13 +4,13 @@ import { Decimal } from "../../shared/decimal";
 import { User } from "../../domain/user";
 import { ID } from "../../shared/id";
 
-type Options = {
-    goodsIssueId: string;
-    purpose: Purpose;
-    user: User;
-    goodsIssueLines: GoodsIssueLine[];
-    returnDate: string;
-};
+// type Options = {
+//     goodsIssueId: string;
+//     purpose: Purpose;
+//     user: User;
+//     goodsIssueLines: GoodsIssueLine[];
+//     returnDate: string;
+// };
 
 export enum GoodsIssueStatus {
     PENDING = "Por Devolver",
@@ -39,8 +39,13 @@ export class GoodsIssue {
         this.securityDeposit = Decimal.fromString("0");
     }
 
-    static create(options: Options): GoodsIssue {
-        const { goodsIssueId, purpose, user, goodsIssueLines, returnDate } = options;
+    static create(
+        goodsIssueId: string,
+        goodsIssueLines: GoodsIssueLine[],
+        purpose: Purpose,
+        user: User,
+        returnDate: string
+    ): GoodsIssue {
         const returnDateParsed = new Date(returnDate);
         const goodsIssue = new GoodsIssue(
             ID.fromString(goodsIssueId),

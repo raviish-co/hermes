@@ -26,8 +26,8 @@ describe("Test Goods Issue", () => {
 
     it("Deve chamar o método **getAll** no repositório de artigos", async () => {
         const lines = [{ itemId: "1001", quantity: 1 }];
-        const { service, itemCategoryRepository } = makeService();
-        const spy = vi.spyOn(itemCategoryRepository, "findAll");
+        const { service, itemRepository } = makeService();
+        const spy = vi.spyOn(itemRepository, "findAll");
 
         await service.new({ ...goodsIssueData, lines });
 
@@ -160,9 +160,9 @@ describe("Test Goods Issue", () => {
     });
 
     it("Deve atualizar o estoque dos artigos solicitados no repositório", async () => {
-        const { service, itemCategoryRepository } = makeService({});
+        const { service, itemRepository } = makeService({});
 
-        const spy = vi.spyOn(itemCategoryRepository, "updateAll");
+        const spy = vi.spyOn(itemRepository, "updateAll");
 
         await service.new(goodsIssueData);
 
@@ -171,11 +171,11 @@ describe("Test Goods Issue", () => {
     });
 
     it("Deve diminuir o estoque dos artigos solicitados", async () => {
-        const { service, itemCategoryRepository } = makeService();
+        const { service, itemRepository } = makeService();
 
         await service.new(goodsIssueData);
 
-        const item = await itemCategoryRepository.getById(ID.fromString("1001"));
+        const item = await itemRepository.getById(ID.fromString("1001"));
 
         const stock = item.getStock();
 
@@ -217,7 +217,7 @@ describe("Test Goods Issue", () => {
         const lines = [
             { itemId: "1001", quantity: 2 },
             { itemId: "1002", quantity: 3 },
-            { itemId: "1003", quantity: 14, variations: ["1004", "1005"] },
+            { itemId: "1003", quantity: 14 },
         ];
         const { service } = makeService();
 
@@ -269,12 +269,12 @@ describe("Test Goods Issue", () => {
     });
 
     it("Deve receber o estado atual dos artigos solicitados", async () => {
-        const { service, itemCategoryRepository } = makeService();
+        const { service, itemRepository } = makeService();
 
         await service.new(goodsIssueData);
 
-        const item1 = await itemCategoryRepository.getById(ID.fromString("1001"));
-        const item2 = await itemCategoryRepository.getById(ID.fromString("1002"));
+        const item1 = await itemRepository.getById(ID.fromString("1001"));
+        const item2 = await itemRepository.getById(ID.fromString("1002"));
 
         expect(item1.getCondition().status).toEqual("Bom");
         expect(item2.getCondition().status).toEqual("Mau");
@@ -307,21 +307,21 @@ const goodsIssueData = {
 };
 
 interface Dependencies {
-    itemCategoryRepository?: ItemRepository;
+    itemRepository?: ItemRepository;
 }
 
 function makeService(deps?: Dependencies) {
     const purposeSource = new DefaultPurposeSpecification();
-    const itemCategoryRepository = deps?.itemCategoryRepository ?? new ItemRepositoryStub();
+    const itemRepository = deps?.itemRepository ?? new ItemRepositoryStub();
     const goodsIssuerepository = new InmemGoodsIssueRepository();
     const storage = new InmemSequenceStorage();
     const generator = new SequenceGenerator(storage, 1000);
     const service = new GoodsIssueService(
-        itemCategoryRepository,
+        itemRepository,
         goodsIssuerepository,
         generator,
         purposeSource
     );
 
-    return { goodsIssuerepository, service, itemCategoryRepository, purposeSource };
+    return { goodsIssuerepository, service, itemRepository, purposeSource };
 }

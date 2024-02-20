@@ -63,8 +63,7 @@ export class ImportService {
         const categoryOrError = await this.#categoryRepository.findByName(categoryName);
         const sectionId: string | undefined = undefined;
         // Procurar a seção pelo nome
-
-        //A mesma coisa com as variacoes
+        // A mesma coisa com as variacoes
 
         if (categoryOrError.isLeft()) {
             // const category = Category.create(categoryName);
