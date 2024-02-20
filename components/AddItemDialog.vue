@@ -140,7 +140,7 @@ defineExpose({ show: showDialog });
         <div class="overflow-x-auto w-full">
             <table class="table">
                 <thead>
-                    <tr>
+                    <tr class="text-left">
                         <th class="min-w-16 w-16 hidden sm:initial">ID</th>
                         <th class="min-w-36 w-36">Nome</th>
                         <th class="min-w-16 w-16">Stock</th>

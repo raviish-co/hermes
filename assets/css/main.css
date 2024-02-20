@@ -46,7 +46,7 @@ h1 {
 }
 
 .table th {
-    @apply text-left border-t font-medium uppercase;
+    @apply border-t font-medium uppercase;
 }
 
 .btn {
