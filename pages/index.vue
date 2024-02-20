@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { AddItemDialog, DescribeItemStatusDialog } from "#build/components";
+import type { AddItemDialog, DescribeItemStatusDialog, ChoosePurpose } from "#build/components";
 import type { VariationValue } from "@frontend/models/goods_issue_item";
 import { convertToNumber } from "@frontend/helpers/convert_to_number";
 import { GoodsIssueService } from "@frontend/services/goods_issue_service";
@@ -8,34 +8,20 @@ import { handleException } from "@frontend/helpers/error_handler";
 import type { GoodsIssueItem } from "@frontend/models/goods_issue_item";
 import { formatCurrency } from "@frontend/helpers/format_currency";
 
-export interface Purpose {
-    name: string;
-    placeholder?: string;
-    details?: string[];
-}
-
-const INNER_LAUNDRY = "Interna";
-const DISCARD = "Descartar";
-const PURPOSE = "Finalidade";
 const DETAILS = "Detalhes";
 
-const purposes = usePurpose().purposes;
-
+const choosePurposeRef = ref<typeof ChoosePurpose>();
 const addItemDialogRef = ref<typeof AddItemDialog>();
 const describeItemStatusDialogRef = ref<typeof DescribeItemStatusDialog>();
-const currentPurposeDetail = ref<string[]>([]);
-const currentPurposeNotesType = ref<string>("");
-const currentPurposeDetails = ref<string>("");
-const currentPurposeDescription = ref<string>("");
-const purposeDetailsIsDisabled = ref<boolean>(false);
+const purposeNotesType = ref<string>("");
+const purposeDetail = ref<string>("");
+const purposeDescription = ref<string>("");
 const goodsIssueItems = ref<GoodsIssueItem[]>([]);
 const securityDeposit = ref<string>("0,00");
 const grandTotal = ref<string>("0,00");
 const returnDate = ref<string>("");
 const selectedRow = ref<GoodsIssueItem>({} as GoodsIssueItem);
-const currentPurposeNotesTypePlaceholder = ref<string>("Descrição");
-
-const isDisabledSection = computed(() => currentPurposeDetail.value.length <= 0);
+const isValidPurpose = ref<boolean>(false);
 
 const goodsIssueService = new GoodsIssueService();
 
@@ -63,41 +49,18 @@ function toGoodsIssue(): GoodsIssueModel {
         securityDeposit: removeSpaces(securityDeposit.value),
         returnDate: returnDate.value,
         purpose: {
-            description: currentPurposeDescription.value,
-            details: currentPurposeDetails.value,
-            notes: currentPurposeNotesType.value,
+            description: purposeDescription.value,
+            details: purposeDetail.value,
+            notes: purposeNotesType.value,
         },
         lines: toGoodsIssueLine(),
     };
 }
 
-const isValidPurposeDescription = computed(() =>
-    purposes.value.some((p) => p.description === currentPurposeDescription.value)
-);
-
-const isValidDetails = computed(() => {
-    if (currentPurposeDetail.value.length > 0) {
-        return currentPurposeDetail.value.some((s) => s === currentPurposeDetails.value);
-    }
-
-    return true;
-});
-
-const isValidNotesType = computed(() => {
-    if (currentPurposeNotesType.value === "" && !purposeDetailsIsDisabled.value) return false;
-
-    return true;
-});
-
 const isValidGoodsIssue = computed(() => {
     const isValidGoodsItems = goodsIssueItems.value.length > 0;
 
-    if (
-        isValidPurposeDescription.value &&
-        isValidDetails.value &&
-        isValidGoodsItems &&
-        isValidNotesType.value
-    ) {
+    if (isValidPurpose && isValidGoodsItems) {
         return true;
     }
 
@@ -105,8 +68,7 @@ const isValidGoodsIssue = computed(() => {
 });
 
 function newGoodsIssue() {
-    currentPurposeDetails.value =
-        currentPurposeDetails.value === DETAILS ? "" : currentPurposeDetails.value;
+    purposeDetail.value = purposeDetail.value === DETAILS ? "" : purposeDetail.value;
 
     const goodsIssue = toGoodsIssue();
 
@@ -119,66 +81,12 @@ function newGoodsIssue() {
         .catch(handleException);
 }
 
-function getPurposeDescriptions(): string[] {
-    return purposes.value.map((p) => p.description);
-}
-
-function findDetailsByPurposeDescription(description: string): void {
-    if (description === PURPOSE) {
-        currentPurposeDetails.value = DETAILS;
-        currentPurposeDetail.value = [];
-        return;
-    }
-
-    purposes.value.find((p) => {
-        if (p.description === description) {
-            currentPurposeNotesTypePlaceholder.value = p.notesType!;
-            disableNotesType(description);
-            updateCurrentPurposeDetails(p.detailsConstraint);
-        }
-    });
-
-    currentPurposeDescription.value = description;
-    updateCurrentPurposeNotesType("");
-}
-
-function disableNotesType(purposeName: string): void {
-    if (purposeName === DISCARD) {
-        purposeDetailsIsDisabled.value = true;
-        return;
-    }
-
-    purposeDetailsIsDisabled.value = false;
-}
-
-function updateCurrentPurposeDetails(sections?: string[]) {
-    if (!sections) {
-        currentPurposeDetail.value = [];
-        return;
-    }
-
-    currentPurposeDetail.value = sections;
-}
-
-function updateCurrentPurposeNotesType(sectionName: string) {
-    currentPurposeDetails.value = sectionName;
-
-    if (sectionName === INNER_LAUNDRY) {
-        purposeDetailsIsDisabled.value = true;
-        return;
-    }
-
-    purposeDetailsIsDisabled.value = false;
-
-    disableNotesType(currentPurposeDescription.value);
-}
-
-function removeRequestRow(id: string): void {
+function removeGoodsIssueItem(id: string): void {
     goodsIssueItems.value = goodsIssueItems.value.filter((r) => r.itemId !== id);
     calculateGrandTotal();
 }
 
-function clearRequestList() {
+function clearGoodsIssueItems() {
     goodsIssueItems.value = [];
     grandTotal.value = "0,00";
     securityDeposit.value = "0,00";
@@ -232,14 +140,28 @@ function listVariationValues(itemVariation?: VariationValue[]) {
 }
 
 function clearValues() {
-    returnDate.value = new Date().toISOString();
-    currentPurposeDescription.value = PURPOSE;
-    currentPurposeDetails.value = DETAILS;
-    currentPurposeNotesType.value = "";
-    currentPurposeDetail.value = [];
+    returnDate.value = new Date().toString();
     goodsIssueItems.value = [];
     grandTotal.value = "0,00";
     securityDeposit.value = "0,00";
+
+    choosePurposeRef.value?.clearInputs();
+}
+
+function updatePurposeDescription(description: string) {
+    purposeDescription.value = description;
+}
+
+function updatePurposeDetail(detail: string) {
+    purposeDetail.value = detail;
+}
+
+function updatePurposeNotesType(notesType: string) {
+    purposeNotesType.value = notesType;
+}
+
+function updateIsValidPurpose(value: boolean) {
+    isValidPurpose.value = value;
 }
 </script>
 
@@ -255,31 +177,12 @@ function clearValues() {
                     <input v-model="returnDate" type="datetime-local" class="input-field" />
                 </div>
 
-                <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
-                    <VSelect
-                        :value="currentPurposeDescription"
-                        :placeholder="PURPOSE"
-                        :options="getPurposeDescriptions()"
-                        :is-invalid="!isValidPurposeDescription"
-                        @change="findDetailsByPurposeDescription"
-                    />
-
-                    <VSelect
-                        :value="currentPurposeDetails"
-                        :placeholder="DETAILS"
-                        :options="currentPurposeDetail"
-                        :disabled="isDisabledSection"
-                        :is-invalid="!isValidDetails"
-                        @change="updateCurrentPurposeNotesType"
-                    />
-                </div>
-
-                <input
-                    v-model="currentPurposeNotesType"
-                    :placeholder="currentPurposeNotesTypePlaceholder"
-                    :disabled="purposeDetailsIsDisabled"
-                    class="input-field mb-4"
-                    :class="{ invalid: !isValidNotesType }"
+                <ChoosePurpose
+                    ref="choosePurposeRef"
+                    @description-changed="updatePurposeDescription"
+                    @detail-changed="updatePurposeDetail"
+                    @notes-type-changed="updatePurposeNotesType"
+                    @valid-purpose="updateIsValidPurpose"
                 />
             </form>
         </section>
@@ -298,7 +201,7 @@ function clearValues() {
 
                     <span
                         class="material-symbols-outlined hover:text-red-500 p-2 cursor-pointer"
-                        @click="clearRequestList"
+                        @click="clearGoodsIssueItems"
                     >
                         delete
                     </span>
@@ -334,7 +237,10 @@ function clearValues() {
                                 <td>{{ row.quantity }}</td>
                                 <td class="text-right">{{ row.price }}</td>
                                 <td class="text-right">{{ row.total }}</td>
-                                <td class="cursor-pointer" @click="removeRequestRow(row.itemId)">
+                                <td
+                                    class="cursor-pointer"
+                                    @click="removeGoodsIssueItem(row.itemId)"
+                                >
                                     <span class="material-symbols-outlined">close</span>
                                 </td>
                             </tr>
