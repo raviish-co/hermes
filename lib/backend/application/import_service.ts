@@ -1,16 +1,15 @@
-import { Item, type Condition, Status } from "../domain/catalog/item";
-import { ItemBuilder } from "../domain/catalog/item_builder";
 import type { CategoryRepository } from "../domain/catalog/category_repository";
 import { InvalidFileHeader } from "../domain/readers/invalid_file_header_error";
 import { FileNotSupported } from "../domain/readers/file_not_supported_error";
+import type { SectionRepository } from "../domain/catalog/section_repository";
 import { CsvReader, VALID_CSV_HEADER } from "../domain/readers/csv_reader";
 import { SequenceGenerator } from "../domain/sequences/sequence_generator";
 import type { ItemRepository } from "../domain/catalog/item_repository";
+import { Item, type Condition, Status } from "../domain/catalog/item";
 import { FileEmpty } from "../domain/readers/file_empty_error";
+import { ItemBuilder } from "../domain/catalog/item_builder";
 import { left, right, type Either } from "../shared/either";
-import { ItemStock } from "../domain/catalog/item_stock";
 import { Sequence } from "../domain/sequences/sequence";
-import { Category } from "../domain/catalog/category";
 import type { FileError } from "../shared/errors";
 import { Decimal } from "../shared/decimal";
 import { ID } from "../shared/id";
@@ -18,15 +17,18 @@ import { ID } from "../shared/id";
 export class ImportService {
     #itemRepository: ItemRepository;
     #categoryRepository: CategoryRepository;
+    #sectionRepository: SectionRepository;
     #generator: SequenceGenerator;
 
     constructor(
         itemRepository: ItemRepository,
         categoryRepository: CategoryRepository,
+        sectionRepository: SectionRepository,
         generator: SequenceGenerator
     ) {
         this.#categoryRepository = categoryRepository;
         this.#itemRepository = itemRepository;
+        this.#sectionRepository = sectionRepository;
         this.#generator = generator;
     }
 
@@ -39,44 +41,38 @@ export class ImportService {
         const validOrError = this.#isValidFile(lines);
         if (validOrError.isLeft()) return Promise.resolve(left(validOrError.value));
 
-        const items = await this.#buildItems(lines);
+        const itemsOrError = await this.#buildItems(lines);
+        if (itemsOrError.isLeft()) return left(itemsOrError.value);
 
-        await this.#itemRepository.saveAll(items);
+        await this.#itemRepository.saveAll(itemsOrError.value);
 
         return Promise.resolve(right(undefined));
     }
 
-    async #buildItems(lines: string[]): Promise<Item[]> {
+    async #buildItems(lines: string[]): Promise<Either<Error, Item[]>> {
         const items: Item[] = [];
 
-        for (const line of lines) {
-            const item = await this.#parseLine(line);
-            items.push(item);
+        for (const line of lines.slice(1)) {
+            const itemOrError = await this.#parseLine(line);
+            if (itemOrError.isLeft()) return left(itemOrError.value);
+            items.push(itemOrError.value);
         }
 
-        return items;
+        return right(items);
     }
 
-    async #parseLine(line: string): Promise<Item> {
+    async #parseLine(line: string): Promise<Either<Error, Item>> {
         const [name, price, quantity, comment, categoryName, sectionName] = line.split(",");
-
         const categoryOrError = await this.#categoryRepository.findByName(categoryName);
-        const sectionId: string | undefined = undefined;
-        // Procurar a seção pelo nome
+        const sectionOrError = await this.#sectionRepository.findByName(sectionName);
+
+        if (categoryOrError.isLeft()) return left(categoryOrError.value);
+
+        if (sectionOrError.isLeft()) return left(sectionOrError.value);
+
         // A mesma coisa com as variacoes
 
-        if (categoryOrError.isLeft()) {
-            // const category = Category.create(categoryName);
-            // const categoryId = category.categoryId;
-
-            // await this.#categoryRepository.save(category);
-            throw new Error("Category not found");
-        }
-
         const itemId = this.#generator.generate(Sequence.Item);
-
-        const stock = new ItemStock(Number(quantity));
-
         const condition: Condition = { status: Status.Good };
 
         if (comment) {
@@ -84,21 +80,22 @@ export class ImportService {
             condition.comment = comment;
         }
 
-        const itemOrErr = new ItemBuilder()
+        const categoryId = categoryOrError.value.categoryId;
+        const sectionId = sectionOrError.value.sectionId;
+
+        const itemOrError = new ItemBuilder()
             .withItemId(ID.fromString(itemId))
             .withName(name)
             .withPrice(Decimal.fromString(price))
-            .withCategoryId(categoryOrError.value.categoryId)
+            .withCategoryId(categoryId)
             .withCondition(condition)
-            .withStock(Number(stock))
-            .withSectionId(ID.fromString(sectionId!))
+            .withStock(Number(quantity))
+            .withSectionId(sectionId)
             .build();
 
-        if (itemOrErr.isLeft()) {
-            throw new Error("Error creating item");
-        }
+        if (itemOrError.isLeft()) return left(itemOrError.value);
 
-        return itemOrErr.value;
+        return right(itemOrError.value);
     }
 
     #isCsvFile(file: File): boolean {
