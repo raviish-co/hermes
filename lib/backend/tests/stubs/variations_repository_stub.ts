@@ -10,12 +10,12 @@ export class VariationsRepositoryStub extends InmemVariationRepository {
 
 const _variationsData = [
     {
-        id: ID.New("1"),
+        id: ID.fromString("1"),
         name: "Cor",
         values: ["Preto"],
     },
     {
-        id: ID.New("2"),
+        id: ID.fromString("2"),
         name: "Marca",
         values: ["Nike", "Adidas", "Rebock"],
     },

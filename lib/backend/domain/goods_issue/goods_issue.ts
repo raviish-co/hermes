@@ -1,16 +1,16 @@
-import { GoodsIssueLine } from "@backend/domain/goods_issue/goods_issue_line";
-import { Purpose } from "@backend/domain/goods_issue/purpose";
-import { Decimal } from "@backend/shared/decimal";
-import { User } from "@backend/domain/user";
-import { ID } from "@backend/shared/id";
+import { GoodsIssueLine } from "../../domain/goods_issue/goods_issue_line";
+import { Purpose } from "../../domain/goods_issue/purpose";
+import { Decimal } from "../../shared/decimal";
+import { User } from "../../domain/user";
+import { ID } from "../../shared/id";
 
-type Options = {
-    goodsIssueId: string;
-    purpose: Purpose;
-    user: User;
-    goodsIssueLines: GoodsIssueLine[];
-    returnDate: string;
-};
+// type Options = {
+//     goodsIssueId: string;
+//     purpose: Purpose;
+//     user: User;
+//     goodsIssueLines: GoodsIssueLine[];
+//     returnDate: string;
+// };
 
 export enum GoodsIssueStatus {
     PENDING = "Por Devolver",
@@ -39,10 +39,20 @@ export class GoodsIssue {
         this.securityDeposit = Decimal.fromString("0");
     }
 
-    static create(options: Options): GoodsIssue {
-        const { goodsIssueId, purpose, user, goodsIssueLines, returnDate } = options;
+    static create(
+        goodsIssueId: string,
+        goodsIssueLines: GoodsIssueLine[],
+        purpose: Purpose,
+        user: User,
+        returnDate: string
+    ): GoodsIssue {
         const returnDateParsed = new Date(returnDate);
-        const goodsIssue = new GoodsIssue(ID.New(goodsIssueId), purpose, user, returnDateParsed);
+        const goodsIssue = new GoodsIssue(
+            ID.fromString(goodsIssueId),
+            purpose,
+            user,
+            returnDateParsed
+        );
         goodsIssue.addGoodsIssueLines(goodsIssueLines);
         return goodsIssue;
     }

@@ -1,4 +1,4 @@
-import { Variation } from "@backend/domain/catalog/variation";
+import { Variation } from "../../domain/catalog/variation";
 
 export interface VariationRepository {
     save(variation: Variation): Promise<void>;

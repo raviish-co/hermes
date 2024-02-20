@@ -1,28 +1,27 @@
-import {
-    ItemCategory,
-    type ItemCondition,
-    ItemStatus,
-} from "@backend/domain/catalog/item_category";
-import type { ItemCategoryRepository } from "@backend/domain/catalog/item_category_repository";
-import type { CategoryRepository } from "@backend/domain/catalog/category_repository";
-import { InvalidFileHeader } from "@backend/domain/readers/invalid_file_header_error";
-import { FileNotSupported } from "@backend/domain/readers/file_not_supported_error";
-import { CsvReader, VALID_CSV_HEADER } from "@backend/domain/readers/csv_reader";
-import { SequenceGenerator } from "@backend/domain/sequences/sequence_generator";
-import { ItemCategoryStock } from "@backend/domain/catalog/item_category_stock";
-import { FileEmpty } from "@backend/domain/readers/file_empty_error";
-import { left, right, type Either } from "@backend/shared/either";
-import { Sequence } from "@backend/domain/sequences/sequence";
-import { Category } from "@backend/domain/catalog/category";
-import type { FileError } from "@backend/shared/errors";
+import { Item, type Condition, Status } from "../domain/catalog/item";
+import { ItemBuilder } from "../domain/catalog/item_builder";
+import type { CategoryRepository } from "../domain/catalog/category_repository";
+import { InvalidFileHeader } from "../domain/readers/invalid_file_header_error";
+import { FileNotSupported } from "../domain/readers/file_not_supported_error";
+import { CsvReader, VALID_CSV_HEADER } from "../domain/readers/csv_reader";
+import { SequenceGenerator } from "../domain/sequences/sequence_generator";
+import type { ItemRepository } from "../domain/catalog/item_repository";
+import { FileEmpty } from "../domain/readers/file_empty_error";
+import { left, right, type Either } from "../shared/either";
+import { ItemStock } from "../domain/catalog/item_stock";
+import { Sequence } from "../domain/sequences/sequence";
+import { Category } from "../domain/catalog/category";
+import type { FileError } from "../shared/errors";
+import { Decimal } from "../shared/decimal";
+import { ID } from "../shared/id";
 
 export class ImportService {
-    #itemRepository: ItemCategoryRepository;
+    #itemRepository: ItemRepository;
     #categoryRepository: CategoryRepository;
     #generator: SequenceGenerator;
 
     constructor(
-        itemRepository: ItemCategoryRepository,
+        itemRepository: ItemRepository,
         categoryRepository: CategoryRepository,
         generator: SequenceGenerator
     ) {
@@ -47,89 +46,59 @@ export class ImportService {
         return Promise.resolve(right(undefined));
     }
 
-    async #buildItems(lines: string[]): Promise<ItemCategory[]> {
-        const items: ItemCategory[] = [];
+    async #buildItems(lines: string[]): Promise<Item[]> {
+        const items: Item[] = [];
 
-        for (let i = 1; i < lines.length; i++) {
-            const [
-                name,
-                price,
-                isunique,
-                quantity,
-                comment,
-                categoryName,
-                sectionName,
-                departmentName,
-            ] = lines[i].split(",");
-
-            const categoryOrError = await this.#categoryRepository.findByName(categoryName);
-            const section = { name: sectionName, department: departmentName };
-
-            if (categoryOrError.isLeft()) {
-                const category = Category.create(categoryName);
-                const categoryId = category.categoryId;
-
-                await this.#categoryRepository.save(category);
-
-                const itemId = this.#generator.generate(Sequence.Item);
-
-                const stock = new ItemCategoryStock(Number(quantity));
-
-                const unique = isunique === "true" ? true : false;
-
-                const condition: ItemCondition = { status: ItemStatus.Good };
-
-                if (comment) {
-                    condition.status = ItemStatus.Bad;
-                    condition.comment = comment;
-                }
-
-                const item = ItemCategory.create({
-                    itemId,
-                    name,
-                    price,
-                    unique,
-                    categoryId,
-                    condition,
-                    stock,
-                    section,
-                });
-
-                items.push(item);
-            }
-
-            if (categoryOrError.isRight()) {
-                const category = categoryOrError.value;
-                const categoryId = category.categoryId;
-                const itemId = this.#generator.generate(Sequence.Item);
-
-                const stock = new ItemCategoryStock(Number(quantity));
-
-                const unique = isunique === "true" ? true : false;
-
-                const condition: ItemCondition = { status: ItemStatus.Good };
-
-                if (comment) {
-                    condition.status = ItemStatus.Bad;
-                    condition.comment = comment;
-                }
-
-                const item = ItemCategory.create({
-                    itemId,
-                    name,
-                    price,
-                    unique,
-                    categoryId,
-                    condition,
-                    stock,
-                    section,
-                });
-
-                items.push(item);
-            }
+        for (const line of lines) {
+            const item = await this.#parseLine(line);
+            items.push(item);
         }
 
         return items;
+    }
+
+    async #parseLine(line: string): Promise<Item> {
+        const [name, price, quantity, comment, categoryName, sectionName] = line.split(",");
+
+        const categoryOrError = await this.#categoryRepository.findByName(categoryName);
+        const sectionId: string | undefined = undefined;
+        // Procurar a seção pelo nome
+        // A mesma coisa com as variacoes
+
+        if (categoryOrError.isLeft()) {
+            // const category = Category.create(categoryName);
+            // const categoryId = category.categoryId;
+
+            // await this.#categoryRepository.save(category);
+            throw new Error("Category not found");
+        }
+
+        const itemId = this.#generator.generate(Sequence.Item);
+
+        const stock = new ItemStock(Number(quantity));
+
+        const condition: Condition = { status: Status.Good };
+
+        if (comment) {
+            condition.status = Status.Bad;
+            condition.comment = comment;
+        }
+
+        const itemOrErr = new ItemBuilder()
+            .withItemId(ID.fromString(itemId))
+            .withName(name)
+            .withPrice(Decimal.fromString(price))
+            .withCategoryId(categoryOrError.value.categoryId)
+            .withCondition(condition)
+            .withStock(Number(stock))
+            .withSectionId(ID.fromString(sectionId!))
+            .build();
+
+        if (itemOrErr.isLeft()) {
+            throw new Error("Error creating item");
+        }
+
+        return itemOrErr.value;
     }
 
     #isCsvFile(file: File): boolean {

@@ -1,10 +1,9 @@
-import { InvalidTotal } from "@backend/domain/goods_issue/invalid_total_error";
-import { GoodsIssueLine } from "@backend/domain/goods_issue/goods_issue_line";
-import { GoodsIssue } from "@backend/domain/goods_issue/goods_issue";
-import { type Either, left, right } from "@backend/shared/either";
-import { Purpose } from "@backend/domain/goods_issue/purpose";
-import type { PurposeDTO } from "@backend/shared/types";
-import type { User } from "@backend/domain/user";
+import { InvalidTotal } from "../../domain/goods_issue/invalid_total_error";
+import { GoodsIssueLine } from "../../domain/goods_issue/goods_issue_line";
+import { GoodsIssue } from "../../domain/goods_issue/goods_issue";
+import { type Either, left, right } from "../../shared/either";
+import { Purpose } from "../../domain/goods_issue/purpose";
+import type { User } from "../../domain/user";
 
 export class GoodsIssueBuilder {
     #goodsIssueId: string = "";
@@ -22,12 +21,8 @@ export class GoodsIssueBuilder {
         return this;
     }
 
-    withPurpose(purpose: PurposeDTO): GoodsIssueBuilder {
-        this.#purpose = Purpose.fromOptions({
-            description: purpose.description,
-            details: purpose.detailConstraint,
-            notes: purpose.notes,
-        });
+    withPurpose(purpose: Purpose): GoodsIssueBuilder {
+        this.#purpose = purpose;
         return this;
     }
 
@@ -57,13 +52,13 @@ export class GoodsIssueBuilder {
     }
 
     build(): Either<InvalidTotal, GoodsIssue> {
-        const goodsIssue = GoodsIssue.create({
-            goodsIssueId: this.#goodsIssueId,
-            purpose: this.#purpose,
-            goodsIssueLines: this.#goodsIssueLines,
-            user: this.#user,
-            returnDate: this.#returnDate,
-        });
+        const goodsIssue = GoodsIssue.create(
+            this.#goodsIssueId,
+            this.#goodsIssueLines,
+            this.#purpose,
+            this.#user,
+            this.#returnDate
+        );
 
         const isInvalidTotal = goodsIssue.verifyTotal(this.#total, this.#securityDeposit);
         if (isInvalidTotal) return left(new InvalidTotal());

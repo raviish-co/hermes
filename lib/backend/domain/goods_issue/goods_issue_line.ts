@@ -1,24 +1,18 @@
-import { ItemCategory } from "@backend/domain/catalog/item_category";
-import { Decimal } from "@backend/shared/decimal";
-
-type Options = {
-    item: ItemCategory;
-    quantity: number;
-};
+import { Decimal } from "../../shared/decimal";
+import { Item } from "../catalog/item";
 
 export class GoodsIssueLine {
-    readonly item: ItemCategory;
+    readonly item: Item;
     readonly quantity: number;
     #netTotal: Decimal;
 
-    private constructor(item: ItemCategory, quantity: number) {
+    private constructor(item: Item, quantity: number) {
         this.item = item;
         this.quantity = quantity;
         this.#netTotal = Decimal.fromString("0");
     }
 
-    static create(options: Options): GoodsIssueLine {
-        const { item, quantity } = options;
+    static create(item: Item, quantity: number): GoodsIssueLine {
         const goodsIssueLine = new GoodsIssueLine(item, quantity);
         goodsIssueLine.#calculateTotal();
         return goodsIssueLine;

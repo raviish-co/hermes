@@ -1,4 +1,4 @@
-import type { Reader } from "@backend/domain/readers/reader";
+import type { Reader } from "../../domain/readers/reader";
 
 export const VALID_CSV_HEADER = ["nome,preco,unico,quantidade,estado,categoria,secao,departamento"];
 

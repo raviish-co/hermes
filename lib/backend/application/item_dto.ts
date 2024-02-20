@@ -1,10 +1,9 @@
-import { ItemCategory } from "@backend/domain/catalog/item_category";
+import { Item } from "../domain/catalog/item";
 
 interface ItemDTO {
     itemId: string;
     name: string;
     price: string;
-    isUnique: boolean;
     stock: number;
     state: ItemStateDTO;
 }
@@ -14,13 +13,12 @@ export interface ItemStateDTO {
     comment?: string;
 }
 
-export function makeItemsDTO(items: ItemCategory[]): ItemDTO[] {
+export function makeItemsDTO(items: Item[]): ItemDTO[] {
     return items.map((i) => ({
         itemId: i.itemId.toString(),
         name: i.name,
         price: i.price.value.toString(),
-        isUnique: i.isUnique(),
-        stock: i.getStock().getQuantity(),
+        stock: i.getStock().quantity,
         state: {
             status: i.getCondition().status,
             comment: i.getCondition().comment,

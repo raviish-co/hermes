@@ -1,6 +1,6 @@
-import type { GoodsIssueRepository } from "@backend/domain/goods_issue/goods_issue_repository";
-import { GoodsIssue } from "@backend/domain/goods_issue/goods_issue";
-import { ID } from "@backend/shared/id";
+import type { GoodsIssueRepository } from "../../domain/goods_issue/goods_issue_repository";
+import { GoodsIssue } from "../../domain/goods_issue/goods_issue";
+import { ID } from "../../shared/id";
 
 export class InmemGoodsIssueRepository implements GoodsIssueRepository {
     #goodsIssues: Record<string, GoodsIssue> = {};

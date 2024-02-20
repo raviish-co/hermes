@@ -1,41 +1,41 @@
-import { ItemCategoryNotFound } from "@backend/domain/catalog/item_category_not_found_error";
-import type { ItemCategoryRepository } from "@backend/domain/catalog/item_category_repository";
-import { ItemCategory, ItemStatus } from "@backend/domain/catalog/item_category";
-import { Variation } from "@backend/domain/catalog/variation";
-import { ItemCategoryStock } from "@backend/domain/catalog/item_category_stock";
-import { type Either, left, right } from "@backend/shared/either";
-import type { Pagination } from "@backend/shared/pagination";
-import type { ItemQuery } from "@backend/shared/types";
-import { ID } from "@backend/shared/id";
+import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
+import type { ItemRepository } from "../../domain/catalog/item_repository";
+import { Item } from "../../domain/catalog/item";
+import { ItemBuilder } from "../../domain/catalog/item_builder";
+import { ItemStock } from "../../domain/catalog/item_stock";
+import { Variation } from "../../domain/catalog/variation";
+import { type Either, left, right } from "../../shared/either";
+import type { Pagination } from "../../shared/pagination";
+import { ID } from "../../shared/id";
+import { Decimal } from "../../shared/decimal";
 
-export class ItemRepositoryStub implements ItemCategoryRepository {
-    #items: Record<string, ItemCategory> = {};
+export class ItemRepositoryStub implements ItemRepository {
+    #items: Record<string, Item> = {};
 
     constructor() {
         this.#populate();
     }
 
-    getById(itemId: ID): Promise<ItemCategory> {
+    getById(itemId: ID): Promise<Item> {
         return Promise.resolve(this.#items[itemId.toString()]);
     }
 
-    getAll(queries: ItemQuery[]): Promise<Either<ItemCategoryNotFound, ItemCategory[]>> {
-        const items: ItemCategory[] = [];
+    findAll(queries: ID[]): Promise<Either<ItemNotFound, Item[]>> {
+        const items: Item[] = [];
 
         for (const query of queries) {
             const filtered = this.records.find(
-                (item) => item.itemId.toString() === query.itemId.toString()
+                (item) => item.itemId.toString() === query.toString()
             );
 
-            if (!filtered)
-                return Promise.resolve(left(new ItemCategoryNotFound(query.itemId.toString())));
+            if (!filtered) return Promise.resolve(left(new ItemNotFound(query.toString())));
 
             items.push(filtered);
         }
         return Promise.resolve(right(items));
     }
 
-    list(pageToken: number, perPage: number): Promise<Pagination<ItemCategory>> {
+    list(pageToken: number, perPage: number): Promise<Pagination<Item>> {
         const startIndex = (pageToken - 1) * perPage;
 
         const endIndex = startIndex + perPage;
@@ -52,7 +52,7 @@ export class ItemRepositoryStub implements ItemCategoryRepository {
         });
     }
 
-    search(query: string, pageToken: number, perPage: number): Promise<Pagination<ItemCategory>> {
+    search(query: string, pageToken: number, perPage: number): Promise<Pagination<Item>> {
         const items = this.records.filter((i) => {
             return (
                 i.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -77,7 +77,7 @@ export class ItemRepositoryStub implements ItemCategoryRepository {
         });
     }
 
-    updateAll(items: ItemCategory[]): Promise<void> {
+    updateAll(items: Item[]): Promise<void> {
         for (const item of items) {
             this.#items[item.itemId.toString()] = item;
         }
@@ -85,18 +85,18 @@ export class ItemRepositoryStub implements ItemCategoryRepository {
         return Promise.resolve(undefined);
     }
 
-    saveAll(items: ItemCategory[]): Promise<void> {
+    saveAll(items: Item[]): Promise<void> {
         for (const item of items) {
             this.#items[item.itemId.toString()] = item;
         }
         return Promise.resolve(undefined);
     }
 
-    get records(): ItemCategory[] {
+    get records(): Item[] {
         return Object.values(this.#items);
     }
 
-    last(): Promise<ItemCategory> {
+    last(): Promise<Item> {
         return Promise.resolve(this.records[this.records.length - 1]);
     }
 
@@ -104,46 +104,47 @@ export class ItemRepositoryStub implements ItemCategoryRepository {
         const variation1 = new Variation(ID.random(), "Cor", ["Preto"]);
         const variation2 = new Variation(ID.random(), "Marca", ["Nike", "Adidas", "Rebock"]);
 
-        const stock1 = new ItemCategoryStock(10);
-        const stock2 = new ItemCategoryStock(10);
-        const stock3 = new ItemCategoryStock(10);
+        const stock1 = new ItemStock(10);
+        const stock2 = new ItemStock(10);
+        const stock3 = new ItemStock(10);
 
-        const item1 = ItemCategory.create({
-            itemId: "1001",
-            name: "T-shirt desportiva gola redonda",
-            price: "4500,00",
-            categoryId: ID.random(),
-            condition: { status: ItemStatus.Good },
-            stock: stock1,
-            variations: [
-                { variationId: variation1.variationId.toString(), value: "Preto" },
-                { variationId: variation2.variationId.toString(), value: "Nike" },
-            ],
-        });
+        const item1 = new ItemBuilder()
+            .withItemId(ID.fromString("1001"))
+            .withName("T-shirt desportiva gola redonda")
+            .withPrice(Decimal.fromString("4500,00"))
+            .withCategoryId(ID.random())
+            .withStock(10)
+            .withGoodCondition()
+            .withSectionId(ID.random())
+            .withVariationsValues({ Cor: "Preto", Marca: "Nike" })
+            .build();
 
-        const item2 = ItemCategory.create({
-            itemId: "1002",
-            name: "Sapato social",
-            price: "15500,00",
-            categoryId: ID.random(),
-            condition: { status: ItemStatus.Good },
-            stock: stock2,
-            variations: [],
-        });
+        const item2 = new ItemBuilder()
+            .withItemId(ID.fromString("1002"))
+            .withName("Sapato social")
+            .withPrice(Decimal.fromString("15500,00"))
+            .withCategoryId(ID.random())
+            .withStock(10)
+            .withGoodCondition()
+            .withSectionId(ID.random())
+            .withVariationsValues({ Cor: "Branca", Marca: "Polo" })
+            .build();
 
-        const item3 = ItemCategory.create({
-            itemId: "1003",
-            name: "Calça jeans",
-            price: "5500,00",
-            categoryId: ID.random(),
-            condition: { status: ItemStatus.Good },
-            stock: stock3,
-        });
+        const item3 = new ItemBuilder()
+            .withItemId(ID.fromString("1003"))
+            .withName("Calça jeans")
+            .withPrice(Decimal.fromString("5500,00"))
+            .withCategoryId(ID.random())
+            .withStock(10)
+            .withGoodCondition()
+            .withSectionId(ID.random())
+            .withVariationsValues({ Cor: "Azul" })
+            .build();
 
         this.#items = {
-            "1001": item1,
-            "1002": item2,
-            "1003": item3,
+            "1001": item1.value as Item,
+            "1002": item2.value as Item,
+            "1003": item3.value as Item,
         };
     }
 }

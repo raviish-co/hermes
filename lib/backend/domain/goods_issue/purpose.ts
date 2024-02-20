@@ -1,10 +1,6 @@
-type Options = {
-    description: string;
-    details?: string;
-    notes?: string;
-};
+// import type { PurposeDTO } from "../../shared/types";
 
-export class Purpose implements Options {
+export class Purpose {
     description: string;
     details?: string;
     notes?: string;
@@ -13,12 +9,12 @@ export class Purpose implements Options {
         this.description = description;
     }
 
-    static fromOptions(options: Options): Purpose {
+    static fromOptions(options: any): Purpose {
         const purpose = new Purpose(options.description);
 
-        if (!options.details && !options.notes) return purpose;
+        if (!options.detailConstraint && !options.notes) return purpose;
 
-        purpose.details = options.details;
+        purpose.details = options.detailConstraint;
 
         purpose.notes = options.notes;
 

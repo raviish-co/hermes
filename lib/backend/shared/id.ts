@@ -7,7 +7,7 @@ export class ID {
         this.#value = raw;
     }
 
-    static New(raw: string): ID {
+    static fromString(raw: string): ID {
         return new ID(raw);
     }
 

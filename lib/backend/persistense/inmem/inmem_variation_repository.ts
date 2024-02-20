@@ -1,5 +1,5 @@
-import type { VariationRepository } from "@backend/domain/catalog/variation_repository";
-import { Variation } from "@backend/domain/catalog/variation";
+import type { VariationRepository } from "../../domain/catalog/variation_repository";
+import { Variation } from "../../domain/catalog/variation";
 
 export class InmemVariationRepository implements VariationRepository {
     #variations: Record<string, Variation> = {};
