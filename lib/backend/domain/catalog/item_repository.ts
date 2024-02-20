@@ -4,7 +4,7 @@ import type { Either } from "../../shared/either";
 import { ID } from "../../shared/id";
 import { Item } from "./item";
 
-export interface ItemCategoryRepository {
+export interface ItemRepository {
     findAll(queries: ID[]): Promise<Either<ItemNotFound, Item[]>>;
     getById(itemId: ID): Promise<Item>;
     list(pageToken: number, perPage: number): Promise<Pagination<Item>>;

@@ -1,14 +1,14 @@
-import type { ItemCategoryRepository } from "../domain/catalog/item_repository";
 import type { VariationRepository } from "../domain/catalog/variation_repository";
-import { Item } from "../domain/catalog/item";
+import type { ItemRepository } from "../domain/catalog/item_repository";
 import { Variation } from "../domain/catalog/variation";
 import type { Pagination } from "../shared/pagination";
+import { Item } from "../domain/catalog/item";
 
 export class CatalogService {
-    #itemRepository: ItemCategoryRepository;
+    #itemRepository: ItemRepository;
     #variationRepository: VariationRepository;
 
-    constructor(itemRepository: ItemCategoryRepository, variationRepository: VariationRepository) {
+    constructor(itemRepository: ItemRepository, variationRepository: VariationRepository) {
         this.#itemRepository = itemRepository;
         this.#variationRepository = variationRepository;
     }

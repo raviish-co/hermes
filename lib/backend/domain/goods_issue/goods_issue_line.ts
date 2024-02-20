@@ -1,10 +1,5 @@
-import { Item } from "../catalog/item";
 import { Decimal } from "../../shared/decimal";
-
-type Options = {
-    item: Item;
-    quantity: number;
-};
+import { Item } from "../catalog/item";
 
 export class GoodsIssueLine {
     readonly item: Item;
@@ -17,8 +12,7 @@ export class GoodsIssueLine {
         this.#netTotal = Decimal.fromString("0");
     }
 
-    static create(options: Options): GoodsIssueLine {
-        const { item, quantity } = options;
+    static create(item: Item, quantity: number): GoodsIssueLine {
         const goodsIssueLine = new GoodsIssueLine(item, quantity);
         goodsIssueLine.#calculateTotal();
         return goodsIssueLine;

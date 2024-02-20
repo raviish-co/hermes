@@ -1,33 +1,32 @@
-import { InsufficientStock } from "../domain/catalog/insufficient_stock_error";
-import type { ItemCategoryRepository } from "../domain/catalog/item_repository";
 import type { GoodsIssueRepository } from "../domain/goods_issue/goods_issue_repository";
 import type { PurposeSpecification } from "../domain/goods_issue/purpose_specification";
-import type { GoodsIssueDTO, GoodIssueLineDTO, ItemQuery } from "../shared/types";
 import { PurposeNotFound } from "../domain/goods_issue/purpose_not_found_error";
 import type { SequenceGenerator } from "../domain/sequences/sequence_generator";
-import type { Item } from "~/lib/backend/domain/catalog/item_category";
+import { InsufficientStock } from "../domain/catalog/insufficient_stock_error";
 import { GoodsIssueBuilder } from "../domain/goods_issue/goods_issue_builder";
 import { GoodsIssueLine } from "../domain/goods_issue/goods_issue_line";
+import type { ItemRepository } from "../domain/catalog/item_repository";
 import { type Either, left, right } from "../shared/either";
 import { Sequence } from "../domain/sequences/sequence";
 import { Purpose } from "../domain/goods_issue/purpose";
 import type { GoodsIssueError } from "../shared/errors";
+import { Item } from "../domain/catalog/item";
 import { User } from "../domain/user";
 import { ID } from "../shared/id";
 
 export class GoodsIssueService {
-    #itemCategoryRepository: ItemCategoryRepository;
+    #itemRepository: ItemRepository;
     #goodsIssueRepository: GoodsIssueRepository;
     #sequenceGenerator: SequenceGenerator;
     #purposeSpecification: PurposeSpecification;
 
     constructor(
-        itemCategoryRepository: ItemCategoryRepository,
+        itemRepository: ItemRepository,
         goodsIssueRepository: GoodsIssueRepository,
         sequenceGenerator: SequenceGenerator,
         purposeSpecification: PurposeSpecification
     ) {
-        this.#itemCategoryRepository = itemCategoryRepository;
+        this.#itemRepository = itemRepository;
         this.#goodsIssueRepository = goodsIssueRepository;
         this.#sequenceGenerator = sequenceGenerator;
         this.#purposeSpecification = purposeSpecification;
@@ -42,7 +41,7 @@ export class GoodsIssueService {
 
         const itemsQueries = this.#buildQueries(lines);
 
-        const itemsCategoriesOrError = await this.#itemCategoryRepository.findAll(itemsQueries);
+        const itemsCategoriesOrError = await this.#itemRepository.findAll(itemsQueries);
         if (itemsCategoriesOrError.isLeft()) return left(itemsCategoriesOrError.value);
 
         const itemsCategories = itemsCategoriesOrError.value;
@@ -66,15 +65,15 @@ export class GoodsIssueService {
 
         await this.#goodsIssueRepository.save(goodsIssueOrError.value);
 
-        await this.#itemCategoryRepository.updateAll(itemsCategories);
+        await this.#itemRepository.updateAll(itemsCategories);
 
         return right(undefined);
     }
 
-    #buildQueries(lines: GoodIssueLineDTO[]): ItemQuery[] {
-        const queries: ItemQuery[] = [];
+    #buildQueries(lines: GoodIssueLineDTO[]): ID[] {
+        const queries: ID[] = [];
         for (const line of lines) {
-            const query = { itemId: ID.fromString(line.itemId) };
+            const query = ID.fromString(line.itemId);
             queries.push(query);
         }
         return queries;
@@ -96,9 +95,9 @@ export class GoodsIssueService {
 
             item.reduceStock(quantity);
 
-            if (condition) item.updateCondition(condition);
+            if (condition) item.updateCondition(condition as any);
 
-            const goodsIssueLine = GoodsIssueLine.create({ item, quantity });
+            const goodsIssueLine = GoodsIssueLine.create(item, quantity);
 
             goodsIssueLines.push(goodsIssueLine);
         }
@@ -106,3 +105,26 @@ export class GoodsIssueService {
         return right(goodsIssueLines);
     }
 }
+
+type GoodsIssueDTO = {
+    purpose: {
+        description: string;
+        detailConstraint?: string;
+        notes?: string;
+    };
+    lines: GoodIssueLineDTO[];
+    total: string;
+    returnDate: string;
+    securityDeposit: string;
+};
+
+type GoodIssueLineDTO = {
+    itemId: string;
+    quantity: number;
+    condition?: Condition;
+};
+
+type Condition = {
+    status: string;
+    comment?: string;
+};

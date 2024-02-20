@@ -1,14 +1,15 @@
 import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
-import type { ItemCategoryRepository } from "../../domain/catalog/item_repository";
-import { Item, Status } from "../../domain/catalog/item";
+import type { ItemRepository } from "../../domain/catalog/item_repository";
+import { Item } from "../../domain/catalog/item";
+import { ItemBuilder } from "../../domain/catalog/item_builder";
 import { ItemStock } from "../../domain/catalog/item_stock";
 import { Variation } from "../../domain/catalog/variation";
 import { type Either, left, right } from "../../shared/either";
 import type { Pagination } from "../../shared/pagination";
-import type { ItemQuery } from "../../shared/types";
 import { ID } from "../../shared/id";
+import { Decimal } from "../../shared/decimal";
 
-export class ItemCategoryRepositoryStub implements ItemCategoryRepository {
+export class ItemRepositoryStub implements ItemRepository {
     #items: Record<string, Item> = {};
 
     constructor() {
@@ -19,15 +20,15 @@ export class ItemCategoryRepositoryStub implements ItemCategoryRepository {
         return Promise.resolve(this.#items[itemId.toString()]);
     }
 
-    findAll(queries: ItemQuery[]): Promise<Either<ItemNotFound, Item[]>> {
+    findAll(queries: ID[]): Promise<Either<ItemNotFound, Item[]>> {
         const items: Item[] = [];
 
         for (const query of queries) {
             const filtered = this.records.find(
-                (item) => item.itemId.toString() === query.itemId.toString()
+                (item) => item.itemId.toString() === query.toString()
             );
 
-            if (!filtered) return Promise.resolve(left(new ItemNotFound(query.itemId.toString())));
+            if (!filtered) return Promise.resolve(left(new ItemNotFound(query.toString())));
 
             items.push(filtered);
         }
@@ -107,42 +108,43 @@ export class ItemCategoryRepositoryStub implements ItemCategoryRepository {
         const stock2 = new ItemStock(10);
         const stock3 = new ItemStock(10);
 
-        const item1 = Item.create({
-            itemId: "1001",
-            name: "T-shirt desportiva gola redonda",
-            price: "4500,00",
-            categoryId: ID.random(),
-            condition: { status: Status.Good },
-            stock: stock1,
-            variations: [
-                { variationId: variation1.variationId.toString(), value: "Preto" },
-                { variationId: variation2.variationId.toString(), value: "Nike" },
-            ],
-        });
+        const item1 = new ItemBuilder()
+            .withItemId(ID.fromString("1001"))
+            .withName("T-shirt desportiva gola redonda")
+            .withPrice(Decimal.fromString("4500,00"))
+            .withCategoryId(ID.random())
+            .withStock(10)
+            .withGoodCondition()
+            .withSectionId(ID.random())
+            .withVariationsValues({ Cor: "Preto", Marca: "Nike" })
+            .build();
 
-        const item2 = Item.create({
-            itemId: "1002",
-            name: "Sapato social",
-            price: "15500,00",
-            categoryId: ID.random(),
-            condition: { status: Status.Good },
-            stock: stock2,
-            variations: [],
-        });
+        const item2 = new ItemBuilder()
+            .withItemId(ID.fromString("1002"))
+            .withName("Sapato social")
+            .withPrice(Decimal.fromString("15500,00"))
+            .withCategoryId(ID.random())
+            .withStock(10)
+            .withGoodCondition()
+            .withSectionId(ID.random())
+            .withVariationsValues({ Cor: "Branca", Marca: "Polo" })
+            .build();
 
-        const item3 = Item.create({
-            itemId: "1003",
-            name: "Calça jeans",
-            price: "5500,00",
-            categoryId: ID.random(),
-            condition: { status: Status.Good },
-            stock: stock3,
-        });
+        const item3 = new ItemBuilder()
+            .withItemId(ID.fromString("1003"))
+            .withName("Calça jeans")
+            .withPrice(Decimal.fromString("5500,00"))
+            .withCategoryId(ID.random())
+            .withStock(10)
+            .withGoodCondition()
+            .withSectionId(ID.random())
+            .withVariationsValues({ Cor: "Azul" })
+            .build();
 
         this.#items = {
-            "1001": item1,
-            "1002": item2,
-            "1003": item3,
+            "1001": item1.value as Item,
+            "1002": item2.value as Item,
+            "1003": item3.value as Item,
         };
     }
 }

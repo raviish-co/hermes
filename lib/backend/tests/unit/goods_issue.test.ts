@@ -1,8 +1,9 @@
-import { ItemStock } from "../../domain/catalog/item_stock";
 import { GoodsIssue, GoodsIssueStatus } from "../../domain/goods_issue/goods_issue";
-import { Item, Status } from "../../domain/catalog/item";
 import { GoodsIssueLine } from "../../domain/goods_issue/goods_issue_line";
+import { ItemBuilder } from "../../domain/catalog/item_builder";
 import { Category } from "../../domain/catalog/category";
+import { Item } from "../../domain/catalog/item";
+import { Decimal } from "../../shared/decimal";
 import { describe, expect, it } from "vitest";
 import { User } from "../../domain/user";
 import { ID } from "../../shared/id";
@@ -33,7 +34,7 @@ describe("Test Goods Issue", () => {
         expect(goodsIssue.purpose.details).toBeUndefined();
     });
 
-    it("Deve definir um destino a solicitação de saída de artigos", () => {
+    it("Deve definir uma nota a solicitação de saída de artigos", () => {
         const client = "John Doe";
         const purpose = { description: "Aluguer", notes: client };
         const options = { ...goodsIssueOptions, purpose: purpose };
@@ -91,21 +92,7 @@ describe("Test Goods Issue", () => {
     });
 
     it("Deve calcular o valor total da linha com base num preço com casas decimais", () => {
-        const category = Category.create("some-category");
-        const item = Item.create({
-            itemId: "some-id",
-            name: "some",
-            price: "1150,50",
-            categoryId: category.categoryId,
-            stock,
-            condition,
-        });
-        const goodsIssueLines = [
-            GoodsIssueLine.create({
-                item,
-                quantity: 3,
-            }),
-        ];
+        const goodsIssueLines = [GoodsIssueLine.create(item1.value as Item, 3)];
         const goodsIssue = GoodsIssue.create({
             ...goodsIssueOptions,
             goodsIssueLines,
@@ -117,21 +104,7 @@ describe("Test Goods Issue", () => {
     });
 
     it("Deve calcular o valor total da solicitação de uma linha, onde o total da linha tem casas decimais", () => {
-        const category = Category.create("some-category");
-        const item = Item.create({
-            itemId: "some-id",
-            name: "some",
-            price: "1150,50",
-            categoryId: category.categoryId,
-            stock,
-            condition,
-        });
-        const goodsIssueLines = [
-            GoodsIssueLine.create({
-                item,
-                quantity: 3,
-            }),
-        ];
+        const goodsIssueLines = [GoodsIssueLine.create(item1.value as Item, 3)];
         const goodsIssue = GoodsIssue.create({
             ...goodsIssueOptions,
             goodsIssueLines,
@@ -141,32 +114,9 @@ describe("Test Goods Issue", () => {
     });
 
     it("Deve calcular o valor total de uma solicitação com várias linhas, onde o total de cada linha tem casas decimais", () => {
-        const category = Category.create("some-category");
-        const item1 = Item.create({
-            itemId: "some-id",
-            name: "some",
-            price: "1150,50",
-            categoryId: category.categoryId,
-            stock,
-            condition,
-        });
-        const item2 = Item.create({
-            itemId: "some-id",
-            name: "some",
-            price: "1150,50",
-            categoryId: category.categoryId,
-            stock,
-            condition,
-        });
         const goodsIssueLines = [
-            GoodsIssueLine.create({
-                item: item1,
-                quantity: 3,
-            }),
-            GoodsIssueLine.create({
-                item: item2,
-                quantity: 2,
-            }),
+            GoodsIssueLine.create(item1.value as Item, 3),
+            GoodsIssueLine.create(item1.value as Item, 2),
         ];
         const goodsIssue = GoodsIssue.create({
             ...goodsIssueOptions,
@@ -184,26 +134,32 @@ describe("Test Goods Issue", () => {
     });
 });
 
-const stock = new ItemStock(10);
-const condition = { status: Status.Bad, comment: "Some comment" };
-const item = Item.create({
-    itemId: "some-id",
-    name: "some",
-    price: "150,00",
-    categoryId: ID.random(),
-    stock,
-    condition,
-});
+const category = Category.create("some-category");
 
-const goodsIssueItemOptions = {
-    item,
-    quantity: 3,
-};
+const item = new ItemBuilder()
+    .withItemId(ID.fromString("some-id"))
+    .withName("some")
+    .withPrice(Decimal.fromString("150,00"))
+    .withSectionId(ID.random())
+    .withCategoryId(ID.random())
+    .withStock(10)
+    .withBadCondition("Some comment")
+    .build();
+
+const item1 = new ItemBuilder()
+    .withItemId(ID.fromString("some-id"))
+    .withCategoryId(category.categoryId)
+    .withName("some")
+    .withSectionId(ID.random())
+    .withPrice(Decimal.fromString("1150,50"))
+    .withStock(10)
+    .withBadCondition("Some comment")
+    .build();
 
 const goodsIssueLines: GoodsIssueLine[] = [
-    GoodsIssueLine.create(goodsIssueItemOptions),
-    GoodsIssueLine.create({ ...goodsIssueItemOptions, quantity: 2 }),
-    GoodsIssueLine.create({ ...goodsIssueItemOptions, quantity: 2 }),
+    GoodsIssueLine.create(item.value as Item, 3),
+    GoodsIssueLine.create(item.value as Item, 2),
+    GoodsIssueLine.create(item.value as Item, 2),
 ];
 
 const goodsIssueOptions = {
@@ -212,5 +168,5 @@ const goodsIssueOptions = {
     user: User.create("John Doe"),
     returnDate: "2024-01-21T00:00:00.000Z",
     total: "1050",
-    goodsIssueLines: goodsIssueLines,
+    goodsIssueLines,
 };

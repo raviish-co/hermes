@@ -1,12 +1,12 @@
 import { InmemGoodsIssueRepository } from "../../persistense/inmem/inmem_goods_issue_repository";
-import type { ItemCategoryRepository } from "../../domain/catalog/item_repository";
+import type { ItemRepository } from "../../domain/catalog/item_repository";
 import { InsufficientStock } from "../../domain/catalog/insufficient_stock_error";
 import { DefaultPurposeSpecification } from "../../adapters/default_purpose_specification";
 import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
 import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
 import { InvalidTotal } from "../../domain/goods_issue/invalid_total_error";
-import { ItemCategoryRepositoryStub } from "../stubs/item_repository_stub";
+import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { GoodsIssueService } from "../../application/goods_issue_service";
 import { describe, expect, it, vi } from "vitest";
 import { ID } from "../../shared/id";
@@ -27,13 +27,13 @@ describe("Test Goods Issue", () => {
     it("Deve chamar o método **getAll** no repositório de artigos", async () => {
         const lines = [{ itemId: "1001", quantity: 1 }];
         const { service, itemCategoryRepository } = makeService();
-        const spy = vi.spyOn(itemCategoryRepository, "getAll");
+        const spy = vi.spyOn(itemCategoryRepository, "findAll");
 
         await service.new({ ...goodsIssueData, lines });
 
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledTimes(1);
-        expect(spy).toHaveBeenCalledWith([{ itemId: ID.fromString("1001") }]);
+        expect(spy).toHaveBeenCalledWith([ID.fromString("1001")]);
     });
 
     it("Deve retornar um erro **ItemNotFound** se não existir", async () => {
@@ -307,12 +307,12 @@ const goodsIssueData = {
 };
 
 interface Dependencies {
-    itemCategoryRepository?: ItemCategoryRepository;
+    itemCategoryRepository?: ItemRepository;
 }
 
 function makeService(deps?: Dependencies) {
     const purposeSource = new DefaultPurposeSpecification();
-    const itemCategoryRepository = deps?.itemCategoryRepository ?? new ItemCategoryRepositoryStub();
+    const itemCategoryRepository = deps?.itemCategoryRepository ?? new ItemRepositoryStub();
     const goodsIssuerepository = new InmemGoodsIssueRepository();
     const storage = new InmemSequenceStorage();
     const generator = new SequenceGenerator(storage, 1000);

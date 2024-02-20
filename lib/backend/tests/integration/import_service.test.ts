@@ -1,6 +1,6 @@
 import { InmemCategoryRepository } from "../../persistense/inmem/inmem_category_repository";
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
-import { InmemItemCategoryRepository } from "../../persistense/inmem/inmem_item_category_repository";
+import { InmemItemRepository } from "../../persistense/inmem/inmem_item_repository";
 import { InvalidFileHeader } from "../../domain/readers/invalid_file_header_error";
 import { FileNotSupported } from "../../domain/readers/file_not_supported_error";
 import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
@@ -15,7 +15,7 @@ describe("Test Upload Items", async () => {
         const storage = new InmemSequenceStorage();
         const sequenceGenerator = new SequenceGenerator(storage);
         const categoryRepoistory = new InmemCategoryRepository();
-        const itemRepository = new InmemItemCategoryRepository();
+        const itemRepository = new InmemItemRepository();
         const service = new ImportService(itemRepository, categoryRepoistory, sequenceGenerator);
 
         const error = await service.uploadItems(fileTxt);
@@ -28,7 +28,7 @@ describe("Test Upload Items", async () => {
         const storage = new InmemSequenceStorage();
         const sequenceGenerator = new SequenceGenerator(storage);
         const categoryRepoistory = new InmemCategoryRepository();
-        const itemRepository = new InmemItemCategoryRepository();
+        const itemRepository = new InmemItemRepository();
         const service = new ImportService(itemRepository, categoryRepoistory, sequenceGenerator);
 
         const error = await service.uploadItems(fileHeader);
@@ -41,7 +41,7 @@ describe("Test Upload Items", async () => {
         const storage = new InmemSequenceStorage();
         const sequenceGenerator = new SequenceGenerator(storage);
         const categoryRepoistory = new InmemCategoryRepository();
-        const itemRepository = new InmemItemCategoryRepository();
+        const itemRepository = new InmemItemRepository();
         const service = new ImportService(itemRepository, categoryRepoistory, sequenceGenerator);
 
         const error = await service.uploadItems(emptyFile);
@@ -54,7 +54,7 @@ describe("Test Upload Items", async () => {
         const storage = new InmemSequenceStorage();
         const sequenceGenerator = new SequenceGenerator(storage);
         const categoryRepoistory = new InmemCategoryRepository();
-        const itemRepository = new InmemItemCategoryRepository();
+        const itemRepository = new InmemItemRepository();
         const service = new ImportService(itemRepository, categoryRepoistory, sequenceGenerator);
 
         const file = new File([incompleteFile], "filename.csv", {
@@ -70,7 +70,7 @@ describe("Test Upload Items", async () => {
         const storage = new InmemSequenceStorage();
         const sequenceGenerator = new SequenceGenerator(storage);
         const categoryRepoistory = new InmemCategoryRepository();
-        const itemRepository = new InmemItemCategoryRepository();
+        const itemRepository = new InmemItemRepository();
         const service = new ImportService(itemRepository, categoryRepoistory, sequenceGenerator);
 
         await service.uploadItems(file);
@@ -84,7 +84,7 @@ describe("Test Upload Items", async () => {
         const storage = new InmemSequenceStorage();
         const sequenceGenerator = new SequenceGenerator(storage);
         const categoryRepoistory = new InmemCategoryRepository();
-        const itemRepository = new InmemItemCategoryRepository();
+        const itemRepository = new InmemItemRepository();
         const service = new ImportService(itemRepository, categoryRepoistory, sequenceGenerator);
 
         await service.uploadItems(file);
@@ -99,7 +99,7 @@ describe("Test Upload Items", async () => {
         const storage = new InmemSequenceStorage();
         const sequenceGenerator = new SequenceGenerator(storage);
         const categoryRepoistory = new InmemCategoryRepository();
-        const itemRepository = new InmemItemCategoryRepository();
+        const itemRepository = new InmemItemRepository();
         const service = new ImportService(itemRepository, categoryRepoistory, sequenceGenerator);
 
         await service.uploadItems(file);
@@ -118,7 +118,7 @@ describe("Test Upload Items", async () => {
         const storage = new InmemSequenceStorage();
         const sequenceGenerator = new SequenceGenerator(storage);
         const categoryRepoistory = new InmemCategoryRepository();
-        const itemRepository = new InmemItemCategoryRepository();
+        const itemRepository = new InmemItemRepository();
         const service = new ImportService(itemRepository, categoryRepoistory, sequenceGenerator);
 
         await service.uploadItems(file);
@@ -134,7 +134,7 @@ describe("Test Upload Items", async () => {
         const storage = new InmemSequenceStorage();
         const sequenceGenerator = new SequenceGenerator(storage);
         const repoistory = new InmemCategoryRepository();
-        const itemRepository = new InmemItemCategoryRepository();
+        const itemRepository = new InmemItemRepository();
         const service = new ImportService(itemRepository, repoistory, sequenceGenerator);
 
         await service.uploadItems(file);
@@ -152,7 +152,7 @@ describe("Test Upload Items", async () => {
         const storage = new InmemSequenceStorage();
         const sequenceGenerator = new SequenceGenerator(storage);
         const categoryRepository = new InmemCategoryRepository();
-        const itemRepository = new InmemItemCategoryRepository();
+        const itemRepository = new InmemItemRepository();
         const service = new ImportService(itemRepository, categoryRepository, sequenceGenerator);
 
         await service.uploadItems(file);

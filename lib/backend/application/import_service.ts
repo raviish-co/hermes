@@ -1,26 +1,27 @@
-import { Item, type Condition, Status, ItemBuilder } from "../domain/catalog/item";
-import type { ItemCategoryRepository } from "../domain/catalog/item_repository";
+import { Item, type Condition, Status } from "../domain/catalog/item";
+import { ItemBuilder } from "../domain/catalog/item_builder";
 import type { CategoryRepository } from "../domain/catalog/category_repository";
 import { InvalidFileHeader } from "../domain/readers/invalid_file_header_error";
 import { FileNotSupported } from "../domain/readers/file_not_supported_error";
 import { CsvReader, VALID_CSV_HEADER } from "../domain/readers/csv_reader";
 import { SequenceGenerator } from "../domain/sequences/sequence_generator";
-import { ItemStock } from "../domain/catalog/item_stock";
+import type { ItemRepository } from "../domain/catalog/item_repository";
 import { FileEmpty } from "../domain/readers/file_empty_error";
 import { left, right, type Either } from "../shared/either";
+import { ItemStock } from "../domain/catalog/item_stock";
 import { Sequence } from "../domain/sequences/sequence";
 import { Category } from "../domain/catalog/category";
 import type { FileError } from "../shared/errors";
-import { ID } from "../shared/id";
 import { Decimal } from "../shared/decimal";
+import { ID } from "../shared/id";
 
 export class ImportService {
-    #itemRepository: ItemCategoryRepository;
+    #itemRepository: ItemRepository;
     #categoryRepository: CategoryRepository;
     #generator: SequenceGenerator;
 
     constructor(
-        itemRepository: ItemCategoryRepository,
+        itemRepository: ItemRepository,
         categoryRepository: CategoryRepository,
         generator: SequenceGenerator
     ) {

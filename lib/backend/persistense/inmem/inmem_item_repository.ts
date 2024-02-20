@@ -1,27 +1,26 @@
-import type { ItemCategoryRepository } from "../../domain/catalog/item_repository";
+import type { ItemRepository as ItemRepository } from "../../domain/catalog/item_repository";
 import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
-import { Item } from "../../domain/catalog/item";
 import { type Either, left, right } from "../../shared/either";
 import type { Pagination } from "../../shared/pagination";
-import type { ItemQuery } from "../../shared/types";
+import { Item } from "../../domain/catalog/item";
 import { ID } from "../../shared/id";
 
-export class InmemItemCategoryRepository implements ItemCategoryRepository {
+export class InmemItemRepository implements ItemRepository {
     #items: Record<string, Item> = {};
 
-    getById(itemCategoryId: ID): Promise<Item> {
-        return Promise.resolve(this.#items[itemCategoryId.toString()]);
+    getById(itemId: ID): Promise<Item> {
+        return Promise.resolve(this.#items[itemId.toString()]);
     }
 
-    findAll(queries: ItemQuery[]): Promise<Either<ItemNotFound, Item[]>> {
+    findAll(queries: ID[]): Promise<Either<ItemNotFound, Item[]>> {
         const items: Item[] = [];
 
         for (const query of queries) {
             const filtered = this.records.find(
-                (item) => item.itemId.toString() === query.itemId.toString()
+                (item) => item.itemId.toString() === query.toString()
             );
 
-            if (!filtered) return Promise.resolve(left(new ItemNotFound(query.itemId.toString())));
+            if (!filtered) return Promise.resolve(left(new ItemNotFound(query.toString())));
 
             items.push(filtered);
         }
