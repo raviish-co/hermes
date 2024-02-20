@@ -11,6 +11,7 @@ export interface GoodsIssueItem {
     price: string;
     isUnique: boolean;
     quantity: number;
+    stock: number;
     total: string;
     variationsValues?: VariationValue[];
     condition?: Condition;

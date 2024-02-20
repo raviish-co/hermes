@@ -119,7 +119,9 @@ function clearInputs() {
 
 defineExpose({ clearInputs });
 
-getDescriptions();
+onMounted(() => {
+    getDescriptions();
+});
 </script>
 
 <template>
