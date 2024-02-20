@@ -14,8 +14,6 @@ interface Emits {
     (e: "added"): void;
 }
 
-const props = defineProps<Props>();
-const emits = defineEmits<Emits>();
 const dialogRef = ref<typeof VDialog>();
 const query = ref<string>("");
 const items = ref<ItemModel[]>([]);
@@ -24,6 +22,9 @@ const pages = ref<number>(1);
 const quantities = ref<number[]>([]);
 
 const catalogService = new CatalogService();
+
+const props = defineProps<Props>();
+const emits = defineEmits<Emits>();
 
 function emitItemAdded(item: ItemModel, idx: number) {
     addItem(item, idx);
@@ -56,7 +57,7 @@ function addItem(item: ItemModel, idx: number) {
 
     props.goodsIssueItems.push(newRow);
 
-    quantities.value[idx] = 0;
+    quantities.value[idx] = 1;
 }
 
 function calculateTotal(item: ItemModel, quantity: number): string {
@@ -95,7 +96,7 @@ async function listItems(pageToken: number = 1) {
 }
 
 function initializeQuantities() {
-    items.value.forEach((_, idx) => (quantities.value[idx] = 0));
+    items.value.forEach((_, idx) => (quantities.value[idx] = 1));
 }
 
 function listVariationValues(variationValues?: VariationValue[]) {
@@ -185,6 +186,8 @@ defineExpose({ show: showDialog });
                                 placeholder="QTD"
                                 min="0"
                                 :max="item.quantity"
+                                @keypress.enter="emitItemAdded(item, idx)"
+                                @keydown.tab="emitItemAdded(item, idx)"
                             />
 
                             <input
