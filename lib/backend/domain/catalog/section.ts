@@ -1,13 +1,13 @@
 import type { ID } from "../../shared/id";
 
 export class Section {
-    readonly id: ID;
-    #name: string;
+    readonly sectionId: ID;
+    name: string;
     #departmentId: ID;
 
-    constructor(id: ID, name: string, departmentId: ID) {
-        this.id = id;
-        this.#name = name;
+    constructor(sectionId: ID, name: string, departmentId: ID) {
+        this.sectionId = sectionId;
+        this.name = name;
         this.#departmentId = departmentId;
     }
 }
