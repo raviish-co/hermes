@@ -26,6 +26,10 @@ const catalogService = new CatalogService();
 const props = defineProps<Props>();
 const emits = defineEmits<Emits>();
 
+function itemExistInGoodsIssueItems(item: ItemModel): boolean {
+    return props.goodsIssueItems.some((i) => i.itemId == item.itemId);
+}
+
 function emitItemAdded(item: ItemModel, idx: number) {
     addItem(item, idx);
 
@@ -151,10 +155,10 @@ defineExpose({ show: showDialog });
 
                 <tbody>
                     <tr
-                        v-if="items"
                         v-for="(item, idx) in items"
                         :key="item.itemId"
                         class="hover:bg-gray-50"
+                        :class="{ hidden: itemExistInGoodsIssueItems(item) }"
                     >
                         <td class="w-16 cursor-pointer hidden sm:initial">{{ item.itemId }}</td>
 

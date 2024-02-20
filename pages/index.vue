@@ -60,7 +60,7 @@ function toGoodsIssue(): GoodsIssueModel {
 const isValidGoodsIssue = computed(() => {
     const isValidGoodsItems = goodsIssueItems.value.length > 0;
 
-    if (isValidPurpose && isValidGoodsItems) {
+    if (isValidPurpose.value && isValidGoodsItems) {
         return true;
     }
 
