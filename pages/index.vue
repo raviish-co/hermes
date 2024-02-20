@@ -10,6 +10,8 @@ import { formatCurrency } from "@frontend/helpers/format_currency";
 
 const DETAILS = "Detalhes";
 
+const now = () => new Date().toISOString().slice(0, 16);
+
 const choosePurposeRef = ref<typeof ChoosePurpose>();
 const addItemDialogRef = ref<typeof AddItemDialog>();
 const describeItemStatusDialogRef = ref<typeof DescribeItemStatusDialog>();
@@ -19,7 +21,7 @@ const purposeDescription = ref<string>("");
 const goodsIssueItems = ref<GoodsIssueItem[]>([]);
 const securityDeposit = ref<string>("0,00");
 const grandTotal = ref<string>("0,00");
-const returnDate = ref<string>("");
+const returnDate = ref<string>(now());
 const selectedRow = ref<GoodsIssueItem>({} as GoodsIssueItem);
 const isValidPurpose = ref<boolean>(false);
 
@@ -150,7 +152,7 @@ function listVariationValues(itemVariation?: VariationValue[]) {
 }
 
 function clearValues() {
-    returnDate.value = new Date().toString();
+    returnDate.value = now();
     goodsIssueItems.value = [];
     grandTotal.value = "0,00";
     securityDeposit.value = "0,00";

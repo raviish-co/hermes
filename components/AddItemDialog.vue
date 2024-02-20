@@ -163,7 +163,9 @@ defineExpose({ show: showDialog });
                         <td class="w-16 cursor-pointer hidden sm:initial">{{ item.itemId }}</td>
 
                         <td class="cursor-pointer" @click="emitItemAdded(item, idx)">
-                            {{ item.name }}
+                            <span>
+                                {{ item.name }}
+                            </span>
 
                             <br />
 
