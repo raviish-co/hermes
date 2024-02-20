@@ -73,7 +73,7 @@ function calculateTotal(item: ItemModel, quantity: number): string {
 }
 
 function toGoodsIssueLine(item: ItemModel, quantity: number, total: string): GoodsIssueItem {
-    return { ...item, quantity, total };
+    return { ...item, stock: item.quantity, quantity, total };
 }
 
 async function searchItems(pageToken: number = 1) {

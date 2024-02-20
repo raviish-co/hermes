@@ -32,14 +32,14 @@ function removeSpaces(value: string): string {
 function toGoodsIssueLine(): GoodsIssueLine[] {
     if (goodsIssueItems.value.length === 0) return [];
 
-    return goodsIssueItems.value.map((row) => ({
-        itemId: row.itemId,
-        quantity: row.quantity,
+    return goodsIssueItems.value.map((item) => ({
+        itemId: item.itemId,
+        quantity: item.quantity,
         condition: {
-            comment: row?.condition?.comment,
-            status: row?.condition!.status,
+            comment: item?.condition?.comment,
+            status: item?.condition!.status,
         },
-        variations: row.variationsValues?.map((v) => v.variationId),
+        variations: item.variationsValues?.map((v) => v.variationId),
     }));
 }
 
@@ -57,10 +57,20 @@ function toGoodsIssue(): GoodsIssueModel {
     };
 }
 
+function isValidQuantities(): boolean {
+    const invalidItem = goodsIssueItems.value.find((i) => i.quantity > i.stock);
+
+    if (invalidItem) return false;
+
+    return true;
+}
+
 const isValidGoodsIssue = computed(() => {
     const isValidGoodsItems = goodsIssueItems.value.length > 0;
 
-    if (isValidPurpose.value && isValidGoodsItems) {
+    const quantitiesIsValid = isValidQuantities();
+
+    if (isValidPurpose.value && isValidGoodsItems && quantitiesIsValid) {
         return true;
     }
 
@@ -222,24 +232,34 @@ function updateIsValidPurpose(value: boolean) {
 
                         <tbody>
                             <tr
-                                v-for="(row, idx) in goodsIssueItems"
+                                v-for="(item, idx) in goodsIssueItems"
                                 :key="idx"
                                 class="cursor-pointer"
                             >
-                                <td>{{ row.itemId }}</td>
-                                <td @click="showDescribeItemStatusDialog(row)">
-                                    {{ row.name }}
+                                <td>{{ item.itemId }}</td>
+                                <td @click="showDescribeItemStatusDialog(item)">
+                                    {{ item.name }}
                                     <br />
-                                    <span class="text-light-600 text-sm">{{
-                                        listVariationValues(row?.variationsValues)
-                                    }}</span>
+                                    <span class="text-light-600 text-sm">
+                                        {{ listVariationValues(item?.variationsValues) }}
+                                    </span>
                                 </td>
-                                <td>{{ row.quantity }}</td>
-                                <td class="text-right">{{ row.price }}</td>
-                                <td class="text-right">{{ row.total }}</td>
+
+                                <td>
+                                    <input
+                                        type="number"
+                                        v-model="item.quantity"
+                                        class="input-number"
+                                        :disabled="item.isUnique"
+                                        min="1"
+                                        :max="item.stock"
+                                    />
+                                </td>
+                                <td class="text-right">{{ item.price }}</td>
+                                <td class="text-right">{{ item.total }}</td>
                                 <td
                                     class="cursor-pointer"
-                                    @click="removeGoodsIssueItem(row.itemId)"
+                                    @click="removeGoodsIssueItem(item.itemId)"
                                 >
                                     <span class="material-symbols-outlined">close</span>
                                 </td>
