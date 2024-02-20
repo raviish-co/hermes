@@ -1,5 +1,5 @@
-import { InmemItemRepository } from "../../persistense/inmem/inmem_item_repository";
 import { InmemVariationRepository } from "../../persistense/inmem/inmem_variation_repository";
+import { InmemItemRepository } from "../../persistense/inmem/inmem_item_repository";
 import { CatalogService } from "../../application/catalog_service";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { Variation } from "../../domain/catalog/variation";

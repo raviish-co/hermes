@@ -1,4 +1,4 @@
-import { GoodsIssue } from "../../domain/goods_issue/goods_issue";
+import { GoodsIssue } from "./goods_issue_note";
 import { ID } from "../../shared/id";
 
 export interface GoodsIssueRepository {

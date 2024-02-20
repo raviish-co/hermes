@@ -1,9 +1,9 @@
-import type { GoodsIssueRepository } from "../domain/goods_issue/goods_issue_repository";
+import type { GoodsIssueRepository } from "../domain/goods_issue/goods_issue_note_repository";
 import type { PurposeSpecification } from "../domain/goods_issue/purpose_specification";
 import { PurposeNotFound } from "../domain/goods_issue/purpose_not_found_error";
 import type { SequenceGenerator } from "../domain/sequences/sequence_generator";
 import { InsufficientStock } from "../domain/catalog/insufficient_stock_error";
-import { GoodsIssueBuilder } from "../domain/goods_issue/goods_issue_builder";
+import { GoodsIssueBuilder as GoodsIssueNoteBuilder } from "../domain/goods_issue/goods_issue_builder";
 import { GoodsIssueLine } from "../domain/goods_issue/goods_issue_line";
 import type { ItemRepository } from "../domain/catalog/item_repository";
 import { type Either, left, right } from "../shared/either";
@@ -11,8 +11,8 @@ import { Sequence } from "../domain/sequences/sequence";
 import { Purpose } from "../domain/goods_issue/purpose";
 import type { GoodsIssueError } from "../shared/errors";
 import { Item } from "../domain/catalog/item";
-import { User } from "../domain/user";
 import { ID } from "../shared/id";
+import { InvalidTotal } from "../domain/goods_issue/invalid_total_error";
 
 export class GoodsIssueService {
     #itemRepository: ItemRepository;
@@ -33,39 +33,36 @@ export class GoodsIssueService {
     }
 
     async new(data: GoodsIssueDTO): Promise<Either<GoodsIssueError, void>> {
-        const { purpose: purposeData, lines, total, returnDate, securityDeposit } = data;
-
-        const purpose = Purpose.fromOptions(purposeData);
+        const purpose = Purpose.fromOptions(data.purpose);
         if (!this.#purposeSpecification.isSatisfiedBy(purpose))
-            return left(new PurposeNotFound(purposeData.description));
+            return left(new PurposeNotFound(data.purpose.description));
 
-        const itemsQueries = this.#buildQueries(lines);
+        const itemsIds = this.#buildQueries(data.lines);
 
-        const itemsCategoriesOrError = await this.#itemRepository.findAll(itemsQueries);
-        if (itemsCategoriesOrError.isLeft()) return left(itemsCategoriesOrError.value);
+        const itemsOrErr = await this.#itemRepository.findAll(itemsIds);
+        if (itemsOrErr.isLeft()) return left(itemsOrErr.value);
 
-        const itemsCategories = itemsCategoriesOrError.value;
-        const goodsIssueLinesOrError = this.#buildGoodsIssueLines(itemsCategories, lines);
-        if (goodsIssueLinesOrError.isLeft()) return left(goodsIssueLinesOrError.value);
+        const items = itemsOrErr.value;
+        const linesOrErr = this.#buildGoodsIssueLines(items, data.lines);
+        if (linesOrErr.isLeft()) return left(linesOrErr.value);
 
-        const goodsIssueId = this.#sequenceGenerator.generate(Sequence.Request);
-        const goodsIssueLines = goodsIssueLinesOrError.value;
-        const user = User.create("Teste");
-        const goodsIssueOrError = new GoodsIssueBuilder()
-            .withUser(user)
-            .withTotal(total)
+        const issueId = this.#sequenceGenerator.generate(Sequence.GoodIssueNote);
+        const lines = linesOrErr.value;
+        const noteOrError = new GoodsIssueNoteBuilder()
             .withPurpose(purpose)
-            .withReturnDate(returnDate)
-            .withGoodsIssueId(goodsIssueId)
-            .withGoodsIssueLines(goodsIssueLines)
-            .withSecurityDeposit(securityDeposit)
+            .withReturnDate(data.returnDate)
+            .withGoodsIssueId(issueId)
+            .withUser(ID.fromString("user-id"))
+            .withLines(lines)
             .build();
 
-        if (goodsIssueOrError.isLeft()) return left(goodsIssueOrError.value);
+        if (noteOrError.isLeft()) return left(noteOrError.value);
 
-        await this.#goodsIssueRepository.save(goodsIssueOrError.value);
+        if (!noteOrError.value.isSameTotal(data.total)) return left(new InvalidTotal());
 
-        await this.#itemRepository.updateAll(itemsCategories);
+        await this.#goodsIssueRepository.save(noteOrError.value);
+
+        await this.#itemRepository.updateAll(items);
 
         return right(undefined);
     }

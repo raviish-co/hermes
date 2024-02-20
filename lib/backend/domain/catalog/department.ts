@@ -1,6 +1,6 @@
 import { ID } from "../../shared/id";
 
-class Department {
+export class Department {
     readonly id: ID;
     #name: string;
 

@@ -215,7 +215,7 @@ Produto 2,200.00,2,some-comment,Categoria 1,Secao 1,Departamento 1
 Produto 3,300.00,3,some-comment,Categoria 1,Secao 1,Departamento 1
 Produto 4,400.00,4,some-comment,Categoria 1,Secao 1,Departamento 1
 Produto 5,500.00,5,some-comment,Categoria 1,Secao 1,Departamento 1`;
-const category = Category.create("Categoria 1");
+const category = new Category(ID.random(), "Categoria 1");
 const section = new Section(ID.random(), "Secao 1", ID.random());
 const invalidData = `name,price,isunique,quantity\nProduto 1,100.00,true,1\nProduto 2,,false,4`;
 const incompleteFile = new File([invalidData], "filename.csv", { type: "text/csv" });

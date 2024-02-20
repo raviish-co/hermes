@@ -1,25 +1,16 @@
-import { GoodsIssueLine } from "../../domain/goods_issue/goods_issue_line";
-import { Purpose } from "../../domain/goods_issue/purpose";
+import { GoodsIssueLine } from "./goods_issue_line";
 import { Decimal } from "../../shared/decimal";
-import { User } from "../../domain/user";
+import { Purpose } from "./purpose";
 import { ID } from "../../shared/id";
-
-// type Options = {
-//     goodsIssueId: string;
-//     purpose: Purpose;
-//     user: User;
-//     goodsIssueLines: GoodsIssueLine[];
-//     returnDate: string;
-// };
 
 export enum GoodsIssueStatus {
     PENDING = "Por Devolver",
 }
 
-export class GoodsIssue {
-    readonly goodsIssueId: ID;
+export class GoodsIssueNote {
+    readonly goodsIssueNoteId: ID;
     readonly purpose: Purpose;
-    readonly user: User;
+    readonly userId: ID;
     readonly goodsIssueLines: GoodsIssueLine[];
     readonly returnDate: Date;
     readonly issuedAt: Date;
@@ -27,44 +18,34 @@ export class GoodsIssue {
     total: Decimal;
     securityDeposit: Decimal;
 
-    private constructor(requestId: ID, purpose: Purpose, user: User, returnDate: Date) {
-        this.goodsIssueId = requestId;
+    constructor(
+        requestId: ID,
+        purpose: Purpose,
+        user: ID,
+        returnDate: Date,
+        lines: GoodsIssueLine[]
+    ) {
+        this.goodsIssueNoteId = requestId;
         this.purpose = purpose;
-        this.user = user;
+        this.userId = user;
         this.status = GoodsIssueStatus.PENDING;
         this.issuedAt = new Date();
         this.returnDate = returnDate;
         this.total = Decimal.fromString("0");
         this.goodsIssueLines = [];
         this.securityDeposit = Decimal.fromString("0");
+
+        this.#addLines(lines);
     }
 
-    static create(
-        goodsIssueId: string,
-        goodsIssueLines: GoodsIssueLine[],
-        purpose: Purpose,
-        user: User,
-        returnDate: string
-    ): GoodsIssue {
-        const returnDateParsed = new Date(returnDate);
-        const goodsIssue = new GoodsIssue(
-            ID.fromString(goodsIssueId),
-            purpose,
-            user,
-            returnDateParsed
-        );
-        goodsIssue.addGoodsIssueLines(goodsIssueLines);
-        return goodsIssue;
-    }
-
-    addGoodsIssueLines(goodsIssueLines: GoodsIssueLine[]): void {
+    #addLines(goodsIssueLines: GoodsIssueLine[]): void {
         for (const line of goodsIssueLines) {
-            this.addGoodsIssueLine(line);
+            this.#addLine(line);
         }
         this.#calculateSecurityDeposit();
     }
 
-    addGoodsIssueLine(goodsIssueLine: GoodsIssueLine): void {
+    #addLine(goodsIssueLine: GoodsIssueLine): void {
         const total = goodsIssueLine.getTotal();
         this.goodsIssueLines.push(goodsIssueLine);
         this.#calculateTotal(total);
