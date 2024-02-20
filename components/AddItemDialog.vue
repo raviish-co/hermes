@@ -116,8 +116,8 @@ function changeListPage(pageToken: number) {
     listItems(pageToken);
 }
 
-function enableToEditQuantity(isUnique: boolean, quantity: number) {
-    return !isUnique && quantity > 0;
+function canEditQuantity(item: ItemModel): boolean {
+    return !item.isUnique && item.quantity > 0;
 }
 
 function showDialog() {
@@ -179,23 +179,15 @@ defineExpose({ show: showDialog });
 
                         <td class="text-xs">
                             <input
-                                v-if="enableToEditQuantity(item.isUnique, item.quantity)"
                                 v-model="quantities[idx]"
                                 type="number"
-                                class="input-number"
                                 placeholder="QTD"
                                 min="0"
+                                :disabled="!canEditQuantity(item)"
+                                class="input-number"
                                 :max="item.quantity"
                                 @keypress.enter="emitItemAdded(item, idx)"
                                 @keydown.tab="emitItemAdded(item, idx)"
-                            />
-
-                            <input
-                                v-else
-                                :value="item.quantity"
-                                disabled
-                                type="number"
-                                class="input-number"
                             />
                         </td>
                     </tr>
@@ -212,4 +204,3 @@ defineExpose({ show: showDialog });
         </p>
     </VDialog>
 </template>
-~/lib/frontend/helpers/number_format ~/lib/frontend/models/goods_issue~/lib/frontend/models/item
