@@ -194,7 +194,7 @@ function updateIsValidPurpose(value: boolean) {
                     @description-changed="updatePurposeDescription"
                     @detail-changed="updatePurposeDetail"
                     @notes-type-changed="updatePurposeNotesType"
-                    @valid-purpose="updateIsValidPurpose"
+                    @valid-purpose-changed="updateIsValidPurpose"
                 />
             </form>
         </section>

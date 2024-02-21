@@ -3,25 +3,24 @@ interface Emits {
     (e: "descriptionChanged", value: string): void;
     (e: "detailChanged", value: string): void;
     (e: "notesTypeChanged", value: string): void;
-    (e: "validPurpose", value: boolean): void;
+    (e: "validPurposeChanged", value: boolean): void;
 }
 
 const emits = defineEmits<Emits>();
 
 const INNER_LAUNDRY = "Interna";
-const DISCARD = "Descartar";
 const PURPOSE = "Finalidade";
 const DETAILS = "Detalhes";
 
 const purposes = usePurpose().purposes;
 const currentNotesType = ref<string>("");
-const currentDetails = ref<string[]>([]);
-const currentDescription = ref<string>(PURPOSE);
-const descriptions = ref<string[]>([]);
 const currentDetail = ref<string>(DETAILS);
-const isDisabledDetails = computed(() => currentDetails.value.length <= 0);
-const notesTypeIsDisabled = ref<boolean>(false);
+const currentDescription = ref<string>(PURPOSE);
+const currentDetails = ref<string[]>([]);
 const currentNotesTypePlaceholder = ref<string>("Descrição");
+const descriptions = ref<string[]>([]);
+const isDisabledDetailsSelect = computed(() => currentDetails.value.length <= 0);
+const isDisabledNotesTypeInput = ref<boolean>(false);
 
 const isValidDescription = computed(() =>
     purposes.value.some((p) => p.description === currentDescription.value)
@@ -36,7 +35,7 @@ const isValidDetail = computed(() => {
 });
 
 const isValidNotesType = computed(() => {
-    if (currentNotesType.value === "" && !notesTypeIsDisabled.value) return false;
+    if (currentNotesType.value === "" && !isDisabledNotesTypeInput.value) return false;
 
     return true;
 });
@@ -49,15 +48,42 @@ function getDescriptions() {
     descriptions.value = purposes.value.map((p) => p.description);
 }
 
-function findDetailsByDescription(e: Event): void {
+function disableNotesTypeInput(): void {
+    if (currentDetail.value === INNER_LAUNDRY) {
+        isDisabledNotesTypeInput.value = true;
+        currentNotesType.value = "";
+
+        emits("notesTypeChanged", currentNotesType.value);
+        emits("validPurposeChanged", isValidPurpose.value);
+
+        return;
+    }
+
+    isDisabledNotesTypeInput.value = false;
+}
+
+function updateCurrentDetails(details: string[]) {
+    if (details.length === 0) {
+        currentDetails.value = [];
+        currentDetail.value = DETAILS;
+
+        emits("detailChanged", currentDetail.value);
+
+        return;
+    }
+
+    currentDetails.value = details;
+}
+
+function findDetailsByDescription(): void {
     emits("descriptionChanged", currentDescription.value);
-    emits("validPurpose", isValidPurpose.value);
+    emits("validPurposeChanged", isValidPurpose.value);
 
     if (currentDescription.value === PURPOSE) {
         currentDetail.value = DETAILS;
 
         emits("descriptionChanged", currentDetail.value);
-        emits("validPurpose", isValidPurpose.value);
+        emits("validPurposeChanged", isValidPurpose.value);
 
         currentDetails.value = [];
         return;
@@ -66,55 +92,33 @@ function findDetailsByDescription(e: Event): void {
     purposes.value.find((p) => {
         if (p.description === currentDescription.value) {
             currentNotesTypePlaceholder.value = p.notesType!;
-            updateCurrentDetails(p.detailsConstraint);
-            disableNotesType();
+            updateCurrentDetails(p.detailsConstraint!);
             return true;
         }
     });
 
-    currentDetail.value = DETAILS;
+    disableNotesTypeInput();
+
     emits("detailChanged", currentDetail.value);
-    emits("validPurpose", isValidPurpose.value);
+    emits("validPurposeChanged", isValidPurpose.value);
 }
 
-function disableNotesType(): void {
-    if (currentDescription.value === DISCARD || currentDetail.value === INNER_LAUNDRY) {
-        notesTypeIsDisabled.value = true;
-        currentNotesType.value = "";
-
-        emits("notesTypeChanged", currentNotesType.value);
-        emits("validPurpose", isValidPurpose.value);
-
-        return;
-    }
-
-    notesTypeIsDisabled.value = false;
-}
-
-function updateCurrentDetails(details?: string[]) {
-    if (!details) {
-        currentDetails.value = [];
-        return;
-    }
-
-    currentDetails.value = details;
-}
-
-function emitCurrentDetail(e: Event) {
+function emitCurrentDetail() {
     emits("detailChanged", currentDetail.value);
-    emits("validPurpose", isValidPurpose.value);
+    emits("validPurposeChanged", isValidPurpose.value);
 
-    disableNotesType();
+    disableNotesTypeInput();
 }
 
-function emitNotesType(e: Event) {
+function emitNotesType() {
     emits("notesTypeChanged", currentNotesType.value);
-    emits("validPurpose", isValidPurpose.value);
+    emits("validPurposeChanged", isValidPurpose.value);
 }
 
 function clearInputs() {
     currentDescription.value = PURPOSE;
     currentDetail.value = DETAILS;
+    currentNotesType.value = "";
 }
 
 defineExpose({ clearInputs });
@@ -140,7 +144,7 @@ onMounted(() => {
 
         <select
             v-model="currentDetail"
-            :disabled="isDisabledDetails"
+            :disabled="isDisabledDetailsSelect"
             class="input-field"
             :class="{ invalid: !isValidDetail }"
             @change="emitCurrentDetail"
@@ -155,7 +159,7 @@ onMounted(() => {
     <input
         v-model="currentNotesType"
         :placeholder="currentNotesTypePlaceholder"
-        :disabled="notesTypeIsDisabled"
+        :disabled="isDisabledNotesTypeInput"
         class="input-field mb-4"
         :class="{ invalid: !isValidNotesType }"
         @input="emitNotesType"
