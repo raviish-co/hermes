@@ -49,8 +49,7 @@ export class Item {
         return tokens.join(" ").toLowerCase();
     }
 
-    updateCondition(condition: Condition): void {
-        const { status, comment } = condition;
+    updateCondition(status: string, comment?: string): void {
         if (Status.Good == status) {
             this.#condition = { status: Status.Good };
             return;
