@@ -6,6 +6,14 @@ import { type Either, left, right } from "../../shared/either";
 export class InmemSectionRepository implements SectionRepository {
     #sections: Record<string, Section> = {};
 
+    constructor(sections?: Section[]) {
+        if (sections) {
+            sections.forEach((section) => {
+                this.#sections[section.sectionId.toString()] = section;
+            });
+        }
+    }
+
     findByName(name: string): Promise<Either<SectionNotFound, Section>> {
         const section = this.records.find((s) => s.name === name);
 

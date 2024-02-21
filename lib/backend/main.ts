@@ -1,7 +1,6 @@
-import { InmemCategoryRepository } from "./persistense/inmem/inmem_category_repository";
 import { DefaultPurposeSpecification } from "./adapters/default_purpose_specification";
 import { InmemGoodsIssueRepository } from "./persistense/inmem/inmem_goods_issue_repository";
-import { VariationRepositoryStub } from "./tests/stubs/variations_repository_stub";
+import { VariationRepositoryStub } from "./tests/stubs/variation_repository_stub";
 import { InmemSequenceStorage } from "./persistense/inmem/inmem_sequence_storage";
 import { SequenceGenerator } from "./domain/sequences/sequence_generator";
 import { ItemRepositoryStub } from "./tests/stubs/item_repository_stub";
@@ -9,13 +8,16 @@ import { GoodsIssueService } from "./application/goods_issue_service";
 import { CatalogService } from "./application/catalog_service";
 import { ImportService } from "./application/import_service";
 import { PurposeService } from "./application/purpose_service";
+import { SectionRepositoryStub } from "./tests/stubs/section_repository_stub";
+import { CategoryRepositoryStub } from "./tests/stubs/categoria_repository_stub";
 
 const itemRepository = new ItemRepositoryStub();
 const goodsIssueRepository = new InmemGoodsIssueRepository();
 const sequenceStorage = new InmemSequenceStorage();
 const sequenceGenerator = new SequenceGenerator(sequenceStorage);
-const categoryRepository = new InmemCategoryRepository();
+const categoryRepository = new CategoryRepositoryStub();
 const variationRepository = new VariationRepositoryStub();
+const sectionRepository = new SectionRepositoryStub();
 const purposeSpec = new DefaultPurposeSpecification();
 
 interface Services {
@@ -35,7 +37,13 @@ export const makeServices = (): Services => {
 
     const catalogService = new CatalogService(itemRepository, variationRepository);
 
-    const importService = new ImportService(itemRepository, categoryRepository, sequenceGenerator);
+    const importService = new ImportService(
+        itemRepository,
+        categoryRepository,
+        sectionRepository,
+        variationRepository,
+        sequenceGenerator
+    );
 
     const purposeService = new PurposeService();
 

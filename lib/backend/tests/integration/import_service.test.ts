@@ -7,7 +7,7 @@ import { CategoryNotFound } from "../../domain/catalog/category_not_found_error"
 import { FileNotSupported } from "../../domain/readers/file_not_supported_error";
 import { SectionNotFound } from "../../domain/catalog/section_not_found_error";
 import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
-import { VariationRepositoryStub } from "../stubs/variations_repository_stub";
+import { VariationRepositoryStub } from "../stubs/variation_repository_stub";
 import { VariationNotFound } from "../../domain/catalog/variation_not_found_error";
 import { InmemVariationRepository } from "../../persistense/inmem/inmem_variation_repository";
 import { InvalidVariationFormat } from "../../domain/catalog/invalid_variation_format_error";

@@ -126,7 +126,7 @@ export class ImportService {
         return result;
     }
 
-    #extractVariations(variations: string): Either<Error, VariationResult> {
+    #extractVariations(variations: string): Either<InvalidVariationFormat, VariationResult> {
         let names: string[] = [];
         let values: string[] = [];
 

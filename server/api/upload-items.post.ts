@@ -11,26 +11,33 @@ export default defineEventHandler(async (event) => {
 
     const file = formData.get("file") as File;
 
-    const resultOrError = await importService.uploadItems(file);
+    const resultOrErr = await importService.uploadItems(file);
 
-    if (resultOrError.value instanceof InvalidFileHeader) {
+    if (resultOrErr.value instanceof InvalidFileHeader) {
         return createError({
             statusCode: HttpStatus.BadRequest,
-            message: resultOrError.value.message,
+            message: resultOrErr.value.message,
         });
     }
 
-    if (resultOrError.value instanceof FileEmpty) {
+    if (resultOrErr.value instanceof FileEmpty) {
         return createError({
             statusCode: HttpStatus.BadRequest,
-            message: resultOrError.value.message,
+            message: resultOrErr.value.message,
         });
     }
 
-    if (resultOrError.value instanceof FileNotSupported) {
+    if (resultOrErr.value instanceof FileNotSupported) {
         return createError({
             statusCode: HttpStatus.BadRequest,
-            message: resultOrError.value.message,
+            message: resultOrErr.value.message,
+        });
+    }
+
+    if (resultOrErr.value instanceof Error) {
+        return createError({
+            statusCode: HttpStatus.BadRequest,
+            message: resultOrErr.value.message,
         });
     }
 

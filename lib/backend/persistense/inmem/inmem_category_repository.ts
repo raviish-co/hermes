@@ -6,6 +6,14 @@ import { Category } from "../../domain/catalog/category";
 export class InmemCategoryRepository implements CategoryRepository {
     #categories: Record<string, Category> = {};
 
+    constructor(categories?: Category[]) {
+        if (categories) {
+            categories.forEach((category) => {
+                this.#categories[category.categoryId.toString()] = category;
+            });
+        }
+    }
+
     findByName(name: string): Promise<Either<CategoryNotFound, Category>> {
         const category = this.records.find((c) => c.name === name);
 
