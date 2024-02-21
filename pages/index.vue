@@ -252,7 +252,6 @@ function updateIsValidPurpose(value: boolean) {
                                         type="number"
                                         v-model="item.quantity"
                                         class="input-number"
-                                        :disabled="item.isUnique"
                                         min="1"
                                         :max="item.stock"
                                     />

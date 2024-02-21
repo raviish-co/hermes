@@ -11,7 +11,6 @@ export interface ItemModel {
     price: string;
     categoryId: string;
     variationsValues?: VariationValue[];
-    isUnique: boolean;
     quantity: number;
     condition?: Condition;
 }
