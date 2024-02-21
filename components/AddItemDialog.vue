@@ -44,9 +44,7 @@ function validateQuantity(itemQuantityInStock: number, quantity: number): boolea
     return true;
 }
 
-function calculateTotal(price: string, isUnique: boolean, quantity: number): string {
-    if (isUnique) return price;
-
+function calculateTotal(price: string, quantity: number): string {
     const p = convertToNumber(price);
     const total = (p * quantity) / 100;
     return formatCurrency(total);
@@ -63,7 +61,7 @@ function addItem(item: ItemModel, idx: number) {
 
     if (itemExistInGoodsIssueItems(item.itemId)) return;
 
-    total.value = calculateTotal(item.price, item.isUnique, quantity);
+    total.value = calculateTotal(item.price, quantity);
 
     const newItem = toGoodsIssueItem(item, quantity, total.value);
 
@@ -117,7 +115,7 @@ function changePageToken(pageToken: number) {
 }
 
 function canEditQuantity(item: ItemModel): boolean {
-    return !item.isUnique && item.quantity > 0;
+    return item.quantity > 0;
 }
 
 function showDialog() {
@@ -168,12 +166,7 @@ defineExpose({ show: showDialog });
                         </td>
 
                         <td>
-                            <div>
-                                <span v-if="item.isUnique">Único</span>
-                                <span v-else>
-                                    {{ item.quantity === 0 ? "Esgotado" : item.quantity }}</span
-                                >
-                            </div>
+                            <span> {{ item.quantity === 0 ? "Esgotado" : item.quantity }}</span>
                         </td>
 
                         <td class="text-xs">
