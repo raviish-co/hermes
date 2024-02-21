@@ -1,7 +1,7 @@
 import { InmemCategoryRepository } from "./persistense/inmem/inmem_category_repository";
 import { DefaultPurposeSpecification } from "./adapters/default_purpose_specification";
 import { InmemGoodsIssueRepository } from "./persistense/inmem/inmem_goods_issue_repository";
-import { VariationsRepositoryStub } from "./tests/stubs/variations_repository_stub";
+import { VariationRepositoryStub } from "./tests/stubs/variations_repository_stub";
 import { InmemSequenceStorage } from "./persistense/inmem/inmem_sequence_storage";
 import { SequenceGenerator } from "./domain/sequences/sequence_generator";
 import { ItemRepositoryStub } from "./tests/stubs/item_repository_stub";
@@ -15,7 +15,7 @@ const goodsIssueRepository = new InmemGoodsIssueRepository();
 const sequenceStorage = new InmemSequenceStorage();
 const sequenceGenerator = new SequenceGenerator(sequenceStorage);
 const categoryRepository = new InmemCategoryRepository();
-const variationRepository = new VariationsRepositoryStub();
+const variationRepository = new VariationRepositoryStub();
 const purposeSpec = new DefaultPurposeSpecification();
 
 interface Services {

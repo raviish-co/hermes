@@ -21,8 +21,8 @@ export class ItemBuilder {
         this.#variationsValues = {};
     }
 
-    withItemId(itemId: ID): ItemBuilder {
-        this.#itemId = itemId;
+    withItemId(itemId: string): ItemBuilder {
+        this.#itemId = ID.fromString(itemId);
         return this;
     }
 
@@ -51,7 +51,7 @@ export class ItemBuilder {
         return this;
     }
 
-    withVarition(variationId: ID, value: string): ItemBuilder {
+    withVariation(variationId: ID, value: string): ItemBuilder {
         this.#variationsValues = {
             ...this.#variationsValues,
             [variationId.toString()]: value,

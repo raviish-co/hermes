@@ -1,13 +1,11 @@
 import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import type { ItemRepository } from "../../domain/catalog/item_repository";
-import { Item } from "../../domain/catalog/item";
 import { ItemBuilder } from "../../domain/catalog/item_builder";
-import { ItemStock } from "../../domain/catalog/item_stock";
-import { Variation } from "../../domain/catalog/variation";
 import { type Either, left, right } from "../../shared/either";
 import type { Pagination } from "../../shared/pagination";
-import { ID } from "../../shared/id";
+import { Item } from "../../domain/catalog/item";
 import { Decimal } from "../../shared/decimal";
+import { ID } from "../../shared/id";
 
 export class ItemRepositoryStub implements ItemRepository {
     #items: Record<string, Item> = {};
@@ -101,44 +99,37 @@ export class ItemRepositoryStub implements ItemRepository {
     }
 
     #populate() {
-        const variation1 = new Variation(ID.random(), "Cor", ["Preto"]);
-        const variation2 = new Variation(ID.random(), "Marca", ["Nike", "Adidas", "Rebock"]);
-
-        const stock1 = new ItemStock(10);
-        const stock2 = new ItemStock(10);
-        const stock3 = new ItemStock(10);
-
         const item1 = new ItemBuilder()
-            .withItemId(ID.fromString("1001"))
+            .withItemId("1001")
             .withName("T-shirt desportiva gola redonda")
             .withPrice(Decimal.fromString("4500,00"))
             .withCategoryId(ID.random())
             .withStock(10)
             .withGoodCondition()
             .withSectionId(ID.random())
-            .withVariationsValues({ Cor: "Preto", Marca: "Nike" })
+            .withVariation(ID.fromString("1"), "Cor: Preto")
             .build();
 
         const item2 = new ItemBuilder()
-            .withItemId(ID.fromString("1002"))
+            .withItemId("1002")
             .withName("Sapato social")
             .withPrice(Decimal.fromString("15500,00"))
             .withCategoryId(ID.random())
             .withStock(10)
             .withGoodCondition()
             .withSectionId(ID.random())
-            .withVariationsValues({ Cor: "Branca", Marca: "Polo" })
+            .withVariation(ID.fromString("2"), "Marca: Nike")
             .build();
 
         const item3 = new ItemBuilder()
-            .withItemId(ID.fromString("1003"))
+            .withItemId("1003")
             .withName("Calça jeans")
             .withPrice(Decimal.fromString("5500,00"))
             .withCategoryId(ID.random())
             .withStock(10)
             .withGoodCondition()
             .withSectionId(ID.random())
-            .withVariationsValues({ Cor: "Azul" })
+            .withVariation(ID.fromString("3"), "Tamanho: 42")
             .build();
 
         this.#items = {

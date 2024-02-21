@@ -2,7 +2,7 @@ import { Variation } from "../../domain/catalog/variation";
 import { InmemVariationRepository } from "../../persistense/inmem/inmem_variation_repository";
 import { ID } from "../../shared/id";
 
-export class VariationsRepositoryStub extends InmemVariationRepository {
+export class VariationRepositoryStub extends InmemVariationRepository {
     constructor() {
         super(_variationsData.map((v) => new Variation(v.id, v.name, v.values)));
     }

@@ -84,4 +84,12 @@ export class Item {
     get fulltext(): string {
         return this.#fulltext;
     }
+
+    get variations(): Record<string, string> {
+        return this.#variationsValues;
+    }
+
+    get sectionId(): ID {
+        return this.#sectionId;
+    }
 }

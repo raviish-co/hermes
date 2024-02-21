@@ -1,5 +1,7 @@
 import type { VariationRepository } from "../../domain/catalog/variation_repository";
 import { Variation } from "../../domain/catalog/variation";
+import { VariationNotFound } from "../../domain/catalog/variation_not_found_error";
+import { left, right, type Either } from "../../shared/either";
 
 export class InmemVariationRepository implements VariationRepository {
     #variations: Record<string, Variation> = {};
@@ -10,6 +12,16 @@ export class InmemVariationRepository implements VariationRepository {
                 this.#variations[variation.variationId.toString()] = variation;
             });
         }
+    }
+
+    findByNames(names: string[]): Promise<Either<VariationNotFound, Variation[]>> {
+        const variations = [];
+        for (const name of names) {
+            const variation = this.records.find((v) => v.name === name);
+            if (!variation) return Promise.resolve(left(new VariationNotFound(name)));
+            variations.push(variation);
+        }
+        return Promise.resolve(right(variations));
     }
 
     save(variation: Variation): Promise<void> {
