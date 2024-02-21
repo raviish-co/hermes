@@ -22,7 +22,7 @@ const goodsIssueItems = ref<GoodsIssueItem[]>([]);
 const securityDeposit = ref<string>("0,00");
 const grandTotal = ref<string>("0,00");
 const returnDate = ref<string>(now());
-const selectedRow = ref<GoodsIssueItem>({} as GoodsIssueItem);
+const selectedItem = ref<GoodsIssueItem>({} as GoodsIssueItem);
 const isValidPurpose = ref<boolean>(false);
 
 const goodsIssueService = new GoodsIssueService();
@@ -133,7 +133,7 @@ function showAddItemDialog() {
 }
 
 function showDescribeItemStatusDialog(item: GoodsIssueItem) {
-    selectedRow.value = item;
+    selectedItem.value = item;
 
     describeItemStatusDialogRef.value?.initializeItemState(
         item?.condition!.status,
@@ -308,5 +308,5 @@ function updateIsValidPurpose(value: boolean) {
         :goods-issue-items="goodsIssueItems"
     />
 
-    <DescribeItemStatusDialog :row="selectedRow" ref="describeItemStatusDialogRef" />
+    <DescribeItemStatusDialog :item="selectedItem" ref="describeItemStatusDialogRef" />
 </template>

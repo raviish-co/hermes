@@ -2,20 +2,21 @@
 import type { VDialog } from "#build/components";
 import type { GoodsIssueItem } from "~/lib/frontend/models/goods_issue_item";
 
-export type ConditionStatus = "Bom" | "Mau";
+export type Status = "Bom" | "Mau";
 
 interface Props {
-    row: GoodsIssueItem;
+    item: GoodsIssueItem;
 }
+
+const BAD = "Mau";
+const GOOD = "Bom";
 
 const pros = defineProps<Props>();
 
 const dialogRef = ref<typeof VDialog>();
 const newStatus = ref<string>("");
 const newComment = ref<string>("");
-const options = ["Bom", "Mau"];
-const BAD = "Mau";
-const GOOD = "Bom";
+const statusOptions = ["Bom", "Mau"];
 
 const isGoodState = computed(() => newStatus.value !== BAD);
 
@@ -23,7 +24,7 @@ function showDialog() {
     dialogRef.value?.show();
 }
 
-function verifyComment(): boolean {
+function verifyIfCommentIsRequired(): boolean {
     if (newStatus.value === BAD && !newComment.value) {
         alert("Escreva uma nota relacionada ao estado do artigo.");
         return false;
@@ -32,15 +33,15 @@ function verifyComment(): boolean {
     return true;
 }
 
-function updateItemState() {
-    if (!verifyComment()) return;
+function updateItemStatus() {
+    if (!verifyIfCommentIsRequired()) return;
 
     if (newStatus.value === GOOD) {
         newComment.value = "";
     }
 
-    pros.row.condition = {
-        status: newStatus.value as ConditionStatus,
+    pros.item.condition = {
+        status: newStatus.value as Status,
         comment: newComment.value,
     };
 
@@ -48,11 +49,11 @@ function updateItemState() {
 }
 
 function updateStatus(e: Event) {
-    const s = (e.target as HTMLSelectElement).value;
-    newStatus.value = s;
+    const status = (e.target as HTMLSelectElement).value;
+    newStatus.value = status;
 }
 
-function initializeItemState(status: ConditionStatus, comment: string) {
+function initializeItemState(status: Status, comment: string) {
     newStatus.value = status;
     newComment.value = comment;
 }
@@ -61,20 +62,19 @@ defineExpose({ show: showDialog, initializeItemState });
 </script>
 
 <template>
-    <VDialog ref="dialogRef" title="Descrever danos do artigo" class="max-w-[30rem]">
+    <VDialog ref="dialogRef" title="Descrever estado do artigo" class="max-w-[30rem]">
         <select class="input-field" @change="updateStatus">
-            <option v-for="opt in options">{{ opt }}</option>
+            <option v-for="opt in statusOptions">{{ opt }}</option>
         </select>
 
         <textarea
             v-model="newComment"
-            placeholder="Descrever o estado do artigo"
+            placeholder="Escreva uma nota sobre o estado atual do artigo."
             :rows="3"
             :disabled="isGoodState"
             class="input-field resize-none"
         />
 
-        <button class="btn-secondary" @click="updateItemState">Salvar</button>
+        <button class="btn-secondary" @click="updateItemStatus">Salvar</button>
     </VDialog>
 </template>
-~/lib/frontend/models/item
