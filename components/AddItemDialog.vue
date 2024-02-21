@@ -198,8 +198,6 @@ defineExpose({ show: showDialog });
             </table>
         </div>
 
-        <p>
-            <ThePagination :total="pages" @changed="changePageToken" />
-        </p>
+        <ThePagination :total="pages" @changed="changePageToken" />
     </VDialog>
 </template>
