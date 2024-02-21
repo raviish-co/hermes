@@ -26,8 +26,8 @@ const catalogService = new CatalogService();
 const props = defineProps<Props>();
 const emits = defineEmits<Emits>();
 
-function itemExistInGoodsIssueItems(item: ItemModel): boolean {
-    return props.goodsIssueItems.some((i) => i.itemId == item.itemId);
+function itemExistInGoodsIssueItems(itemId: string): boolean {
+    return props.goodsIssueItems.some((i) => i.itemId == itemId);
 }
 
 function emitItemAdded(item: ItemModel, idx: number) {
@@ -36,44 +36,49 @@ function emitItemAdded(item: ItemModel, idx: number) {
     emits("added");
 }
 
-function itemExist(itemId: string): boolean {
-    return props.goodsIssueItems.some((row) => row.itemId === itemId);
-}
-
-function validateQuantity(item: ItemModel, quantity: number): boolean {
+function validateQuantity(itemQuantityInStock: number, quantity: number): boolean {
     if (quantity <= 0) return false;
 
-    if (quantity > item.quantity) return false;
+    if (quantity > itemQuantityInStock) return false;
 
     return true;
+}
+
+function calculateTotal(price: string, isUnique: boolean, quantity: number): string {
+    if (isUnique) return price;
+
+    const p = convertToNumber(price);
+    const total = (p * quantity) / 100;
+    return formatCurrency(total);
+}
+
+function toGoodsIssueItem(item: ItemModel, quantity: number, total: string): GoodsIssueItem {
+    return { ...item, stock: item.quantity, quantity, total };
 }
 
 function addItem(item: ItemModel, idx: number) {
     const quantity = quantities.value[idx];
 
-    if (!validateQuantity(item, quantity)) return;
+    if (!validateQuantity(item.quantity, quantity)) return;
 
-    if (itemExist(item.itemId)) return;
+    if (itemExistInGoodsIssueItems(item.itemId)) return;
 
-    total.value = calculateTotal(item, quantity);
+    total.value = calculateTotal(item.price, item.isUnique, quantity);
 
-    const newRow = toGoodsIssueLine(item, quantity, total.value);
+    const newItem = toGoodsIssueItem(item, quantity, total.value);
 
-    props.goodsIssueItems.push(newRow);
+    props.goodsIssueItems.push(newItem);
 
     quantities.value[idx] = 1;
 }
 
-function calculateTotal(item: ItemModel, quantity: number): string {
-    if (item.isUnique) return item.price;
+async function listItems(pageToken: number = 1) {
+    const { items: i, total } = await catalogService.listItems(pageToken);
 
-    const price = convertToNumber(item.price);
-    const total = (price * quantity) / 100;
-    return formatCurrency(total);
-}
+    items.value = i;
+    pages.value = total;
 
-function toGoodsIssueLine(item: ItemModel, quantity: number, total: string): GoodsIssueItem {
-    return { ...item, stock: item.quantity, quantity, total };
+    initializeQuantities();
 }
 
 async function searchItems(pageToken: number = 1) {
@@ -83,15 +88,6 @@ async function searchItems(pageToken: number = 1) {
     }
 
     const { items: i, total } = await catalogService.searchItems(query.value, pageToken);
-
-    items.value = i;
-    pages.value = total;
-
-    initializeQuantities();
-}
-
-async function listItems(pageToken: number = 1) {
-    const { items: i, total } = await catalogService.listItems(pageToken);
 
     items.value = i;
     pages.value = total;
@@ -111,8 +107,8 @@ function listVariationValues(variationValues?: VariationValue[]) {
     return values.join(" | ");
 }
 
-function changeListPage(pageToken: number) {
-    if (query.value.length > 0) {
+function changePageToken(pageToken: number) {
+    if (query.value.length >= 3) {
         searchItems(pageToken);
         return;
     }
@@ -135,7 +131,7 @@ defineExpose({ show: showDialog });
 <template>
     <VDialog ref="dialogRef" title="Pesquisar Artigo" class="max-w-[36rem]">
         <input
-            placeholder="Pesquisar por Nome ou ID"
+            placeholder="Pesquisar artigos..."
             type="search"
             v-model="query"
             class="input-field"
@@ -146,7 +142,6 @@ defineExpose({ show: showDialog });
             <table class="table">
                 <thead>
                     <tr class="text-left">
-                        <th class="min-w-16 w-16 hidden sm:initial">ID</th>
                         <th class="min-w-36 w-36">Nome</th>
                         <th class="min-w-16 w-16">Stock</th>
                         <th class="min-w-12 w-12 md:w-16">QTD</th>
@@ -158,10 +153,8 @@ defineExpose({ show: showDialog });
                         v-for="(item, idx) in items"
                         :key="item.itemId"
                         class="hover:bg-gray-50"
-                        :class="{ hidden: itemExistInGoodsIssueItems(item) }"
+                        :class="{ hidden: itemExistInGoodsIssueItems(item.itemId) }"
                     >
-                        <td class="w-16 cursor-pointer hidden sm:initial">{{ item.itemId }}</td>
-
                         <td class="cursor-pointer" @click="emitItemAdded(item, idx)">
                             <span>
                                 {{ item.name }}
@@ -199,14 +192,14 @@ defineExpose({ show: showDialog });
                     </tr>
 
                     <tr v-if="items.length === 0">
-                        <td colspan="3">Nenhum resultado encontrado</td>
+                        <td colspan="3">Nenhum artigo encontrado</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
         <p>
-            <ThePagination :total="pages" @changed="changeListPage" />
+            <ThePagination :total="pages" @changed="changePageToken" />
         </p>
     </VDialog>
 </template>
