@@ -32,7 +32,7 @@ function toggleMenu() {
         </main>
 
         <div
-            class="z-50 fixed shadow-lg bottom-0 bg-white flex gap-2 text-sm w-80 h-screen flex-col justify-start items-start p-0 top-0"
+            class="z-50 fixed shadow-lg bottom-0 bg-white flex gap-2 text-sm w-4/5 min-w-52 sm:w-80 h-screen flex-col justify-start items-start p-0 top-0"
             :class="{ hidden: !menuVisibility }"
         >
             <div class="w-full h-24 bg-primary relative">
