@@ -1,29 +1,27 @@
 import { Decimal } from "../../shared/decimal";
-import { Item } from "../catalog/item";
+import type { ID } from "../../shared/id";
 
 export class GoodsIssueLine {
-    readonly item: Item;
+    readonly itemId: ID;
     readonly quantity: number;
+    readonly price: Decimal;
     #netTotal: Decimal;
 
-    private constructor(item: Item, quantity: number) {
-        this.item = item;
+    constructor(itemId: ID, price: Decimal, quantity: number) {
+        this.itemId = itemId;
         this.quantity = quantity;
+        this.price = price;
         this.#netTotal = Decimal.fromString("0");
-    }
 
-    static create(item: Item, quantity: number): GoodsIssueLine {
-        const goodsIssueLine = new GoodsIssueLine(item, quantity);
-        goodsIssueLine.#calculateTotal();
-        return goodsIssueLine;
+        this.#calculateTotal();
     }
 
     #calculateTotal(): void {
         const factor = Decimal.fromString(this.quantity.toString());
-        this.#netTotal = this.item.price.multiply(factor);
+        this.#netTotal = this.price.multiply(factor);
     }
 
-    getTotal(): Decimal {
+    get total(): Decimal {
         return this.#netTotal;
     }
 }

@@ -82,8 +82,8 @@ describe("Test Goods Issue", () => {
         const goodsIssueLine = goodsIssue.goodsIssueLines[0];
 
         expect(goodsIssue.goodsIssueLines.length).toBe(1);
-        expect(goodsIssueLine.item.itemId.toString()).toEqual("1001");
-        expect(goodsIssueLine.getTotal().value).toEqual("4500,00");
+        expect(goodsIssueLine.itemId.toString()).toEqual("1001");
+        expect(goodsIssueLine.total.value).toEqual("4500,00");
         expect(goodsIssueLine.quantity).toEqual(1);
     });
 
@@ -230,18 +230,6 @@ describe("Test Goods Issue", () => {
         expect(error.value).toBeInstanceOf(InsufficientStock);
     });
 
-    // it("Deve retornar **InvalidTotal** se o total da çaução não foi igual ao valor calculado", async () => {
-    //     const { service } = makeService();
-
-    //     const error = await service.new({
-    //         ...goodsIssueData,
-    //         securityDeposit: "100,00",
-    //     });
-
-    //     expect(error.isLeft()).toBeTruthy();
-    //     expect(error.value).toBeInstanceOf(InvalidTotal);
-    // });
-
     it("Deve gerar o ID da solicitação", async () => {
         const { service, goodsIssueRepository } = makeService();
 
@@ -306,6 +294,7 @@ const goodsIssueData = {
     total: "55500,00",
     securityDeposit: "111000,00",
     returnDate: "2021-01-01T16:40:00",
+    userId: "1000",
 };
 
 interface Dependencies {

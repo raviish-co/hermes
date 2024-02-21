@@ -38,17 +38,16 @@ export class GoodsIssueNote {
         this.#addLines(lines);
     }
 
-    #addLines(goodsIssueLines: GoodsIssueLine[]): void {
-        for (const line of goodsIssueLines) {
+    #addLines(lines: GoodsIssueLine[]): void {
+        for (const line of lines) {
             this.#addLine(line);
         }
         this.#calculateSecurityDeposit();
     }
 
-    #addLine(goodsIssueLine: GoodsIssueLine): void {
-        const total = goodsIssueLine.getTotal();
-        this.goodsIssueLines.push(goodsIssueLine);
-        this.#calculateTotal(total);
+    #addLine(line: GoodsIssueLine): void {
+        this.goodsIssueLines.push(line);
+        this.#calculateTotal(line.total);
     }
 
     isSameTotal(total: string): boolean {

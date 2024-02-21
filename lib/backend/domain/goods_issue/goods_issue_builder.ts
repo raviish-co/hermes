@@ -1,61 +1,55 @@
-import { InvalidTotal } from "../../domain/goods_issue/invalid_total_error";
 import { GoodsIssueLine } from "../../domain/goods_issue/goods_issue_line";
-import { GoodsIssueNote } from "./goods_issue_note";
 import { type Either, left, right } from "../../shared/either";
 import { Purpose } from "../../domain/goods_issue/purpose";
+import { GoodsIssueNote } from "./goods_issue_note";
 import { ID } from "../../shared/id";
 
-export class GoodsIssueBuilder {
-    #goodsIssueId?: string;
+export class GoodsIssueNoteBuilder {
+    #goodsIssueNoteId?: ID;
     #purpose: Purpose = {} as Purpose;
     #lines: GoodsIssueLine[] = [];
-    #returnDate?: string;
+    #returnDate?: Date;
     #userId?: ID;
 
     constructor() {}
 
-    withGoodsIssueId(goodsIssueId: string): GoodsIssueBuilder {
-        this.#goodsIssueId = goodsIssueId;
+    withGoodsIssueNoteId(noteId: string): GoodsIssueNoteBuilder {
+        this.#goodsIssueNoteId = ID.fromString(noteId);
         return this;
     }
 
-    withPurpose(purpose: Purpose): GoodsIssueBuilder {
+    withPurpose(purpose: Purpose): GoodsIssueNoteBuilder {
         this.#purpose = purpose;
         return this;
     }
 
-    withLines(lines: GoodsIssueLine[]): GoodsIssueBuilder {
+    withLines(lines: GoodsIssueLine[]): GoodsIssueNoteBuilder {
         this.#lines = lines;
         return this;
     }
 
-    withUser(userId: ID): GoodsIssueBuilder {
-        this.#userId = userId;
+    withUser(userId: string): GoodsIssueNoteBuilder {
+        this.#userId = ID.fromString(userId);
         return this;
     }
 
-    withReturnDate(returnDate: string): GoodsIssueBuilder {
-        this.#returnDate = returnDate;
+    withReturnDate(returnDate: string): GoodsIssueNoteBuilder {
+        this.#returnDate = new Date(returnDate);
         return this;
     }
 
-    build(): Either<InvalidTotal, GoodsIssueNote> {
-        // Corrigir aqui
-        if (!this.#goodsIssueId) return left(new InvalidTotal());
+    build(): Either<Error, GoodsIssueNote> {
+        if (!this.#goodsIssueNoteId) return left(new Error("goodsIssueId is required"));
 
-        // Corrigir aqui
-        if (!this.#returnDate) return left(new InvalidTotal());
+        if (!this.#returnDate) return left(new Error("returnDate is required"));
 
-        // Corrigir aqui
-        if (!this.#userId) return left(new InvalidTotal());
-
-        const returnDateParsed = new Date(this.#returnDate);
+        if (!this.#userId) return left(new Error("userId is required"));
 
         const goodsIssue = new GoodsIssueNote(
-            ID.fromString(this.#goodsIssueId),
+            this.#goodsIssueNoteId,
             this.#purpose,
             this.#userId,
-            returnDateParsed,
+            this.#returnDate,
             this.#lines
         );
 

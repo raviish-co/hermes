@@ -5,7 +5,7 @@ import { ID } from "../../shared/id";
 import { Item } from "./item";
 
 export interface ItemRepository {
-    findAll(queries: ID[]): Promise<Either<ItemNotFound, Item[]>>;
+    findAll(itemsIds: ID[]): Promise<Either<ItemNotFound, Item[]>>;
     getById(itemId: ID): Promise<Item>;
     list(pageToken: number, perPage: number): Promise<Pagination<Item>>;
     search(query: string, pageToken: number, perPage: number): Promise<Pagination<Item>>;
