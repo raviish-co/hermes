@@ -29,6 +29,6 @@ export class CatalogService {
     }
 
     async listVariations(): Promise<VariationModel[]> {
-        return [];
+        return await $fetch("/api/variations", { method: "get" });
     }
 }
