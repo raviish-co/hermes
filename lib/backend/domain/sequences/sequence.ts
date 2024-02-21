@@ -1,4 +1,4 @@
 export enum Sequence {
-    Request = "GS",
+    GoodIssueNote = "GS",
     Item = "RVS",
 }

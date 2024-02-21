@@ -1,18 +1,16 @@
 import { InvalidTotal } from "../../domain/goods_issue/invalid_total_error";
 import { GoodsIssueLine } from "../../domain/goods_issue/goods_issue_line";
-import { GoodsIssue } from "../../domain/goods_issue/goods_issue";
+import { GoodsIssueNote } from "./goods_issue_note";
 import { type Either, left, right } from "../../shared/either";
 import { Purpose } from "../../domain/goods_issue/purpose";
-import type { User } from "../../domain/user";
+import { ID } from "../../shared/id";
 
 export class GoodsIssueBuilder {
-    #goodsIssueId: string = "";
+    #goodsIssueId?: string;
     #purpose: Purpose = {} as Purpose;
-    #goodsIssueLines: GoodsIssueLine[] = [];
-    #user: User = {} as User;
-    #returnDate: string = "";
-    #total: string = "";
-    #securityDeposit: string = "";
+    #lines: GoodsIssueLine[] = [];
+    #returnDate?: string;
+    #userId?: ID;
 
     constructor() {}
 
@@ -26,13 +24,13 @@ export class GoodsIssueBuilder {
         return this;
     }
 
-    withGoodsIssueLines(goodsIssueLines: GoodsIssueLine[]): GoodsIssueBuilder {
-        this.#goodsIssueLines = goodsIssueLines;
+    withLines(lines: GoodsIssueLine[]): GoodsIssueBuilder {
+        this.#lines = lines;
         return this;
     }
 
-    withUser(user: User): GoodsIssueBuilder {
-        this.#user = user;
+    withUser(userId: ID): GoodsIssueBuilder {
+        this.#userId = userId;
         return this;
     }
 
@@ -41,27 +39,25 @@ export class GoodsIssueBuilder {
         return this;
     }
 
-    withTotal(total: string): GoodsIssueBuilder {
-        this.#total = total;
-        return this;
-    }
+    build(): Either<InvalidTotal, GoodsIssueNote> {
+        // Corrigir aqui
+        if (!this.#goodsIssueId) return left(new InvalidTotal());
 
-    withSecurityDeposit(securityDeposit: string): GoodsIssueBuilder {
-        this.#securityDeposit = securityDeposit;
-        return this;
-    }
+        // Corrigir aqui
+        if (!this.#returnDate) return left(new InvalidTotal());
 
-    build(): Either<InvalidTotal, GoodsIssue> {
-        const goodsIssue = GoodsIssue.create(
-            this.#goodsIssueId,
-            this.#goodsIssueLines,
+        // Corrigir aqui
+        if (!this.#userId) return left(new InvalidTotal());
+
+        const returnDateParsed = new Date(this.#returnDate);
+
+        const goodsIssue = new GoodsIssueNote(
+            ID.fromString(this.#goodsIssueId),
             this.#purpose,
-            this.#user,
-            this.#returnDate
+            this.#userId,
+            returnDateParsed,
+            this.#lines
         );
-
-        const isInvalidTotal = goodsIssue.verifyTotal(this.#total, this.#securityDeposit);
-        if (isInvalidTotal) return left(new InvalidTotal());
 
         return right(goodsIssue);
     }
