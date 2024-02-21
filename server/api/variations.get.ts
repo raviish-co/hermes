@@ -4,14 +4,14 @@ import { makeServices } from "@backend/main";
 const { catalogService } = makeServices();
 
 interface VariationDTO {
-    id: string;
+    variationId: string;
     name: string;
     values: string[];
 }
 
 function toVariationDTO(v: Variation): VariationDTO {
     return {
-        id: v.variationId.toString(),
+        variationId: v.variationId.toString(),
         name: v.name,
         values: v.values,
     };
