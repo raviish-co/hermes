@@ -10,7 +10,13 @@ import { formatCurrency } from "@frontend/helpers/format_currency";
 
 const DETAILS = "Detalhes";
 
-const now = () => new Date().toISOString().slice(0, 16);
+const now = () => {
+    const currentDate = new Date();
+
+    currentDate.setHours(currentDate.getHours() + 1);
+
+    return currentDate.toISOString().slice(0, 16);
+};
 
 const choosePurposeRef = ref<typeof ChoosePurpose>();
 const addItemDialogRef = ref<typeof AddItemDialog>();
