@@ -10,14 +10,6 @@ import { formatCurrency } from "@frontend/helpers/format_currency";
 
 const DETAILS = "Detalhes";
 
-const now = () => {
-    const currentDate = new Date();
-
-    currentDate.setHours(currentDate.getHours() + 1);
-
-    return currentDate.toISOString().slice(0, 16);
-};
-
 const choosePurposeRef = ref<typeof ChoosePurpose>();
 const addItemDialogRef = ref<typeof AddItemDialog>();
 const describeItemStatusDialogRef = ref<typeof DescribeItemStatusDialog>();
@@ -33,14 +25,20 @@ const isValidPurpose = ref<boolean>(false);
 
 const goodsIssueService = new GoodsIssueService();
 
+function now() {
+    const currentDate = new Date();
+
+    currentDate.setHours(currentDate.getHours() + 1);
+
+    return currentDate.toISOString().slice(0, 16);
+}
+
 function removeSpaces(value: string): string {
     return value.replace(/\s/g, "");
 }
 
-function toGoodsIssueLine(): GoodsIssueLine[] {
-    if (goodsIssueItems.value.length === 0) return [];
-
-    return goodsIssueItems.value.map((item) => ({
+function toGoodsIssueLine(item: GoodsIssueItem): GoodsIssueLine {
+    return {
         itemId: item.itemId,
         quantity: item.quantity,
         condition: {
@@ -48,7 +46,7 @@ function toGoodsIssueLine(): GoodsIssueLine[] {
             status: item?.condition!.status,
         },
         variations: item.variationsValues?.map((v) => v.variationId),
-    }));
+    };
 }
 
 function toGoodsIssue(): GoodsIssueModel {
@@ -61,24 +59,24 @@ function toGoodsIssue(): GoodsIssueModel {
             details: purposeDetail.value,
             notes: purposeNotesType.value,
         },
-        lines: toGoodsIssueLine(),
+        lines: goodsIssueItems.value.map(toGoodsIssueLine),
     };
 }
 
-function isValidQuantities(): boolean {
-    const invalidItem = goodsIssueItems.value.find((i) => i.quantity > i.stock);
+function validateQuantitiesInStock(): boolean {
+    const invalidItemOrUndefined = goodsIssueItems.value.find((i) => i.quantity > i.stock);
 
-    if (invalidItem) return false;
+    if (invalidItemOrUndefined) return false;
 
     return true;
 }
 
 const isValidGoodsIssue = computed(() => {
-    const isValidGoodsItems = goodsIssueItems.value.length > 0;
+    const hasItems = goodsIssueItems.value.length > 0;
 
-    const quantitiesIsValid = isValidQuantities();
+    const areQuantitiesInStock = validateQuantitiesInStock();
 
-    if (isValidPurpose.value && isValidGoodsItems && quantitiesIsValid) {
+    if (isValidPurpose.value && hasItems && areQuantitiesInStock) {
         return true;
     }
 
@@ -100,7 +98,7 @@ function newGoodsIssue() {
 }
 
 function removeGoodsIssueItem(id: string): void {
-    goodsIssueItems.value = goodsIssueItems.value.filter((r) => r.itemId !== id);
+    goodsIssueItems.value = goodsIssueItems.value.filter((i) => i.itemId !== id);
     calculateGrandTotal();
 }
 
@@ -187,23 +185,21 @@ function updateIsValidPurpose(value: boolean) {
     <section class="section-content">
         <h1 class="text-xl text-center sm:text-2xl sm:my-10 my-8">Guia de Saída de Artigos</h1>
 
-        <section>
-            <form>
-                <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
-                    <input class="input-field" placeholder="John Doe" :disabled="true" />
+        <form>
+            <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
+                <input class="input-field" placeholder="John Doe" :disabled="true" />
 
-                    <input v-model="returnDate" type="datetime-local" class="input-field" />
-                </div>
+                <input v-model="returnDate" type="datetime-local" class="input-field" />
+            </div>
 
-                <ChoosePurpose
-                    ref="choosePurposeRef"
-                    @description-changed="updatePurposeDescription"
-                    @detail-changed="updatePurposeDetail"
-                    @notes-type-changed="updatePurposeNotesType"
-                    @valid-purpose-changed="updateIsValidPurpose"
-                />
-            </form>
-        </section>
+            <ChoosePurpose
+                ref="choosePurposeRef"
+                @description-changed="updatePurposeDescription"
+                @detail-changed="updatePurposeDetail"
+                @notes-type-changed="updatePurposeNotesType"
+                @valid-purpose-changed="updateIsValidPurpose"
+            />
+        </form>
 
         <section class="pb-16 sm:pb-5 md:pb-[4.5rem]">
             <div
