@@ -45,7 +45,6 @@ function toGoodsIssueLine(item: GoodsIssueItem): GoodsIssueLine {
             comment: item?.condition?.comment,
             status: item?.condition!.status,
         },
-        variations: item.variationsValues?.map((v) => v.variationId),
     };
 }
 

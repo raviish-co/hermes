@@ -9,7 +9,6 @@ export interface Purpose {
 export interface GoodsIssueLine {
     itemId: string;
     quantity: number;
-    variations?: string[];
     condition?: Condition;
 }
 
