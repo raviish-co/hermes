@@ -1,26 +1,24 @@
 <script lang="ts" setup>
-import type { AddItemDialog, DescribeItemStatusDialog, ChoosePurpose } from "#build/components";
-import type { VariationValue } from "@frontend/models/goods_issue_item";
+import type { AddLineDialog, DescribeLineStatusDialog, ChoosePurpose } from "#build/components";
 import { convertToNumber } from "@frontend/helpers/convert_to_number";
 import { GoodsIssueService } from "@frontend/services/goods_issue_service";
-import type { GoodsIssueModel, GoodsIssueLine } from "@frontend/models/goods_issue";
+import type { GoodsIssueLine, GoodsIssueModel, VariationValue } from "@frontend/models/goods_issue";
 import { handleException } from "@frontend/helpers/error_handler";
-import type { GoodsIssueItem } from "@frontend/models/goods_issue_item";
 import { formatCurrency } from "@frontend/helpers/format_currency";
 
 const DETAILS = "Detalhes";
 
 const choosePurposeRef = ref<typeof ChoosePurpose>();
-const addItemDialogRef = ref<typeof AddItemDialog>();
-const describeItemStatusDialogRef = ref<typeof DescribeItemStatusDialog>();
+const addLineDialogRef = ref<typeof AddLineDialog>();
+const describeLineStatusDialogRef = ref<typeof DescribeLineStatusDialog>();
 const purposeNotesType = ref<string>("");
 const purposeDetail = ref<string>("");
 const purposeDescription = ref<string>("");
-const goodsIssueItems = ref<GoodsIssueItem[]>([]);
+const goodsIssueLines = ref<GoodsIssueLine[]>([]);
 const securityDeposit = ref<string>("0,00");
 const grandTotal = ref<string>("0,00");
 const returnDate = ref<string>(now());
-const selectedItem = ref<GoodsIssueItem>({} as GoodsIssueItem);
+const selectedLine = ref<GoodsIssueLine>({} as GoodsIssueLine);
 const isValidPurpose = ref<boolean>(false);
 
 const goodsIssueService = new GoodsIssueService();
@@ -33,49 +31,20 @@ function now() {
     return currentDate.toISOString().slice(0, 16);
 }
 
-function removeSpaces(value: string): string {
-    return value.replace(/\s/g, "");
-}
-
-function toGoodsIssueLine(item: GoodsIssueItem): GoodsIssueLine {
-    return {
-        itemId: item.itemId,
-        quantity: item.quantity,
-        condition: {
-            comment: item?.condition?.comment,
-            status: item?.condition!.status,
-        },
-    };
-}
-
-function toGoodsIssue(): GoodsIssueModel {
-    return {
-        total: removeSpaces(grandTotal.value),
-        securityDeposit: removeSpaces(securityDeposit.value),
-        returnDate: returnDate.value,
-        purpose: {
-            description: purposeDescription.value,
-            details: purposeDetail.value,
-            notes: purposeNotesType.value,
-        },
-        lines: goodsIssueItems.value.map(toGoodsIssueLine),
-    };
-}
-
 function validateQuantitiesInStock(): boolean {
-    const invalidItemOrUndefined = goodsIssueItems.value.find((i) => i.quantity > i.stock);
+    const invalidLineOrUndefined = goodsIssueLines.value.find((i) => i.quantity > i.stock);
 
-    if (invalidItemOrUndefined) return false;
+    if (invalidLineOrUndefined) return false;
 
     return true;
 }
 
 const isValidGoodsIssue = computed(() => {
-    const hasItems = goodsIssueItems.value.length > 0;
+    const hasLines = goodsIssueLines.value.length > 0;
 
     const areQuantitiesInStock = validateQuantitiesInStock();
 
-    if (isValidPurpose.value && hasItems && areQuantitiesInStock) {
+    if (isValidPurpose.value && hasLines && areQuantitiesInStock) {
         return true;
     }
 
@@ -85,7 +54,16 @@ const isValidGoodsIssue = computed(() => {
 function newGoodsIssue() {
     purposeDetail.value = purposeDetail.value === DETAILS ? "" : purposeDetail.value;
 
-    const goodsIssue = toGoodsIssue();
+    const goodsIssue: GoodsIssueModel = {
+        returnDate: returnDate.value,
+        total: grandTotal.value,
+        purposeSpecification: {
+            description: purposeDescription.value,
+            detailsConstraint: purposeDetail.value,
+            notes: purposeNotesType.value,
+        },
+        lines: goodsIssueLines.value,
+    };
 
     goodsIssueService
         .new(goodsIssue)
@@ -96,13 +74,13 @@ function newGoodsIssue() {
         .catch(handleException);
 }
 
-function removeGoodsIssueItem(id: string): void {
-    goodsIssueItems.value = goodsIssueItems.value.filter((i) => i.itemId !== id);
+function removeGoodsIssueLine(id: string): void {
+    goodsIssueLines.value = goodsIssueLines.value.filter((l) => l.itemId !== id);
     calculateGrandTotal();
 }
 
-function clearGoodsIssueItems() {
-    goodsIssueItems.value = [];
+function clearGoodsIssueLines() {
+    goodsIssueLines.value = [];
     grandTotal.value = "0,00";
     securityDeposit.value = "0,00";
 }
@@ -114,14 +92,14 @@ function calculateSecurityDeposit() {
 }
 
 function calculateGrandTotal() {
-    goodsIssueItems.value.forEach((item, idx) => {
+    goodsIssueLines.value.forEach((line, idx) => {
         if (idx === 0) {
-            grandTotal.value = formatCurrency(convertToNumber(item.total) / 100);
+            grandTotal.value = formatCurrency(convertToNumber(line.total) / 100);
             calculateSecurityDeposit();
             return;
         }
 
-        const value = convertToNumber(item.total);
+        const value = convertToNumber(line.total);
         const total = convertToNumber(grandTotal.value);
 
         const result = (value + total) / 100;
@@ -131,32 +109,32 @@ function calculateGrandTotal() {
     });
 }
 
-function showAddItemDialog() {
-    addItemDialogRef.value?.show();
+function showAddLineDialog() {
+    addLineDialogRef.value?.show();
 }
 
-function showDescribeItemStatusDialog(item: GoodsIssueItem) {
-    selectedItem.value = item;
+function showDescribeLineStatusDialog(line: GoodsIssueLine) {
+    selectedLine.value = line;
 
-    describeItemStatusDialogRef.value?.initializeItemState(
-        item?.condition!.status,
-        item?.condition?.comment
+    describeLineStatusDialogRef.value?.initializeLineState(
+        line?.condition!.status,
+        line?.condition?.comment
     );
 
-    describeItemStatusDialogRef.value?.show();
+    describeLineStatusDialogRef.value?.show();
 }
 
-function listVariationValues(itemVariation?: VariationValue[]) {
-    if (!itemVariation) return "";
+function listVariationValues(lineVariation?: VariationValue[]) {
+    if (!lineVariation) return "";
 
-    const values = itemVariation.map((v) => v.value);
+    const values = lineVariation.map((v) => v.value);
 
     return values.join(" | ");
 }
 
 function clearValues() {
     returnDate.value = now();
-    goodsIssueItems.value = [];
+    goodsIssueLines.value = [];
     grandTotal.value = "0,00";
     securityDeposit.value = "0,00";
 
@@ -207,14 +185,14 @@ function updateIsValidPurpose(value: boolean) {
                 <div class="w-full flex items-center justify-between">
                     <span
                         class="material-symbols-outlined hover:text-secondary-600 p-2 cursor-pointer"
-                        @click="showAddItemDialog"
+                        @click="showAddLineDialog"
                     >
                         add
                     </span>
 
                     <span
                         class="hover:text-red-500 hover:bg-red-500 hover:bg-opacity-10 p-2 cursor-pointer"
-                        @click="clearGoodsIssueItems"
+                        @click="clearGoodsIssueLines"
                     >
                         Limpar
                     </span>
@@ -235,33 +213,33 @@ function updateIsValidPurpose(value: boolean) {
 
                         <tbody>
                             <tr
-                                v-for="(item, idx) in goodsIssueItems"
+                                v-for="(line, idx) in goodsIssueLines"
                                 :key="idx"
                                 class="cursor-pointer"
                             >
-                                <td>{{ item.itemId }}</td>
-                                <td @click="showDescribeItemStatusDialog(item)">
-                                    {{ item.name }}
+                                <td>{{ line.itemId }}</td>
+                                <td @click="showDescribeLineStatusDialog(line)">
+                                    {{ line.name }}
                                     <br />
                                     <span class="text-light-600 text-sm">
-                                        {{ listVariationValues(item?.variationsValues) }}
+                                        {{ listVariationValues(line?.variationsValues) }}
                                     </span>
                                 </td>
 
                                 <td>
                                     <input
                                         type="number"
-                                        v-model="item.quantity"
+                                        v-model="line.quantity"
                                         class="input-number"
                                         min="1"
-                                        :max="item.stock"
+                                        :max="line.stock"
                                     />
                                 </td>
-                                <td class="text-right">{{ item.price }}</td>
-                                <td class="text-right">{{ item.total }}</td>
+                                <td class="text-right">{{ line.price }}</td>
+                                <td class="text-right">{{ line.total }}</td>
                                 <td
                                     class="cursor-pointer"
-                                    @click="removeGoodsIssueItem(item.itemId)"
+                                    @click="removeGoodsIssueLine(line.itemId)"
                                 >
                                     <span class="material-symbols-outlined">close</span>
                                 </td>
@@ -302,11 +280,11 @@ function updateIsValidPurpose(value: boolean) {
         </div>
     </section>
 
-    <AddItemDialog
-        ref="addItemDialogRef"
+    <AddLineDialog
+        ref="addLineDialogRef"
         @added="calculateGrandTotal"
-        :goods-issue-items="goodsIssueItems"
+        :goods-issue-lines="goodsIssueLines"
     />
 
-    <DescribeItemStatusDialog :item="selectedItem" ref="describeItemStatusDialogRef" />
+    <DescribeLineStatusDialog :line="selectedLine" ref="describeLineStatusDialogRef" />
 </template>

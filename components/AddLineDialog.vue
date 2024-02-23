@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
 import { convertToNumber } from "@frontend/helpers/convert_to_number";
-import type { GoodsIssueItem } from "@frontend/models/goods_issue_item";
 import type { ItemModel, VariationValue } from "@frontend/models/item";
 import { CatalogService } from "@frontend/services/catalog_service";
 import { formatCurrency } from "@frontend/helpers/format_currency";
+import type { GoodsIssueLine } from "~/lib/frontend/models/goods_issue";
 
 interface Props {
-    goodsIssueItems: GoodsIssueItem[];
+    goodsIssueLines: GoodsIssueLine[];
 }
 
 interface Emits {
@@ -27,7 +27,7 @@ const props = defineProps<Props>();
 const emits = defineEmits<Emits>();
 
 function itemExistInGoodsIssueItems(itemId: string): boolean {
-    return props.goodsIssueItems.some((i) => i.itemId == itemId);
+    return props.goodsIssueLines.some((i) => i.itemId == itemId);
 }
 
 function emitItemAdded(item: ItemModel, idx: number) {
@@ -36,10 +36,10 @@ function emitItemAdded(item: ItemModel, idx: number) {
     emits("added");
 }
 
-function validateQuantity(itemQuantityInStock: number, quantity: number): boolean {
+function validateQuantity(stock: number, quantity: number): boolean {
     if (quantity <= 0) return false;
 
-    if (quantity > itemQuantityInStock) return false;
+    if (quantity > stock) return false;
 
     return true;
 }
@@ -50,7 +50,7 @@ function calculateTotal(price: string, quantity: number): string {
     return formatCurrency(total);
 }
 
-function toGoodsIssueItem(item: ItemModel, quantity: number, total: string): GoodsIssueItem {
+function toGoodsIssueItem(item: ItemModel, quantity: number, total: string): GoodsIssueLine {
     return { ...item, stock: item.quantity, quantity, total };
 }
 
@@ -65,7 +65,7 @@ function addItem(item: ItemModel, idx: number) {
 
     const newItem = toGoodsIssueItem(item, quantity, total.value);
 
-    props.goodsIssueItems.push(newItem);
+    props.goodsIssueLines.push(newItem);
 
     quantities.value[idx] = 1;
 }

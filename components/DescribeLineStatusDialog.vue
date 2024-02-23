@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
-import type { GoodsIssueItem } from "~/lib/frontend/models/goods_issue_item";
+import type { GoodsIssueLine } from "@frontend/models/goods_issue";
 
 export type Status = "Bom" | "Mau";
 
 interface Props {
-    item: GoodsIssueItem;
+    line: GoodsIssueLine;
 }
 
 const BAD = "Mau";
@@ -33,14 +33,14 @@ function verifyIfCommentIsRequired(): boolean {
     return true;
 }
 
-function updateItemStatus() {
+function updateLineStatus() {
     if (!verifyIfCommentIsRequired()) return;
 
     if (newStatus.value === GOOD) {
         newComment.value = "";
     }
 
-    pros.item.condition = {
+    pros.line.condition = {
         status: newStatus.value as Status,
         comment: newComment.value,
     };
@@ -53,12 +53,12 @@ function updateStatus(e: Event) {
     newStatus.value = status;
 }
 
-function initializeItemState(status: Status, comment: string) {
+function initializeLineState(status: Status, comment: string) {
     newStatus.value = status;
     newComment.value = comment;
 }
 
-defineExpose({ show: showDialog, initializeItemState });
+defineExpose({ show: showDialog, initializeLineState });
 </script>
 
 <template>
@@ -75,6 +75,6 @@ defineExpose({ show: showDialog, initializeItemState });
             class="input-field resize-none"
         />
 
-        <button class="btn-secondary" @click="updateItemStatus">Salvar</button>
+        <button class="btn-secondary" @click="updateLineStatus">Salvar</button>
     </VDialog>
 </template>

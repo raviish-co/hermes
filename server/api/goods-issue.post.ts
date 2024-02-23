@@ -8,9 +8,9 @@ import { makeServices } from "@backend/main";
 const { goodsIssueService } = makeServices();
 
 export default defineEventHandler(async (event) => {
-    const { request } = await readBody(event);
+    const { data } = await readBody(event);
 
-    const voidOrError = await goodsIssueService.new(request);
+    const voidOrError = await goodsIssueService.new(data);
 
     if (voidOrError.value instanceof InvalidPurpose) {
         throw createError({
