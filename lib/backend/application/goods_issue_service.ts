@@ -1,7 +1,7 @@
 import type { GoodsIssueRepository } from "../domain/goods_issue/goods_issue_note_repository";
 import type { PurposeSpecification } from "../domain/goods_issue/purpose_specification";
 import { GoodsIssueNoteBuilder } from "../domain/goods_issue/goods_issue_builder";
-import { PurposeNotFound } from "../domain/goods_issue/purpose_not_found_error";
+import { InvalidPurpose } from "../domain/goods_issue/invalid_purpose_error";
 import type { SequenceGenerator } from "../domain/sequences/sequence_generator";
 import { InsufficientStock } from "../domain/catalog/insufficient_stock_error";
 import { InvalidTotal } from "../domain/goods_issue/invalid_total_error";
@@ -34,12 +34,12 @@ export class GoodsIssueService {
 
     async new(data: GoodsIssueDTO): Promise<Either<GoodsIssueNoteError, void>> {
         const purpose = new Purpose(
-            data.purpose.description,
-            data.purpose.detailConstraint,
-            data.purpose.notes
+            data.purposeSpecification.description,
+            data.purposeSpecification.detailsConstraint,
+            data.purposeSpecification.notes
         );
         if (!this.#purposeSpecification.isSatisfiedBy(purpose))
-            return left(new PurposeNotFound(data.purpose.description));
+            return left(new InvalidPurpose(data.purposeSpecification.description));
 
         const itemsIds = this.#buildItemsIds(data.lines);
         const itemsOrErr = await this.#itemRepository.findAll(itemsIds);
@@ -106,16 +106,15 @@ export class GoodsIssueService {
 }
 
 type GoodsIssueDTO = {
-    purpose: {
+    purposeSpecification: {
         description: string;
-        detailConstraint?: string;
+        detailsConstraint?: string;
         notes?: string;
     };
     lines: GoodIssueLineDTO[];
     userId: string;
     total: string;
     returnDate: string;
-    securityDeposit: string;
 };
 
 type GoodIssueLineDTO = {
