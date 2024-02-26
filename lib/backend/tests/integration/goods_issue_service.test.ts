@@ -2,26 +2,28 @@ import { InmemGoodsIssueRepository } from "../../persistense/inmem/inmem_goods_i
 import type { ItemRepository } from "../../domain/catalog/item_repository";
 import { InsufficientStock } from "../../domain/catalog/insufficient_stock_error";
 import { DefaultPurposeSpecification } from "../../adapters/default_purpose_specification";
-import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
 import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
+import { InvalidPurpose } from "../../domain/goods_issue/invalid_purpose_error";
 import { InvalidTotal } from "../../domain/goods_issue/invalid_total_error";
-import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { GoodsIssueService } from "../../application/goods_issue_service";
+import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
+import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { describe, expect, it, vi } from "vitest";
 import { ID } from "../../shared/id";
 
 describe("Test Goods Issue", () => {
-    it("Deve retornar error **PurposeNotFound** se não existir", async () => {
+    it("Deve retornar error **InvalidPurpose** se não existir", async () => {
         const data = {
             ...goodsIssueData,
-            purpose: { description: "Alguel" },
+            purposeSpecification: { description: "Alguel" },
         };
         const { service } = makeService();
 
         const error = await service.new(data);
 
         expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(InvalidPurpose);
     });
 
     it("Deve chamar o método **getAll** no repositório de artigos", async () => {
@@ -49,7 +51,7 @@ describe("Test Goods Issue", () => {
         expect(error.value).toBeInstanceOf(ItemNotFound);
     });
 
-    it("Deve chamar o método **save** no repositório de solicitações de artigos", async () => {
+    it("Deve chamar o método **save** no repositório de guia de saída de mercadoria", async () => {
         const lines = [{ itemId: "1001", quantity: 1 }];
         const total = "4500,00";
         const { service, goodsIssueRepository } = makeService();
@@ -60,14 +62,13 @@ describe("Test Goods Issue", () => {
             ...goodsIssueData,
             lines,
             total,
-            securityDeposit: "9000,00",
         });
 
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
-    it("Deve efectuar a solicitação de um uníco artigo", async () => {
+    it("Deve efectuar a nota de saída de mercadoria, de um uníco artigo", async () => {
         const lines = [{ itemId: "1001", quantity: 1 }];
         const { service, goodsIssueRepository } = makeService();
 
@@ -75,7 +76,6 @@ describe("Test Goods Issue", () => {
             ...goodsIssueData,
             lines,
             total: "4500,00",
-            securityDeposit: "9000,00",
         });
 
         const goodsIssue = await goodsIssueRepository.last();
@@ -87,7 +87,7 @@ describe("Test Goods Issue", () => {
         expect(goodsIssueLine.quantity).toEqual(1);
     });
 
-    it("Deve efectuar a solicitação de mais de um artigo", async () => {
+    it("Deve efectuar a nota de saída de mercadoria, de mais de um artigo", async () => {
         const lines = [
             { itemId: "1001", quantity: 1 },
             { itemId: "1002", quantity: 1 },
@@ -100,7 +100,6 @@ describe("Test Goods Issue", () => {
             ...goodsIssueData,
             lines,
             total,
-            securityDeposit,
         });
 
         const goodsIssue = await goodsIssueRepository.last();
@@ -108,7 +107,7 @@ describe("Test Goods Issue", () => {
         expect(goodsIssue.getTotal().value).toEqual(total);
     });
 
-    it("Deve retornar **InvalidTotal** se o total enviado pelo solicitante for diferente do total a pagar da solicitação", async () => {
+    it("Deve retornar **InvalidTotal** se o total enviado pelo solicitante for diferente do total a pagar da nota de saída de mercadoria,", async () => {
         const total = "25,00";
         const { service } = makeService();
 
@@ -121,7 +120,7 @@ describe("Test Goods Issue", () => {
         expect(error.value).toBeInstanceOf(InvalidTotal);
     });
 
-    it("Deve registrar a data de devolução da solicitação", async () => {
+    it("Deve registrar a data de devolução da nota de saída de mercadoria,", async () => {
         const { service, goodsIssueRepository } = makeService();
 
         await service.new(goodsIssueData);
@@ -182,7 +181,7 @@ describe("Test Goods Issue", () => {
         expect(stock.quantity).toEqual(8);
     });
 
-    it("Deve ser adicionada a solicitação, caso a finalidade tenha uma seção", async () => {
+    it("Deve ser adicionada a nota de saída de mercadoria,, caso a finalidade tenha uma seção", async () => {
         const { service, goodsIssueRepository } = makeService();
 
         await service.new(goodsIssueData);
@@ -193,12 +192,12 @@ describe("Test Goods Issue", () => {
         expect(goodsIssue.purpose.details).toEqual("Interna");
     });
 
-    it("Deve ser adicionada a solicitação caso a finalidade tenha um destino", async () => {
+    it("Deve ser adicionada a nota de saída de mercadoria, caso a finalidade tenha um nota", async () => {
         const data = {
             ...goodsIssueData,
-            purpose: {
+            purposeSpecification: {
                 description: "Lavandaria",
-                detailConstraint: "Externa",
+                detailsConstraint: "Externa",
                 notes: "John Doe",
             },
         };
@@ -230,7 +229,7 @@ describe("Test Goods Issue", () => {
         expect(error.value).toBeInstanceOf(InsufficientStock);
     });
 
-    it("Deve gerar o ID da solicitação", async () => {
+    it("Deve gerar o ID da nota de saída de mercadoria,", async () => {
         const { service, goodsIssueRepository } = makeService();
 
         await service.new(goodsIssueData);
@@ -274,9 +273,9 @@ describe("Test Goods Issue", () => {
 });
 
 const goodsIssueData = {
-    purpose: {
+    purposeSpecification: {
         description: "Lavandaria",
-        detailConstraint: "Interna",
+        detailsConstraint: "Interna",
         notes: "Nome",
     },
     lines: [
@@ -292,7 +291,6 @@ const goodsIssueData = {
         },
     ],
     total: "55500,00",
-    securityDeposit: "111000,00",
     returnDate: "2021-01-01T16:40:00",
     userId: "1000",
 };
