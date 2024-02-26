@@ -4,7 +4,7 @@ import { convertToNumber } from "@frontend/helpers/convert_to_number";
 import type { ItemModel, VariationValue } from "@frontend/models/item";
 import { CatalogService } from "@frontend/services/catalog_service";
 import { formatCurrency } from "@frontend/helpers/format_currency";
-import type { GoodsIssueLine } from "~/lib/frontend/models/goods_issue";
+import type { GoodsIssueLine } from "@frontend/models/goods_issue";
 
 interface Props {
     goodsIssueLines: GoodsIssueLine[];
@@ -26,12 +26,12 @@ const catalogService = new CatalogService();
 const props = defineProps<Props>();
 const emits = defineEmits<Emits>();
 
-function itemExistInGoodsIssueItems(itemId: string): boolean {
+function itemExistInGoodsIssueLines(itemId: string): boolean {
     return props.goodsIssueLines.some((i) => i.itemId == itemId);
 }
 
-function emitItemAdded(item: ItemModel, idx: number) {
-    addItem(item, idx);
+function emitLineAdded(item: ItemModel, idx: number) {
+    addLine(item, idx);
 
     emits("added");
 }
@@ -54,12 +54,12 @@ function toGoodsIssueItem(item: ItemModel, quantity: number, total: string): Goo
     return { ...item, stock: item.quantity, quantity, total };
 }
 
-function addItem(item: ItemModel, idx: number) {
+function addLine(item: ItemModel, idx: number) {
     const quantity = quantities.value[idx];
 
     if (!validateQuantity(item.quantity, quantity)) return;
 
-    if (itemExistInGoodsIssueItems(item.itemId)) return;
+    if (itemExistInGoodsIssueLines(item.itemId)) return;
 
     total.value = calculateTotal(item.price, quantity);
 
@@ -151,9 +151,9 @@ defineExpose({ show: showDialog });
                         v-for="(item, idx) in items"
                         :key="item.itemId"
                         class="hover:bg-gray-50"
-                        :class="{ hidden: itemExistInGoodsIssueItems(item.itemId) }"
+                        :class="{ hidden: itemExistInGoodsIssueLines(item.itemId) }"
                     >
-                        <td class="cursor-pointer" @click="emitItemAdded(item, idx)">
+                        <td class="cursor-pointer" @click="emitLineAdded(item, idx)">
                             <span>
                                 {{ item.name }}
                             </span>
@@ -178,8 +178,8 @@ defineExpose({ show: showDialog });
                                 :disabled="!canEditQuantity(item)"
                                 class="input-number"
                                 :max="item.quantity"
-                                @keypress.enter="emitItemAdded(item, idx)"
-                                @keydown.tab="emitItemAdded(item, idx)"
+                                @keypress.enter="emitLineAdded(item, idx)"
+                                @keydown.tab="emitLineAdded(item, idx)"
                             />
                         </td>
                     </tr>
