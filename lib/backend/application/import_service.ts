@@ -148,7 +148,7 @@ export class ImportService {
     }
 
     #isValidFile(lines: string[]): Either<FileError, void> {
-        if (!VALID_CSV_HEADER.includes(lines[0])) {
+        if (!VALID_CSV_HEADER.includes(lines[0].trim())) {
             return left(new InvalidFileHeader());
         }
 
