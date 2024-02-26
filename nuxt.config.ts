@@ -3,6 +3,10 @@ import { fileURLToPath } from "url";
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
 export default defineNuxtConfig({
+    sourcemap: {
+        server: true,
+        client: true,
+    },
     alias: {
         "@backend": fileURLToPath(new URL("./lib/backend", import.meta.url)),
         "@frontend": fileURLToPath(new URL("./lib/frontend", import.meta.url)),
