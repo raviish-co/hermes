@@ -195,14 +195,14 @@ describe("Test Upload Items", async () => {
 const category = new Category(ID.random(), "Categoria 1");
 const section = new Section(ID.random(), "Secao 1", ID.random());
 
-const csvData = `nome,preco,quantidade,estado,categoria,secao,variacoes
+const csvData = `nome,preco,quantidade,estado,categoria,seccao,variacoes
 Produto 1,100.00,1,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Nike
 Produto 2,200.00,2,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Rebock
 Produto 3,300.00,3,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Adidas
 Produto 4,400.00,4,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Nike
 Produto 5,500.00,5,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Rebock`;
 
-const variationFormatData = `nome,preco,quantidade,estado,categoria,secao,variacoes
+const variationFormatData = `nome,preco,quantidade,estado,categoria,seccao,variacoes
 Produto 1,100.00,1,some-comment,Categoria 1,Secao 1,Cor-Preto`;
 
 const file = new File([csvData], "filename.csv", { type: "text/csv" });
@@ -212,7 +212,7 @@ const fileHeader = new File(["nome,invali_field"], "filename.csv", {
 });
 const fileTxt = new File([], "filename.txt", { type: "text/plain" });
 const emptyFile = new File(
-    ["nome,preco,quantidade,estado,categoria,secao,variacoes"],
+    ["nome,preco,quantidade,estado,categoria,seccao,variacoes"],
     "filename.csv",
     {
         type: "text/csv",
