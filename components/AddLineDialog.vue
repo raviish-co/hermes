@@ -50,7 +50,7 @@ function calculateTotal(price: string, quantity: number): string {
     return formatCurrency(total);
 }
 
-function toGoodsIssueItem(item: ItemModel, quantity: number, total: string): GoodsIssueLine {
+function toGoodsIssueLine(item: ItemModel, quantity: number, total: string): GoodsIssueLine {
     return { ...item, stock: item.quantity, quantity, total };
 }
 
@@ -63,7 +63,7 @@ function addLine(item: ItemModel, idx: number) {
 
     total.value = calculateTotal(item.price, quantity);
 
-    const newItem = toGoodsIssueItem(item, quantity, total.value);
+    const newItem = toGoodsIssueLine(item, quantity, total.value);
 
     props.goodsIssueLines.push(newItem);
 

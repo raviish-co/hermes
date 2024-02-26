@@ -81,6 +81,10 @@ function removeGoodsIssueLine(id: string): void {
 
 function clearGoodsIssueLines() {
     goodsIssueLines.value = [];
+    clearGrandTotalAndSecurityDeposit();
+}
+
+function clearGrandTotalAndSecurityDeposit() {
     grandTotal.value = "0,00";
     securityDeposit.value = "0,00";
 }
@@ -92,20 +96,22 @@ function calculateSecurityDeposit() {
 }
 
 function calculateGrandTotal() {
-    goodsIssueLines.value.forEach((line, idx) => {
-        if (idx === 0) {
-            grandTotal.value = formatCurrency(convertToNumber(line.total) / 100);
-            calculateSecurityDeposit();
-            return;
-        }
+    clearGrandTotalAndSecurityDeposit();
 
-        const value = convertToNumber(line.total);
+    goodsIssueLines.value.forEach((line, idx) => {
+        const price = convertToNumber(line.price);
+
+        const lineTotal = price * line.quantity;
+
         const total = convertToNumber(grandTotal.value);
 
-        const result = (value + total) / 100;
+        const result = (lineTotal + total) / 100;
 
         grandTotal.value = formatCurrency(result);
+
         calculateSecurityDeposit();
+
+        line.total = formatCurrency(lineTotal);
     });
 }
 
@@ -233,6 +239,7 @@ function updateIsValidPurpose(value: boolean) {
                                         class="input-number"
                                         min="1"
                                         :max="line.stock"
+                                        @input="calculateGrandTotal"
                                     />
                                 </td>
                                 <td class="text-right">{{ line.price }}</td>
