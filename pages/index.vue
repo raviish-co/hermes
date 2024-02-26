@@ -258,7 +258,7 @@ function updateIsValidPurpose(value: boolean) {
         </section>
     </section>
 
-    <section class="fixed bottom-0 w-full mx-auto shadow-md shadow-light-500">
+    <section class="fixed shadow-top bottom-0 w-full bg-white shadow-light-500">
         <div
             class="flex justify-between items-center section-content p-4 bg-white flex-wrap flex-col-reverse md:flex-row md:flex-nowrap gap-4"
         >
