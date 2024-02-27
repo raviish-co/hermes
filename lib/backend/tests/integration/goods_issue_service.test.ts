@@ -11,6 +11,9 @@ import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { describe, expect, it, vi } from "vitest";
 import { ID } from "../../shared/id";
+import type { GoodsIssueRepository } from "../../domain/goods_issue/goods_issue_note_repository";
+import { GoodsIssueRepositoryStub } from "../stubs/goods_issue_repository_stub";
+import type { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 
 describe("Test Goods Issue", () => {
     it("Deve retornar error **InvalidPurpose** se não existir", async () => {
@@ -234,7 +237,8 @@ describe("Test Goods Issue", () => {
 
         await service.new(goodsIssueData);
 
-        const goodsIssue = await goodsIssueRepository.get(ID.fromString("GS - 1000"));
+        const goodsIssueOrErr = await goodsIssueRepository.get(ID.fromString("GS - 1000"));
+        const goodsIssue = <GoodsIssueNote>goodsIssueOrErr.value;
 
         expect(goodsIssue.goodsIssueNoteId).toBeDefined();
         expect(goodsIssue.goodsIssueNoteId).toBeInstanceOf(ID);
@@ -244,14 +248,14 @@ describe("Test Goods Issue", () => {
     it("Deve gerar 2 solicitações com IDs diferentes", async () => {
         const { service, goodsIssueRepository } = makeService();
 
-        const issue1OrErr = await service.new(goodsIssueData);
-        const issue2OrErr = await service.new(goodsIssueData);
+        await service.new(goodsIssueData);
+        await service.new(goodsIssueData);
 
-        const goodsIssue1 = await goodsIssueRepository.get(ID.fromString("GS - 1000"));
-        const goodsIssue2 = await goodsIssueRepository.get(ID.fromString("GS - 1001"));
+        const goodsIssue1rErr = await goodsIssueRepository.get(ID.fromString("GS - 1000"));
+        const goodsIssue2rErr = await goodsIssueRepository.get(ID.fromString("GS - 1001"));
 
-        expect(issue1OrErr.isRight()).toBeTruthy();
-        expect(issue2OrErr.isRight()).toBeTruthy();
+        const goodsIssue1 = <GoodsIssueNote>goodsIssue1rErr.value;
+        const goodsIssue2 = <GoodsIssueNote>goodsIssue2rErr.value;
 
         expect(goodsIssue1.goodsIssueNoteId.toString()).toEqual("GS - 1000");
         expect(goodsIssue2.goodsIssueNoteId.toString()).toEqual("GS - 1001");
@@ -269,6 +273,29 @@ describe("Test Goods Issue", () => {
         expect(item2.getCondition().status).toEqual("Mau");
         expect(item1.getCondition().comment).toBeUndefined();
         expect(item2.getCondition().comment).toEqual("T-shirt rasgada");
+    });
+});
+
+describe("List Goods Issue Notes", () => {
+    it("Deve retornar uma lista vazia se não houver guias de saídas", async () => {
+        const { service } = makeService();
+
+        const goodsIssues = await service.list();
+
+        expect(goodsIssues.length).toBe(0);
+    });
+
+    it("Deve recuperar as guias de saídas presentes no repositório", async () => {
+        const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const { service } = makeService({ goodsIssueRepository });
+
+        const goodsIssues = await service.list();
+
+        expect(goodsIssues.length).toBe(1);
+
+        const goodsIssue = goodsIssues[0];
+
+        expect(goodsIssue.goodsIssueNoteId.toString()).toEqual("GS - 1000");
     });
 });
 
@@ -297,12 +324,13 @@ const goodsIssueData = {
 
 interface Dependencies {
     itemRepository?: ItemRepository;
+    goodsIssueRepository?: GoodsIssueRepository;
 }
 
 function makeService(deps?: Dependencies) {
     const purposeSource = new DefaultPurposeSpecification();
     const itemRepository = deps?.itemRepository ?? new ItemRepositoryStub();
-    const goodsIssueRepository = new InmemGoodsIssueRepository();
+    const goodsIssueRepository = deps?.goodsIssueRepository ?? new InmemGoodsIssueRepository();
     const storage = new InmemSequenceStorage();
     const generator = new SequenceGenerator(storage, 1000);
     const service = new GoodsIssueService(

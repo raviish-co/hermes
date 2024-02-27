@@ -13,6 +13,7 @@ import { Purpose } from "../domain/goods_issue/purpose";
 import type { GoodsIssueNoteError } from "../shared/errors";
 import { Item } from "../domain/catalog/item";
 import { ID } from "../shared/id";
+import type { GoodsIssueNote } from "../domain/goods_issue/goods_issue_note";
 
 export class GoodsIssueService {
     #itemRepository: ItemRepository;
@@ -68,6 +69,10 @@ export class GoodsIssueService {
         await this.#itemRepository.updateAll(items);
 
         return right(undefined);
+    }
+
+    async list(): Promise<GoodsIssueNote[]> {
+        return await this.#goodsIssueRepository.getAll();
     }
 
     #buildItemsIds(lines: GoodIssueLineDTO[]): ID[] {

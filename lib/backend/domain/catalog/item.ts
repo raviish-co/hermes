@@ -73,6 +73,11 @@ export class Item {
         return this.#stock;
     }
 
+    updateStock(quantity: number): void {
+        const result = this.#stock.quantity + quantity;
+        this.#stock = new ItemStock(result);
+    }
+
     get name(): string {
         return this.#name;
     }
