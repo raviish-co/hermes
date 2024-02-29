@@ -14,10 +14,29 @@ const goodsIssueLines = ref<GoodsIssueLine[]>(GOODS_ISSUE_LINES);
 const selectedLine = ref<GoodsIssueLine>({} as GoodsIssueLine);
 const items = ref<ItemModel[]>([]);
 const itemPages = ref<number>(1);
+const securityDepositInputState = ref<boolean>(true);
 
 const goodsIssueService = new GoodsIssueService();
 
-const isValidGoodsReturn = computed(() => false);
+function toggleSecurirtyDepositInputState() {
+    securityDepositInputState.value = !securityDepositInputState.value;
+}
+
+function validateQuantitiesInStock(): boolean {
+    const invalidLineOrUndefined = goodsIssueLines.value.find(
+        (i) => i.quantity > i.stock || i.quantity <= 0
+    );
+
+    if (invalidLineOrUndefined) return false;
+
+    return true;
+}
+
+const isValidGoodsReturn = computed(() => {
+    if (goodsIssueLines.value.length === 0 || !validateQuantitiesInStock()) return false;
+
+    return true;
+});
 
 function showAddLineDialog() {
     addLineDialogRef.value?.show();
@@ -137,7 +156,13 @@ function changePageToken(searchText: string, pageToken: number) {
                                 </td>
 
                                 <td>
-                                    {{ line.quantity }}
+                                    <input
+                                        type="number"
+                                        v-model="line.quantity"
+                                        class="input-number"
+                                        min="1"
+                                        :max="line.stock"
+                                    />
                                 </td>
                                 <td
                                     class="cursor-pointer"
@@ -172,8 +197,17 @@ function changePageToken(searchText: string, pageToken: number) {
 
                 <p class="flex items-center text-center w-full md:w-auto md:text-right space-x-1">
                     <span class="font-medium">Caução a reter(kz):</span>
-                    <input class="input-field max-w-32" value="12345,00" />
-                    <span class="material-symbols-outlined cursor-pointer"> edit </span>
+                    <input
+                        :disabled="securityDepositInputState"
+                        class="input-field max-w-32"
+                        value="12345,00"
+                    />
+                    <span
+                        class="material-symbols-outlined cursor-pointer"
+                        @click="toggleSecurirtyDepositInputState"
+                    >
+                        edit
+                    </span>
                 </p>
             </div>
         </div>

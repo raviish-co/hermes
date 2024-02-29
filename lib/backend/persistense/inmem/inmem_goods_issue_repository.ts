@@ -1,18 +1,33 @@
 import type { GoodsIssueRepository } from "../../domain/goods_issue/goods_issue_note_repository";
 import { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { ID } from "../../shared/id";
+import { left, right, type Either } from "../../shared/either";
+import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/GoodsIssueNoteNotFound";
 
 export class InmemGoodsIssueRepository implements GoodsIssueRepository {
     #goodsIssues: Record<string, GoodsIssueNote> = {};
 
+    constructor(notes?: GoodsIssueNote[]) {
+        if (notes) {
+            notes.forEach((note) => (this.#goodsIssues[note.goodsIssueNoteId.toString()] = note));
+        }
+    }
+
+    get(goodsIssueId: ID): Promise<Either<GoodsIssueNoteNotFound, GoodsIssueNote>> {
+        const goodsIssue = this.records.find(
+            (g) => g.goodsIssueNoteId.toString() === goodsIssueId.toString()
+        );
+        if (!goodsIssue) return Promise.resolve(left(new GoodsIssueNoteNotFound()));
+        return Promise.resolve(right(goodsIssue));
+    }
+
+    getAll(): Promise<GoodsIssueNote[]> {
+        return Promise.resolve(this.records);
+    }
+
     save(goodIssueNote: GoodsIssueNote): Promise<void> {
         this.#goodsIssues[goodIssueNote.goodsIssueNoteId.toString()] = goodIssueNote;
         return Promise.resolve(undefined);
-    }
-
-    get(goodsIssueId: ID): Promise<GoodsIssueNote> {
-        const goodsIssue = this.#goodsIssues[goodsIssueId.toString()];
-        return Promise.resolve(goodsIssue);
     }
 
     last(): Promise<GoodsIssueNote> {

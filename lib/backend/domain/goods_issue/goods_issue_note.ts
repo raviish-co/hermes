@@ -18,14 +18,8 @@ export class GoodsIssueNote {
     total: Decimal;
     securityDeposit: Decimal;
 
-    constructor(
-        requestId: ID,
-        purpose: Purpose,
-        user: ID,
-        returnDate: Date,
-        lines: GoodsIssueLine[]
-    ) {
-        this.goodsIssueNoteId = requestId;
+    constructor(noteId: ID, purpose: Purpose, user: ID, returnDate: Date, lines: GoodsIssueLine[]) {
+        this.goodsIssueNoteId = noteId;
         this.purpose = purpose;
         this.userId = user;
         this.status = GoodsIssueStatus.PENDING;

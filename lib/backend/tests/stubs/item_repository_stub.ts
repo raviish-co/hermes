@@ -6,6 +6,7 @@ import type { Pagination } from "../../shared/pagination";
 import { Item } from "../../domain/catalog/item";
 import { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
+import { ItemStock } from "../../domain/catalog/item_stock";
 
 export class ItemRepositoryStub implements ItemRepository {
     #items: Record<string, Item> = {};
