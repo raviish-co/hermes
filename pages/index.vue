@@ -2,12 +2,13 @@
 import type { AddLineDialog, DescribeLineStatusDialog, ChoosePurpose } from "#build/components";
 import { convertToNumber } from "@frontend/helpers/convert_to_number";
 import { GoodsIssueService } from "@frontend/services/goods_issue_service";
-import type { GoodsIssueLine, GoodsIssueModel, VariationValue } from "@frontend/models/goods_issue";
+import type { GoodsIssueLine, GoodsIssueModel } from "@frontend/models/goods_issue";
 import { handleException } from "@frontend/helpers/error_handler";
 import { formatCurrency } from "@frontend/helpers/format_currency";
 import { CatalogService } from "@frontend/services/catalog_service";
 import type { ItemModel } from "@frontend/models/item";
 import { getCurrentLocalDateTime } from "@frontend/helpers/current_local_date_time";
+import { joinVariationValues } from "~/lib/frontend/helpers/join_variation_values";
 
 const DETAILS = "Detalhes";
 
@@ -31,7 +32,6 @@ const catalogService = new CatalogService();
 
 function validateQuantitiesInStock(): boolean {
     const invalidLineOrUndefined = goodsIssueLines.value.find((i) => i.quantity > i.stock);
-
     if (invalidLineOrUndefined) return false;
 
     return true;
@@ -93,13 +93,26 @@ function calculateSecurityDeposit() {
     securityDeposit.value = formatCurrency(doubleTotal);
 }
 
+function calculateLineTotal(line: GoodsIssueLine): number {
+    if (line.quantity > line.stock) {
+        line.total = "0,00";
+        return 0;
+    }
+
+    const price = convertToNumber(line.price);
+
+    const total = price * line.quantity;
+
+    line.total = formatCurrency(total / 100);
+
+    return total;
+}
+
 function calculateGrandTotal() {
     clearGrandTotalAndSecurityDeposit();
 
-    goodsIssueLines.value.forEach((line, idx) => {
-        const price = convertToNumber(line.price);
-
-        const lineTotal = price * line.quantity;
+    goodsIssueLines.value.forEach((line) => {
+        const lineTotal = calculateLineTotal(line);
 
         const total = convertToNumber(grandTotal.value);
 
@@ -108,8 +121,6 @@ function calculateGrandTotal() {
         grandTotal.value = formatCurrency(result);
 
         calculateSecurityDeposit();
-
-        line.total = formatCurrency(lineTotal);
     });
 }
 
@@ -127,14 +138,6 @@ function showDescribeLineStatusDialog(line: GoodsIssueLine) {
     );
 
     describeLineStatusDialogRef.value?.show();
-}
-
-function listVariationValues(lineVariation?: VariationValue[]) {
-    if (!lineVariation) return "";
-
-    const values = lineVariation.map((v) => v.value);
-
-    return values.join(" | ");
 }
 
 function clearValues() {
@@ -269,7 +272,7 @@ onBeforeRouteUpdate(() => {
                                     {{ line.name }}
                                     <br />
                                     <span class="text-light-600 text-sm">
-                                        {{ listVariationValues(line?.variationsValues) }}
+                                        {{ joinVariationValues(line?.variationsValues) }}
                                     </span>
                                 </td>
 
@@ -314,13 +317,17 @@ onBeforeRouteUpdate(() => {
                 <button class="btn-light w-full md:flex-1">Cancelar</button>
             </div>
 
-            <div class="text-sm md:text-base flex gap-2 w-full md:w-auto">
-                <p class="text-center w-full md:w-auto md:text-right space-x-1">
+            <div class="text-sm md:text-base flex gap-2 w-full md:w-auto overflow-hidde">
+                <p
+                    class="text-center w-full md:w-auto md:text-right space-x-1 max-w-80 truncate overflow-hidden"
+                >
                     <span class="font-medium">Total Geral(kz):</span>
                     <span>{{ grandTotal }}</span>
                 </p>
 
-                <p class="text-center w-full md:w-auto md:text-right space-x-1">
+                <p
+                    class="text-center w-full md:w-auto md:text-right space-x-1 max-w-80 truncate overflow-hidden"
+                >
                     <span class="font-medium">Caução(kz):</span>
                     <span>{{ securityDeposit }}</span>
                 </p>

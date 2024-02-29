@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
 import { convertToNumber } from "@frontend/helpers/convert_to_number";
-import type { ItemModel, VariationValue } from "@frontend/models/item";
+import type { ItemModel } from "@frontend/models/item";
 import { formatCurrency } from "@frontend/helpers/format_currency";
 import type { GoodsIssueLine } from "@frontend/models/goods_issue";
+import { joinVariationValues } from "~/lib/frontend/helpers/join_variation_values";
 
 interface Props {
     goodsIssueLines: GoodsIssueLine[];
@@ -62,23 +63,14 @@ function addLine(item: ItemModel, idx: number) {
 
     total.value = calculateTotal(item.price, quantity);
 
-    const newItem = toGoodsIssueLine(item, quantity, total.value);
-
-    props.goodsIssueLines.push(newItem);
+    const newLine = toGoodsIssueLine(item, quantity, total.value);
+    props.goodsIssueLines.push(newLine);
 
     quantities.value[idx] = 1;
 }
 
 function initializeQuantities() {
     props.items.forEach((_, idx) => (quantities.value[idx] = 1));
-}
-
-function listVariationValues(variationValues?: VariationValue[]) {
-    if (!variationValues) return "";
-
-    const values = variationValues.map((v) => v.value);
-
-    return values.join(" | ");
 }
 
 function canEditQuantity(item: ItemModel): boolean {
@@ -136,7 +128,7 @@ defineExpose({ show: showDialog, initializeQuantities });
                             <br />
 
                             <span class="text-light-600 text-xs sm:text-sm">
-                                {{ listVariationValues(item?.variationsValues) }}
+                                {{ joinVariationValues(item?.variationsValues) }}
                             </span>
                         </td>
 
