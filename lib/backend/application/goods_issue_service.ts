@@ -14,6 +14,7 @@ import type { GoodsIssueNoteError } from "../shared/errors";
 import { Item } from "../domain/catalog/item";
 import { ID } from "../shared/id";
 import type { GoodsIssueNote } from "../domain/goods_issue/goods_issue_note";
+import type { GoodsIssueNoteNotFound } from "../domain/goods_issue/goods_issue_note_not_found_error";
 
 export class GoodsIssueService {
     #itemRepository: ItemRepository;
@@ -84,6 +85,14 @@ export class GoodsIssueService {
         return itemsIds;
     }
 
+    async get(goodsIssueNoteId: string): Promise<Either<GoodsIssueNoteNotFound, GoodsIssueNote>> {
+        const noteOrErr = await this.#goodsIssueRepository.getById(ID.fromString(goodsIssueNoteId));
+
+        if (noteOrErr.isLeft()) return left(noteOrErr.value);
+
+        return right(noteOrErr.value);
+    }
+
     #buildGoodsIssueLines(
         items: Item[],
         lines: GoodIssueLineDTO[]
@@ -94,14 +103,17 @@ export class GoodsIssueService {
             const { quantity, condition } = lines[idx];
             const item = items[idx];
 
-            if (!item.canBeReducedStock(quantity))
+            if (!item.canBeReducedStock(quantity)) {
                 return left(new InsufficientStock(item.itemId.toString()));
+            }
+
+            if (condition) {
+                item.updateCondition(condition.status, condition.comment);
+            }
 
             item.reduceStock(quantity);
 
-            if (condition) item.updateCondition(condition.status, condition.comment);
-
-            const goodsIssueLine = new GoodsIssueLine(item.itemId, item.price, quantity);
+            const goodsIssueLine = new GoodsIssueLine(item, quantity);
 
             goodsIssueLines.push(goodsIssueLine);
         }

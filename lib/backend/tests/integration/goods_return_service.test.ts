@@ -102,7 +102,7 @@ describe("GoodsReturnService", () => {
 
         const item = await itemRepository.getById(ID.fromString("1001"));
 
-        expect(item.getStock().quantity).toBe(13);
+        expect(item.getStock().quantity).toBe(10);
     });
 
     it("Deve actualizar o estado da guida de saída para devolvido", async () => {

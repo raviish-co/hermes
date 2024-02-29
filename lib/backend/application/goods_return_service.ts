@@ -43,9 +43,7 @@ export class GoodsReturnService {
         const voidOrErr = this.#verifyItemsQuantities(itemsData, lines);
         if (voidOrErr.isLeft()) return left(voidOrErr.value);
 
-        const itemsIds = this.#getItemsIds(lines);
-        const itemsOrErr = await this.#itemRepository.findAll(itemsIds);
-        const items = <Item[]>itemsOrErr.value;
+        const items = lines.map((line) => line.item);
 
         const goodsReturnNoteId = this.#generateGoodsReturnNoteId();
         const goodsReturnNote = new GoodsReturnNote(
@@ -54,7 +52,7 @@ export class GoodsReturnService {
             securityDepositWithHeld
         );
 
-        this.#restoreItemsQuantities(items, lines);
+        this.#restoreItemsQuantities(lines);
 
         this.#updateItemsCondition(items, itemsData);
 
@@ -74,11 +72,9 @@ export class GoodsReturnService {
         return ID.fromString(goodsReturnId);
     }
 
-    #restoreItemsQuantities(items: Item[], lines: GoodsIssueLine[]) {
-        for (const item of items) {
-            const itemId = item.itemId.toString();
-            const line = this.#findGoodsIssueLine(itemId, lines);
-            item.updateStock(line!.quantity);
+    #restoreItemsQuantities(lines: GoodsIssueLine[]) {
+        for (const line of lines) {
+            line.restoreQuantity();
         }
     }
 
@@ -103,7 +99,7 @@ export class GoodsReturnService {
     }
 
     #findGoodsIssueLine(itemId: string, lines: GoodsIssueLine[]): GoodsIssueLine {
-        return lines.find((line) => line.itemId.toString() === itemId)!;
+        return lines.find((line) => line.item.itemId.toString() === itemId)!;
     }
 
     #checkQuantity(line: GoodsIssueLine, quantity: number): boolean {
@@ -111,7 +107,7 @@ export class GoodsReturnService {
     }
 
     #getItemsIds(lines: GoodsIssueLine[]): ID[] {
-        return lines.map((line) => line.itemId);
+        return lines.map((line) => line.item.itemId);
     }
 }
 

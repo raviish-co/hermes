@@ -1,3 +1,5 @@
+import { Item, Status } from "../../domain/catalog/item";
+import { ItemStock } from "../../domain/catalog/item_stock";
 import { GoodsIssueLine } from "../../domain/goods_issue/goods_issue_line";
 import { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { InmemGoodsIssueRepository } from "../../persistense/inmem/inmem_goods_issue_repository";
@@ -15,6 +17,17 @@ export class GoodsIssueRepositoryStub extends InmemGoodsIssueRepository {
     }
 }
 
+const _item = new Item(
+    ID.fromString("1001"),
+    ID.random(),
+    "Item 1",
+    ID.random(),
+    Decimal.fromString("1000"),
+    { "1": "Cor: Preta" },
+    new ItemStock(1),
+    { status: Status.Good }
+);
+
 const _goodsIssueData = [
     {
         noteId: ID.fromString("GS - 1000"),
@@ -25,6 +38,6 @@ const _goodsIssueData = [
         },
         userId: ID.fromString("1"),
         returnDate: new Date(),
-        lines: [new GoodsIssueLine(ID.fromString("1001"), Decimal.fromString("0"), 3)],
+        lines: [new GoodsIssueLine(_item, 3)],
     },
 ];

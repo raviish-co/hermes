@@ -9,11 +9,12 @@ import { InvalidTotal } from "../../domain/goods_issue/invalid_total_error";
 import { GoodsIssueService } from "../../application/goods_issue_service";
 import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
-import { describe, expect, it, vi } from "vitest";
-import { ID } from "../../shared/id";
 import type { GoodsIssueRepository } from "../../domain/goods_issue/goods_issue_note_repository";
 import { GoodsIssueRepositoryStub } from "../stubs/goods_issue_repository_stub";
 import type { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
+import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
+import { describe, expect, it, vi } from "vitest";
+import { ID } from "../../shared/id";
 
 describe("Test Goods Issue", () => {
     it("Deve retornar error **InvalidPurpose** se não existir", async () => {
@@ -85,7 +86,7 @@ describe("Test Goods Issue", () => {
         const goodsIssueLine = goodsIssue.goodsIssueLines[0];
 
         expect(goodsIssue.goodsIssueLines.length).toBe(1);
-        expect(goodsIssueLine.itemId.toString()).toEqual("1001");
+        expect(goodsIssueLine.item.itemId.toString()).toEqual("1001");
         expect(goodsIssueLine.total.value).toEqual("4500,00");
         expect(goodsIssueLine.quantity).toEqual(1);
     });
@@ -295,6 +296,30 @@ describe("List Goods Issue Notes", () => {
 
         const goodsIssue = goodsIssues[0];
 
+        expect(goodsIssue.goodsIssueNoteId.toString()).toEqual("GS - 1000");
+    });
+});
+
+describe("Get Goods Issue Note", () => {
+    it("Deve retornar **GoodsIssueNoteFound** se a guia de saída não existir", async () => {
+        const goodsIssueRepository = new InmemGoodsIssueRepository();
+
+        const { service } = makeService({ goodsIssueRepository });
+
+        const error = await service.get("GS - 1000");
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(GoodsIssueNoteNotFound);
+    });
+
+    it("Deve retornar a guia de saída de mercadoria", async () => {
+        const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const { service } = makeService({ goodsIssueRepository });
+
+        const goodsIssueOrErr = await service.get("GS - 1000");
+        const goodsIssue = <GoodsIssueNote>goodsIssueOrErr.value;
+
+        expect(goodsIssueOrErr.isRight()).toBeTruthy();
         expect(goodsIssue.goodsIssueNoteId.toString()).toEqual("GS - 1000");
     });
 });
