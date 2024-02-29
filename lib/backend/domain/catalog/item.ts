@@ -54,6 +54,11 @@ export class Item {
             this.#condition = { status: Status.Good };
             return;
         }
+
+        this.updateBadCondition(comment!);
+    }
+
+    updateBadCondition(comment: string): void {
         this.#condition = { status: Status.Bad, comment };
     }
 
