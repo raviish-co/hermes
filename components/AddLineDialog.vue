@@ -2,26 +2,25 @@
 import type { VDialog } from "#build/components";
 import { convertToNumber } from "@frontend/helpers/convert_to_number";
 import type { ItemModel, VariationValue } from "@frontend/models/item";
-import { CatalogService } from "@frontend/services/catalog_service";
 import { formatCurrency } from "@frontend/helpers/format_currency";
 import type { GoodsIssueLine } from "@frontend/models/goods_issue";
 
 interface Props {
     goodsIssueLines: GoodsIssueLine[];
+    items: ItemModel[];
+    pages: number;
 }
 
 interface Emits {
     (e: "added"): void;
+    (e: "input", value: string): void;
+    (e: "pageTokenChanged", searchText: string, pageToken: number): void;
 }
 
 const dialogRef = ref<typeof VDialog>();
-const query = ref<string>("");
-const items = ref<ItemModel[]>([]);
+const searchText = ref<string>("");
 const total = ref<string>("0,00");
-const pages = ref<number>(1);
 const quantities = ref<number[]>([]);
-
-const catalogService = new CatalogService();
 
 const props = defineProps<Props>();
 const emits = defineEmits<Emits>();
@@ -70,31 +69,8 @@ function addLine(item: ItemModel, idx: number) {
     quantities.value[idx] = 1;
 }
 
-async function listItems(pageToken: number = 1) {
-    const { items: i, total } = await catalogService.listItems(pageToken);
-
-    items.value = i;
-    pages.value = total;
-
-    initializeQuantities();
-}
-
-async function searchItems(pageToken: number = 1) {
-    if (query.value.length < 3) {
-        listItems();
-        return;
-    }
-
-    const { items: i, total } = await catalogService.searchItems(query.value, pageToken);
-
-    items.value = i;
-    pages.value = total;
-
-    initializeQuantities();
-}
-
 function initializeQuantities() {
-    items.value.forEach((_, idx) => (quantities.value[idx] = 1));
+    props.items.forEach((_, idx) => (quantities.value[idx] = 1));
 }
 
 function listVariationValues(variationValues?: VariationValue[]) {
@@ -105,25 +81,24 @@ function listVariationValues(variationValues?: VariationValue[]) {
     return values.join(" | ");
 }
 
-function changePageToken(pageToken: number) {
-    if (query.value.length >= 3) {
-        searchItems(pageToken);
-        return;
-    }
-
-    listItems(pageToken);
-}
-
 function canEditQuantity(item: ItemModel): boolean {
     return item.quantity > 0;
 }
 
+function emitInputValue() {
+    emits("input", searchText.value);
+}
+
+function emitChangePageToken(pageToken: number) {
+    emits("pageTokenChanged", searchText.value, pageToken);
+}
+
 function showDialog() {
-    listItems();
+    initializeQuantities();
     dialogRef.value?.show();
 }
 
-defineExpose({ show: showDialog });
+defineExpose({ show: showDialog, initializeQuantities });
 </script>
 
 <template>
@@ -131,9 +106,9 @@ defineExpose({ show: showDialog });
         <input
             placeholder="Pesquisar artigos..."
             type="search"
-            v-model="query"
+            v-model="searchText"
             class="input-field"
-            @input="() => searchItems()"
+            @input="emitInputValue"
         />
 
         <div class="overflow-x-auto w-full">
@@ -191,6 +166,6 @@ defineExpose({ show: showDialog });
             </table>
         </div>
 
-        <ThePagination :total="pages" @changed="changePageToken" />
+        <ThePagination :total="pages" @changed="emitChangePageToken" />
     </VDialog>
 </template>

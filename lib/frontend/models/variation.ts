@@ -1,5 +1,5 @@
 export interface VariationModel {
-    varitationId: string;
+    variationId: string;
     name: string;
     values: string[];
 }
