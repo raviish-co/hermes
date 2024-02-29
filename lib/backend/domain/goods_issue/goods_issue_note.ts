@@ -4,7 +4,8 @@ import { Purpose } from "./purpose";
 import { ID } from "../../shared/id";
 
 export enum GoodsIssueStatus {
-    PENDING = "Por Devolver",
+    Pending = "Por Devolver",
+    Returned = "Devolvido",
 }
 
 export class GoodsIssueNote {
@@ -22,7 +23,7 @@ export class GoodsIssueNote {
         this.goodsIssueNoteId = noteId;
         this.purpose = purpose;
         this.userId = user;
-        this.status = GoodsIssueStatus.PENDING;
+        this.status = GoodsIssueStatus.Pending;
         this.issuedAt = new Date();
         this.returnDate = returnDate;
         this.total = Decimal.fromString("0");
@@ -50,6 +51,14 @@ export class GoodsIssueNote {
 
     isSameSecurityDeposit(securityDeposit: string): boolean {
         return this.securityDeposit.value === securityDeposit;
+    }
+
+    isReturned(): boolean {
+        return this.status === GoodsIssueStatus.Returned;
+    }
+
+    returnTheGoods(): void {
+        this.status = GoodsIssueStatus.Returned;
     }
 
     verifyTotal(total: string, securityDeposit: string) {

@@ -2,7 +2,7 @@ import type { GoodsIssueRepository } from "../../domain/goods_issue/goods_issue_
 import { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { ID } from "../../shared/id";
 import { left, right, type Either } from "../../shared/either";
-import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/GoodsIssueNoteNotFound";
+import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
 
 export class InmemGoodsIssueRepository implements GoodsIssueRepository {
     #goodsIssues: Record<string, GoodsIssueNote> = {};
@@ -13,7 +13,7 @@ export class InmemGoodsIssueRepository implements GoodsIssueRepository {
         }
     }
 
-    get(goodsIssueId: ID): Promise<Either<GoodsIssueNoteNotFound, GoodsIssueNote>> {
+    getById(goodsIssueId: ID): Promise<Either<GoodsIssueNoteNotFound, GoodsIssueNote>> {
         const goodsIssue = this.records.find(
             (g) => g.goodsIssueNoteId.toString() === goodsIssueId.toString()
         );
@@ -27,6 +27,11 @@ export class InmemGoodsIssueRepository implements GoodsIssueRepository {
 
     save(goodIssueNote: GoodsIssueNote): Promise<void> {
         this.#goodsIssues[goodIssueNote.goodsIssueNoteId.toString()] = goodIssueNote;
+        return Promise.resolve(undefined);
+    }
+
+    update(goodsIssue: GoodsIssueNote): Promise<void> {
+        this.#goodsIssues[goodsIssue.goodsIssueNoteId.toString()] = goodsIssue;
         return Promise.resolve(undefined);
     }
 

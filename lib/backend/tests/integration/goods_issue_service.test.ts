@@ -237,7 +237,7 @@ describe("Test Goods Issue", () => {
 
         await service.new(goodsIssueData);
 
-        const goodsIssueOrErr = await goodsIssueRepository.get(ID.fromString("GS - 1000"));
+        const goodsIssueOrErr = await goodsIssueRepository.getById(ID.fromString("GS - 1000"));
         const goodsIssue = <GoodsIssueNote>goodsIssueOrErr.value;
 
         expect(goodsIssue.goodsIssueNoteId).toBeDefined();
@@ -251,8 +251,8 @@ describe("Test Goods Issue", () => {
         await service.new(goodsIssueData);
         await service.new(goodsIssueData);
 
-        const goodsIssue1rErr = await goodsIssueRepository.get(ID.fromString("GS - 1000"));
-        const goodsIssue2rErr = await goodsIssueRepository.get(ID.fromString("GS - 1001"));
+        const goodsIssue1rErr = await goodsIssueRepository.getById(ID.fromString("GS - 1000"));
+        const goodsIssue2rErr = await goodsIssueRepository.getById(ID.fromString("GS - 1001"));
 
         const goodsIssue1 = <GoodsIssueNote>goodsIssue1rErr.value;
         const goodsIssue2 = <GoodsIssueNote>goodsIssue2rErr.value;
