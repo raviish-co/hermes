@@ -1,10 +1,6 @@
 import type { PurposeSpecification } from "./purpose_specification";
 import type { Condition } from "./condition";
-
-export interface VariationValue {
-    variationId: string;
-    value: string;
-}
+import type { VariationValue } from "./variation_value";
 
 export interface GoodsIssueLine {
     itemId: string;

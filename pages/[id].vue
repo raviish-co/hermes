@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { AddLineDialog, DescribeLineStatusDialog } from "#build/components";
-import type { GoodsIssueLine, VariationValue } from "@frontend/models/goods_issue";
+import type { GoodsIssueLine } from "@frontend/models/goods_issue";
 import { GOODS_ISSUE_LINES } from "~/data/goods_issue_line";
 import type { ItemModel } from "~/lib/frontend/models/item";
 import { GoodsIssueService } from "~/lib/frontend/services/goods_issue_service";
+import { joinVariationValues } from "~/lib/frontend/helpers/join_variation_values";
 
 const route = useRoute();
 const GOODS_ISSUE_ID = route.params.id as string;
@@ -51,14 +52,6 @@ function showDescribeLineStatusDialog(line: GoodsIssueLine) {
     );
 
     describeLineStatusDialogRef.value?.show();
-}
-
-function listVariationValues(lineVariation?: VariationValue[]) {
-    if (!lineVariation) return "";
-
-    const values = lineVariation.map((v) => v.value);
-
-    return values.join(" | ");
 }
 
 function removeGoodsIssueLine(id: string) {
@@ -151,7 +144,7 @@ function changePageToken(searchText: string, pageToken: number) {
                                     {{ line.name }}
                                     <br />
                                     <span class="text-light-600 text-sm">
-                                        {{ listVariationValues(line?.variationsValues) }}
+                                        {{ joinVariationValues(line?.variationsValues) }}
                                     </span>
                                 </td>
 

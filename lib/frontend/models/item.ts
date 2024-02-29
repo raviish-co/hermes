@@ -1,9 +1,5 @@
 import type { Condition } from "./condition";
-
-export interface VariationValue {
-    variationId: string;
-    value: string;
-}
+import type { VariationValue } from "./variation_value";
 
 export interface ItemModel {
     itemId: string;
