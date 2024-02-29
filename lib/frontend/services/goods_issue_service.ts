@@ -1,6 +1,7 @@
 import type { GoodsIssueModel, GoodsIssueLine } from "@frontend/models/goods_issue";
 import type { Condition } from "../models/condition";
 import type { PurposeSpecification } from "../models/purpose_specification";
+import type { ItemModel } from "../models/item";
 
 interface Line {
     itemId: string;
@@ -23,6 +24,23 @@ export class GoodsIssueService {
             method: "post",
             body: { data },
         });
+    }
+
+    async searchItems(
+        query: string,
+        goodsIssueId: string,
+        pageToken: number = 1,
+        perPage: number = 8
+    ): Promise<{ items: ItemModel[]; total: number }> {
+        return { items: [], total: 1 };
+    }
+
+    async listItems(
+        goodsIssueId: string,
+        pageToken: number = 1,
+        perPage: number = 8
+    ): Promise<{ items: ItemModel[]; total: number }> {
+        return { items: [], total: 1 };
     }
 
     #toGoodsIssueLine(line: GoodsIssueLine): Line {

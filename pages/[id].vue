@@ -2,13 +2,22 @@
 import type { AddLineDialog, DescribeLineStatusDialog } from "#build/components";
 import type { GoodsIssueLine, VariationValue } from "@frontend/models/goods_issue";
 import { GOODS_ISSUE_LINES } from "~/data/goods_issue_line";
+import type { ItemModel } from "~/lib/frontend/models/item";
+import { GoodsIssueService } from "~/lib/frontend/services/goods_issue_service";
+
+const route = useRoute();
+const GOODS_ISSUE_ID = route.params.id as string;
 
 const addLineDialogRef = ref<typeof AddLineDialog>();
 const describeLineStatusDialogRef = ref<typeof DescribeLineStatusDialog>();
 const goodsIssueLines = ref<GoodsIssueLine[]>(GOODS_ISSUE_LINES);
 const selectedLine = ref<GoodsIssueLine>({} as GoodsIssueLine);
+const items = ref<ItemModel[]>([]);
+const itemPages = ref<number>(1);
 
-const isValidIncomingGoods = computed(() => false);
+const goodsIssueService = new GoodsIssueService();
+
+const isValidGoodsReturn = computed(() => false);
 
 function showAddLineDialog() {
     addLineDialogRef.value?.show();
@@ -35,6 +44,38 @@ function listVariationValues(lineVariation?: VariationValue[]) {
 
 function removeGoodsIssueLine(id: string) {
     goodsIssueLines.value = goodsIssueLines.value.filter((l) => l.itemId !== id);
+}
+
+function listItems(pageToken: number = 1) {
+    goodsIssueService.listItems(GOODS_ISSUE_ID, pageToken).then(({ items: i, total }) => {
+        items.value = i;
+        itemPages.value = total;
+    });
+}
+
+function searchItems(searchText: string, pageToken: number = 1) {
+    if (searchText.length === 0) {
+        listItems();
+        return;
+    }
+
+    if (searchText.length < 3) return;
+
+    goodsIssueService
+        .searchItems(searchText, GOODS_ISSUE_ID, pageToken)
+        .then(({ items: i, total }) => {
+            items.value = i;
+            itemPages.value = total;
+        });
+}
+
+function changePageToken(searchText: string, pageToken: number) {
+    if (searchText.length >= 3) {
+        searchItems(searchText, pageToken);
+        return;
+    }
+
+    listItems(pageToken);
 }
 </script>
 
@@ -117,7 +158,7 @@ function removeGoodsIssueLine(id: string) {
             class="flex justify-between items-center section-content p-4 flex-wrap flex-col-reverse md:flex-row md:flex-nowrap gap-4"
         >
             <div class="flex flex-wrap sm:flex-nowrap gap-4 w-full md:w-auto pb-4 md:pb-0">
-                <button class="btn-secondary w-full md:flex-1" :disabled="!isValidIncomingGoods">
+                <button class="btn-secondary w-full md:flex-1" :disabled="!isValidGoodsReturn">
                     Devolver
                 </button>
                 <button class="btn-light w-full md:flex-1">Cancelar</button>
@@ -138,7 +179,14 @@ function removeGoodsIssueLine(id: string) {
         </div>
     </section>
 
-    <AddLineDialog ref="addLineDialogRef" :goods-issue-lines="goodsIssueLines" />
+    <AddLineDialog
+        ref="addLineDialogRef"
+        :goods-issue-lines="goodsIssueLines"
+        :items="items"
+        :pages="itemPages"
+        @input="searchItems"
+        @page-token-changed="changePageToken"
+    />
 
     <DescribeLineStatusDialog :line="selectedLine" ref="describeLineStatusDialogRef" />
 </template>
