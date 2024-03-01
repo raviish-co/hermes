@@ -8,18 +8,24 @@ const { goodsReturnService } = makeServices();
 export default defineEventHandler(async (event) => {
     const { goodsIssueNoteId, securityDepositWithHeld, itemsData } = await readBody(event);
 
-    const result = await goodsReturnService.returningGoods(
+    const resultOrErr = await goodsReturnService.returningGoods(
         goodsIssueNoteId,
         securityDepositWithHeld,
         itemsData
     );
 
-    if (result instanceof GoodsIssueNoteNotFound) {
-        return createError({ message: result.message, statusCode: HttpStatus.BadRequest });
+    if (resultOrErr.value instanceof GoodsIssueNoteNotFound) {
+        return createError({
+            message: resultOrErr.value.message,
+            statusCode: HttpStatus.BadRequest,
+        });
     }
 
-    if (result instanceof InvalidGoodsIssueLineQuantity) {
-        return createError({ message: result.message, statusCode: HttpStatus.BadRequest });
+    if (resultOrErr.value instanceof InvalidGoodsIssueLineQuantity) {
+        return createError({
+            message: resultOrErr.value.message,
+            statusCode: HttpStatus.BadRequest,
+        });
     }
 
     setResponseStatus(event, HttpStatus.Created);

@@ -36,7 +36,11 @@ function showDescribeLineStatusDialog(line: GoodsIssueLineBase) {
 
 function newGoodsReturn() {
     goodsReturnService
-        .new(goodsIssue.value.goodsIssueId, retainedSecurityDeposit.value, goodsIssue.value.lines)
+        .new(
+            goodsIssue.value.goodsIssueNoteId,
+            retainedSecurityDeposit.value,
+            goodsIssue.value.lines
+        )
         .then(() => alert("Devolução efetuada com sucesso!"))
         .catch(handleException);
 }
@@ -67,14 +71,10 @@ onMounted(() => {
 
             <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
                 <input class="input-field" :value="goodsIssue.purpose?.description" disabled />
-                <input
-                    class="input-field"
-                    :value="goodsIssue.purpose?.detailsConstraint || 'N/D'"
-                    disabled
-                />
+                <input class="input-field" :value="goodsIssue.purpose?.details || 'N/D'" disabled />
             </div>
 
-            <input class="input-field" :value="goodsIssue.purpose?.notesType" disabled />
+            <input class="input-field" :value="goodsIssue.purpose?.notes" disabled />
         </form>
 
         <section class="pb-16 sm:pb-5 md:pb-[4.5rem]">
