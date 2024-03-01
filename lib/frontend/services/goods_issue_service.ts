@@ -1,7 +1,7 @@
-import type { GoodsIssueModel, GoodsIssueLine } from "@frontend/models/goods_issue";
 import type { Condition } from "../models/condition";
 import type { PurposeSpecification } from "../models/purpose_specification";
-import type { ItemModel } from "../models/item";
+import type { GoodsIssueLine, GoodsIssue } from "../models/goods_issue";
+import type { GoodsIssueModel } from "../models/goods_issue_read";
 
 interface Line {
     itemId: string;
@@ -17,7 +17,7 @@ interface GoodsIssueDTO {
 }
 
 export class GoodsIssueService {
-    async new(goodsIssue: GoodsIssueModel) {
+    async new(goodsIssue: GoodsIssue) {
         const data = this.#toGoodsIssueDTO(goodsIssue);
 
         return await $fetch("/api/goods-issue", {
@@ -26,21 +26,8 @@ export class GoodsIssueService {
         });
     }
 
-    async searchItems(
-        query: string,
-        goodsIssueId: string,
-        pageToken: number = 1,
-        perPage: number = 8
-    ): Promise<{ items: ItemModel[]; total: number }> {
-        return { items: [], total: 1 };
-    }
-
-    async listItems(
-        goodsIssueId: string,
-        pageToken: number = 1,
-        perPage: number = 8
-    ): Promise<{ items: ItemModel[]; total: number }> {
-        return { items: [], total: 1 };
+    async getById(id: string): Promise<GoodsIssueModel> {
+        return await $fetch(`/api/goods-issue/${id}`, { method: "get" });
     }
 
     #toGoodsIssueLine(line: GoodsIssueLine): Line {
@@ -54,7 +41,7 @@ export class GoodsIssueService {
         };
     }
 
-    #toGoodsIssueDTO(goodsIssue: GoodsIssueModel): GoodsIssueDTO {
+    #toGoodsIssueDTO(goodsIssue: GoodsIssue): GoodsIssueDTO {
         return {
             total: goodsIssue.total.replace(/\s/g, ""),
             returnDate: goodsIssue.returnDate,

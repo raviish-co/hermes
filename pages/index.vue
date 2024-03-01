@@ -2,11 +2,9 @@
 import type { AddLineDialog, DescribeLineStatusDialog, ChoosePurpose } from "#build/components";
 import { convertToNumber } from "@frontend/helpers/convert_to_number";
 import { GoodsIssueService } from "@frontend/services/goods_issue_service";
-import type { GoodsIssueLine, GoodsIssueModel } from "@frontend/models/goods_issue";
+import type { GoodsIssueLine, GoodsIssue } from "@frontend/models/goods_issue";
 import { handleException } from "@frontend/helpers/error_handler";
 import { formatCurrency } from "@frontend/helpers/format_currency";
-import { CatalogService } from "@frontend/services/catalog_service";
-import type { ItemModel } from "@frontend/models/item";
 import { getCurrentLocalDateTime } from "@frontend/helpers/current_local_date_time";
 import { joinVariationValues } from "~/lib/frontend/helpers/join_variation_values";
 
@@ -24,11 +22,8 @@ const grandTotal = ref<string>("0,00");
 const returnDate = ref<string>(getCurrentLocalDateTime());
 const selectedLine = ref<GoodsIssueLine>({} as GoodsIssueLine);
 const isValidPurpose = ref<boolean>(false);
-const items = ref<ItemModel[]>([]);
-const itemPages = ref<number>(1);
 
 const goodsIssueService = new GoodsIssueService();
-const catalogService = new CatalogService();
 
 function validateQuantitiesInStock(): boolean {
     const invalidLineOrUndefined = goodsIssueLines.value.find((i) => i.quantity > i.stock);
@@ -52,7 +47,7 @@ const isValidGoodsIssue = computed(() => {
 function newGoodsIssue() {
     purposeDetail.value = purposeDetail.value === DETAILS ? "" : purposeDetail.value;
 
-    const goodsIssue: GoodsIssueModel = {
+    const goodsIssue: GoodsIssue = {
         returnDate: returnDate.value,
         total: grandTotal.value,
         purposeSpecification: {
@@ -164,48 +159,6 @@ function updatePurposeNotesType(notesType: string) {
 function updateIsValidPurpose(value: boolean) {
     isValidPurpose.value = value;
 }
-
-function listItems(pageToken: number = 1) {
-    catalogService.listItems(pageToken).then(({ items: i, total }) => {
-        items.value = i;
-        itemPages.value = total;
-
-        addLineDialogRef.value?.initializeQuantities();
-    });
-}
-
-function searchItems(searchText: string, pageToken: number = 1) {
-    if (searchText.length === 0) {
-        listItems();
-        return;
-    }
-
-    if (searchText.length < 3) return;
-
-    catalogService.searchItems(searchText, pageToken).then(({ items: i, total }) => {
-        items.value = i;
-        itemPages.value = total;
-
-        addLineDialogRef.value?.initializeQuantities();
-    });
-}
-
-function changePageToken(searchText: string, pageToken: number) {
-    if (searchText.length >= 3) {
-        searchItems(searchText, pageToken);
-        return;
-    }
-
-    listItems(pageToken);
-}
-
-onMounted(() => {
-    listItems();
-});
-
-onBeforeRouteUpdate(() => {
-    listItems();
-});
 </script>
 
 <template>
@@ -338,11 +291,7 @@ onBeforeRouteUpdate(() => {
     <AddLineDialog
         ref="addLineDialogRef"
         :goods-issue-lines="goodsIssueLines"
-        :items="items"
-        :pages="itemPages"
         @added="calculateGrandTotal"
-        @input="searchItems"
-        @page-token-changed="changePageToken"
     />
 
     <DescribeLineStatusDialog :line="selectedLine" ref="describeLineStatusDialogRef" />

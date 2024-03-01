@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
-import type { GoodsIssueLine } from "@frontend/models/goods_issue";
+import type { GoodsIssueLineBase } from "@frontend/models/goods_issue_base";
 
 export type Status = "Bom" | "Mau";
 
 interface Props {
-    line: GoodsIssueLine;
+    line: GoodsIssueLineBase;
 }
 
 const BAD = "Mau";

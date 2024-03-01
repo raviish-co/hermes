@@ -5,35 +5,22 @@ import type { ItemModel } from "@frontend/models/item";
 import { formatCurrency } from "@frontend/helpers/format_currency";
 import type { GoodsIssueLine } from "@frontend/models/goods_issue";
 import { joinVariationValues } from "~/lib/frontend/helpers/join_variation_values";
+import { CatalogService } from "@frontend/services/catalog_service";
 
-interface Props {
-    goodsIssueLines: GoodsIssueLine[];
-    items: ItemModel[];
-    pages: number;
-}
-
-interface Emits {
-    (e: "added"): void;
-    (e: "input", value: string): void;
-    (e: "pageTokenChanged", searchText: string, pageToken: number): void;
-}
+const catalogService = new CatalogService();
 
 const dialogRef = ref<typeof VDialog>();
 const searchText = ref<string>("");
 const total = ref<string>("0,00");
 const quantities = ref<number[]>([]);
+const items = ref<ItemModel[]>([]);
+const pages = ref<number>(1);
 
-const props = defineProps<Props>();
-const emits = defineEmits<Emits>();
+const props = defineProps<{ goodsIssueLines: GoodsIssueLine[] }>();
+const emits = defineEmits<{ (e: "added"): void }>();
 
 function itemExistInGoodsIssueLines(itemId: string): boolean {
     return props.goodsIssueLines.some((i) => i.itemId == itemId);
-}
-
-function emitLineAdded(item: ItemModel, idx: number) {
-    addLine(item, idx);
-
-    emits("added");
 }
 
 function validateQuantity(stock: number, quantity: number): boolean {
@@ -64,30 +51,59 @@ function addLine(item: ItemModel, idx: number) {
     total.value = calculateTotal(item.price, quantity);
 
     const newLine = toGoodsIssueLine(item, quantity, total.value);
+
     props.goodsIssueLines.push(newLine);
 
     quantities.value[idx] = 1;
+
+    emits("added");
 }
 
 function initializeQuantities() {
-    props.items.forEach((_, idx) => (quantities.value[idx] = 1));
+    items.value.forEach((_, idx) => (quantities.value[idx] = 1));
 }
 
 function canEditQuantity(item: ItemModel): boolean {
     return item.quantity > 0;
 }
 
-function emitInputValue() {
-    emits("input", searchText.value);
-}
-
-function emitChangePageToken(pageToken: number) {
-    emits("pageTokenChanged", searchText.value, pageToken);
-}
-
 function showDialog() {
-    initializeQuantities();
+    listItems();
     dialogRef.value?.show();
+}
+
+function listItems(pageToken: number = 1) {
+    catalogService.listItems(pageToken).then(({ items: i, total }) => {
+        items.value = i;
+        pages.value = total;
+
+        initializeQuantities();
+    });
+}
+
+function searchItems(pageToken: number = 1) {
+    if (searchText.value.length === 0) {
+        listItems();
+        return;
+    }
+
+    if (searchText.value.length < 3) return;
+
+    catalogService.searchItems(searchText.value, pageToken).then(({ items: i, total }) => {
+        items.value = i;
+        pages.value = total;
+
+        initializeQuantities();
+    });
+}
+
+function changePageToken(pageToken: number) {
+    if (searchText.value.length >= 3) {
+        searchItems(pageToken);
+        return;
+    }
+
+    listItems(pageToken);
 }
 
 defineExpose({ show: showDialog, initializeQuantities });
@@ -100,7 +116,7 @@ defineExpose({ show: showDialog, initializeQuantities });
             type="search"
             v-model="searchText"
             class="input-field"
-            @input="emitInputValue"
+            @input="() => searchItems()"
         />
 
         <div class="overflow-x-auto w-full">
@@ -120,7 +136,7 @@ defineExpose({ show: showDialog, initializeQuantities });
                         class="hover:bg-gray-50"
                         :class="{ hidden: itemExistInGoodsIssueLines(item.itemId) }"
                     >
-                        <td class="cursor-pointer" @click="emitLineAdded(item, idx)">
+                        <td class="cursor-pointer" @click="addLine(item, idx)">
                             <span>
                                 {{ item.name }}
                             </span>
@@ -145,8 +161,8 @@ defineExpose({ show: showDialog, initializeQuantities });
                                 :disabled="!canEditQuantity(item)"
                                 class="input-number"
                                 :max="item.quantity"
-                                @keypress.enter="emitLineAdded(item, idx)"
-                                @keydown.tab="emitLineAdded(item, idx)"
+                                @keypress.enter="addLine(item, idx)"
+                                @keydown.tab="addLine(item, idx)"
                             />
                         </td>
                     </tr>
@@ -158,6 +174,6 @@ defineExpose({ show: showDialog, initializeQuantities });
             </table>
         </div>
 
-        <ThePagination :total="pages" @changed="emitChangePageToken" />
+        <ThePagination :total="pages" @changed="changePageToken" />
     </VDialog>
 </template>
