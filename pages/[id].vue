@@ -8,6 +8,7 @@ import { handleException } from "~/lib/frontend/helpers/error_handler";
 import { GoodsReturnService } from "~/lib/frontend/services/goods_return_service";
 
 const route = useRoute();
+
 const GOODS_ISSUE_ID = route.params.id as string;
 
 const describeLineStatusDialogRef = ref<typeof DescribeLineStatusDialog>();

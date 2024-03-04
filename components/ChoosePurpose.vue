@@ -13,6 +13,7 @@ const PURPOSE = "Finalidade";
 const DETAILS = "Detalhes";
 
 const purposes = usePurpose().purposes;
+
 const currentNotesType = ref<string>("");
 const currentDetail = ref<string>(DETAILS);
 const currentDescription = ref<string>(PURPOSE);

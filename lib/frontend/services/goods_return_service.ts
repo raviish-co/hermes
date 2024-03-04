@@ -13,9 +13,13 @@ interface NewGoodsReturnData {
 }
 
 export class GoodsReturnService {
-    async new(goodsIssueId: string, retainedSecurityDeposit: string, lines: GoodsIssueLineBase[]) {
+    async new(
+        goodsIssueNoteId: string,
+        retainedSecurityDeposit: string,
+        lines: GoodsIssueLineBase[]
+    ) {
         const data: NewGoodsReturnData = {
-            goodsIssueNoteId: goodsIssueId,
+            goodsIssueNoteId,
             securityDepositWithHeld: retainedSecurityDeposit,
             itemsData: lines.map(this.#toItemDTO),
         };
