@@ -1,7 +1,7 @@
 import { convertToNumber } from "../helpers/convert_to_number";
 import { formatCurrency } from "../helpers/format_currency";
 
-export class GoodsIssueCalculation {
+export class GoodsIssueCalculationService {
     #grandTotal: number = 0;
     #securityDeposit: number = 0;
 

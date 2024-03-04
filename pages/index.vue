@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import type { AddLineDialog, DescribeLineStatusDialog, ChoosePurpose } from "#build/components";
 import { GoodsIssueService } from "@frontend/services/goods_issue_service";
-import type { GoodsIssueLine, GoodsIssue } from "@frontend/models/_goods_issue";
+import type { GoodsIssueLine, GoodsIssue } from "@frontend/models/goods_issue";
 import { handleException } from "@frontend/helpers/error_handler";
 import { getCurrentLocalDateTime } from "@frontend/helpers/current_local_date_time";
 import { joinVariationValues } from "~/lib/frontend/helpers/join_variation_values";
-import { GoodsIssueCalculation } from "~/lib/frontend/services/goods_issue_calculation";
+import { GoodsIssueCalculationService } from "~/lib/frontend/services/goods_issue_calculation_service";
 
 const DETAILS = "Detalhes";
 
@@ -24,7 +24,7 @@ const selectedLine = ref<GoodsIssueLine>({} as GoodsIssueLine);
 const isValidPurpose = ref<boolean>(false);
 
 const goodsIssueService = new GoodsIssueService();
-const goodsIssueCalculation = new GoodsIssueCalculation();
+const goodsIssueCalculationService = new GoodsIssueCalculationService();
 
 function validateQuantitiesInStock(): boolean {
     const invalidLineOrUndefined = goodsIssueLines.value.find((i) => i.quantity > i.stock);
@@ -82,20 +82,20 @@ function clearGoodsIssueLines() {
 function calculateLineTotal(line: GoodsIssueLine): void {
     if (line.quantity > line.stock) {
         line.total = "0,00";
-        goodsIssueCalculation.calculateLineTotal(line.price, 0);
+        goodsIssueCalculationService.calculateLineTotal(line.price, 0);
         return;
     }
 
-    line.total = goodsIssueCalculation.calculateLineTotal(line.price, line.quantity);
+    line.total = goodsIssueCalculationService.calculateLineTotal(line.price, line.quantity);
 }
 
 function performCalculations() {
-    goodsIssueCalculation.initializeGrandTotalAndSecurityDeposit();
+    goodsIssueCalculationService.initializeGrandTotalAndSecurityDeposit();
 
     goodsIssueLines.value.forEach(calculateLineTotal);
 
-    grandTotal.value = goodsIssueCalculation.grandTotal;
-    securityDeposit.value = goodsIssueCalculation.securityDeposit;
+    grandTotal.value = goodsIssueCalculationService.grandTotal;
+    securityDeposit.value = goodsIssueCalculationService.securityDeposit;
 }
 
 function showAddLineDialog() {
