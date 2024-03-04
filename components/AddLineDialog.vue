@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
-import { convertToNumber } from "@frontend/helpers/convert_to_number";
 import type { ItemModel } from "@frontend/models/item";
-import { formatCurrency } from "@frontend/helpers/format_currency";
-import type { GoodsIssueLine } from "@frontend/models/goods_issue";
+import type { GoodsIssueLine } from "@frontend/models/_goods_issue";
 import { joinVariationValues } from "~/lib/frontend/helpers/join_variation_values";
 import { CatalogService } from "@frontend/services/catalog_service";
 
@@ -11,7 +9,6 @@ const catalogService = new CatalogService();
 
 const dialogRef = ref<typeof VDialog>();
 const searchText = ref<string>("");
-const total = ref<string>("0,00");
 const quantities = ref<number[]>([]);
 const items = ref<ItemModel[]>([]);
 const pages = ref<number>(1);
@@ -31,14 +28,8 @@ function validateQuantity(stock: number, quantity: number): boolean {
     return true;
 }
 
-function calculateTotal(price: string, quantity: number): string {
-    const p = convertToNumber(price);
-    const total = (p * quantity) / 100;
-    return formatCurrency(total);
-}
-
-function toGoodsIssueLine(item: ItemModel, quantity: number, total: string): GoodsIssueLine {
-    return { ...item, stock: item.quantity, quantity, total };
+function toGoodsIssueLine(item: ItemModel, quantity: number): GoodsIssueLine {
+    return { ...item, stock: item.quantity, quantity, total: "0,00" };
 }
 
 function addLine(item: ItemModel, idx: number) {
@@ -48,13 +39,9 @@ function addLine(item: ItemModel, idx: number) {
 
     if (itemExistInGoodsIssueLines(item.itemId)) return;
 
-    total.value = calculateTotal(item.price, quantity);
-
-    const newLine = toGoodsIssueLine(item, quantity, total.value);
+    const newLine = toGoodsIssueLine(item, quantity);
 
     props.goodsIssueLines.push(newLine);
-
-    quantities.value[idx] = 1;
 
     emits("added");
 }

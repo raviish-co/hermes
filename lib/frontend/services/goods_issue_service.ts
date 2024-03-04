@@ -1,7 +1,7 @@
 import type { Condition } from "../models/condition";
 import type { PurposeSpecification } from "../models/purpose_specification";
 import type { GoodsIssueLine, GoodsIssue } from "../models/goods_issue";
-import type { GoodsIssueModel } from "../models/goods_issue_read";
+import type { GoodsIssueNoteModel } from "../models/goods_issue_note";
 
 interface Line {
     itemId: string;
@@ -26,7 +26,7 @@ export class GoodsIssueService {
         });
     }
 
-    async getById(id: string): Promise<GoodsIssueModel> {
+    async getById(id: string): Promise<GoodsIssueNoteModel> {
         return await $fetch(`/api/goods-issue/${id}`, { method: "get" });
     }
 

@@ -1,12 +1,14 @@
 import type { GoodsIssueBase, GoodsIssueLineBase } from "./goods_issue_base";
 
-export interface GoodsIssueModel extends GoodsIssueBase {
+interface Purpose {
+    description: string;
+    details?: string;
+    notes?: string;
+}
+
+export interface GoodsIssueNoteModel extends GoodsIssueBase {
     goodsIssueNoteId: string;
-    purpose: {
-        description: string;
-        details?: string;
-        notes?: string;
-    };
+    purpose: Purpose;
     status: string;
     securityDeposit: string;
     lines: GoodsIssueLineBase[];
