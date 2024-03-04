@@ -1,6 +1,6 @@
 import { GoodsIssueNoteHasAlreadyBeenReturned } from "../domain/goods_issue/goods_issue_note_has_already_been_returned_error";
 import type { GoodsIssueNoteNotFound } from "../domain/goods_issue/goods_issue_note_not_found_error";
-import type { GoodsIssueRepository } from "../domain/goods_issue/goods_issue_note_repository";
+import type { GoodsIssueNoteRepository } from "../domain/goods_issue/goods_issue_note_repository";
 import type { PurposeSpecification } from "../domain/goods_issue/purpose_specification";
 import { GoodsIssueNoteBuilder } from "../domain/goods_issue/goods_issue_builder";
 import type { SequenceGenerator } from "../domain/sequences/sequence_generator";
@@ -19,30 +19,27 @@ import { ID } from "../shared/id";
 
 export class GoodsIssueService {
     #itemRepository: ItemRepository;
-    #goodsIssueRepository: GoodsIssueRepository;
+    #goodsIssueNoteRepository: GoodsIssueNoteRepository;
     #sequenceGenerator: SequenceGenerator;
     #purposeSpecification: PurposeSpecification;
 
     constructor(
         itemRepository: ItemRepository,
-        goodsIssueRepository: GoodsIssueRepository,
+        goodsIssueNoteRepository: GoodsIssueNoteRepository,
         sequenceGenerator: SequenceGenerator,
         purposeSpecification: PurposeSpecification
     ) {
         this.#itemRepository = itemRepository;
-        this.#goodsIssueRepository = goodsIssueRepository;
+        this.#goodsIssueNoteRepository = goodsIssueNoteRepository;
         this.#sequenceGenerator = sequenceGenerator;
         this.#purposeSpecification = purposeSpecification;
     }
 
-    async new(data: GoodsIssueDTO): Promise<Either<GoodsIssueNoteError, void>> {
-        const purpose = new Purpose(
-            data.purposeSpecification.description,
-            data.purposeSpecification.detailsConstraint,
-            data.purposeSpecification.notes
-        );
-        if (!this.#purposeSpecification.isSatisfiedBy(purpose))
-            return left(new InvalidPurpose(data.purposeSpecification.description));
+    async new(data: GoodsIssueNoteDTO): Promise<Either<GoodsIssueNoteError, void>> {
+        const purpose = this.#buildPurpose(data.purpose);
+        if (!this.#purposeSpecification.isSatisfiedBy(purpose)) {
+            return left(new InvalidPurpose(data.purpose.description));
+        }
 
         const itemsIds = this.#buildItemsIds(data.lines);
         const itemsOrErr = await this.#itemRepository.findAll(itemsIds);
@@ -52,12 +49,12 @@ export class GoodsIssueService {
         const linesOrErr = this.#buildGoodsIssueLines(items, data.lines);
         if (linesOrErr.isLeft()) return left(linesOrErr.value);
 
-        const issueId = this.#sequenceGenerator.generate(Sequence.GoodIssueNote);
         const lines = linesOrErr.value;
+        const noteId = this.#sequenceGenerator.generate(Sequence.GoodIssueNote);
         const noteOrError = new GoodsIssueNoteBuilder()
+            .withGoodsIssueNoteId(noteId)
             .withPurpose(purpose)
             .withReturnDate(data.returnDate)
-            .withGoodsIssueNoteId(issueId)
             .withUser(data.userId)
             .withLines(lines)
             .build();
@@ -66,7 +63,7 @@ export class GoodsIssueService {
 
         if (!noteOrError.value.isSameTotal(data.total)) return left(new InvalidTotal());
 
-        await this.#goodsIssueRepository.save(noteOrError.value);
+        await this.#goodsIssueNoteRepository.save(noteOrError.value);
 
         await this.#itemRepository.updateAll(items);
 
@@ -74,21 +71,23 @@ export class GoodsIssueService {
     }
 
     async list(): Promise<GoodsIssueNote[]> {
-        return await this.#goodsIssueRepository.getAll();
+        return await this.#goodsIssueNoteRepository.getAll();
     }
 
-    async get(goodsIssueNoteId: string): Promise<Either<GoodsIssueNoteNotFound, GoodsIssueNote>> {
-        const noteOrErr = await this.#goodsIssueRepository.getById(ID.fromString(goodsIssueNoteId));
-
+    async get(noteId: string): Promise<Either<GoodsIssueNoteNotFound, GoodsIssueNote>> {
+        const noteOrErr = await this.#goodsIssueNoteRepository.getById(ID.fromString(noteId));
         if (noteOrErr.isLeft()) return left(noteOrErr.value);
 
         const note = noteOrErr.value;
-
         if (note.isReturned()) {
             return left(new GoodsIssueNoteHasAlreadyBeenReturned(note.goodsIssueNoteId.toString()));
         }
 
         return right(noteOrErr.value);
+    }
+
+    #buildPurpose(data: PurposeDTO) {
+        return new Purpose(data.description, data.detailsConstraint, data.notes);
     }
 
     #buildItemsIds(lines: GoodIssueLineDTO[]): ID[] {
@@ -124,12 +123,8 @@ export class GoodsIssueService {
     }
 }
 
-type GoodsIssueDTO = {
-    purposeSpecification: {
-        description: string;
-        detailsConstraint?: string;
-        notes?: string;
-    };
+type GoodsIssueNoteDTO = {
+    purpose: PurposeDTO;
     lines: GoodIssueLineDTO[];
     userId: string;
     total: string;
@@ -140,6 +135,12 @@ type GoodIssueLineDTO = {
     itemId: string;
     quantity: number;
     condition?: Condition;
+};
+
+type PurposeDTO = {
+    description: string;
+    detailsConstraint?: string;
+    notes?: string;
 };
 
 type Condition = {

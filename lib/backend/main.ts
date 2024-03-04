@@ -1,5 +1,5 @@
 import { DefaultPurposeSpecification } from "./adapters/default_purpose_specification";
-import { InmemGoodsIssueRepository } from "./persistense/inmem/inmem_goods_issue_repository";
+import { InmemGoodsIssueNoteRepository } from "./persistense/inmem/inmem_goods_issue_note_repository";
 import { VariationRepositoryStub } from "./tests/stubs/variation_repository_stub";
 import { InmemSequenceStorage } from "./persistense/inmem/inmem_sequence_storage";
 import { SequenceGenerator } from "./domain/sequences/sequence_generator";
@@ -14,7 +14,7 @@ import { GoodsReturnService } from "./application/goods_return_service";
 import { InmemGoodsReturnNoteRepository } from "./persistense/inmem/inmem_goods_return_note_repository";
 
 const itemRepository = new ItemRepositoryStub();
-const goodsIssueRepository = new InmemGoodsIssueRepository();
+const goodsIssueRepository = new InmemGoodsIssueNoteRepository();
 const sequenceStorage = new InmemSequenceStorage();
 const sequenceGenerator = new SequenceGenerator(sequenceStorage);
 const categoryRepository = new CategoryRepositoryStub();

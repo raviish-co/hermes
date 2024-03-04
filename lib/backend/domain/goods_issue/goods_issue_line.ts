@@ -18,7 +18,7 @@ export class GoodsIssueLine {
         this.#netTotal = this.item.price.multiply(factor);
     }
 
-    restoreQuantity(): void {
+    restoreStockQuantity(): void {
         this.item.updateStock(this.quantity);
     }
 

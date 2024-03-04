@@ -1,4 +1,4 @@
-import { InmemGoodsIssueRepository } from "../../persistense/inmem/inmem_goods_issue_repository";
+import { InmemGoodsIssueNoteRepository } from "../../persistense/inmem/inmem_goods_issue_note_repository";
 import type { ItemRepository } from "../../domain/catalog/item_repository";
 import { InsufficientStock } from "../../domain/catalog/insufficient_stock_error";
 import { DefaultPurposeSpecification } from "../../adapters/default_purpose_specification";
@@ -9,7 +9,7 @@ import { InvalidTotal } from "../../domain/goods_issue/invalid_total_error";
 import { GoodsIssueService } from "../../application/goods_issue_service";
 import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
-import type { GoodsIssueRepository } from "../../domain/goods_issue/goods_issue_note_repository";
+import type { GoodsIssueNoteRepository } from "../../domain/goods_issue/goods_issue_note_repository";
 import { GoodsIssueRepositoryStub } from "../stubs/goods_issue_repository_stub";
 import type { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
@@ -19,10 +19,7 @@ import { GoodsIssueNoteHasAlreadyBeenReturned } from "../../domain/goods_issue/g
 
 describe("Test Goods Issue", () => {
     it("Deve retornar error **InvalidPurpose** se não existir", async () => {
-        const data = {
-            ...goodsIssueData,
-            purposeSpecification: { description: "Alguel" },
-        };
+        const data = { ...goodsIssueData, purpose: { description: "Alguel" } };
         const { service } = makeService();
 
         const error = await service.new(data);
@@ -200,7 +197,7 @@ describe("Test Goods Issue", () => {
     it("Deve ser adicionada a nota de saída de mercadoria, caso a finalidade tenha um nota", async () => {
         const data = {
             ...goodsIssueData,
-            purposeSpecification: {
+            purpose: {
                 description: "Lavandaria",
                 detailsConstraint: "Externa",
                 notes: "John Doe",
@@ -303,7 +300,7 @@ describe("List Goods Issue Notes", () => {
 
 describe("Get Goods Issue Note", () => {
     it("Deve retornar **GoodsIssueNoteFound** se a guia de saída não existir", async () => {
-        const goodsIssueRepository = new InmemGoodsIssueRepository();
+        const goodsIssueRepository = new InmemGoodsIssueNoteRepository();
 
         const { service } = makeService({ goodsIssueRepository });
 
@@ -340,7 +337,7 @@ describe("Get Goods Issue Note", () => {
 });
 
 const goodsIssueData = {
-    purposeSpecification: {
+    purpose: {
         description: "Lavandaria",
         detailsConstraint: "Interna",
         notes: "Nome",
@@ -364,13 +361,13 @@ const goodsIssueData = {
 
 interface Dependencies {
     itemRepository?: ItemRepository;
-    goodsIssueRepository?: GoodsIssueRepository;
+    goodsIssueRepository?: GoodsIssueNoteRepository;
 }
 
 function makeService(deps?: Dependencies) {
     const purposeSource = new DefaultPurposeSpecification();
     const itemRepository = deps?.itemRepository ?? new ItemRepositoryStub();
-    const goodsIssueRepository = deps?.goodsIssueRepository ?? new InmemGoodsIssueRepository();
+    const goodsIssueRepository = deps?.goodsIssueRepository ?? new InmemGoodsIssueNoteRepository();
     const storage = new InmemSequenceStorage();
     const generator = new SequenceGenerator(storage, 1000);
     const service = new GoodsIssueService(

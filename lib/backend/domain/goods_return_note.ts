@@ -4,11 +4,11 @@ import { ID } from "../shared/id";
 export class GoodsReturnNote {
     readonly goodsReturnsNoteId: ID;
     readonly goodsIssueNoteId: ID;
-    readonly securityDepositWithHeld: Decimal;
+    readonly securityDepositToBeRetained: Decimal;
 
-    constructor(goodsReturnNoteId: ID, goodsIssueNoteId: ID, securityDepositWithHeld: string) {
+    constructor(goodsReturnNoteId: ID, goodsIssueNoteId: ID, securityDepositToBeRetained: string) {
         this.goodsReturnsNoteId = goodsReturnNoteId;
         this.goodsIssueNoteId = goodsIssueNoteId;
-        this.securityDepositWithHeld = Decimal.fromString(securityDepositWithHeld);
+        this.securityDepositToBeRetained = Decimal.fromString(securityDepositToBeRetained);
     }
 }
