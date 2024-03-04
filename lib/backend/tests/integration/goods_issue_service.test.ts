@@ -15,6 +15,7 @@ import type { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
 import { describe, expect, it, vi } from "vitest";
 import { ID } from "../../shared/id";
+import { GoodsIssueNoteHasAlreadyBeenReturned } from "../../domain/goods_issue/goods_issue_note_has_already_been_returned_error";
 
 describe("Test Goods Issue", () => {
     it("Deve retornar error **InvalidPurpose** se não existir", async () => {
@@ -321,6 +322,20 @@ describe("Get Goods Issue Note", () => {
 
         expect(goodsIssueOrErr.isRight()).toBeTruthy();
         expect(goodsIssue.goodsIssueNoteId.toString()).toEqual("GS - 1000");
+    });
+
+    it("Deve retornar **GoodsIssueHasBenWilhd** se a guia de saída de mercadoria já foi devolvida", async () => {
+        const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsIssueOrErr = await goodsIssueRepository.getById(ID.fromString("GS - 1000"));
+        const goodsIssue = <GoodsIssueNote>goodsIssueOrErr.value;
+        goodsIssue.returnTheGoods();
+
+        const { service } = makeService({ goodsIssueRepository });
+
+        const error = await service.get("GS - 1000");
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(GoodsIssueNoteHasAlreadyBeenReturned);
     });
 });
 

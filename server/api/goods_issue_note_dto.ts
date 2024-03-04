@@ -7,7 +7,7 @@ interface GoodsIssueLineDTO {
     itemId: string;
     quantity: number;
     fulltext: string;
-    variations: string[];
+    variationValues: string[];
 }
 
 interface GoodsIssueNoteDTO {
@@ -26,7 +26,9 @@ function toGoodsIssueLineDTO(line: GoodsIssueLine): GoodsIssueLineDTO {
         quantity: line.quantity,
         name: line.item.name,
         fulltext: line.item.fulltext,
-        variations: Object.values(line.item.variations).map((variation) => variation.toString()),
+        variationValues: Object.values(line.item.variations).map((variation) =>
+            variation.toString()
+        ),
     };
 }
 
