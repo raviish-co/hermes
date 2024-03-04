@@ -1,13 +1,10 @@
-import type { GoodsIssueLineBase, GoodsIssueBase } from "./goods_issue_base";
-import type { PurposeSpecification } from "./purpose_specification";
+import type { GoodsIssueBase, GoodsIssueLineBase } from "./goods_issue_base";
+import type { PurposeModel } from "./purpose";
 
-export interface GoodsIssueLine extends GoodsIssueLineBase {
-    price: string;
-    stock: number;
-    total: string;
-}
-
-export interface GoodsIssue extends GoodsIssueBase {
-    purposeSpecification: PurposeSpecification;
-    lines: GoodsIssueLine[];
+export interface GoodsIssueModel extends GoodsIssueBase {
+    purpose: PurposeModel;
+    goodsIssueId: string;
+    status: string;
+    securityDeposit: string;
+    lines: GoodsIssueLineBase[];
 }

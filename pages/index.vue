@@ -1,18 +1,18 @@
 <script lang="ts" setup>
 import type { AddLineDialog, DescribeLineStatusDialog, ChoosePurpose } from "#build/components";
-import { convertToNumber } from "@frontend/helpers/convert_to_number";
 import { GoodsIssueService } from "@frontend/services/goods_issue_service";
-import type { GoodsIssueLine, GoodsIssue } from "@frontend/models/goods_issue";
+import type { GoodsIssueLine, GoodsIssue } from "@frontend/models/_goods_issue";
 import { handleException } from "@frontend/helpers/error_handler";
-import { formatCurrency } from "@frontend/helpers/format_currency";
 import { getCurrentLocalDateTime } from "@frontend/helpers/current_local_date_time";
 import { joinVariationValues } from "~/lib/frontend/helpers/join_variation_values";
+import { GoodsIssueCalculation } from "~/lib/frontend/services/goods_issue_calculation";
 
 const DETAILS = "Detalhes";
 
 const choosePurposeRef = ref<typeof ChoosePurpose>();
 const addLineDialogRef = ref<typeof AddLineDialog>();
 const describeLineStatusDialogRef = ref<typeof DescribeLineStatusDialog>();
+
 const purposeNotesType = ref<string>("");
 const purposeDetail = ref<string>("");
 const purposeDescription = ref<string>("");
@@ -24,6 +24,7 @@ const selectedLine = ref<GoodsIssueLine>({} as GoodsIssueLine);
 const isValidPurpose = ref<boolean>(false);
 
 const goodsIssueService = new GoodsIssueService();
+const goodsIssueCalculation = new GoodsIssueCalculation();
 
 function validateQuantitiesInStock(): boolean {
     const invalidLineOrUndefined = goodsIssueLines.value.find((i) => i.quantity > i.stock);
@@ -69,54 +70,32 @@ function newGoodsIssue() {
 
 function removeGoodsIssueLine(id: string): void {
     goodsIssueLines.value = goodsIssueLines.value.filter((l) => l.itemId !== id);
-    calculateGrandTotal();
+    performCalculations();
 }
 
 function clearGoodsIssueLines() {
     goodsIssueLines.value = [];
-    clearGrandTotalAndSecurityDeposit();
-}
-
-function clearGrandTotalAndSecurityDeposit() {
     grandTotal.value = "0,00";
     securityDeposit.value = "0,00";
 }
 
-function calculateSecurityDeposit() {
-    const total = convertToNumber(grandTotal.value);
-    const doubleTotal = (total * 2) / 100;
-    securityDeposit.value = formatCurrency(doubleTotal);
-}
-
-function calculateLineTotal(line: GoodsIssueLine): number {
+function calculateLineTotal(line: GoodsIssueLine): void {
     if (line.quantity > line.stock) {
         line.total = "0,00";
-        return 0;
+        goodsIssueCalculation.calculateLineTotal(line.price, 0);
+        return;
     }
 
-    const price = convertToNumber(line.price);
-
-    const total = price * line.quantity;
-
-    line.total = formatCurrency(total / 100);
-
-    return total;
+    line.total = goodsIssueCalculation.calculateLineTotal(line.price, line.quantity);
 }
 
-function calculateGrandTotal() {
-    clearGrandTotalAndSecurityDeposit();
+function performCalculations() {
+    goodsIssueCalculation.initializeGrandTotalAndSecurityDeposit();
 
-    goodsIssueLines.value.forEach((line) => {
-        const lineTotal = calculateLineTotal(line);
+    goodsIssueLines.value.forEach(calculateLineTotal);
 
-        const total = convertToNumber(grandTotal.value);
-
-        const result = (lineTotal + total) / 100;
-
-        grandTotal.value = formatCurrency(result);
-
-        calculateSecurityDeposit();
-    });
+    grandTotal.value = goodsIssueCalculation.grandTotal;
+    securityDeposit.value = goodsIssueCalculation.securityDeposit;
 }
 
 function showAddLineDialog() {
@@ -137,6 +116,7 @@ function showDescribeLineStatusDialog(line: GoodsIssueLine) {
 
 function clearValues() {
     returnDate.value = getCurrentLocalDateTime();
+
     goodsIssueLines.value = [];
     grandTotal.value = "0,00";
     securityDeposit.value = "0,00";
@@ -236,7 +216,7 @@ function updateIsValidPurpose(value: boolean) {
                                         class="input-number"
                                         min="1"
                                         :max="line.stock"
-                                        @input="calculateGrandTotal"
+                                        @input="performCalculations"
                                     />
                                 </td>
                                 <td class="text-right">{{ line.price }}</td>
@@ -291,7 +271,7 @@ function updateIsValidPurpose(value: boolean) {
     <AddLineDialog
         ref="addLineDialogRef"
         :goods-issue-lines="goodsIssueLines"
-        @added="calculateGrandTotal"
+        @added="performCalculations"
     />
 
     <DescribeLineStatusDialog :line="selectedLine" ref="describeLineStatusDialogRef" />

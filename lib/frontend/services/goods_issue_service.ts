@@ -1,7 +1,7 @@
 import type { Condition } from "../models/condition";
 import type { PurposeSpecification } from "../models/purpose_specification";
-import type { GoodsIssueLine, GoodsIssue } from "../models/goods_issue";
-import type { GoodsIssueModel } from "../models/goods_issue_read";
+import type { GoodsIssueLine, GoodsIssue } from "../models/_goods_issue";
+import type { GoodsIssueModel } from "../models/goods_issue";
 
 interface Line {
     itemId: string;

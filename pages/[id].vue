@@ -2,7 +2,7 @@
 import type { DescribeLineStatusDialog } from "#build/components";
 import { GoodsIssueService } from "~/lib/frontend/services/goods_issue_service";
 import { joinVariationValues } from "~/lib/frontend/helpers/join_variation_values";
-import type { GoodsIssueModel } from "~/lib/frontend/models/goods_issue_read";
+import type { GoodsIssueModel } from "~/lib/frontend/models/goods_issue";
 import type { GoodsIssueLineBase } from "~/lib/frontend/models/goods_issue_base";
 import { handleException } from "~/lib/frontend/helpers/error_handler";
 import { GoodsReturnService } from "~/lib/frontend/services/goods_return_service";
@@ -11,6 +11,7 @@ const route = useRoute();
 const GOODS_ISSUE_ID = route.params.id as string;
 
 const describeLineStatusDialogRef = ref<typeof DescribeLineStatusDialog>();
+
 const goodsIssue = ref<GoodsIssueModel>({} as GoodsIssueModel);
 const selectedLine = ref<GoodsIssueLineBase>({} as GoodsIssueLineBase);
 const securityDepositInputState = ref<boolean>(true);
@@ -46,8 +47,6 @@ onMounted(() => {
         .getById(GOODS_ISSUE_ID)
         .then((result) => {
             goodsIssue.value = result;
-
-            console.log(result);
 
             retainedSecurityDeposit.value = goodsIssue.value.securityDeposit;
         })
