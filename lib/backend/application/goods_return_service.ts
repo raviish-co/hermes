@@ -1,5 +1,5 @@
 import { InvalidGoodsIssueLineQuantity } from "../domain/goods_issue/invalid_goods_issue_line_quantity_error";
-import type { GoodsIssueRepository } from "../domain/goods_issue/goods_issue_note_repository";
+import type { GoodsIssueNoteRepository } from "../domain/goods_issue/goods_issue_note_repository";
 import type { GoodsReturnNoteRepository } from "../domain/goods_return_note_repository";
 import type { SequenceGenerator } from "../domain/sequences/sequence_generator";
 import type { GoodsIssueLine } from "../domain/goods_issue/goods_issue_line";
@@ -13,13 +13,13 @@ import { ID } from "../shared/id";
 
 export class GoodsReturnService {
     #goodsReturnsNoteRepository: GoodsReturnNoteRepository;
-    #goodsIssueRepository: GoodsIssueRepository;
+    #goodsIssueRepository: GoodsIssueNoteRepository;
     #itemRepository: ItemRepository;
     #sequenceGenerator: SequenceGenerator;
 
     constructor(
         goodsReturnsNoteRepository: GoodsReturnNoteRepository,
-        goodsIssueRepository: GoodsIssueRepository,
+        goodsIssueRepository: GoodsIssueNoteRepository,
         itemRepository: ItemRepository,
         sequenceGenerator: SequenceGenerator
     ) {
@@ -31,7 +31,7 @@ export class GoodsReturnService {
 
     async returningGoods(
         noteId: string,
-        securityDepositWithHeld: string,
+        securityDepositToBeRetained: string,
         itemsData: ItemData[]
     ): Promise<Either<GoodsReturnNoteError, void>> {
         const noteOrErr = await this.#goodsIssueRepository.getById(ID.fromString(noteId));
@@ -40,19 +40,18 @@ export class GoodsReturnService {
         const note = noteOrErr.value;
         const lines = note.goodsIssueLines;
 
-        const voidOrErr = this.#verifyItemsQuantities(itemsData, lines);
+        const voidOrErr = this.#verifyQuantities(itemsData, lines);
         if (voidOrErr.isLeft()) return left(voidOrErr.value);
 
         const items = lines.map((line) => line.item);
-
         const goodsReturnNoteId = this.#generateGoodsReturnNoteId();
         const goodsReturnNote = new GoodsReturnNote(
             goodsReturnNoteId,
             note.goodsIssueNoteId,
-            securityDepositWithHeld
+            securityDepositToBeRetained
         );
 
-        this.#restoreItemsQuantities(lines);
+        this.#restoreStockQuantities(lines);
 
         this.#updateItemsCondition(items, itemsData);
 
@@ -72,9 +71,9 @@ export class GoodsReturnService {
         return ID.fromString(goodsReturnId);
     }
 
-    #restoreItemsQuantities(lines: GoodsIssueLine[]) {
+    #restoreStockQuantities(lines: GoodsIssueLine[]) {
         for (const line of lines) {
-            line.restoreQuantity();
+            line.restoreStockQuantity();
         }
     }
 
@@ -86,7 +85,7 @@ export class GoodsReturnService {
         }
     }
 
-    #verifyItemsQuantities(
+    #verifyQuantities(
         items: ItemData[],
         lines: GoodsIssueLine[]
     ): Either<InvalidGoodsIssueLineQuantity, void> {
@@ -104,10 +103,6 @@ export class GoodsReturnService {
 
     #checkQuantity(line: GoodsIssueLine, quantity: number): boolean {
         return line.quantity === quantity;
-    }
-
-    #getItemsIds(lines: GoodsIssueLine[]): ID[] {
-        return lines.map((line) => line.item.itemId);
     }
 }
 

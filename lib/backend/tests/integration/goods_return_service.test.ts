@@ -79,7 +79,7 @@ describe("GoodsReturnService", () => {
 
         const note = await goodsReturnRepository.last();
 
-        expect(note.securityDepositWithHeld.value).toBe(securityDepositWithHeld);
+        expect(note.securityDepositToBeRetained.value).toBe(securityDepositWithHeld);
     });
 
     it("Deve actualizar o stock dos artigos devolvidos", async () => {

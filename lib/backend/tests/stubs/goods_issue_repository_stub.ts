@@ -2,11 +2,11 @@ import { Item, Status } from "../../domain/catalog/item";
 import { ItemStock } from "../../domain/catalog/item_stock";
 import { GoodsIssueLine } from "../../domain/goods_issue/goods_issue_line";
 import { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
-import { InmemGoodsIssueRepository } from "../../persistense/inmem/inmem_goods_issue_repository";
+import { InmemGoodsIssueNoteRepository } from "../../persistense/inmem/inmem_goods_issue_note_repository";
 import { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
 
-export class GoodsIssueRepositoryStub extends InmemGoodsIssueRepository {
+export class GoodsIssueRepositoryStub extends InmemGoodsIssueNoteRepository {
     constructor() {
         super(
             _goodsIssueData.map(

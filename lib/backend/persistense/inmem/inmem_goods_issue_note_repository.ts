@@ -1,10 +1,10 @@
-import type { GoodsIssueRepository } from "../../domain/goods_issue/goods_issue_note_repository";
+import type { GoodsIssueNoteRepository } from "../../domain/goods_issue/goods_issue_note_repository";
 import { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { ID } from "../../shared/id";
 import { left, right, type Either } from "../../shared/either";
 import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
 
-export class InmemGoodsIssueRepository implements GoodsIssueRepository {
+export class InmemGoodsIssueNoteRepository implements GoodsIssueNoteRepository {
     #goodsIssues: Record<string, GoodsIssueNote> = {};
 
     constructor(notes?: GoodsIssueNote[]) {
@@ -14,11 +14,11 @@ export class InmemGoodsIssueRepository implements GoodsIssueRepository {
     }
 
     getById(goodsIssueId: ID): Promise<Either<GoodsIssueNoteNotFound, GoodsIssueNote>> {
-        const goodsIssue = this.records.find(
+        const goodsIssueNote = this.records.find(
             (g) => g.goodsIssueNoteId.toString() === goodsIssueId.toString()
         );
-        if (!goodsIssue) return Promise.resolve(left(new GoodsIssueNoteNotFound()));
-        return Promise.resolve(right(goodsIssue));
+        if (!goodsIssueNote) return Promise.resolve(left(new GoodsIssueNoteNotFound()));
+        return Promise.resolve(right(goodsIssueNote));
     }
 
     getAll(): Promise<GoodsIssueNote[]> {
