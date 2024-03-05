@@ -1,5 +1,4 @@
 import { convertToNumber } from "./helpers/convert_to_number";
-import { getCurrentLocalDateTime } from "./helpers/current_local_date_time";
 import type { ItemModel } from "./models/item";
 
 export class GoodsIssueLine {
@@ -34,21 +33,20 @@ export class GoodsIssueNote {
     grossTotal: number;
     securityDeposit: number;
     returnDate: string;
-    purpose: string;
+    purpose: Purpose;
 
-    constructor() {
+    constructor(purpose: Purpose, returnDate: string) {
         this.grossTotal = 0;
         this.securityDeposit = 0;
         this.lines = [];
-        this.returnDate = getCurrentLocalDateTime();
-        this.purpose = "";
+        this.returnDate = returnDate;
+        this.purpose = purpose;
     }
 
     addLine(item: ItemModel, quantity: number) {
         const line = new GoodsIssueLine(item, quantity);
         line.calculateTotal();
         this.lines.push(line);
-
         this.#calculate();
     }
 
@@ -76,3 +74,9 @@ export class GoodsIssueNote {
         this.securityDeposit = this.grossTotal * factor;
     }
 }
+
+type Purpose = {
+    description: string;
+    detailsConstraint: string;
+    notes: string;
+};
