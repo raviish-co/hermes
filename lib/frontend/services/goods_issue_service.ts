@@ -12,7 +12,7 @@ interface Line {
 interface GoodsIssueDTO {
     total: string;
     returnDate: string;
-    purposeSpecification: PurposeSpecification;
+    purpose: PurposeSpecification;
     lines: Line[];
 }
 
@@ -45,7 +45,7 @@ export class GoodsIssueService {
         return {
             total: goodsIssue.total.replace(/\s/g, ""),
             returnDate: goodsIssue.returnDate,
-            purposeSpecification: goodsIssue.purposeSpecification,
+            purpose: goodsIssue.purposeSpecification,
             lines: goodsIssue.lines.map(this.#toGoodsIssueLine),
         };
     }
