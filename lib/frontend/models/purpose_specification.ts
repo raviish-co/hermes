@@ -1,5 +1,5 @@
-export interface PurposeSpecification {
+export interface PurposeSpecificationModel {
     description: string;
-    detailsConstraint: string;
-    notes?: string;
+    detailsConstraint?: string[];
+    notesType: string;
 }

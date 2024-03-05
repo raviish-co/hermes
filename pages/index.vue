@@ -1,143 +1,34 @@
 <script lang="ts" setup>
-import type { AddLineDialog, DescribeLineStatusDialog, ChoosePurpose } from "#build/components";
-import { GoodsIssueService } from "@frontend/services/goods_issue_service";
-import type { GoodsIssueLine, GoodsIssue } from "@frontend/models/goods_issue";
-import { handleException } from "@frontend/helpers/error_handler";
+import type { ShowItemsDialog, DescribeConditionDialog, ChoosePurpose } from "#build/components";
 import { getCurrentLocalDateTime } from "@frontend/helpers/current_local_date_time";
-import { joinVariationValues } from "~/lib/frontend/helpers/join_variation_values";
-import { GoodsIssueCalculationService } from "~/lib/frontend/services/goods_issue_calculation_service";
+import { GoodsIssueService } from "@frontend/services/goods_issue_service";
+import { handleException } from "@frontend/helpers/error_handler";
+import { GoodsIssueNote } from "~/lib/frontend/example";
+import type { Condition } from "~/lib/frontend/models/condition";
 
-const DETAILS = "Detalhes";
-
-const choosePurposeRef = ref<typeof ChoosePurpose>();
-const addLineDialogRef = ref<typeof AddLineDialog>();
-const describeLineStatusDialogRef = ref<typeof DescribeLineStatusDialog>();
-
-const purposeNotesType = ref<string>("");
-const purposeDetail = ref<string>("");
-const purposeDescription = ref<string>("");
-const goodsIssueLines = ref<GoodsIssueLine[]>([]);
-const securityDeposit = ref<string>("0,00");
-const grandTotal = ref<string>("0,00");
+const itemsDialogRef = ref<typeof ShowItemsDialog>();
+const conditionDialogRef = ref<typeof DescribeConditionDialog>();
 const returnDate = ref<string>(getCurrentLocalDateTime());
-const selectedLine = ref<GoodsIssueLine>({} as GoodsIssueLine);
-const isValidPurpose = ref<boolean>(false);
 
 const goodsIssueService = new GoodsIssueService();
-const goodsIssueCalculationService = new GoodsIssueCalculationService();
-
-function validateQuantitiesInStock(): boolean {
-    const invalidLineOrUndefined = goodsIssueLines.value.find((i) => i.quantity > i.stock);
-    if (invalidLineOrUndefined) return false;
-
-    return true;
-}
-
-const isValidGoodsIssue = computed(() => {
-    const hasLines = goodsIssueLines.value.length > 0;
-
-    const areQuantitiesInStock = validateQuantitiesInStock();
-
-    if (isValidPurpose.value && hasLines && areQuantitiesInStock) {
-        return true;
-    }
-
-    return false;
-});
+const goodsIssueNote = reactive<GoodsIssueNote>(new GoodsIssueNote(returnDate.value));
 
 function newGoodsIssue() {
-    purposeDetail.value = purposeDetail.value === DETAILS ? "" : purposeDetail.value;
-
-    const goodsIssue: GoodsIssue = {
-        returnDate: returnDate.value,
-        total: grandTotal.value,
-        purposeSpecification: {
-            description: purposeDescription.value,
-            detailsConstraint: purposeDetail.value,
-            notes: purposeNotesType.value,
-        },
-        lines: goodsIssueLines.value,
-    };
-
     goodsIssueService
-        .new(goodsIssue)
+        .new(goodsIssueNote as GoodsIssueNote)
         .then(({ message }) => {
             alert(message);
-            clearValues();
         })
         .catch(handleException);
 }
 
-function removeGoodsIssueLine(id: string): void {
-    goodsIssueLines.value = goodsIssueLines.value.filter((l) => l.itemId !== id);
-    performCalculations();
+function showItems() {
+    itemsDialogRef.value?.show();
 }
 
-function clearGoodsIssueLines() {
-    goodsIssueLines.value = [];
-    grandTotal.value = "0,00";
-    securityDeposit.value = "0,00";
-}
-
-function calculateLineTotal(line: GoodsIssueLine): void {
-    if (line.quantity > line.stock) {
-        line.total = "0,00";
-        goodsIssueCalculationService.calculateLineTotal(line.price, 0);
-        return;
-    }
-
-    line.total = goodsIssueCalculationService.calculateLineTotal(line.price, line.quantity);
-}
-
-function performCalculations() {
-    goodsIssueCalculationService.initializeGrandTotalAndSecurityDeposit();
-
-    goodsIssueLines.value.forEach(calculateLineTotal);
-
-    grandTotal.value = goodsIssueCalculationService.grandTotal;
-    securityDeposit.value = goodsIssueCalculationService.securityDeposit;
-}
-
-function showAddLineDialog() {
-    addLineDialogRef.value?.initializeQuantities();
-    addLineDialogRef.value?.show();
-}
-
-function showDescribeLineStatusDialog(line: GoodsIssueLine) {
-    selectedLine.value = line;
-
-    describeLineStatusDialogRef.value?.initializeLineState(
-        line?.condition!.status,
-        line?.condition?.comment
-    );
-
-    describeLineStatusDialogRef.value?.show();
-}
-
-function clearValues() {
-    returnDate.value = getCurrentLocalDateTime();
-
-    goodsIssueLines.value = [];
-    grandTotal.value = "0,00";
-    securityDeposit.value = "0,00";
-
-    choosePurposeRef.value?.clearInputs();
-}
-
-function updatePurposeDescription(description: string) {
-    purposeDescription.value = description;
-}
-
-function updatePurposeDetail(detail: string) {
-    purposeDetail.value = detail;
-}
-
-function updatePurposeNotesType(notesType: string) {
-    purposeNotesType.value = notesType;
-}
-
-function updateIsValidPurpose(value: boolean) {
-    isValidPurpose.value = value;
+function showConditionDialog(itemId: string, condition?: Condition) {
+    conditionDialogRef.value?.initializeCondition(itemId, condition);
+    conditionDialogRef.value?.show();
 }
 </script>
 
@@ -152,13 +43,7 @@ function updateIsValidPurpose(value: boolean) {
                 <input v-model="returnDate" type="datetime-local" class="input-field" />
             </div>
 
-            <ChoosePurpose
-                ref="choosePurposeRef"
-                @description-changed="updatePurposeDescription"
-                @detail-changed="updatePurposeDetail"
-                @notes-type-changed="updatePurposeNotesType"
-                @valid-purpose-changed="updateIsValidPurpose"
-            />
+            <ChoosePurpose @choosed="(purpose) => goodsIssueNote.setPurpose(purpose)" />
         </form>
 
         <section class="pb-16 sm:pb-5 md:pb-[4.5rem]">
@@ -168,14 +53,14 @@ function updateIsValidPurpose(value: boolean) {
                 <div class="w-full flex items-center justify-between">
                     <span
                         class="material-symbols-outlined hover:text-secondary-600 p-2 cursor-pointer"
-                        @click="showAddLineDialog"
+                        @click="showItems"
                     >
                         add
                     </span>
 
                     <span
                         class="hover:text-red-500 hover:bg-red-500 hover:bg-opacity-10 p-2 cursor-pointer"
-                        @click="clearGoodsIssueLines"
+                        @click="goodsIssueNote.clear()"
                     >
                         Limpar
                     </span>
@@ -186,7 +71,7 @@ function updateIsValidPurpose(value: boolean) {
                         <thead>
                             <tr class="text-left">
                                 <th class="min-w-24 w-24">ID</th>
-                                <th class="min-w-52">Item</th>
+                                <th class="min-w-52">Artigo</th>
                                 <th class="min-w-10 w-16">QTD</th>
                                 <th class="min-w-36 w-36 text-right">Preço Unid (Kz)</th>
                                 <th class="min-w-36 w-36 text-right">Total (Kz)</th>
@@ -196,16 +81,16 @@ function updateIsValidPurpose(value: boolean) {
 
                         <tbody>
                             <tr
-                                v-for="(line, idx) in goodsIssueLines"
+                                v-for="(line, idx) in goodsIssueNote.lines"
                                 :key="idx"
                                 class="cursor-pointer"
                             >
                                 <td>{{ line.itemId }}</td>
-                                <td @click="showDescribeLineStatusDialog(line)">
+                                <td @click="showConditionDialog(line.itemId, line.condition)">
                                     {{ line.name }}
                                     <br />
                                     <span class="text-light-600 text-sm">
-                                        {{ joinVariationValues(line?.variationsValues) }}
+                                        {{ line.formattedVariationsValues }}
                                     </span>
                                 </td>
 
@@ -216,14 +101,14 @@ function updateIsValidPurpose(value: boolean) {
                                         class="input-number"
                                         min="1"
                                         :max="line.stock"
-                                        @input="performCalculations"
+                                        @input="goodsIssueNote.updateLineQuantity(line.itemId)"
                                     />
                                 </td>
-                                <td class="text-right">{{ line.price }}</td>
-                                <td class="text-right">{{ line.total }}</td>
+                                <td class="text-right">{{ line.formattedPrice }}</td>
+                                <td class="text-right">{{ line.formattedTotal }}</td>
                                 <td
                                     class="cursor-pointer"
-                                    @click="removeGoodsIssueLine(line.itemId)"
+                                    @click="goodsIssueNote.removeLine(line.itemId)"
                                 >
                                     <span class="material-symbols-outlined">close</span>
                                 </td>
@@ -243,7 +128,7 @@ function updateIsValidPurpose(value: boolean) {
                 <button
                     class="btn-secondary w-full md:flex-1"
                     @click="newGoodsIssue"
-                    :disabled="!isValidGoodsIssue"
+                    :disabled="!goodsIssueNote.isValid()"
                 >
                     Solicitar
                 </button>
@@ -254,25 +139,29 @@ function updateIsValidPurpose(value: boolean) {
                 <p
                     class="text-center w-full md:w-auto md:text-right space-x-1 max-w-80 truncate overflow-hidden"
                 >
-                    <span class="font-medium">Total Geral(kz):</span>
-                    <span>{{ grandTotal }}</span>
+                    <span class="font-medium">Total Geral (Kz):</span>
+                    <span>{{ goodsIssueNote.formattedGrossTotal }}</span>
                 </p>
 
                 <p
                     class="text-center w-full md:w-auto md:text-right space-x-1 max-w-80 truncate overflow-hidden"
                 >
-                    <span class="font-medium">Caução(kz):</span>
-                    <span>{{ securityDeposit }}</span>
+                    <span class="font-medium">Caução (Kz):</span>
+                    <span>{{ goodsIssueNote.formattedSecurityDeposit }}</span>
                 </p>
             </div>
         </div>
     </section>
 
-    <AddLineDialog
-        ref="addLineDialogRef"
-        :goods-issue-lines="goodsIssueLines"
-        @added="performCalculations"
+    <ShowItemsDialog
+        ref="itemsDialogRef"
+        @add="(item, quantity) => goodsIssueNote.addLine(item, quantity)"
     />
 
-    <DescribeLineStatusDialog :line="selectedLine" ref="describeLineStatusDialogRef" />
+    <DescribeConditionDialog
+        ref="conditionDialogRef"
+        @update-condition="
+            (itemId, condition) => goodsIssueNote.updateLineCondition(itemId, condition)
+        "
+    />
 </template>

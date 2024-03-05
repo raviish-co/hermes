@@ -1,168 +1,99 @@
 <script lang="ts" setup>
-interface Emits {
-    (e: "descriptionChanged", value: string): void;
-    (e: "detailChanged", value: string): void;
-    (e: "notesTypeChanged", value: string): void;
-    (e: "validPurposeChanged", value: boolean): void;
-}
+import type { Purpose } from "@frontend/models/purpose";
+import type { PurposeSpecificationModel } from "~/lib/frontend/models/purpose_specification";
+import { PurposeService } from "~/lib/frontend/services/purpose_service";
 
-const emits = defineEmits<Emits>();
+const purpose = ref<Purpose>({
+    description: "",
+    details: "",
+    notes: "",
+});
 
-const INNER_LAUNDRY = "Interna";
-const PURPOSE = "Finalidade";
-const DETAILS = "Detalhes";
+const service = new PurposeService();
+const specitications = ref<PurposeSpecificationModel[]>([]);
+const detailsConstraint = ref<string[]>([]);
+const notesType = ref<string>("");
 
-const purposes = usePurpose().purposes;
-
-const currentNotesType = ref<string>("");
-const currentDetail = ref<string>(DETAILS);
-const currentDescription = ref<string>(PURPOSE);
-const currentDetails = ref<string[]>([]);
-const currentNotesTypePlaceholder = ref<string>("Descrição");
-const descriptions = ref<string[]>([]);
-const isDisabledDetailsSelect = computed(() => currentDetails.value.length <= 0);
-const isDisabledNotesTypeInput = ref<boolean>(false);
-
-const isValidDescription = computed(() =>
-    purposes.value.some((p) => p.description === currentDescription.value)
+const disableDetailsConstraint = computed(
+    () => detailsConstraint.value.length <= 0 || purpose.value.description == ""
 );
-
-const isValidDetail = computed(() => {
-    if (currentDetails.value.length > 0) {
-        return currentDetails.value.some((s) => s === currentDetail.value);
-    }
-
-    return true;
-});
-
-const isValidNotesType = computed(() => {
-    if (currentNotesType.value === "" && !isDisabledNotesTypeInput.value) return false;
-
-    return true;
-});
-
-const isValidPurpose = computed(
-    () => isValidDescription.value && isValidDetail.value && isValidNotesType.value
+const isEmptyDescription = computed(() => purpose.value.description === "");
+const isEmptyDetails = computed(
+    () => purpose.value.details === "" && !disableDetailsConstraint.value
 );
+const isEmptyNotes = computed(() => purpose.value.notes === "" && !isEmptyDescription.value);
 
-function getDescriptions() {
-    descriptions.value = purposes.value.map((p) => p.description);
-}
+specitications.value = await service.listPurposes();
 
-function disableNotesTypeInput(): void {
-    if (currentDetail.value === INNER_LAUNDRY) {
-        isDisabledNotesTypeInput.value = true;
-        currentNotesType.value = "";
+const emits = defineEmits<{ (e: "choosed", purpose: Purpose): void }>();
 
-        emits("notesTypeChanged", currentNotesType.value);
-        emits("validPurposeChanged", isValidPurpose.value);
+function chooseDetails(evt: Event): void {
+    const el = evt.target as HTMLSelectElement;
+    purpose.value.description = el.value;
 
+    const specification = specitications.value.find((s) => s.description === el.value);
+
+    if (!specification) {
+        notesType.value = "";
         return;
     }
 
-    isDisabledNotesTypeInput.value = false;
+    detailsConstraint.value = specification.detailsConstraint ?? [];
+    notesType.value = specification.notesType;
+
+    emits("choosed", purpose.value);
 }
 
-function updateCurrentDetails(details: string[]) {
-    if (details.length === 0) {
-        currentDetails.value = [];
-        currentDetail.value = DETAILS;
-
-        emits("detailChanged", currentDetail.value);
-
-        return;
-    }
-
-    currentDetails.value = details;
+function selectDetails(evt: Event) {
+    const target = evt.target as HTMLSelectElement;
+    purpose.value.details = target.value;
 }
 
-function findDetailsByDescription(): void {
-    emits("descriptionChanged", currentDescription.value);
-    emits("validPurposeChanged", isValidPurpose.value);
-
-    if (currentDescription.value === PURPOSE) {
-        currentDetail.value = DETAILS;
-
-        emits("descriptionChanged", currentDetail.value);
-        emits("validPurposeChanged", isValidPurpose.value);
-
-        currentDetails.value = [];
-        return;
-    }
-
-    purposes.value.find((p) => {
-        if (p.description === currentDescription.value) {
-            currentNotesTypePlaceholder.value = p.notesType!;
-            updateCurrentDetails(p.detailsConstraint!);
-            return true;
-        }
-    });
-
-    disableNotesTypeInput();
-
-    emits("detailChanged", currentDetail.value);
-    emits("validPurposeChanged", isValidPurpose.value);
+function clear() {
+    purpose.value = {
+        description: "",
+        details: "",
+        notes: "",
+    };
 }
 
-function emitCurrentDetail() {
-    emits("detailChanged", currentDetail.value);
-    emits("validPurposeChanged", isValidPurpose.value);
-
-    disableNotesTypeInput();
-}
-
-function emitNotesType() {
-    emits("notesTypeChanged", currentNotesType.value);
-    emits("validPurposeChanged", isValidPurpose.value);
-}
-
-function clearInputs() {
-    currentDescription.value = PURPOSE;
-    currentDetail.value = DETAILS;
-    currentNotesType.value = "";
-}
-
-defineExpose({ clearInputs });
-
-onMounted(() => {
-    getDescriptions();
-});
+defineExpose({ clear });
 </script>
 
 <template>
     <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
         <select
-            v-model="currentDescription"
             class="input-field"
-            :class="{ invalid: !isValidDescription }"
-            @change="findDetailsByDescription"
+            :class="{ invalid: isEmptyDescription }"
+            @change="chooseDetails"
         >
-            <option selected>{{ PURPOSE }}</option>
-            <option v-for="description in descriptions" :key="description">
-                {{ description }}
+            <option selected value="">Finalidade</option>
+            <option v-for="spec in specitications" :key="spec.description">
+                {{ spec.description }}
             </option>
         </select>
 
         <select
-            v-model="currentDetail"
-            :disabled="isDisabledDetailsSelect"
             class="input-field"
-            :class="{ invalid: !isValidDetail }"
-            @change="emitCurrentDetail"
+            :class="{ invalid: isEmptyDetails }"
+            :disabled="disableDetailsConstraint"
+            @change="selectDetails"
         >
-            <option selected>{{ DETAILS }}</option>
-            <option v-for="detail in currentDetails" :key="detail">
-                {{ detail }}
+            <option selected value="">Detalhes</option>
+            <option v-for="opt in detailsConstraint" :key="opt">
+                {{ opt }}
             </option>
         </select>
     </div>
 
+    <!-- :class="{ invalid: !isValidNotes }" -->
+
     <input
-        v-model="currentNotesType"
-        :placeholder="currentNotesTypePlaceholder"
-        :disabled="isDisabledNotesTypeInput"
+        v-model="purpose.notes"
         class="input-field mb-4"
-        :class="{ invalid: !isValidNotesType }"
-        @input="emitNotesType"
+        :class="{ invalid: isEmptyNotes }"
+        :disabled="isEmptyDescription"
+        :placeholder="notesType"
+        @input="$emit('choosed', purpose)"
     />
 </template>

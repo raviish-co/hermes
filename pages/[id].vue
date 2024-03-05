@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { DescribeLineStatusDialog } from "#build/components";
+import type { DescribeConditionDialog } from "#build/components";
 import { GoodsIssueService } from "~/lib/frontend/services/goods_issue_service";
-import { joinVariationValues } from "~/lib/frontend/helpers/join_variation_values";
+import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_values";
 import type { GoodsIssueNoteModel } from "~/lib/frontend/models/goods_issue_note";
 import type { GoodsIssueLineBase } from "~/lib/frontend/models/goods_issue_base";
 import { handleException } from "~/lib/frontend/helpers/error_handler";
@@ -11,7 +11,7 @@ const route = useRoute();
 
 const GOODS_ISSUE_ID = route.params.id as string;
 
-const describeLineStatusDialogRef = ref<typeof DescribeLineStatusDialog>();
+const conditionDialogRef = ref<typeof DescribeConditionDialog>();
 
 const goodsIssue = ref<GoodsIssueNoteModel>({} as GoodsIssueNoteModel);
 const selectedLine = ref<GoodsIssueLineBase>({} as GoodsIssueLineBase);
@@ -28,12 +28,12 @@ function toggleSecurirtyDepositInputState() {
 function showDescribeLineStatusDialog(line: GoodsIssueLineBase) {
     selectedLine.value = line;
 
-    describeLineStatusDialogRef.value?.initializeLineState(
+    conditionDialogRef.value?.initializeLineState(
         line?.condition!.status,
         line?.condition?.comment
     );
 
-    describeLineStatusDialogRef.value?.show();
+    conditionDialogRef.value?.show();
 }
 
 function newGoodsReturn() {
@@ -105,7 +105,7 @@ onMounted(() => {
                                     <br />
 
                                     <span class="text-light-600 text-sm">
-                                        {{ joinVariationValues(line?.variationsValues) }}
+                                        {{ formatVariationValues(line?.variationsValues) }}
                                     </span>
                                 </td>
 
@@ -161,5 +161,5 @@ onMounted(() => {
         </div>
     </section>
 
-    <DescribeLineStatusDialog :line="selectedLine" ref="describeLineStatusDialogRef" />
+    <DescribeConditionDialog :line="selectedLine" ref="conditionDialogRef" />
 </template>

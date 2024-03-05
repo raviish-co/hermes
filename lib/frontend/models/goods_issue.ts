@@ -1,5 +1,5 @@
 import type { GoodsIssueLineBase, GoodsIssueBase } from "./goods_issue_base";
-import type { PurposeSpecification } from "./purpose_specification";
+import type { Purpose } from "./purpose";
 
 export interface GoodsIssueLine extends GoodsIssueLineBase {
     price: string;
@@ -8,6 +8,6 @@ export interface GoodsIssueLine extends GoodsIssueLineBase {
 }
 
 export interface GoodsIssue extends GoodsIssueBase {
-    purposeSpecification: PurposeSpecification;
+    purposeSpecification: Purpose;
     lines: GoodsIssueLine[];
 }

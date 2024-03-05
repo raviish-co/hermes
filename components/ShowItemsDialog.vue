@@ -1,61 +1,27 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
 import type { ItemModel } from "@frontend/models/item";
-import type { GoodsIssueLine } from "@frontend/models/_goods_issue";
-import { joinVariationValues } from "~/lib/frontend/helpers/join_variation_values";
 import { CatalogService } from "@frontend/services/catalog_service";
-
-const catalogService = new CatalogService();
+import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_values";
 
 const dialogRef = ref<typeof VDialog>();
 const searchText = ref<string>("");
 const quantities = ref<number[]>([]);
 const items = ref<ItemModel[]>([]);
 const pages = ref<number>(1);
+const catalogService = new CatalogService();
 
-const props = defineProps<{ goodsIssueLines: GoodsIssueLine[] }>();
-const emits = defineEmits<{ (e: "added"): void }>();
-
-function itemExistInGoodsIssueLines(itemId: string): boolean {
-    return props.goodsIssueLines.some((i) => i.itemId == itemId);
-}
-
-function validateQuantity(stock: number, quantity: number): boolean {
-    if (quantity <= 0) return false;
-
-    if (quantity > stock) return false;
-
-    return true;
-}
-
-function toGoodsIssueLine(item: ItemModel, quantity: number): GoodsIssueLine {
-    return { ...item, stock: item.quantity, quantity, total: "0,00" };
-}
-
-function addLine(item: ItemModel, idx: number) {
-    const quantity = quantities.value[idx];
-
-    if (!validateQuantity(item.quantity, quantity)) return;
-
-    if (itemExistInGoodsIssueLines(item.itemId)) return;
-
-    const newLine = toGoodsIssueLine(item, quantity);
-
-    props.goodsIssueLines.push(newLine);
-
-    emits("added");
-}
+const emits = defineEmits<{ (e: "add", item: ItemModel, quantity: number): void }>();
 
 function initializeQuantities() {
     items.value.forEach((_, idx) => (quantities.value[idx] = 1));
 }
 
-function canEditQuantity(item: ItemModel): boolean {
-    return item.quantity > 0;
-}
+function show() {
+    initializeQuantities();
 
-function showDialog() {
     listItems();
+
     dialogRef.value?.show();
 }
 
@@ -93,7 +59,7 @@ function changePageToken(pageToken: number) {
     listItems(pageToken);
 }
 
-defineExpose({ show: showDialog, initializeQuantities });
+defineExpose({ show });
 </script>
 
 <template>
@@ -117,21 +83,12 @@ defineExpose({ show: showDialog, initializeQuantities });
                 </thead>
 
                 <tbody>
-                    <tr
-                        v-for="(item, idx) in items"
-                        :key="item.itemId"
-                        class="hover:bg-gray-50"
-                        :class="{ hidden: itemExistInGoodsIssueLines(item.itemId) }"
-                    >
-                        <td class="cursor-pointer" @click="addLine(item, idx)">
-                            <span>
-                                {{ item.name }}
-                            </span>
-
+                    <tr v-for="(item, idx) in items" :key="item.itemId" class="hover:bg-gray-50">
+                        <td class="cursor-pointer" @click="$emit('add', item, quantities[idx])">
+                            <span>{{ item.name }}</span>
                             <br />
-
                             <span class="text-light-600 text-xs sm:text-sm">
-                                {{ joinVariationValues(item?.variationsValues) }}
+                                {{ formatVariationValues(item?.variationsValues) }}
                             </span>
                         </td>
 
@@ -145,11 +102,10 @@ defineExpose({ show: showDialog, initializeQuantities });
                                 type="number"
                                 placeholder="QTD"
                                 min="0"
-                                :disabled="!canEditQuantity(item)"
                                 class="input-number"
                                 :max="item.quantity"
-                                @keypress.enter="addLine(item, idx)"
-                                @keydown.tab="addLine(item, idx)"
+                                @keypress.enter="$emit('add', item, quantities[idx])"
+                                @keydown.tab="$emit('add', item, quantities[idx])"
                             />
                         </td>
                     </tr>
