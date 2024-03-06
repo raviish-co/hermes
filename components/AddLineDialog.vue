@@ -2,6 +2,7 @@
 import type { VDialog } from "#build/components";
 import type { ItemModel } from "@frontend/models/item";
 import { CatalogService } from "@frontend/services/catalog_service";
+import { GoodsIssueNote } from "~/lib/frontend/example";
 import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_values";
 
 const dialogRef = ref<typeof VDialog>();
@@ -11,7 +12,7 @@ const items = ref<ItemModel[]>([]);
 const pages = ref<number>(1);
 const catalogService = new CatalogService();
 
-const emits = defineEmits<{ (e: "add", item: ItemModel, quantity: number): void }>();
+defineProps<{ goodsIssueNote: GoodsIssueNote }>();
 
 function initializeQuantities() {
     items.value.forEach((_, idx) => (quantities.value[idx] = 1));
@@ -83,8 +84,16 @@ defineExpose({ show });
                 </thead>
 
                 <tbody>
-                    <tr v-for="(item, idx) in items" :key="item.itemId" class="hover:bg-gray-50">
-                        <td class="cursor-pointer" @click="$emit('add', item, quantities[idx])">
+                    <tr
+                        v-for="(item, idx) in items"
+                        :key="item.itemId"
+                        class="hover:bg-gray-50"
+                        :class="{ hidden: goodsIssueNote.verifyItem(item.itemId) }"
+                    >
+                        <td
+                            class="cursor-pointer"
+                            @click="goodsIssueNote.addLine(item, quantities[idx])"
+                        >
                             <span>{{ item.name }}</span>
                             <br />
                             <span class="text-light-600 text-xs sm:text-sm">
@@ -104,8 +113,8 @@ defineExpose({ show });
                                 min="0"
                                 class="input-number"
                                 :max="item.quantity"
-                                @keypress.enter="$emit('add', item, quantities[idx])"
-                                @keydown.tab="$emit('add', item, quantities[idx])"
+                                @keypress.enter="goodsIssueNote.addLine(item, quantities[idx])"
+                                @keydown.tab="goodsIssueNote.addLine(item, quantities[idx])"
                             />
                         </td>
                     </tr>

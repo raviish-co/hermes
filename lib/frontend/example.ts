@@ -126,7 +126,7 @@ export class GoodsIssueNote {
         this.resetGrossTotalAndSecurityDeposit();
     }
 
-    private verifyItem(itemId: string) {
+    verifyItem(itemId: string) {
         return this.lines.some((line) => line.itemId === itemId);
     }
 

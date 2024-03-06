@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import type { ShowItemsDialog, DescribeConditionDialog, ChoosePurpose } from "#build/components";
+import type { AddLineDialog, DescribeConditionDialog, ChoosePurpose } from "#build/components";
 import { getCurrentLocalDateTime } from "@frontend/helpers/current_local_date_time";
 import { GoodsIssueService } from "@frontend/services/goods_issue_service";
 import { handleException } from "@frontend/helpers/error_handler";
 import { GoodsIssueNote } from "~/lib/frontend/example";
 import type { Condition } from "~/lib/frontend/models/condition";
 
-const itemsDialogRef = ref<typeof ShowItemsDialog>();
+const addLineDialogRef = ref<typeof AddLineDialog>();
 const conditionDialogRef = ref<typeof DescribeConditionDialog>();
 const returnDate = ref<string>(getCurrentLocalDateTime());
 
@@ -23,7 +23,7 @@ function newGoodsIssue() {
 }
 
 function showItemsDialog() {
-    itemsDialogRef.value?.show();
+    addLineDialogRef.value?.show();
 }
 
 function showConditionDialog(itemId: string, condition?: Condition) {
@@ -153,10 +153,7 @@ function showConditionDialog(itemId: string, condition?: Condition) {
         </div>
     </section>
 
-    <ShowItemsDialog
-        ref="itemsDialogRef"
-        @add="(item, quantity) => goodsIssueNote.addLine(item, quantity)"
-    />
+    <AddLineDialog ref="addLineDialogRef" :goods-issue-note="(goodsIssueNote as GoodsIssueNote)" />
 
     <DescribeConditionDialog
         ref="conditionDialogRef"
