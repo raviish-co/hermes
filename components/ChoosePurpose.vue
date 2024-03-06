@@ -35,6 +35,7 @@ function chooseDetails(evt: Event): void {
 
     if (!specification) {
         notesType.value = "";
+        purpose.value.notes = "";
         return;
     }
 
@@ -85,8 +86,6 @@ defineExpose({ clear });
             </option>
         </select>
     </div>
-
-    <!-- :class="{ invalid: !isValidNotes }" -->
 
     <input
         v-model="purpose.notes"
