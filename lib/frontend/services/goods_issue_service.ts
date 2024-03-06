@@ -1,7 +1,7 @@
 import type { Condition } from "../models/condition";
-// import type { PurposeSpecification } from "../models/purpose_specification";
 import type { GoodsIssueNoteModel } from "../models/goods_issue_note";
 import type { GoodsIssueNote, GoodsIssueNoteLine } from "../example";
+import type { Purpose } from "@frontend/models/purpose"
 
 interface GoodsIssueLineDTO {
     itemId: string;
@@ -13,7 +13,7 @@ interface GoodsIssueDTO {
     total: string;
     returnDate: string;
     lines: GoodsIssueLineDTO[];
-    // purpose: PurposeSpecification;
+    purpose: Purpose;
 }
 
 export class GoodsIssueService {
@@ -43,9 +43,9 @@ export class GoodsIssueService {
 
     #toGoodsIssueDTO(note: GoodsIssueNote): GoodsIssueDTO {
         return {
-            total: note.grossTotal.toString(),
+            total: note.formattedGrossTotal.replace(/\s/, ""),
             returnDate: note.returnDate,
-            // purpose: note.purpose,
+            purpose: note.purpose,
             lines: note.lines.map(this.#toGoodsIssueLine),
         };
     }

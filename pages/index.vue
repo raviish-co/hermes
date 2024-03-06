@@ -22,7 +22,7 @@ function newGoodsIssue() {
         .catch(handleException);
 }
 
-function showItems() {
+function showItemsDialog() {
     itemsDialogRef.value?.show();
 }
 
@@ -53,7 +53,7 @@ function showConditionDialog(itemId: string, condition?: Condition) {
                 <div class="w-full flex items-center justify-between">
                     <span
                         class="material-symbols-outlined hover:text-secondary-600 p-2 cursor-pointer"
-                        @click="showItems"
+                        @click="showItemsDialog"
                     >
                         add
                     </span>
