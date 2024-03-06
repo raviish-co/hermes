@@ -3,7 +3,7 @@ import type { AddLineDialog, DescribeConditionDialog, ChoosePurpose } from "#bui
 import { getCurrentLocalDateTime } from "@frontend/helpers/current_local_date_time";
 import { GoodsIssueService } from "@frontend/services/goods_issue_service";
 import { handleException } from "@frontend/helpers/error_handler";
-import { GoodsIssueNote } from "~/lib/frontend/example";
+import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
 import type { Condition } from "~/lib/frontend/models/condition";
 
 const addLineDialogRef = ref<typeof AddLineDialog>();

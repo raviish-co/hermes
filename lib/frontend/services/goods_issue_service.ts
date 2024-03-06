@@ -1,7 +1,8 @@
 import type { Condition } from "../models/condition";
 import type { GoodsIssueNoteModel } from "../models/goods_issue_note";
-import type { GoodsIssueNote, GoodsIssueNoteLine } from "../example";
-import type { Purpose } from "@frontend/models/purpose"
+import type { GoodsIssueNoteLine } from "../domain/goods_issue_note_line";
+import type { GoodsIssueNote } from "../domain/goods_issue_note";
+import type { Purpose } from "@frontend/models/purpose";
 
 interface GoodsIssueLineDTO {
     itemId: string;

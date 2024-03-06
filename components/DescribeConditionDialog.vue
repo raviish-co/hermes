@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Condition } from "@frontend/models/condition";
 import type { VDialog } from "#build/components";
-import type { GoodsIssueNote } from "~/lib/frontend/example";
+import type { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
 
 const BAD = "Mau";
 const itemId = ref<string>("");
