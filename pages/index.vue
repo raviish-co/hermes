@@ -22,11 +22,11 @@ function newGoodsIssue() {
         .catch(handleException);
 }
 
-function showItemsDialog() {
+function showAddLineDialog() {
     addLineDialogRef.value?.show();
 }
 
-function showConditionDialog(itemId: string, condition?: Condition) {
+function showDescribeConditionDialog(itemId: string, condition?: Condition) {
     conditionDialogRef.value?.initializeCondition(itemId, condition);
     conditionDialogRef.value?.show();
 }
@@ -53,7 +53,7 @@ function showConditionDialog(itemId: string, condition?: Condition) {
                 <div class="w-full flex items-center justify-between">
                     <span
                         class="material-symbols-outlined hover:text-secondary-600 p-2 cursor-pointer"
-                        @click="showItemsDialog"
+                        @click="showAddLineDialog"
                     >
                         add
                     </span>
@@ -86,7 +86,11 @@ function showConditionDialog(itemId: string, condition?: Condition) {
                                 class="cursor-pointer"
                             >
                                 <td>{{ line.itemId }}</td>
-                                <td @click="showConditionDialog(line.itemId, line.condition)">
+                                <td
+                                    @click="
+                                        showDescribeConditionDialog(line.itemId, line.condition)
+                                    "
+                                >
                                     {{ line.name }}
                                     <br />
                                     <span class="text-light-600 text-sm">
@@ -157,8 +161,6 @@ function showConditionDialog(itemId: string, condition?: Condition) {
 
     <DescribeConditionDialog
         ref="conditionDialogRef"
-        @update-condition="
-            (itemId, condition) => goodsIssueNote.updateLineCondition(itemId, condition)
-        "
+        :goods-issue-note="(goodsIssueNote as GoodsIssueNote)"
     />
 </template>

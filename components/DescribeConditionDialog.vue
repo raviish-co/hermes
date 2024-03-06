@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Condition } from "@frontend/models/condition";
 import type { VDialog } from "#build/components";
+import type { GoodsIssueNote } from "~/lib/frontend/example";
 
 const BAD = "Mau";
 const itemId = ref<string>("");
@@ -10,11 +11,20 @@ const dialogRef = ref<typeof VDialog>();
 const isGoodState = computed(() => condition.value.status !== BAD);
 const isValidCondition = computed(() => condition.value.status === BAD && !condition.value.comment);
 
-const emits = defineEmits<{ (e: "updateCondition", itemId: string, condition: Condition): void }>();
+const props = defineProps<{ goodsIssueNote: GoodsIssueNote }>();
 
 function initializeCondition(id: string, oldCondition: Condition) {
     itemId.value = id;
-    condition.value = oldCondition;
+    condition.value = Object.assign({}, oldCondition);
+}
+
+function updateCondition() {
+    if (condition.value.status !== BAD) {
+        condition.value.comment = "";
+    }
+
+    props.goodsIssueNote.updateLineCondition(itemId.value, condition.value);
+    dialogRef.value?.close();
 }
 
 function show() {
@@ -39,11 +49,7 @@ defineExpose({ show, initializeCondition });
             class="input-field resize-none"
         />
 
-        <button
-            class="btn-secondary"
-            :disabled="isValidCondition"
-            @click="$emit('updateCondition', itemId, condition)"
-        >
+        <button class="btn-secondary" :disabled="isValidCondition" @click="updateCondition">
             Salvar
         </button>
     </VDialog>
