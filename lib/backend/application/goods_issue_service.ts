@@ -87,7 +87,7 @@ export class GoodsIssueService {
     }
 
     #buildPurpose(data: PurposeDTO) {
-        return new Purpose(data.description, data.detailsConstraint, data.notes);
+        return new Purpose(data.description, data.details, data.notes);
     }
 
     #buildItemsIds(lines: GoodIssueLineDTO[]): ID[] {
@@ -139,8 +139,8 @@ type GoodIssueLineDTO = {
 
 type PurposeDTO = {
     description: string;
-    detailsConstraint?: string;
-    notes?: string;
+    details?: string;
+    notes: string;
 };
 
 type Condition = {
