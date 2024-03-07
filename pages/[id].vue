@@ -79,7 +79,7 @@ onMounted(() => {
             <input class="input-field" :value="goodsIssueNote.purpose?.notes" disabled />
         </form>
 
-        <section class="pb-16 sm:pb-5 md:pb-[4.5rem]">
+        <section class="pb-28 sm:pb-8 md:pb-20">
             <div
                 class="h-table-lg p-3 flex flex-col justify-between border border-light-500 overflow-hidden"
             >
@@ -143,8 +143,10 @@ onMounted(() => {
                 <button class="btn-light w-full md:flex-1">Cancelar</button>
             </div>
 
-            <div class="text-sm md:text-base flex gap-2 items-center w-full md:w-auto">
-                <p class="text-center w-full md:w-auto md:text-right space-x-1">
+            <div
+                class="text-sm flex-col sm:flex-row md:text-base flex gap-2 items-center w-full md:w-auto"
+            >
+                <p class="text-left sm:text-center w-full md:w-auto md:text-right space-x-1">
                     <span class="font-medium">Total de caução(kz):</span>
                     <span>{{ goodsIssueNote.formattedSecurityDeposit }}</span>
                 </p>

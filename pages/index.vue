@@ -46,7 +46,7 @@ function showDescribeLineConditionDialog(itemId: string, condition?: Condition) 
             <ChoosePurpose @choosed="(purpose) => goodsIssueNote.setPurpose(purpose)" />
         </form>
 
-        <section class="pb-16 sm:pb-5 md:pb-[4.5rem]">
+        <section class="pb-24 sm:pb-5 md:pb-[4.5rem]">
             <div
                 class="h-table-lg p-3 flex flex-col justify-between border border-light-500 overflow-hidden"
             >
@@ -139,16 +139,18 @@ function showDescribeLineConditionDialog(itemId: string, condition?: Condition) 
                 <button class="btn-light w-full md:flex-1">Cancelar</button>
             </div>
 
-            <div class="text-sm md:text-base flex gap-2 w-full md:w-auto overflow-hidde">
+            <div
+                class="text-sm md:text-base flex flex-col sm:flex-row justify-center gap-2 w-full md:w-auto overflow-hidde"
+            >
                 <p
-                    class="text-center w-full md:w-auto md:text-right space-x-1 max-w-80 truncate overflow-hidden"
+                    class="text-center w-full md:w-auto md:text-right space-x-1 sm:max-w-80 truncate overflow-hidden"
                 >
                     <span class="font-medium">Total Geral (Kz):</span>
                     <span>{{ goodsIssueNote.formattedGrossTotal }}</span>
                 </p>
 
                 <p
-                    class="text-center w-full md:w-auto md:text-right space-x-1 max-w-80 truncate overflow-hidden"
+                    class="text-center w-full md:w-auto md:text-right space-x-1 sm:max-w-80 truncate overflow-hidden"
                 >
                     <span class="font-medium">Caução (Kz):</span>
                     <span>{{ goodsIssueNote.formattedSecurityDeposit }}</span>
