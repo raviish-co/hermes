@@ -1,4 +1,4 @@
-import type { GoodsIssueLineBase } from "../models/goods_issue_base";
+import type { GoodsIssueLine } from "../models/goods_issue_note";
 
 interface ItemDTO {
     itemId: string;
@@ -6,19 +6,15 @@ interface ItemDTO {
     comment?: string;
 }
 
-interface NewGoodsReturnData {
+interface GoodsReturnDTO {
     goodsIssueNoteId: string;
     securityDepositWithHeld: string;
     itemsData: ItemDTO[];
 }
 
 export class GoodsReturnService {
-    async new(
-        goodsIssueNoteId: string,
-        retainedSecurityDeposit: string,
-        lines: GoodsIssueLineBase[]
-    ) {
-        const data: NewGoodsReturnData = {
+    async new(goodsIssueNoteId: string, retainedSecurityDeposit: string, lines: GoodsIssueLine[]) {
+        const data: GoodsReturnDTO = {
             goodsIssueNoteId,
             securityDepositWithHeld: retainedSecurityDeposit,
             itemsData: lines.map(this.#toItemDTO),
@@ -27,7 +23,7 @@ export class GoodsReturnService {
         return await $fetch("/api/goods-return", { method: "post", body: data });
     }
 
-    #toItemDTO(line: GoodsIssueLineBase): ItemDTO {
+    #toItemDTO(line: GoodsIssueLine): ItemDTO {
         return {
             itemId: line.itemId,
             quantity: line.quantity,

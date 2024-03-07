@@ -26,7 +26,7 @@ function showAddLineDialog() {
     addLineDialogRef.value?.show();
 }
 
-function showDescribeConditionDialog(itemId: string, condition?: Condition) {
+function showDescribeLineConditionDialog(itemId: string, condition?: Condition) {
     conditionDialogRef.value?.initializeCondition(itemId, condition);
     conditionDialogRef.value?.show();
 }
@@ -88,7 +88,7 @@ function showDescribeConditionDialog(itemId: string, condition?: Condition) {
                                 <td>{{ line.itemId }}</td>
                                 <td
                                     @click="
-                                        showDescribeConditionDialog(line.itemId, line.condition)
+                                        showDescribeLineConditionDialog(line.itemId, line.condition)
                                     "
                                 >
                                     {{ line.name }}

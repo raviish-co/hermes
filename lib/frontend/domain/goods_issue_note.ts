@@ -1,15 +1,19 @@
+import { convertToNumber } from "../helpers/convert_to_number";
 import { formatCurrency } from "../helpers/format_currency";
 import type { Condition } from "../models/condition";
+import type { GoodsIssueNoteModel } from "../models/goods_issue_note";
 import type { ItemModel } from "../models/item";
 import type { Purpose } from "../models/purpose";
 import { GoodsIssueNoteLine } from "./goods_issue_note_line";
 
 export class GoodsIssueNote {
+    goodsIssueNoteId: string;
     lines: GoodsIssueNoteLine[];
     grossTotal: number;
     securityDeposit: number;
     returnDate: string;
     purpose: Purpose;
+    status: string;
 
     constructor(returnDate: string) {
         this.grossTotal = 0;
@@ -17,6 +21,21 @@ export class GoodsIssueNote {
         this.lines = [];
         this.returnDate = returnDate;
         this.purpose = {} as Purpose;
+        this.status = "";
+        this.goodsIssueNoteId = "";
+    }
+
+    static build(data: GoodsIssueNoteModel): GoodsIssueNote {
+        const note = new GoodsIssueNote(data.returnDate);
+
+        note.goodsIssueNoteId = data.goodsIssueNoteId;
+        note.purpose = data.purpose;
+        note.grossTotal = convertToNumber(data.total);
+        note.securityDeposit = convertToNumber(data.securityDeposit);
+        note.status = data.status;
+        note.lines = data.lines as GoodsIssueNoteLine[];
+
+        return note;
     }
 
     addLine(item: ItemModel, quantity: number) {
