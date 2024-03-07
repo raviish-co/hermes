@@ -1,4 +1,3 @@
-import { GoodsIssueNoteNotFound } from "~/lib/backend/domain/goods_issue/goods_issue_note_not_found_error";
 import { toGoodsIssueNoteDTO } from "../goods_issue_note_dto";
 import { makeServices } from "~/lib/backend/main";
 import { HttpStatus } from "../http_status";
@@ -17,7 +16,7 @@ export default defineEventHandler(async (event) => {
 
     const goodsIssueNoteOrErr = await goodsIssueService.get(goodsIssueNoteId);
 
-    if (goodsIssueNoteOrErr.value instanceof GoodsIssueNoteNotFound) {
+    if (goodsIssueNoteOrErr.isLeft()) {
         return createError({
             message: goodsIssueNoteOrErr.value.message,
             status: HttpStatus.NotFound,
