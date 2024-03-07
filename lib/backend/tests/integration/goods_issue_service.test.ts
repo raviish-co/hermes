@@ -1,25 +1,38 @@
+import { GoodsIssueNoteHasAlreadyBeenReturned } from "../../domain/goods_issue/goods_issue_note_has_already_been_returned_error";
 import { InmemGoodsIssueNoteRepository } from "../../persistense/inmem/inmem_goods_issue_note_repository";
-import type { ItemRepository } from "../../domain/catalog/item_repository";
-import { InsufficientStock } from "../../domain/catalog/insufficient_stock_error";
+import type { GoodsIssueNoteRepository } from "../../domain/goods_issue/goods_issue_note_repository";
 import { DefaultPurposeSpecification } from "../../adapters/default_purpose_specification";
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
-import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
+import { InsufficientStock } from "../../domain/catalog/insufficient_stock_error";
 import { InvalidPurpose } from "../../domain/goods_issue/invalid_purpose_error";
+import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
 import { InvalidTotal } from "../../domain/goods_issue/invalid_total_error";
 import { GoodsIssueService } from "../../application/goods_issue_service";
+import type { ItemRepository } from "../../domain/catalog/item_repository";
 import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
-import type { GoodsIssueNoteRepository } from "../../domain/goods_issue/goods_issue_note_repository";
 import { GoodsIssueRepositoryStub } from "../stubs/goods_issue_repository_stub";
 import type { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
 import { describe, expect, it, vi } from "vitest";
 import { ID } from "../../shared/id";
-import { GoodsIssueNoteHasAlreadyBeenReturned } from "../../domain/goods_issue/goods_issue_note_has_already_been_returned_error";
 
 describe("Test Goods Issue", () => {
     it("Deve retornar error **InvalidPurpose** se não existir", async () => {
-        const data = { ...goodsIssueData, purpose: { description: "Alguel" } };
+        const data = { ...goodsIssueData, purpose: { description: "Alguel", notes: "some-note" } };
+        const { service } = makeService();
+
+        const error = await service.new(data);
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(InvalidPurpose);
+    });
+
+    it("Deve retornar **InvalidPurpose** se o detalhe da finalidade for inválido", async () => {
+        const data = {
+            ...goodsIssueData,
+            purpose: { description: "Lavandaria", notes: "some-note" },
+        };
         const { service } = makeService();
 
         const error = await service.new(data);
@@ -183,7 +196,7 @@ describe("Test Goods Issue", () => {
         expect(stock.quantity).toEqual(8);
     });
 
-    it("Deve ser adicionada a nota de saída de mercadoria,, caso a finalidade tenha uma seção", async () => {
+    it("Deve ser adicionada a nota de saída de mercadoria, caso a finalidade tenha uma seção", async () => {
         const { service, goodsIssueRepository } = makeService();
 
         await service.new(goodsIssueData);
@@ -199,7 +212,7 @@ describe("Test Goods Issue", () => {
             ...goodsIssueData,
             purpose: {
                 description: "Lavandaria",
-                detailsConstraint: "Externa",
+                details: "Externa",
                 notes: "John Doe",
             },
         };
@@ -339,7 +352,7 @@ describe("Get Goods Issue Note", () => {
 const goodsIssueData = {
     purpose: {
         description: "Lavandaria",
-        detailsConstraint: "Interna",
+        details: "Interna",
         notes: "Nome",
     },
     lines: [
