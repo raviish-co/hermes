@@ -2,7 +2,7 @@
 import type { VDialog } from "#build/components";
 import type { ItemModel } from "@frontend/models/item";
 import { CatalogService } from "@frontend/services/catalog_service";
-import { GoodsIssueNote } from "~/lib/frontend/example";
+import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
 import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_values";
 
 const dialogRef = ref<typeof VDialog>();
