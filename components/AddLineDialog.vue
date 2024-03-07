@@ -70,7 +70,7 @@ defineExpose({ show });
             type="search"
             v-model="searchText"
             class="input-field"
-            @input="() => searchItems()"
+            @input="searchItems()"
         />
 
         <div class="overflow-x-auto w-full">
