@@ -72,7 +72,7 @@ function showDescribeLineConditionDialog(itemId: string, condition?: Condition) 
                             <tr class="text-left">
                                 <th class="min-w-24 w-24">ID</th>
                                 <th class="min-w-52">Artigo</th>
-                                <th class="min-w-10 w-16">QTD</th>
+                                <th class="min-w-16 w-16">QTD</th>
                                 <th class="min-w-36 w-36 text-right">Preço Unid (Kz)</th>
                                 <th class="min-w-36 w-36 text-right">Total (Kz)</th>
                                 <th class="min-w-10 w-10"></th>
@@ -101,7 +101,8 @@ function showDescribeLineConditionDialog(itemId: string, condition?: Condition) 
                                 <td>
                                     <input
                                         type="number"
-                                        v-model="line.quantity"
+                                        placeholder="QTD"
+                                        :value="line.quantity"
                                         class="input-number"
                                         min="1"
                                         :max="line.stock"

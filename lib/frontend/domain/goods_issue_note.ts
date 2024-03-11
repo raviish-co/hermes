@@ -63,6 +63,8 @@ export class GoodsIssueNote {
         const line = this.lines.find((line) => line.itemId === itemId);
         if (!line) return;
 
+        if (!line.quantity) line.quantity = 0;
+
         line.calculateTotal();
 
         this.calculate();
