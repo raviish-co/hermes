@@ -68,7 +68,7 @@ defineExpose({ clear });
             :class="{ invalid: isEmptyDescription }"
             @change="chooseDetails"
         >
-            <option selected value="">Finalidade</option>
+            <option selected disabled>Finalidade</option>
             <option v-for="spec in specitications" :key="spec.description">
                 {{ spec.description }}
             </option>
@@ -80,7 +80,7 @@ defineExpose({ clear });
             :disabled="disableDetailsConstraint"
             @change="selectDetails"
         >
-            <option selected value="">Detalhes</option>
+            <option selected disabled>Detalhes</option>
             <option v-for="opt in detailsConstraint" :key="opt">
                 {{ opt }}
             </option>

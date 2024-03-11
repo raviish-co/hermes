@@ -27,7 +27,7 @@ function toggleMenu() {
             </div>
         </div>
 
-        <main class="h-full">
+        <main class="h-full mt-24">
             <section class="pb-[7.25rem] md:pb-0">
                 <slot />
             </section>
