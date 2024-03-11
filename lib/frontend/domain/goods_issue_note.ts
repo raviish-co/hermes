@@ -98,9 +98,14 @@ export class GoodsIssueNote {
         return this.lines.some((line) => !line.isAvaliableQuantity() || line.quantity === 0);
     }
 
-    clear() {
+    clearLines() {
         this.lines = [];
         this.resetGrossTotalAndSecurityDeposit();
+    }
+
+    clear() {
+        this.clearLines();
+        this.purpose.clear();
     }
 
     verifyItem(itemId: string) {

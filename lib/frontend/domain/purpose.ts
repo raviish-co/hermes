@@ -20,4 +20,10 @@ export class Purpose {
 
         return true;
     }
+
+    clear() {
+        this.description = "";
+        this.notes = "";
+        this.details = undefined;
+    }
 }

@@ -45,17 +45,12 @@ function selectDetails(evt: Event) {
     const target = evt.target as HTMLSelectElement;
     purpose.value.details = target.value;
 }
-
-function clear() {
-    purpose.value = new Purpose("", "");
-}
-
-defineExpose({ clear });
 </script>
 
 <template>
     <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
         <select
+            :value="purpose.description || 'Finalidade'"
             class="input-field"
             :class="{ invalid: isEmptyDescription }"
             @change="chooseDetails"
@@ -67,9 +62,10 @@ defineExpose({ clear });
         </select>
 
         <select
+            :value="purpose.details || 'Detalhes'"
+            :disabled="disableDetailsConstraint"
             class="input-field"
             :class="{ invalid: isEmptyDetails }"
-            :disabled="disableDetailsConstraint"
             @change="selectDetails"
         >
             <option selected disabled>Detalhes</option>

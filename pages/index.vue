@@ -30,6 +30,10 @@ function showDescribeLineConditionDialog(itemId: string, condition?: Condition) 
     conditionDialogRef.value?.initializeCondition(itemId, condition);
     conditionDialogRef.value?.show();
 }
+
+function clear() {
+    goodsIssueNote.clear();
+}
 </script>
 
 <template>
@@ -60,7 +64,7 @@ function showDescribeLineConditionDialog(itemId: string, condition?: Condition) 
 
                     <span
                         class="hover:text-red-500 hover:bg-red-500 hover:bg-opacity-10 p-2 cursor-pointer"
-                        @click="goodsIssueNote.clear()"
+                        @click="goodsIssueNote.clearLines()"
                     >
                         Limpar
                     </span>
@@ -137,7 +141,7 @@ function showDescribeLineConditionDialog(itemId: string, condition?: Condition) 
                 >
                     Solicitar
                 </button>
-                <button class="btn-light w-full md:flex-1">Cancelar</button>
+                <button class="btn-light w-full md:flex-1" @click="clear">Cancelar</button>
             </div>
 
             <div
