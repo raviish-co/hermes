@@ -3,8 +3,8 @@ import { formatCurrency } from "../helpers/format_currency";
 import type { Condition } from "../models/condition";
 import type { GoodsIssueNoteModel } from "../models/goods_issue_note";
 import type { ItemModel } from "../models/item";
-import type { Purpose } from "../models/purpose";
 import { GoodsIssueNoteLine } from "./goods_issue_note_line";
+import { Purpose } from "./purpose";
 
 export class GoodsIssueNote {
     goodsIssueNoteId: string;
@@ -20,7 +20,7 @@ export class GoodsIssueNote {
         this.securityDeposit = 0;
         this.lines = [];
         this.returnDate = returnDate;
-        this.purpose = {} as Purpose;
+        this.purpose = new Purpose("", "");
         this.status = "";
         this.goodsIssueNoteId = "";
     }
@@ -29,7 +29,11 @@ export class GoodsIssueNote {
         const note = new GoodsIssueNote(data.returnDate);
 
         note.goodsIssueNoteId = data.goodsIssueNoteId;
-        note.purpose = data.purpose;
+        note.purpose = new Purpose(
+            data.purpose.description,
+            data.purpose.notes,
+            data.purpose.details
+        );
         note.grossTotal = convertToNumber(data.total);
         note.securityDeposit = convertToNumber(data.securityDeposit);
         note.status = data.status;
@@ -82,7 +86,16 @@ export class GoodsIssueNote {
     }
 
     isValid() {
-        return this.lines.length > 0 && this.returnDate !== "";
+        return (
+            this.lines.length > 0 &&
+            this.returnDate !== "" &&
+            this.purpose.isValid() &&
+            !this.isInvalidLinesQuantity()
+        );
+    }
+
+    isInvalidLinesQuantity() {
+        return this.lines.some((line) => !line.isAvaliableQuantity() || line.quantity === 0);
     }
 
     clear() {

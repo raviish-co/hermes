@@ -43,7 +43,7 @@ function showDescribeLineConditionDialog(itemId: string, condition?: Condition) 
                 <input v-model="returnDate" type="datetime-local" class="input-field" />
             </div>
 
-            <ChoosePurpose @choosed="(purpose) => goodsIssueNote.setPurpose(purpose)" />
+            <ChoosePurpose @choosed="goodsIssueNote.setPurpose($event)" />
         </form>
 
         <section class="pb-24 sm:pb-5 md:pb-[4.5rem]">
@@ -102,7 +102,7 @@ function showDescribeLineConditionDialog(itemId: string, condition?: Condition) 
                                     <input
                                         type="number"
                                         placeholder="QTD"
-                                        :value="line.quantity"
+                                        v-model="line.quantity"
                                         class="input-number"
                                         min="1"
                                         :max="line.stock"

@@ -1,13 +1,9 @@
 <script lang="ts" setup>
-import type { Purpose } from "@frontend/models/purpose";
+import { Purpose } from "~/lib/frontend/domain/purpose";
 import type { PurposeSpecificationModel } from "~/lib/frontend/models/purpose_specification";
 import { PurposeService } from "~/lib/frontend/services/purpose_service";
 
-const purpose = ref<Purpose>({
-    description: "",
-    details: "",
-    notes: "",
-});
+const purpose = ref<Purpose>(new Purpose("", ""));
 
 const service = new PurposeService();
 const specitications = ref<PurposeSpecificationModel[]>([]);
@@ -51,11 +47,7 @@ function selectDetails(evt: Event) {
 }
 
 function clear() {
-    purpose.value = {
-        description: "",
-        details: "",
-        notes: "",
-    };
+    purpose.value = new Purpose("", "");
 }
 
 defineExpose({ clear });

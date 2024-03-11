@@ -55,7 +55,7 @@ export class GoodsIssueNoteLine {
         return formatVariationValues(this.variationsValues);
     }
 
-    private isAvaliableQuantity() {
+    isAvaliableQuantity() {
         return this.quantity <= this.stock;
     }
 }
