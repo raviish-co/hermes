@@ -3,7 +3,7 @@ import type { ItemRepository } from "../../domain/catalog/item_repository";
 import { ItemBuilder } from "../../domain/catalog/item_builder";
 import { type Either, left, right } from "../../shared/either";
 import type { Pagination } from "../../shared/pagination";
-import { Item } from "../../domain/catalog/item";
+import { Item, Status } from "../../domain/catalog/item";
 import { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
 import { ItemStock } from "../../domain/catalog/item_stock";
@@ -133,10 +133,46 @@ export class ItemRepositoryStub implements ItemRepository {
             .withVariation(ID.fromString("3"), "Tamanho: 42")
             .build();
 
+        const item4 = new Item(
+            ID.fromString("1004"),
+            ID.random(),
+            "Item 1",
+            ID.random(),
+            Decimal.fromString("1000"),
+            { "1": "Cor: Preta" },
+            new ItemStock(7),
+            { status: Status.Good }
+        );
+
+        const item5 = new Item(
+            ID.fromString("1005"),
+            ID.random(),
+            "Item 2",
+            ID.random(),
+            Decimal.fromString("1000"),
+            { "1": "Cor: Preta" },
+            new ItemStock(8),
+            { status: Status.Good }
+        );
+
+        const item6 = new Item(
+            ID.fromString("1006"),
+            ID.random(),
+            "Item 3",
+            ID.random(),
+            Decimal.fromString("1000"),
+            { "1": "Cor: Preta" },
+            new ItemStock(8),
+            { status: Status.Good }
+        );
+
         this.#items = {
             "1001": item1.value as Item,
             "1002": item2.value as Item,
             "1003": item3.value as Item,
+            "1004": item4,
+            "1005": item5,
+            "1006": item6,
         };
     }
 }

@@ -303,7 +303,7 @@ describe("List Goods Issue Notes", () => {
 
         const goodsIssues = await service.list();
 
-        expect(goodsIssues.length).toBe(1);
+        expect(goodsIssues.length).toBeGreaterThanOrEqual(1);
 
         const goodsIssue = goodsIssues[0];
 

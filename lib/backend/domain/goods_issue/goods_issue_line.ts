@@ -18,8 +18,13 @@ export class GoodsIssueLine {
         this.#netTotal = this.item.price.multiply(factor);
     }
 
-    restoreStockQuantity(): void {
-        this.item.updateStock(this.quantity);
+    restoreStockQuantity(quantity?: number): void {
+        if (!quantity) {
+            this.item.updateStock(this.quantity);
+            return;
+        }
+
+        this.item.updateStock(quantity);
     }
 
     get total(): Decimal {
