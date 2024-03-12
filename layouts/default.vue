@@ -10,7 +10,9 @@ function toggleMenu() {
 
 <template>
     <section class="h-screen flex flex-col">
-        <div class="w-full h-20 sm:h-24 py-4 bg-primary flex justify-center items-center relative">
+        <div
+            class="w-full h-20 sm:h-24 py-4 bg-primary flex justify-center items-center fixed z-50"
+        >
             <span
                 class="material-symbols-outlined absolute text-white text-3xl my-auto left-8 cursor-pointer"
                 @click="toggleMenu"
@@ -25,7 +27,7 @@ function toggleMenu() {
             </div>
         </div>
 
-        <main class="h-full">
+        <main class="h-full mt-24">
             <section class="pb-[7.25rem] md:pb-0">
                 <slot />
             </section>

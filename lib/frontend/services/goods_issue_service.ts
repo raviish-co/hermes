@@ -1,9 +1,10 @@
 import type { Condition } from "../models/condition";
-import type { PurposeSpecification } from "../models/purpose_specification";
-import type { GoodsIssueLine, GoodsIssue } from "../models/goods_issue";
 import type { GoodsIssueNoteModel } from "../models/goods_issue_note";
+import type { GoodsIssueNoteLine } from "../domain/goods_issue_note_line";
+import type { GoodsIssueNote } from "../domain/goods_issue_note";
+import type { Purpose } from "@frontend/models/purpose";
 
-interface Line {
+interface GoodsIssueLineDTO {
     itemId: string;
     quantity: number;
     condition?: Condition;
@@ -12,13 +13,13 @@ interface Line {
 interface GoodsIssueDTO {
     total: string;
     returnDate: string;
-    purpose: PurposeSpecification;
-    lines: Line[];
+    lines: GoodsIssueLineDTO[];
+    purpose: Purpose;
 }
 
 export class GoodsIssueService {
-    async new(goodsIssue: GoodsIssue) {
-        const data = this.#toGoodsIssueDTO(goodsIssue);
+    async new(goodsIssueNote: GoodsIssueNote) {
+        const data = this.#toGoodsIssueDTO(goodsIssueNote);
 
         return await $fetch("/api/goods-issue", {
             method: "post",
@@ -30,7 +31,7 @@ export class GoodsIssueService {
         return await $fetch(`/api/goods-issue/${id}`, { method: "get" });
     }
 
-    #toGoodsIssueLine(line: GoodsIssueLine): Line {
+    #toGoodsIssueLine(line: GoodsIssueNoteLine): GoodsIssueLineDTO {
         return {
             itemId: line.itemId,
             quantity: line.quantity,
@@ -41,12 +42,12 @@ export class GoodsIssueService {
         };
     }
 
-    #toGoodsIssueDTO(goodsIssue: GoodsIssue): GoodsIssueDTO {
+    #toGoodsIssueDTO(note: GoodsIssueNote): GoodsIssueDTO {
         return {
-            total: goodsIssue.total.replace(/\s/g, ""),
-            returnDate: goodsIssue.returnDate,
-            purpose: goodsIssue.purposeSpecification,
-            lines: goodsIssue.lines.map(this.#toGoodsIssueLine),
+            total: note.formattedGrossTotal.replace(/\s/, ""),
+            returnDate: note.returnDate,
+            purpose: note.purpose,
+            lines: note.lines.map(this.#toGoodsIssueLine),
         };
     }
 }

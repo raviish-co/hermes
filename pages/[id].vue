@@ -1,49 +1,44 @@
 <script setup lang="ts">
-import type { DescribeLineStatusDialog } from "#build/components";
+import type { DescribeConditionDialog } from "#build/components";
 import { GoodsIssueService } from "~/lib/frontend/services/goods_issue_service";
-import { joinVariationValues } from "~/lib/frontend/helpers/join_variation_values";
-import type { GoodsIssueNoteModel } from "~/lib/frontend/models/goods_issue_note";
-import type { GoodsIssueLineBase } from "~/lib/frontend/models/goods_issue_base";
+import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_values";
 import { handleException } from "~/lib/frontend/helpers/error_handler";
 import { GoodsReturnService } from "~/lib/frontend/services/goods_return_service";
+import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
+import type { Condition } from "~/lib/frontend/models/condition";
 
 const route = useRoute();
 
 const GOODS_ISSUE_ID = route.params.id as string;
 
-const describeLineStatusDialogRef = ref<typeof DescribeLineStatusDialog>();
-
-const goodsIssue = ref<GoodsIssueNoteModel>({} as GoodsIssueNoteModel);
-const selectedLine = ref<GoodsIssueLineBase>({} as GoodsIssueLineBase);
-const securityDepositInputState = ref<boolean>(true);
+const conditionDialogRef = ref<typeof DescribeConditionDialog>();
+const goodsIssueNote = ref<GoodsIssueNote>({} as GoodsIssueNote);
+const editRatainedSecurityDepositIsDisabled = ref<boolean>(true);
 const retainedSecurityDeposit = ref<string>("0,00");
 
 const goodsIssueService = new GoodsIssueService();
 const goodsReturnService = new GoodsReturnService();
 
-function toggleSecurirtyDepositInputState() {
-    securityDepositInputState.value = !securityDepositInputState.value;
+function toggleEditRatainedSecurityDeposit() {
+    editRatainedSecurityDepositIsDisabled.value = !editRatainedSecurityDepositIsDisabled.value;
 }
 
-function showDescribeLineStatusDialog(line: GoodsIssueLineBase) {
-    selectedLine.value = line;
-
-    describeLineStatusDialogRef.value?.initializeLineState(
-        line?.condition!.status,
-        line?.condition?.comment
-    );
-
-    describeLineStatusDialogRef.value?.show();
+function showDescribeLineConditionDialog(itemId: string, condition?: Condition) {
+    conditionDialogRef.value?.initializeCondition(itemId, condition);
+    conditionDialogRef.value?.show();
 }
 
 function newGoodsReturn() {
     goodsReturnService
         .new(
-            goodsIssue.value.goodsIssueNoteId,
+            goodsIssueNote.value.goodsIssueNoteId,
             retainedSecurityDeposit.value,
-            goodsIssue.value.lines
+            goodsIssueNote.value.lines
         )
-        .then(() => alert("Devolução efetuada com sucesso!"))
+        .then(() => {
+            alert("Devolução efetuada com sucesso!");
+            navigateTo("/");
+        })
         .catch(handleException);
 }
 
@@ -51,11 +46,14 @@ onMounted(() => {
     goodsIssueService
         .getById(GOODS_ISSUE_ID)
         .then((result) => {
-            goodsIssue.value = result;
+            goodsIssueNote.value = GoodsIssueNote.build(result);
 
-            retainedSecurityDeposit.value = goodsIssue.value.securityDeposit;
+            retainedSecurityDeposit.value = goodsIssueNote.value.formattedSecurityDeposit;
         })
-        .catch(handleException);
+        .catch((err) => {
+            handleException(err);
+            navigateTo("/");
+        });
 });
 </script>
 
@@ -66,18 +64,22 @@ onMounted(() => {
         <form class="mb-4">
             <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
                 <input class="input-field" value="John Doe" disabled />
-                <input class="input-field" :value="goodsIssue.returnDate" disabled />
+                <input class="input-field" :value="goodsIssueNote.returnDate" disabled />
             </div>
 
             <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
-                <input class="input-field" :value="goodsIssue.purpose?.description" disabled />
-                <input class="input-field" :value="goodsIssue.purpose?.details || 'N/D'" disabled />
+                <input class="input-field" :value="goodsIssueNote.purpose?.description" disabled />
+                <input
+                    class="input-field"
+                    :value="goodsIssueNote.purpose?.details || 'N/D'"
+                    disabled
+                />
             </div>
 
-            <input class="input-field" :value="goodsIssue.purpose?.notes" disabled />
+            <input class="input-field" :value="goodsIssueNote.purpose?.notes" disabled />
         </form>
 
-        <section class="pb-16 sm:pb-5 md:pb-[4.5rem]">
+        <section class="pb-28 sm:pb-8 md:pb-20">
             <div
                 class="h-table-lg p-3 flex flex-col justify-between border border-light-500 overflow-hidden"
             >
@@ -93,19 +95,23 @@ onMounted(() => {
 
                         <tbody>
                             <tr
-                                v-for="(line, idx) in goodsIssue.lines"
+                                v-for="(line, idx) in goodsIssueNote.lines"
                                 :key="idx"
                                 class="cursor-pointer"
                             >
                                 <td>{{ line.itemId }}</td>
 
-                                <td @click="showDescribeLineStatusDialog(line)">
+                                <td
+                                    @click="
+                                        showDescribeLineConditionDialog(line.itemId, line.condition)
+                                    "
+                                >
                                     {{ line.name }}
 
                                     <br />
 
                                     <span class="text-light-600 text-sm">
-                                        {{ joinVariationValues(line?.variationsValues) }}
+                                        {{ formatVariationValues(line?.variationsValues) }}
                                     </span>
                                 </td>
 
@@ -137,22 +143,24 @@ onMounted(() => {
                 <button class="btn-light w-full md:flex-1">Cancelar</button>
             </div>
 
-            <div class="text-sm md:text-base flex gap-2 items-center w-full md:w-auto">
-                <p class="text-center w-full md:w-auto md:text-right space-x-1">
+            <div
+                class="text-sm flex-col sm:flex-row md:text-base flex gap-2 items-center w-full md:w-auto"
+            >
+                <p class="text-left sm:text-center w-full md:w-auto md:text-right space-x-1">
                     <span class="font-medium">Total de caução(kz):</span>
-                    <span>{{ goodsIssue.securityDeposit }}</span>
+                    <span>{{ goodsIssueNote.formattedSecurityDeposit }}</span>
                 </p>
 
                 <p class="flex items-center text-center w-full md:w-auto md:text-right space-x-1">
                     <span class="font-medium">Caução a reter(kz):</span>
                     <input
                         v-model="retainedSecurityDeposit"
-                        :disabled="securityDepositInputState"
+                        :disabled="editRatainedSecurityDepositIsDisabled"
                         class="input-field max-w-32"
                     />
                     <span
                         class="material-symbols-outlined cursor-pointer"
-                        @click="toggleSecurirtyDepositInputState"
+                        @click="toggleEditRatainedSecurityDeposit"
                     >
                         edit
                     </span>
@@ -161,5 +169,8 @@ onMounted(() => {
         </div>
     </section>
 
-    <DescribeLineStatusDialog :line="selectedLine" ref="describeLineStatusDialogRef" />
+    <DescribeConditionDialog
+        :goods-issue-note="(goodsIssueNote as GoodsIssueNote)"
+        ref="conditionDialogRef"
+    />
 </template>
