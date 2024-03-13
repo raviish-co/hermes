@@ -99,7 +99,10 @@ const _goodsIssueData = [
         },
         userId: ID.fromString("1"),
         returnDate: new Date(),
-        lines: [new GoodsIssueLine(_item, 3), new GoodsIssueLine(_item2, 2)],
+        lines: [
+            new GoodsIssueLine(_item.itemId, _item.price, 3),
+            new GoodsIssueLine(_item2.itemId, _item2.price, 2),
+        ],
     },
     {
         noteId: ID.fromString("GS - 1001"),
@@ -110,7 +113,7 @@ const _goodsIssueData = [
         },
         userId: ID.fromString("1"),
         returnDate: new Date(),
-        lines: [new GoodsIssueLine(_item3, 2), new GoodsIssueLine(_item2, 2)],
+        lines: [new GoodsIssueLine(_item3.itemId, _item3.price, 2)],
     },
     {
         noteId: ID.fromString("GS - 1002"),
@@ -121,7 +124,10 @@ const _goodsIssueData = [
         },
         userId: ID.fromString("1"),
         returnDate: new Date(),
-        lines: [new GoodsIssueLine(_item4, 3), new GoodsIssueLine(_item5, 2)],
+        lines: [
+            new GoodsIssueLine(_item4.itemId, _item4.price, 3),
+            new GoodsIssueLine(_item5.itemId, _item5.price, 2),
+        ],
     },
     {
         noteId: ID.fromString("GS - 1003"),
@@ -132,6 +138,6 @@ const _goodsIssueData = [
         },
         userId: ID.fromString("1"),
         returnDate: new Date(),
-        lines: [new GoodsIssueLine(_item6, 2)],
+        lines: [new GoodsIssueLine(_item6.itemId, _item6.price, 2)],
     },
 ];

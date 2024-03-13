@@ -19,4 +19,8 @@ export class ID {
     toString(): string {
         return this.#value;
     }
+
+    equals(id: ID): boolean {
+        return this.#value === id.#value;
+    }
 }

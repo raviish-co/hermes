@@ -16,6 +16,7 @@ import type { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
 import { describe, expect, it, vi } from "vitest";
 import { ID } from "../../shared/id";
+import { GoodsReturnLine } from "../../domain/goods_issue/goods_return_note_line";
 
 describe("Test Goods Issue", () => {
     it("Deve retornar error **InvalidPurpose** se não existir", async () => {
@@ -97,9 +98,9 @@ describe("Test Goods Issue", () => {
         const goodsIssueLine = goodsIssue.goodsIssueLines[0];
 
         expect(goodsIssue.goodsIssueLines.length).toBe(1);
-        expect(goodsIssueLine.item.itemId.toString()).toEqual("1001");
+        expect(goodsIssueLine.itemId.toString()).toEqual("1001");
         expect(goodsIssueLine.total.value).toEqual("4500,00");
-        expect(goodsIssueLine.quantity).toEqual(1);
+        expect(goodsIssueLine.quantityRequested).toEqual(1);
     });
 
     it("Deve efectuar a nota de saída de mercadoria, de mais de um artigo", async () => {
@@ -336,13 +337,14 @@ describe("Get Goods Issue Note", () => {
 
     it("Deve retornar **GoodsIssueHasBenWilhd** se a guia de saída de mercadoria já foi devolvida", async () => {
         const goodsIssueRepository = new GoodsIssueRepositoryStub();
-        const goodsIssueOrErr = await goodsIssueRepository.getById(ID.fromString("GS - 1000"));
+        const goodsIssueOrErr = await goodsIssueRepository.getById(ID.fromString("GS - 1001"));
         const goodsIssue = <GoodsIssueNote>goodsIssueOrErr.value;
-        goodsIssue.returnTheGoods();
+        goodsIssue.returnLines(returnedLines);
+        goodsIssue.returnTheGoods("5000,00");
 
         const { service } = makeService({ goodsIssueRepository });
 
-        const error = await service.get("GS - 1000");
+        const error = await service.get("GS - 1001");
 
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(GoodsIssueNoteHasAlreadyBeenReturned);
@@ -371,6 +373,8 @@ const goodsIssueData = {
     returnDate: "2021-01-01T16:40:00",
     userId: "1000",
 };
+
+const returnedLines = [new GoodsReturnLine(ID.fromString("1003"), 2)];
 
 interface Dependencies {
     itemRepository?: ItemRepository;
