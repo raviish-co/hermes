@@ -80,7 +80,7 @@ function selectDetails(evt: Event) {
         class="input-field mb-4"
         :class="{ invalid: isEmptyNotes }"
         :disabled="isEmptyDescription"
-        :placeholder="notesType"
+        :placeholder="purpose.description && notesType"
         @input="$emit('choosed', purpose)"
     />
 </template>

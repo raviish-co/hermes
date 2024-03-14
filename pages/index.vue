@@ -18,6 +18,7 @@ function newGoodsIssue() {
         .new(goodsIssueNote as GoodsIssueNote)
         .then(({ message }) => {
             alert(message);
+            clear();
         })
         .catch(handleException);
 }
