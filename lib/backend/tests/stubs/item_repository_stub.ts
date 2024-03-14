@@ -1,12 +1,11 @@
 import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import type { ItemRepository } from "../../domain/catalog/item_repository";
-import { ItemBuilder } from "../../domain/catalog/item_builder";
 import { type Either, left, right } from "../../shared/either";
+import { ItemStock } from "../../domain/catalog/item_stock";
 import type { Pagination } from "../../shared/pagination";
 import { Item, Status } from "../../domain/catalog/item";
 import { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
-import { ItemStock } from "../../domain/catalog/item_stock";
 
 export class ItemRepositoryStub implements ItemRepository {
     #items: Record<string, Item> = {};
@@ -100,46 +99,46 @@ export class ItemRepositoryStub implements ItemRepository {
     }
 
     #populate() {
-        const item1 = new ItemBuilder()
-            .withItemId("1001")
-            .withName("T-shirt desportiva gola redonda")
-            .withPrice(Decimal.fromString("4500,00"))
-            .withCategoryId(ID.random())
-            .withStock(10)
-            .withGoodCondition()
-            .withSectionId(ID.random())
-            .withVariation(ID.fromString("1"), "Cor: Preto")
-            .build();
+        const item1 = new Item(
+            ID.fromString("1001"),
+            ID.random(),
+            "T-shirt desportiva gola redonda",
+            ID.random(),
+            Decimal.fromString("4500,00"),
+            { "1": "Cor: Branco" },
+            new ItemStock(10),
+            { status: Status.Good }
+        );
 
-        const item2 = new ItemBuilder()
-            .withItemId("1002")
-            .withName("Sapato social")
-            .withPrice(Decimal.fromString("15500,00"))
-            .withCategoryId(ID.random())
-            .withStock(10)
-            .withGoodCondition()
-            .withSectionId(ID.random())
-            .withVariation(ID.fromString("2"), "Marca: Nike")
-            .build();
+        const item2 = new Item(
+            ID.fromString("1002"),
+            ID.random(),
+            "Calça Jeans Skinny",
+            ID.random(),
+            Decimal.fromString("15500,00"),
+            { "1": "Cor: Castanho", "2": "Marca: Gucci" },
+            new ItemStock(10),
+            { status: Status.Good }
+        );
 
-        const item3 = new ItemBuilder()
-            .withItemId("1003")
-            .withName("Calça jeans")
-            .withPrice(Decimal.fromString("5500,00"))
-            .withCategoryId(ID.random())
-            .withStock(10)
-            .withGoodCondition()
-            .withSectionId(ID.random())
-            .withVariation(ID.fromString("3"), "Tamanho: 42")
-            .build();
+        const item3 = new Item(
+            ID.fromString("1003"),
+            ID.random(),
+            "Moletom com Capuz",
+            ID.random(),
+            Decimal.fromString("1000"),
+            { "1": "Cor: Verde", "2": "Marca: Adidas" },
+            new ItemStock(7),
+            { status: Status.Good }
+        );
 
         const item4 = new Item(
             ID.fromString("1004"),
             ID.random(),
-            "Item 1",
+            "Shorts Esportivo",
             ID.random(),
             Decimal.fromString("1000"),
-            { "1": "Cor: Preta" },
+            { "1": "Cor: Verde", "2": "Marca: Adidas" },
             new ItemStock(7),
             { status: Status.Good }
         );
@@ -147,10 +146,10 @@ export class ItemRepositoryStub implements ItemRepository {
         const item5 = new Item(
             ID.fromString("1005"),
             ID.random(),
-            "Item 2",
+            "Casaco de Inverno",
             ID.random(),
             Decimal.fromString("1000"),
-            { "1": "Cor: Preta" },
+            { "1": "Cor: Cinza", "2": "Tamanho: M", "3": "Marca: Polo" },
             new ItemStock(8),
             { status: Status.Good }
         );
@@ -158,18 +157,18 @@ export class ItemRepositoryStub implements ItemRepository {
         const item6 = new Item(
             ID.fromString("1006"),
             ID.random(),
-            "Item 3",
+            "Camiseta Polo de Manga Longa",
             ID.random(),
             Decimal.fromString("1000"),
-            { "1": "Cor: Preta" },
+            { "1": "Cor: Preta", "2": "Marca: Polo" },
             new ItemStock(8),
             { status: Status.Good }
         );
 
         this.#items = {
-            "1001": item1.value as Item,
-            "1002": item2.value as Item,
-            "1003": item3.value as Item,
+            "1001": item1,
+            "1002": item2,
+            "1003": item3,
             "1004": item4,
             "1005": item5,
             "1006": item6,

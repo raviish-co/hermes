@@ -114,7 +114,7 @@ export class GoodsIssueService {
 
             item.reduceStock(quantity);
 
-            const goodsIssueLine = new GoodsIssueLine(item, quantity);
+            const goodsIssueLine = new GoodsIssueLine(item.itemId, item.price, quantity);
 
             goodsIssueLines.push(goodsIssueLine);
         }

@@ -3,11 +3,9 @@ import { GoodsIssueNote } from "~/lib/backend/domain/goods_issue/goods_issue_not
 import { Purpose } from "~/lib/backend/domain/goods_issue/purpose";
 
 interface GoodsIssueLineDTO {
-    name: string;
     itemId: string;
     quantity: number;
-    fulltext: string;
-    variationValues: string[];
+    returnedQuantity: number;
 }
 
 interface GoodsIssueNoteDTO {
@@ -22,13 +20,15 @@ interface GoodsIssueNoteDTO {
 
 function toGoodsIssueLineDTO(line: GoodsIssueLine): GoodsIssueLineDTO {
     return {
-        itemId: line.item.itemId.toString(),
-        quantity: line.quantity,
-        name: line.item.name,
-        fulltext: line.item.fulltext,
-        variationValues: Object.values(line.item.variations).map((variation) =>
-            variation.toString()
-        ),
+        itemId: line.itemId.toString(),
+        quantity: line.quantityRequested,
+        returnedQuantity: line.quantityReturned,
+
+        // name: line.item.name,
+        // fulltext: line.item.fulltext,
+        // variationValues: Object.values(line.item.variations).map((variation) =>
+        //     variation.toString()
+        // ),
     };
 }
 

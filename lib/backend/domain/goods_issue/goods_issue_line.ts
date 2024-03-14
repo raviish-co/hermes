@@ -1,30 +1,45 @@
 import { Decimal } from "../../shared/decimal";
-import type { Item } from "../catalog/item";
+import { ID } from "../../shared/id";
 
 export class GoodsIssueLine {
-    readonly item: Item;
-    readonly quantity: number;
+    readonly issueLineId: ID;
+    readonly itemId: ID;
+    readonly price: Decimal;
+    readonly #quantity: number;
+    quantityReturned: number;
     #netTotal: Decimal;
 
-    constructor(item: Item, quantity: number) {
-        this.item = item;
-        this.quantity = quantity;
+    constructor(itemId: ID, price: Decimal, quantity: number) {
+        this.issueLineId = ID.random();
+        this.itemId = itemId;
+        this.price = price;
+        this.#quantity = quantity;
+        this.quantityReturned = 0;
         this.#netTotal = Decimal.fromString("0");
+
         this.#calculateTotal();
     }
 
-    #calculateTotal(): void {
-        const factor = Decimal.fromString(this.quantity.toString());
-        this.#netTotal = this.item.price.multiply(factor);
+    returnLine(quantity: number) {
+        if (this.isFullyReturned()) return;
+        this.quantityReturned += quantity;
     }
 
-    restoreStockQuantity(quantity?: number): void {
-        if (!quantity) {
-            this.item.updateStock(this.quantity);
-            return;
-        }
+    checkQuantity(quantity: number): boolean {
+        return this.#quantity >= quantity;
+    }
 
-        this.item.updateStock(quantity);
+    isFullyReturned(): boolean {
+        return this.quantityReturned === this.#quantity;
+    }
+
+    #calculateTotal(): void {
+        const factor = Decimal.fromString(this.#quantity.toString());
+        this.#netTotal = this.price.multiply(factor);
+    }
+
+    get quantityRequested(): number {
+        return this.#quantity;
     }
 
     get total(): Decimal {

@@ -26,6 +26,10 @@ export class Decimal {
         return Decimal.fromString(result.toString());
     }
 
+    isZero(): boolean {
+        return this.#value === "0,00";
+    }
+
     #makeOperand(value: string): number {
         return parseInt(value.replace(",", ""));
     }
