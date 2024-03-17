@@ -20,8 +20,32 @@ h1 {
     @apply text-2xl font-medium text-gray-900;
 }
 
+.page-title {
+    @apply text-xl text-center sm:text-2xl sm:my-10 my-8;
+}
+
 .input-field {
     @apply w-full py-2 px-4 border border-light-500 bg-white placeholder:text-light-500 focus:ring-0 focus:border-primary;
+}
+
+.input-number:invalid {
+    @apply border-red-500 border;
+}
+
+.input-number {
+    @apply appearance-none w-full py-2 px-3 leading-tight overflow-hidden focus:ring-0 focus:border-secondary-600 border-0 border-b border-light-500 disabled:cursor-not-allowed disabled:bg-slate-200;
+}
+
+.input-number::-webkit-inner-spin-button {
+    display: none;
+}
+
+.input-disabled {
+    @apply w-full py-2 px-4 h-[42px] border border-light-500 bg-gray-100 text-gray-500 pointer-events-none;
+}
+
+.input-container {
+    @apply flex flex-wrap items-center gap-4 sm:flex-nowrap;
 }
 
 .invalid {
@@ -49,8 +73,12 @@ h1 {
     @apply border-t font-medium uppercase;
 }
 
+.table-container {
+    @apply h-[36rem] space-y-2 border border-light-500 p-3 overflow-hidden;
+}
+
 .btn {
-    @apply py-2 px-9 text-white font-medium disabled:cursor-not-allowed disabled:bg-opacity-50;
+    @apply w-full py-2 px-9 text-white font-medium disabled:cursor-not-allowed disabled:bg-opacity-50;
 }
 
 .btn-secondary {
@@ -61,15 +89,20 @@ h1 {
     @apply btn bg-light-500;
 }
 
-.input-number::-webkit-inner-spin-button {
-    display: none;
+.footer {
+    @apply fixed shadow-top bottom-0 w-full shadow-light-500 bg-white;
 }
 
-.input-number {
-    @apply appearance-none w-full py-2 px-3 leading-tight overflow-hidden focus:ring-0 focus:border-secondary-600 border-0 border-b border-light-500 disabled:cursor-not-allowed disabled:bg-slate-200;
+.footer-container {
+    @apply section-content flex justify-between items-center gap-4 p-4 flex-wrap flex-col-reverse md:flex-row md:flex-nowrap;
 }
-.input-number:invalid {
-    @apply border-red-500 border;
+
+.badge {
+    @apply text-xs font-medium py-1.5 px-4 rounded-full;
+}
+
+.badge-danger {
+    @apply badge text-red-500 bg-red-100;
 }
 
 ::-webkit-scrollbar {

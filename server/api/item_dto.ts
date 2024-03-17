@@ -24,7 +24,7 @@ export function toItemDTO(item: Item): ItemDTO {
         name: item.name,
         price: item.price.value,
         categoryId: item.categoryId.toString(),
-        variationsValues: toVariationValuesDTO(item),
+        variationsValues: toVariationValuesDTO(item.variations),
         quantity: item.getStock().quantity,
         condition: {
             status: item.getCondition().status,
@@ -33,8 +33,8 @@ export function toItemDTO(item: Item): ItemDTO {
     };
 }
 
-function toVariationValuesDTO(item: Item): VariationValues[] {
-    return Object.entries(item.variations).map(([variationId, value]) => ({
+export function toVariationValuesDTO(variations: Record<string, string>): VariationValues[] {
+    return Object.entries(variations).map(([variationId, value]) => ({
         variationId,
         value,
     }));

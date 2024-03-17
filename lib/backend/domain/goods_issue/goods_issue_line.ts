@@ -4,14 +4,27 @@ import { ID } from "../../shared/id";
 export class GoodsIssueLine {
     readonly issueLineId: ID;
     readonly itemId: ID;
+    readonly name: string;
+    readonly fulltext: string;
     readonly price: Decimal;
     readonly #quantity: number;
+    readonly variationsValues: Record<string, string>;
     quantityReturned: number;
     #netTotal: Decimal;
 
-    constructor(itemId: ID, price: Decimal, quantity: number) {
+    constructor(
+        itemId: ID,
+        name: string,
+        price: Decimal,
+        quantity: number,
+        variationsValues: Record<string, string>,
+        fulltext: string
+    ) {
         this.issueLineId = ID.random();
         this.itemId = itemId;
+        this.name = name;
+        this.variationsValues = variationsValues;
+        this.fulltext = fulltext;
         this.price = price;
         this.#quantity = quantity;
         this.quantityReturned = 0;

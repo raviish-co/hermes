@@ -140,7 +140,7 @@ describe("Test SearchItems", () => {
     });
 
     it("Deve pesquisar os items pelo campo fulltext", async () => {
-        const query = "Preto";
+        const query = "Branco";
         const itemRepository = new ItemRepositoryStub();
         const variationRepository = new InmemVariationRepository();
         const service = new CatalogService(itemRepository, variationRepository);
@@ -152,7 +152,7 @@ describe("Test SearchItems", () => {
     });
 
     it("Deve pesquisar os items pelo campo fulltext com letras minúsculas", async () => {
-        const query = "preto";
+        const query = "branco";
         const itemRepository = new ItemRepositoryStub();
         const variationRepository = new InmemVariationRepository();
         const service = new CatalogService(itemRepository, variationRepository);

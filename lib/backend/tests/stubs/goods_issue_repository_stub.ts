@@ -100,8 +100,22 @@ const _goodsIssueData = [
         userId: ID.fromString("1"),
         returnDate: new Date(),
         lines: [
-            new GoodsIssueLine(_item.itemId, _item.price, 3),
-            new GoodsIssueLine(_item2.itemId, _item2.price, 2),
+            new GoodsIssueLine(
+                _item.itemId,
+                _item.name,
+                _item.price,
+                3,
+                _item.variations,
+                _item.fulltext
+            ),
+            new GoodsIssueLine(
+                _item2.itemId,
+                _item2.name,
+                _item2.price,
+                2,
+                _item2.variations,
+                _item2.fulltext
+            ),
         ],
     },
     {
@@ -113,7 +127,16 @@ const _goodsIssueData = [
         },
         userId: ID.fromString("1"),
         returnDate: new Date(),
-        lines: [new GoodsIssueLine(_item3.itemId, _item3.price, 2)],
+        lines: [
+            new GoodsIssueLine(
+                _item3.itemId,
+                _item3.name,
+                _item3.price,
+                2,
+                _item3.variations,
+                _item3.fulltext
+            ),
+        ],
     },
     {
         noteId: ID.fromString("GS - 1002"),
@@ -125,8 +148,22 @@ const _goodsIssueData = [
         userId: ID.fromString("1"),
         returnDate: new Date(),
         lines: [
-            new GoodsIssueLine(_item4.itemId, _item4.price, 3),
-            new GoodsIssueLine(_item5.itemId, _item5.price, 2),
+            new GoodsIssueLine(
+                _item4.itemId,
+                _item4.name,
+                _item4.price,
+                3,
+                _item4.variations,
+                _item4.fulltext
+            ),
+            new GoodsIssueLine(
+                _item5.itemId,
+                _item5.name,
+                _item5.price,
+                2,
+                _item5.variations,
+                _item5.fulltext
+            ),
         ],
     },
     {
@@ -138,6 +175,15 @@ const _goodsIssueData = [
         },
         userId: ID.fromString("1"),
         returnDate: new Date(),
-        lines: [new GoodsIssueLine(_item6.itemId, _item6.price, 2)],
+        lines: [
+            new GoodsIssueLine(
+                _item6.itemId,
+                _item6.name,
+                _item6.price,
+                2,
+                _item6.variations,
+                _item6.fulltext
+            ),
+        ],
     },
 ];

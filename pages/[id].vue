@@ -1,31 +1,35 @@
 <script setup lang="ts">
-import type { DescribeConditionDialog } from "#build/components";
 import { GoodsIssueService } from "~/lib/frontend/services/goods_issue_service";
-import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_values";
-import { handleException } from "~/lib/frontend/helpers/error_handler";
 import { GoodsReturnService } from "~/lib/frontend/services/goods_return_service";
+import { GoodsReturnNote } from "~/lib/frontend/domain/goods_return_note";
 import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
-import type { Condition } from "~/lib/frontend/models/condition";
+import { handleException } from "~/lib/frontend/helpers/error_handler";
+
+const retainedSecurityDeposit = ref<string>("0,00");
+const goodsReturnNote = ref<GoodsReturnNote>({} as GoodsReturnNote);
+const goodsIssueNote = ref<GoodsIssueNote>({} as GoodsIssueNote);
+const editRatainedSecurityDeposit = ref<boolean>(true);
+
+const goodsReturnService = new GoodsReturnService();
+const goodsIssueService = new GoodsIssueService();
 
 const route = useRoute();
+const noteId = route.params.id as string;
 
-const GOODS_ISSUE_ID = route.params.id as string;
+goodsIssueService
+    .getById(noteId)
+    .then((result) => {
+        goodsIssueNote.value = GoodsIssueNote.build(result);
+        retainedSecurityDeposit.value = goodsIssueNote.value.formattedSecurityDeposit;
+        goodsReturnNote.value = new GoodsReturnNote(goodsIssueNote.value.lines);
+    })
+    .catch((err) => {
+        handleException(err);
+        navigateTo("/");
+    });
 
-const conditionDialogRef = ref<typeof DescribeConditionDialog>();
-const goodsIssueNote = ref<GoodsIssueNote>({} as GoodsIssueNote);
-const editRatainedSecurityDepositIsDisabled = ref<boolean>(true);
-const retainedSecurityDeposit = ref<string>("0,00");
-
-const goodsIssueService = new GoodsIssueService();
-const goodsReturnService = new GoodsReturnService();
-
-function toggleEditRatainedSecurityDeposit() {
-    editRatainedSecurityDepositIsDisabled.value = !editRatainedSecurityDepositIsDisabled.value;
-}
-
-function showDescribeLineConditionDialog(itemId: string, condition?: Condition) {
-    conditionDialogRef.value?.initializeCondition(itemId, condition);
-    conditionDialogRef.value?.show();
+function toggleEdit() {
+    editRatainedSecurityDeposit.value = !editRatainedSecurityDeposit.value;
 }
 
 function newGoodsReturn() {
@@ -33,7 +37,7 @@ function newGoodsReturn() {
         .new(
             goodsIssueNote.value.goodsIssueNoteId,
             retainedSecurityDeposit.value,
-            goodsIssueNote.value.lines
+            goodsReturnNote.value.lines
         )
         .then(() => {
             alert("Devolução efetuada com sucesso!");
@@ -41,136 +45,58 @@ function newGoodsReturn() {
         })
         .catch(handleException);
 }
-
-onMounted(() => {
-    goodsIssueService
-        .getById(GOODS_ISSUE_ID)
-        .then((result) => {
-            goodsIssueNote.value = GoodsIssueNote.build(result);
-
-            retainedSecurityDeposit.value = goodsIssueNote.value.formattedSecurityDeposit;
-        })
-        .catch((err) => {
-            handleException(err);
-            navigateTo("/");
-        });
-});
 </script>
 
 <template>
     <section class="section-content">
-        <h1 class="text-xl text-center sm:text-2xl sm:my-10 my-8">Guia de Devolução</h1>
+        <h1 class="page-title">Guia de Devolução de Artigos</h1>
 
-        <form class="mb-4">
-            <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
-                <input class="input-field" value="John Doe" disabled />
-                <input class="input-field" :value="goodsIssueNote.returnDate" disabled />
+        <section class="space-y-4 mb-4">
+            <div class="input-container">
+                <div class="input-disabled">John Doe</div>
+                <div class="input-disabled">{{ goodsIssueNote.returnDate }}</div>
             </div>
 
-            <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
-                <input class="input-field" :value="goodsIssueNote.purpose?.description" disabled />
-                <input
-                    class="input-field"
-                    :value="goodsIssueNote.purpose?.details || 'N/D'"
-                    disabled
-                />
+            <div class="input-container">
+                <div class="input-disabled">{{ goodsIssueNote.purpose?.description }}</div>
+                <div class="input-disabled">{{ goodsIssueNote.purpose?.details ?? "N/D" }}</div>
             </div>
 
-            <input class="input-field" :value="goodsIssueNote.purpose?.notes" disabled />
-        </form>
-
-        <section class="pb-28 sm:pb-8 md:pb-20">
-            <div
-                class="h-table-lg p-3 flex flex-col justify-between border border-light-500 overflow-hidden"
-            >
-                <div class="flex-1 overflow-y-auto">
-                    <table class="table">
-                        <thead>
-                            <tr class="text-left">
-                                <th class="min-w-24 w-24">ID</th>
-                                <th class="min-w-52">Item</th>
-                                <th class="min-w-10 w-16">QTD</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            <tr
-                                v-for="(line, idx) in goodsIssueNote.lines"
-                                :key="idx"
-                                class="cursor-pointer"
-                            >
-                                <td>{{ line.itemId }}</td>
-
-                                <td
-                                    @click="
-                                        showDescribeLineConditionDialog(line.itemId, line.condition)
-                                    "
-                                >
-                                    {{ line.name }}
-
-                                    <br />
-
-                                    <span class="text-light-600 text-sm">
-                                        {{ formatVariationValues(line?.variationsValues) }}
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <input
-                                        type="number"
-                                        v-model="line.quantity"
-                                        class="input-number"
-                                        min="1"
-                                        disabled
-                                    />
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <div class="input-disabled">{{ goodsIssueNote.purpose?.notes }}</div>
         </section>
+
+        <ReturnNote :note="goodsReturnNote" :requested-lines="goodsIssueNote.lines" />
     </section>
 
-    <section class="fixed shadow-top bottom-0 w-full shadow-light-500 bg-white">
-        <div
-            class="flex justify-between items-center section-content p-4 flex-wrap flex-col-reverse md:flex-row md:flex-nowrap gap-4"
-        >
-            <div class="flex flex-wrap sm:flex-nowrap gap-4 w-full md:w-auto pb-4 md:pb-0">
-                <button class="btn-secondary w-full md:flex-1" @click="newGoodsReturn">
-                    Devolver
-                </button>
-                <button class="btn-light w-full md:flex-1">Cancelar</button>
+    <section class="footer">
+        <div class="footer-container">
+            <div class="flex flex-wrap gap-2 w-full pb-3 md:w-auto sm:flex-nowrap md:gap-4 md:pb-0">
+                <button class="btn-secondary" @click="newGoodsReturn()">Devolver</button>
+                <button class="btn-light">Cancelar</button>
             </div>
 
             <div
-                class="text-sm flex-col sm:flex-row md:text-base flex gap-2 items-center w-full md:w-auto"
+                class="flex flex-col text-sm gap-4 items-center w-full sm:flex-row md:text-base md:w-auto"
             >
-                <p class="text-left sm:text-center w-full md:w-auto md:text-right space-x-1">
-                    <span class="font-medium">Total de caução(kz):</span>
+                <p
+                    class="w-full space-x-1 text-left pt-3 md:w-auto md:text-right md:pt-0 sm:text-center"
+                >
+                    <span class="font-medium">Total de caução (Kz):</span>
                     <span>{{ goodsIssueNote.formattedSecurityDeposit }}</span>
                 </p>
 
                 <p class="flex items-center text-center w-full md:w-auto md:text-right space-x-1">
-                    <span class="font-medium">Caução a reter(kz):</span>
+                    <span class="font-medium">Caução a reter (Kz):</span>
                     <input
-                        v-model="retainedSecurityDeposit"
-                        :disabled="editRatainedSecurityDepositIsDisabled"
                         class="input-field max-w-32"
+                        v-model="retainedSecurityDeposit"
+                        :disabled="editRatainedSecurityDeposit"
                     />
-                    <span
-                        class="material-symbols-outlined cursor-pointer"
-                        @click="toggleEditRatainedSecurityDeposit"
-                    >
+                    <span class="material-symbols-outlined cursor-pointer" @click="toggleEdit">
                         edit
                     </span>
                 </p>
             </div>
         </div>
     </section>
-
-    <DescribeConditionDialog
-        :goods-issue-note="(goodsIssueNote as GoodsIssueNote)"
-        ref="conditionDialogRef"
-    />
 </template>

@@ -4,11 +4,10 @@ import type { PurposeSpecificationModel } from "~/lib/frontend/models/purpose_sp
 import { PurposeService } from "~/lib/frontend/services/purpose_service";
 
 const purpose = ref<Purpose>(new Purpose("", ""));
-
-const service = new PurposeService();
 const specitications = ref<PurposeSpecificationModel[]>([]);
 const detailsConstraint = ref<string[]>([]);
 const notesType = ref<string>("");
+const emits = defineEmits<{ (e: "choosed", purpose: Purpose): void }>();
 
 const disableDetailsConstraint = computed(
     () => detailsConstraint.value.length <= 0 || purpose.value.description == ""
@@ -19,9 +18,8 @@ const isEmptyDetails = computed(
 );
 const isEmptyNotes = computed(() => purpose.value.notes === "" && !isEmptyDescription.value);
 
+const service = new PurposeService();
 specitications.value = await service.listPurposes();
-
-const emits = defineEmits<{ (e: "choosed", purpose: Purpose): void }>();
 
 function chooseDetails(evt: Event): void {
     const el = evt.target as HTMLSelectElement;
@@ -48,39 +46,44 @@ function selectDetails(evt: Event) {
 </script>
 
 <template>
-    <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
-        <select
-            :value="purpose.description || 'Finalidade'"
-            class="input-field"
-            :class="{ invalid: isEmptyDescription }"
-            @change="chooseDetails"
-        >
-            <option selected disabled>Finalidade</option>
-            <option v-for="spec in specitications" :key="spec.description">
-                {{ spec.description }}
-            </option>
-        </select>
+    <div class="space-y-4">
+        <div class="input-container">
+            <select
+                class="input-field"
+                :value="purpose.description || 'Finalidade'"
+                :class="{ invalid: isEmptyDescription }"
+                @change="chooseDetails"
+            >
+                <option selected disabled>Finalidade</option>
+                <option v-for="spec in specitications" :key="spec.description">
+                    {{ spec.description }}
+                </option>
+            </select>
 
-        <select
-            :value="purpose.details || 'Detalhes'"
-            :disabled="disableDetailsConstraint"
-            class="input-field"
-            :class="{ invalid: isEmptyDetails }"
-            @change="selectDetails"
-        >
-            <option selected disabled>Detalhes</option>
-            <option v-for="opt in detailsConstraint" :key="opt">
-                {{ opt }}
-            </option>
-        </select>
+            <select
+                :value="purpose.details || 'Detalhes'"
+                :class="{
+                    'input-field': !disableDetailsConstraint,
+                    'input-disabled': disableDetailsConstraint,
+                    invalid: isEmptyDetails,
+                }"
+                @change="selectDetails"
+            >
+                <option selected disabled>Detalhes</option>
+                <option v-for="opt in detailsConstraint" :key="opt">
+                    {{ opt }}
+                </option>
+            </select>
+        </div>
+        <input
+            v-model="purpose.notes"
+            :class="{
+                'input-field': !isEmptyDescription,
+                'input-disabled': isEmptyDescription,
+                invalid: isEmptyNotes,
+            }"
+            :placeholder="notesType"
+            @input="$emit('choosed', purpose)"
+        />
     </div>
-
-    <input
-        v-model="purpose.notes"
-        class="input-field mb-4"
-        :class="{ invalid: isEmptyNotes }"
-        :disabled="isEmptyDescription"
-        :placeholder="notesType"
-        @input="$emit('choosed', purpose)"
-    />
 </template>

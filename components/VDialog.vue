@@ -1,10 +1,4 @@
 <script setup lang="ts">
-interface Props {
-    title: string;
-}
-
-defineProps<Props>();
-
 const dialogRef = ref<HTMLDialogElement>();
 
 function show() {
@@ -15,13 +9,14 @@ function close() {
     dialogRef.value?.close();
 }
 
+defineProps<{ title: string }>();
 defineExpose({ show, close });
 </script>
 
 <template>
-    <dialog ref="dialogRef" class="m-auto p-4 w-full bg-transparent fixed">
-        <div class="bg-white py-8 px-6 flex flex-col items-center gap-8">
-            <div class="flex justify-between items-center w-full">
+    <dialog ref="dialogRef" class="w-full m-auto bg-white px-6 py-8">
+        <div class="space-y-8">
+            <div class="flex justify-between items-center">
                 <h2 class="font-medium text-lg">{{ title }}</h2>
                 <span class="material-symbols-outlined cursor-pointer" @click="close">close</span>
             </div>

@@ -27,7 +27,7 @@ function goToPreviousPage() {
 </script>
 
 <template>
-    <div v-if="total > 1" class="flex items-center gap-x-4">
+    <div v-if="total > 1" class="flex justify-center items-center gap-x-4">
         <span
             class="material-symbols-outlined cursor-pointer hover:bg-gray-100"
             @click="goToPreviousPage"

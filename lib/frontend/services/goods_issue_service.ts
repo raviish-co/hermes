@@ -4,19 +4,6 @@ import type { GoodsIssueNoteLine } from "../domain/goods_issue_note_line";
 import type { GoodsIssueNote } from "../domain/goods_issue_note";
 import type { Purpose } from "@frontend/models/purpose";
 
-interface GoodsIssueLineDTO {
-    itemId: string;
-    quantity: number;
-    condition?: Condition;
-}
-
-interface GoodsIssueDTO {
-    total: string;
-    returnDate: string;
-    lines: GoodsIssueLineDTO[];
-    purpose: Purpose;
-}
-
 export class GoodsIssueService {
     async new(goodsIssueNote: GoodsIssueNote) {
         const data = this.#toGoodsIssueDTO(goodsIssueNote);
@@ -37,7 +24,8 @@ export class GoodsIssueService {
             quantity: line.quantity,
             condition: {
                 comment: line?.condition?.comment,
-                status: line?.condition!.status,
+                status: "Mau",
+                // line?.condition?.status
             },
         };
     }
@@ -50,4 +38,17 @@ export class GoodsIssueService {
             lines: note.lines.map(this.#toGoodsIssueLine),
         };
     }
+}
+
+interface GoodsIssueLineDTO {
+    itemId: string;
+    quantity: number;
+    condition?: Condition;
+}
+
+interface GoodsIssueDTO {
+    total: string;
+    returnDate: string;
+    lines: GoodsIssueLineDTO[];
+    purpose: Purpose;
 }

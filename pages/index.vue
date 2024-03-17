@@ -1,147 +1,47 @@
 <script lang="ts" setup>
-import type { AddLineDialog, DescribeConditionDialog, ChoosePurpose } from "#build/components";
+import type { ChoosePurpose } from "#build/components";
 import { getCurrentLocalDateTime } from "@frontend/helpers/current_local_date_time";
 import { GoodsIssueService } from "@frontend/services/goods_issue_service";
+import { GoodsIssueNote } from "@frontend/domain/goods_issue_note";
 import { handleException } from "@frontend/helpers/error_handler";
-import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
-import type { Condition } from "~/lib/frontend/models/condition";
-
-const addLineDialogRef = ref<typeof AddLineDialog>();
-const conditionDialogRef = ref<typeof DescribeConditionDialog>();
 const returnDate = ref<string>(getCurrentLocalDateTime());
 
 const goodsIssueService = new GoodsIssueService();
-const goodsIssueNote = reactive<GoodsIssueNote>(new GoodsIssueNote(returnDate.value));
+const note = reactive<GoodsIssueNote>(new GoodsIssueNote(returnDate.value));
 
 function newGoodsIssue() {
     goodsIssueService
-        .new(goodsIssueNote as GoodsIssueNote)
+        .new(note as GoodsIssueNote)
         .then(({ message }) => {
             alert(message);
         })
         .catch(handleException);
 }
-
-function showAddLineDialog() {
-    addLineDialogRef.value?.show();
-}
-
-function showDescribeLineConditionDialog(itemId: string, condition?: Condition) {
-    conditionDialogRef.value?.initializeCondition(itemId, condition);
-    conditionDialogRef.value?.show();
-}
-
-function clear() {
-    goodsIssueNote.clear();
-}
 </script>
 
 <template>
     <section class="section-content">
-        <h1 class="text-xl text-center sm:text-2xl sm:my-10 my-8">Guia de Saída de Artigos</h1>
+        <h1 class="page-title">Guia de Saída de Artigos</h1>
 
-        <form>
-            <div class="flex items-center gap-4 mb-4 flex-wrap sm:flex-nowrap">
-                <input class="input-field" placeholder="John Doe" :disabled="true" />
-
+        <section class="space-y-4 mb-4">
+            <div class="input-container">
+                <div class="input-disabled">John Doe</div>
                 <input v-model="returnDate" type="datetime-local" class="input-field" />
             </div>
 
-            <ChoosePurpose @choosed="goodsIssueNote.setPurpose($event)" />
-        </form>
-
-        <section class="pb-24 sm:pb-5 md:pb-[4.5rem]">
-            <div
-                class="h-table-lg p-3 flex flex-col justify-between border border-light-500 overflow-hidden"
-            >
-                <div class="w-full flex items-center justify-between">
-                    <span
-                        class="material-symbols-outlined hover:text-secondary-600 p-2 cursor-pointer"
-                        @click="showAddLineDialog"
-                    >
-                        add
-                    </span>
-
-                    <span
-                        class="hover:text-red-500 hover:bg-red-500 hover:bg-opacity-10 p-2 cursor-pointer"
-                        @click="goodsIssueNote.clearLines()"
-                    >
-                        Limpar
-                    </span>
-                </div>
-
-                <div class="flex-1 overflow-y-auto">
-                    <table class="table">
-                        <thead>
-                            <tr class="text-left">
-                                <th class="min-w-24 w-24">ID</th>
-                                <th class="min-w-52">Artigo</th>
-                                <th class="min-w-16 w-16">QTD</th>
-                                <th class="min-w-36 w-36 text-right">Preço Unid (Kz)</th>
-                                <th class="min-w-36 w-36 text-right">Total (Kz)</th>
-                                <th class="min-w-10 w-10"></th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            <tr
-                                v-for="(line, idx) in goodsIssueNote.lines"
-                                :key="idx"
-                                class="cursor-pointer"
-                            >
-                                <td>{{ line.itemId }}</td>
-                                <td
-                                    @click="
-                                        showDescribeLineConditionDialog(line.itemId, line.condition)
-                                    "
-                                >
-                                    {{ line.name }}
-                                    <br />
-                                    <span class="text-light-600 text-sm">
-                                        {{ line.formattedVariationsValues }}
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <input
-                                        type="number"
-                                        placeholder="QTD"
-                                        v-model="line.quantity"
-                                        class="input-number"
-                                        min="1"
-                                        :max="line.stock"
-                                        @input="goodsIssueNote.updateLineQuantity(line.itemId)"
-                                    />
-                                </td>
-                                <td class="text-right">{{ line.formattedPrice }}</td>
-                                <td class="text-right">{{ line.formattedTotal }}</td>
-                                <td
-                                    class="cursor-pointer"
-                                    @click="goodsIssueNote.removeLine(line.itemId)"
-                                >
-                                    <span class="material-symbols-outlined">close</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <ChoosePurpose @choosed="note.setPurpose($event)" />
         </section>
+
+        <IssueNote :note="note" />
     </section>
 
-    <section class="fixed shadow-top bottom-0 w-full bg-white shadow-light-500">
-        <div
-            class="flex justify-between items-center section-content p-4 bg-white flex-wrap flex-col-reverse md:flex-row md:flex-nowrap gap-4"
-        >
+    <section class="footer">
+        <div class="footer-container">
             <div class="flex flex-wrap sm:flex-nowrap gap-4 w-full md:w-auto pb-4 md:pb-0">
-                <button
-                    class="btn-secondary w-full md:flex-1"
-                    @click="newGoodsIssue"
-                    :disabled="!goodsIssueNote.isValid()"
-                >
+                <button class="btn-secondary" :disabled="!note.isValid()" @click="newGoodsIssue">
                     Solicitar
                 </button>
-                <button class="btn-light w-full md:flex-1" @click="clear">Cancelar</button>
+                <button class="btn-light" @click="note.clear()">Cancelar</button>
             </div>
 
             <div
@@ -151,23 +51,16 @@ function clear() {
                     class="text-center w-full md:w-auto md:text-right space-x-1 sm:max-w-80 truncate overflow-hidden"
                 >
                     <span class="font-medium">Total Geral (Kz):</span>
-                    <span>{{ goodsIssueNote.formattedGrossTotal }}</span>
+                    <span>{{ note.formattedGrossTotal }}</span>
                 </p>
 
                 <p
                     class="text-center w-full md:w-auto md:text-right space-x-1 sm:max-w-80 truncate overflow-hidden"
                 >
                     <span class="font-medium">Caução (Kz):</span>
-                    <span>{{ goodsIssueNote.formattedSecurityDeposit }}</span>
+                    <span>{{ note.formattedSecurityDeposit }}</span>
                 </p>
             </div>
         </div>
     </section>
-
-    <AddLineDialog ref="addLineDialogRef" :goods-issue-note="(goodsIssueNote as GoodsIssueNote)" />
-
-    <DescribeConditionDialog
-        ref="conditionDialogRef"
-        :goods-issue-note="(goodsIssueNote as GoodsIssueNote)"
-    />
 </template>

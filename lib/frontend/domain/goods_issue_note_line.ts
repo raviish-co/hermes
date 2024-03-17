@@ -2,31 +2,30 @@ import type { VariationValue } from "../models/variation_value";
 import { convertToNumber } from "../helpers/convert_to_number";
 import { formatCurrency } from "../helpers/format_currency";
 import type { Condition } from "../models/condition";
-import type { ItemModel } from "../models/item";
-import { formatVariationValues } from "../helpers/format_variation_values";
+import { NoteLine } from "./note_line";
 
-export class GoodsIssueNoteLine {
-    itemId: string;
-    name: string;
+export class GoodsIssueNoteLine extends NoteLine {
     price: number;
-    quantity: number;
     stock: number;
     total: number;
-    variationsValues?: VariationValue[];
-    condition?: Condition;
 
-    constructor(item: ItemModel, quantity: number) {
-        this.itemId = item.itemId;
-        this.name = item.name;
-        this.quantity = quantity;
-        this.price = convertToNumber(item.price);
-        this.condition = item.condition;
-        this.variationsValues = item.variationsValues;
-        this.stock = item.quantity;
+    constructor(
+        itemId: string,
+        name: string,
+        quantity: number,
+        price: string,
+        stock: number,
+        quantityReturned?: number,
+        variationsValues?: VariationValue[],
+        condition?: Condition
+    ) {
+        super(itemId, name, quantity, quantityReturned, variationsValues, condition);
+        this.price = convertToNumber(price);
+        this.stock = stock;
         this.total = 0;
     }
 
-    calculateTotal() {
+    calculate() {
         if (!this.isAvaliableQuantity()) {
             this.total = 0;
             return;
@@ -35,8 +34,8 @@ export class GoodsIssueNoteLine {
         this.total = this.price * this.quantity;
     }
 
-    updateCondition(status: "Bom" | "Mau", comment?: string) {
-        this.condition = { status, comment };
+    isAvaliableQuantity() {
+        return this.quantity <= this.stock;
     }
 
     totalIsZero() {
@@ -49,13 +48,5 @@ export class GoodsIssueNoteLine {
 
     get formattedTotal() {
         return formatCurrency(this.total);
-    }
-
-    get formattedVariationsValues() {
-        return formatVariationValues(this.variationsValues);
-    }
-
-    isAvaliableQuantity() {
-        return this.quantity <= this.stock;
     }
 }

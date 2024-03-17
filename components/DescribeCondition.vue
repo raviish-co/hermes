@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import type { Condition } from "@frontend/models/condition";
 import type { VDialog } from "#build/components";
-import type { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
+import { Note } from "~/lib/frontend/domain/note";
 
 const BAD = "Mau";
+
 const itemId = ref<string>("");
 const condition = ref<Condition>({ status: "Bom", comment: "" });
 const dialogRef = ref<typeof VDialog>();
+const props = defineProps<{ note: Note }>();
 
 const isGoodState = computed(() => condition.value.status !== BAD);
 const isValidCondition = computed(() => condition.value.status === BAD && !condition.value.comment);
-
-const props = defineProps<{ goodsIssueNote: GoodsIssueNote }>();
 
 function initializeCondition(id: string, oldCondition: Condition) {
     itemId.value = id;
@@ -23,7 +23,7 @@ function updateCondition() {
         condition.value.comment = "";
     }
 
-    props.goodsIssueNote.updateLineCondition(itemId.value, condition.value);
+    props.note.updateCondition(itemId.value, condition.value);
     dialogRef.value?.close();
 }
 

@@ -1,28 +1,23 @@
 import { convertToNumber } from "../helpers/convert_to_number";
 import { formatCurrency } from "../helpers/format_currency";
-import type { Condition } from "../models/condition";
 import type { GoodsIssueNoteModel } from "../models/goods_issue_note";
 import type { ItemModel } from "../models/item";
 import { GoodsIssueNoteLine } from "./goods_issue_note_line";
+import { Note } from "./note";
 import { Purpose } from "./purpose";
 
-export class GoodsIssueNote {
-    goodsIssueNoteId: string;
-    lines: GoodsIssueNoteLine[];
-    grossTotal: number;
-    securityDeposit: number;
+export class GoodsIssueNote extends Note {
+    goodsIssueNoteId: string = "";
+    lines: GoodsIssueNoteLine[] = [];
+    grossTotal: number = 0;
+    securityDeposit: number = 0;
     returnDate: string;
-    purpose: Purpose;
-    status: string;
+    purpose: Purpose = new Purpose("", "");
+    status: string = "";
 
     constructor(returnDate: string) {
-        this.grossTotal = 0;
-        this.securityDeposit = 0;
-        this.lines = [];
+        super();
         this.returnDate = returnDate;
-        this.purpose = new Purpose("", "");
-        this.status = "";
-        this.goodsIssueNoteId = "";
     }
 
     static build(data: GoodsIssueNoteModel): GoodsIssueNote {
@@ -34,21 +29,43 @@ export class GoodsIssueNote {
             data.purpose.notes,
             data.purpose.details
         );
+
         note.grossTotal = convertToNumber(data.total);
         note.securityDeposit = convertToNumber(data.securityDeposit);
         note.status = data.status;
-        note.lines = data.lines as GoodsIssueNoteLine[];
+
+        for (const line of data.lines) {
+            const noteLine = new GoodsIssueNoteLine(
+                line.itemId,
+                line.name,
+                line.quantity,
+                line.price,
+                line.quantityReturned
+            );
+
+            noteLine.variationValues = line.variationValues;
+            noteLine.condition = line.condition;
+            note.lines.push(noteLine);
+        }
 
         return note;
     }
 
     addLine(item: ItemModel, quantity: number) {
-        const isSameItem = this.verifyItem(item.itemId);
-        if (isSameItem) return;
+        if (this.isSameLine(item.itemId)) return;
 
-        const line = new GoodsIssueNoteLine(item, quantity);
+        const line = new GoodsIssueNoteLine(
+            item.itemId,
+            item.name,
+            quantity,
+            item.price,
+            item.quantity
+        );
 
-        line.calculateTotal();
+        line.variationValues = item.variationsValues;
+        line.condition = item.condition;
+
+        line.calculate();
 
         if (line.totalIsZero()) return;
 
@@ -63,22 +80,15 @@ export class GoodsIssueNote {
         this.calculate();
     }
 
-    updateLineQuantity(itemId: string) {
-        const line = this.lines.find((line) => line.itemId === itemId);
+    changeQuantity(itemId: string, quantity: number) {
+        const line = this.findLine(itemId);
         if (!line) return;
 
-        if (!line.quantity) line.quantity = 0;
+        line.changeQuantity(quantity);
 
-        line.calculateTotal();
+        line.calculate();
 
         this.calculate();
-    }
-
-    updateLineCondition(itemId: string, condition: Condition) {
-        const line = this.lines.find((line) => line.itemId === itemId);
-        if (!line) return;
-
-        line.updateCondition(condition.status, condition.comment);
     }
 
     setPurpose(purpose: Purpose) {
@@ -90,12 +100,8 @@ export class GoodsIssueNote {
             this.lines.length > 0 &&
             this.returnDate !== "" &&
             this.purpose.isValid() &&
-            !this.isInvalidLinesQuantity()
+            this.hasNotSameInvalidLine()
         );
-    }
-
-    isInvalidLinesQuantity() {
-        return this.lines.some((line) => !line.isAvaliableQuantity() || line.quantity === 0);
     }
 
     clearLines() {
@@ -106,10 +112,6 @@ export class GoodsIssueNote {
     clear() {
         this.clearLines();
         this.purpose.clear();
-    }
-
-    verifyItem(itemId: string) {
-        return this.lines.some((line) => line.itemId === itemId);
     }
 
     private calculate() {
@@ -129,6 +131,10 @@ export class GoodsIssueNote {
 
     private calculateSecurityDeposit(factor: number = 2) {
         this.securityDeposit = this.grossTotal * factor;
+    }
+
+    private hasNotSameInvalidLine() {
+        return !this.lines.some((line) => line.totalIsZero());
     }
 
     get formattedGrossTotal() {

@@ -23,9 +23,6 @@ export default {
                     600: "#878787",
                 },
             },
-            height: {
-                "table-lg": "36rem",
-            },
         },
     },
     plugins: [require("@tailwindcss/forms")],
