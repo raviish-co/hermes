@@ -56,6 +56,20 @@ describe("Test Goods Receipt", () => {
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(ItemNotFound);
     });
+
+    it("Deve retornar um error **InvalidLines** se não existir", async () => {
+        const data = {
+            entryDate: "2024-03-01T16:40:00",
+            userId: "1000",
+        };
+        const itemRepository = new ItemRepositoryStub();
+        const service = new GoodsReceiptService(itemRepository);
+
+        const error = await service.new(data as any);
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(InvalidLines);
+    });
 });
 
 export class GoodsReceiptService {
@@ -69,6 +83,7 @@ export class GoodsReceiptService {
         const entryDate = data.entryDate;
         if (!entryDate) return left(new InvalidEntryDate(data.entryDate));
 
+        if (!data.lines) return left(new InvalidLines());
         if (data.lines.length === 0) return left(new EmptyLines());
 
         const itemsIds = this.#buildItemsIds(data.lines);
@@ -108,5 +123,11 @@ export class InvalidEntryDate extends Error {
 export class EmptyLines extends Error {
     constructor() {
         super(`Lines is empty`);
+    }
+}
+
+export class InvalidLines extends Error {
+    constructor() {
+        super(`Lines is invalid`);
     }
 }
