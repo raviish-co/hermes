@@ -24,8 +24,7 @@ export class GoodsIssueService {
             quantity: line.quantity,
             condition: {
                 comment: line?.condition?.comment,
-                status: "Mau",
-                // line?.condition?.status
+                status: line.condition?.status!,
             },
         };
     }
