@@ -21,11 +21,30 @@ describe("Test Goods Receipt", () => {
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(InvalidEntryDate);
     });
+
+    it("Deve retornar um erro **EmptyLines** se as linhas não forem definidos", () => {
+        const data = {
+            lines: [],
+            entryDate: "2024-03-01T16:40:00",
+            userId: "1000",
+        };
+        const service = new GoodsReceiptService();
+
+        const error = service.new(data);
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(EmptyLines);
+    });
 });
 
 export class GoodsReceiptService {
     new(data: GoodsReceiptDTO) {
-        return left(new InvalidEntryDate(data.entryDate));
+        const entryDate = data.entryDate;
+        if (!entryDate) {
+            return left(new InvalidEntryDate(data.entryDate));
+        }
+
+        return left(new EmptyLines());
     }
 }
 
@@ -49,5 +68,10 @@ type Condition = {
 export class InvalidEntryDate extends Error {
     constructor(name: string) {
         super(`Entry date ${name} is invalid`);
+    }
+}
+export class EmptyLines extends Error {
+    constructor() {
+        super(`Lines is empty`);
     }
 }
