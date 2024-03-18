@@ -18,7 +18,7 @@ function showItems() {
 defineProps(["note"]);
 </script>
 <template>
-    <BaseNote @add="showItems()" @clear-lines="note.clearLines()">
+    <VNote @add="showItems()" @clear-lines="note.clearLines()">
         <div class="overflow-y-auto">
             <table class="table">
                 <thead>
@@ -67,7 +67,7 @@ defineProps(["note"]);
                 </tbody>
             </table>
         </div>
-    </BaseNote>
+    </VNote>
 
     <AddLineDialog ref="addLineDialogRef" :note="note" />
 

@@ -20,7 +20,7 @@ function showRequestedLines() {
 const props = defineProps(["note", "requestedLines"]);
 </script>
 <template>
-    <BaseNote @add="showRequestedLines()" @clear-lines="note.clearLines()">
+    <VNote @add="showRequestedLines()" @clear-lines="note.clearLines()">
         <div class="overflow-y-auto">
             <table class="table">
                 <thead>
@@ -69,7 +69,7 @@ const props = defineProps(["note", "requestedLines"]);
                 </tbody>
             </table>
         </div>
-    </BaseNote>
+    </VNote>
 
     <DescribeCondition ref="describeConditionRef" :note="note" />
     <ChooseNoteLine ref="chooseNoteLineRef" :note="note" :lines="requestedLines" />
