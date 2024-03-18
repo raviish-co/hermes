@@ -27,7 +27,7 @@ describe("Test Goods Receipt", () => {
         expect(error.value).toBeInstanceOf(InvalidEntryDate);
     });
 
-    it("Deve retornar um erro **EmptyLines** se as linhas não forem definidos", async () => {
+    it("Deve retornar um erro **InvaldLines** se as linhas não forem definidos", async () => {
         const data = {
             lines: [],
             entryDate: "2024-03-01T16:40:00",
@@ -39,7 +39,7 @@ describe("Test Goods Receipt", () => {
         const error = await service.new(data);
 
         expect(error.isLeft()).toBeTruthy();
-        expect(error.value).toBeInstanceOf(EmptyLines);
+        expect(error.value).toBeInstanceOf(InvalidLines);
     });
 
     it("Deve retornar um erro **ItemNotFound** se não existir", async () => {
@@ -83,8 +83,9 @@ export class GoodsReceiptService {
         const entryDate = data.entryDate;
         if (!entryDate) return left(new InvalidEntryDate(data.entryDate));
 
-        if (!data.lines) return left(new InvalidLines());
-        if (data.lines.length === 0) return left(new EmptyLines());
+        if (!data.lines || data.lines.length === 0) {
+            return left(new InvalidLines());
+        }
 
         const itemsIds = this.#buildItemsIds(data.lines);
         const itemsOrError = await this.#itemRepository.findAll(itemsIds);
