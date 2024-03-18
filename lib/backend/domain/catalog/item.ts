@@ -70,6 +70,10 @@ export class Item {
         this.#stock = new ItemStock(this.#stock.quantity - quantity);
     }
 
+    incrementStock(quantity: number): void {
+        this.#stock = new ItemStock(this.#stock.quantity + quantity);
+    }
+
     getCondition(): Condition {
         return this.#condition;
     }

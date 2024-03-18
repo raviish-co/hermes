@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { left, type Either } from "../../shared/either";
+import { left, right, type Either } from "../../shared/either";
 import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import { ID } from "../../shared/id";
 import type { ItemRepository } from "../../domain/catalog/item_repository";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
+import type { Item } from "../../domain/catalog/item";
 
 describe("Test Goods Receipt", () => {
     it("Deve retornar um erro **InvalidEntryDate** se a data de entrada de mercadoria não for definida", async () => {
@@ -70,6 +71,27 @@ describe("Test Goods Receipt", () => {
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(InvalidLines);
     });
+
+    it("Deve atualizar a quantidade em stock dos artigos", async () => {
+        const data = {
+            lines: [
+                { itemId: "1001", quantity: 1 },
+                { itemId: "1002", quantity: 1 },
+            ],
+            entryDate: "2024-03-01T16:40:00",
+            userId: "1000",
+        };
+        const itemRepository = new ItemRepositoryStub();
+        const service = new GoodsReceiptService(itemRepository);
+
+        await service.new(data);
+
+        const item1 = await itemRepository.getById(ID.fromString("1001"));
+        const item2 = await itemRepository.getById(ID.fromString("1002"));
+
+        expect(item1.getStock().quantity).toBe(11);
+        expect(item2.getStock().quantity).toBe(11);
+    });
 });
 
 export class GoodsReceiptService {
@@ -79,7 +101,7 @@ export class GoodsReceiptService {
         this.#itemRepository = itemRepository;
     }
 
-    async new(data: GoodsReceiptDTO) {
+    async new(data: GoodsReceiptDTO): Promise<Either<GoodsReceiptError, void>> {
         const entryDate = data.entryDate;
         if (!entryDate) return left(new InvalidEntryDate(data.entryDate));
 
@@ -91,11 +113,20 @@ export class GoodsReceiptService {
         const itemsOrError = await this.#itemRepository.findAll(itemsIds);
         if (itemsOrError.isLeft()) return left(itemsOrError.value);
 
-        return {} as Promise<Either<any, any>>;
+        this.#incrementItemsStock(itemsOrError.value, data);
+        this.#itemRepository.updateAll(itemsOrError.value);
+
+        return right(undefined);
     }
 
     #buildItemsIds(lines: GoodsReceiptLineDTO[]): ID[] {
         return lines.map((line) => ID.fromString(line.itemId));
+    }
+
+    #incrementItemsStock(items: Item[], data: GoodsReceiptDTO) {
+        items.forEach((item, idx) => {
+            item.incrementStock(data.lines[idx].quantity);
+        });
     }
 }
 
@@ -121,14 +152,11 @@ export class InvalidEntryDate extends Error {
         super(`Entry date ${name} is invalid`);
     }
 }
-export class EmptyLines extends Error {
-    constructor() {
-        super(`Lines is empty`);
-    }
-}
 
 export class InvalidLines extends Error {
     constructor() {
         super(`Lines is invalid`);
     }
 }
+
+export type GoodsReceiptError = InvalidEntryDate | InvalidLines | ItemNotFound;
