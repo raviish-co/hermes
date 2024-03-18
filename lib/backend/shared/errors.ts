@@ -9,13 +9,15 @@ import type { InvalidFileHeader } from "../domain/readers/invalid_file_header_er
 import type { InvalidGoodsIssueLineQuantity } from "../domain/goods_issue/invalid_goods_issue_line_quantity_error";
 import type { GoodsIssueNoteNotFound } from "../domain/goods_issue/goods_issue_note_not_found_error";
 import type { GoodsIssueLineNotFound } from "../domain/goods_issue/goods_lssue_line_not_found_error";
+import { GoodsIssueNoteHasBeenReturned } from "../domain/goods_issue/goods_issue_note_has_been_returned_error";
 
 export type GoodsIssueNoteError = InvalidPurpose | ItemNotFound | InvalidTotal | InsufficientStock;
 
 export type GoodsReturnNoteError =
     | GoodsIssueNoteNotFound
     | InvalidGoodsIssueLineQuantity
-    | GoodsIssueLineNotFound;
+    | GoodsIssueLineNotFound
+    | GoodsIssueNoteHasBeenReturned;
 
 export type FileError =
     | InvalidFileHeader

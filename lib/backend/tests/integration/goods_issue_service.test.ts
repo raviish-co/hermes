@@ -1,6 +1,6 @@
-import { GoodsIssueNoteHasAlreadyBeenReturned } from "../../domain/goods_issue/goods_issue_note_has_already_been_returned_error";
 import { InmemGoodsIssueNoteRepository } from "../../persistense/inmem/inmem_goods_issue_note_repository";
 import type { GoodsIssueNoteRepository } from "../../domain/goods_issue/goods_issue_note_repository";
+import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
 import { DefaultPurposeSpecification } from "../../adapters/default_purpose_specification";
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
 import { InsufficientStock } from "../../domain/catalog/insufficient_stock_error";
@@ -10,13 +10,12 @@ import { InvalidTotal } from "../../domain/goods_issue/invalid_total_error";
 import { GoodsIssueService } from "../../application/goods_issue_service";
 import type { ItemRepository } from "../../domain/catalog/item_repository";
 import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
-import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { GoodsIssueRepositoryStub } from "../stubs/goods_issue_repository_stub";
 import type { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
-import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
+import { GoodsReturnLine } from "../../domain/goods_issue/goods_return_note_line";
+import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { describe, expect, it, vi } from "vitest";
 import { ID } from "../../shared/id";
-import { GoodsReturnLine } from "../../domain/goods_issue/goods_return_note_line";
 
 describe("Test Goods Issue", () => {
     it("Deve retornar error **InvalidPurpose** se não existir", async () => {
@@ -109,7 +108,6 @@ describe("Test Goods Issue", () => {
             { itemId: "1002", quantity: 1 },
         ];
         const total = "20000,00";
-        const securityDeposit = "40000,00";
         const { service, goodsIssueRepository } = makeService();
 
         await service.new({
@@ -333,21 +331,6 @@ describe("Get Goods Issue Note", () => {
 
         expect(goodsIssueOrErr.isRight()).toBeTruthy();
         expect(goodsIssue.goodsIssueNoteId.toString()).toEqual("GS - 1000");
-    });
-
-    it("Deve retornar **GoodsIssueHasBenWilhd** se a guia de saída de mercadoria já foi devolvida", async () => {
-        const goodsIssueRepository = new GoodsIssueRepositoryStub();
-        const goodsIssueOrErr = await goodsIssueRepository.getById(ID.fromString("GS - 1001"));
-        const goodsIssue = <GoodsIssueNote>goodsIssueOrErr.value;
-        goodsIssue.returnLines(returnedLines);
-        goodsIssue.returnTheGoods("5000,00");
-
-        const { service } = makeService({ goodsIssueRepository });
-
-        const error = await service.get("GS - 1001");
-
-        expect(error.isLeft()).toBeTruthy();
-        expect(error.value).toBeInstanceOf(GoodsIssueNoteHasAlreadyBeenReturned);
     });
 });
 

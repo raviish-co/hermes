@@ -1,4 +1,3 @@
-import { GoodsIssueNoteHasAlreadyBeenReturned } from "../domain/goods_issue/goods_issue_note_has_already_been_returned_error";
 import type { GoodsIssueNoteNotFound } from "../domain/goods_issue/goods_issue_note_not_found_error";
 import type { GoodsIssueNoteRepository } from "../domain/goods_issue/goods_issue_note_repository";
 import type { PurposeSpecification } from "../domain/goods_issue/purpose_specification";
@@ -77,11 +76,6 @@ export class GoodsIssueService {
     async get(noteId: string): Promise<Either<GoodsIssueNoteNotFound, GoodsIssueNote>> {
         const noteOrErr = await this.#goodsIssueNoteRepository.getById(ID.fromString(noteId));
         if (noteOrErr.isLeft()) return left(noteOrErr.value);
-
-        const note = noteOrErr.value;
-        if (note.isReturned()) {
-            return left(new GoodsIssueNoteHasAlreadyBeenReturned(note.goodsIssueNoteId.toString()));
-        }
 
         return right(noteOrErr.value);
     }

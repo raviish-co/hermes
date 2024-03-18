@@ -49,7 +49,9 @@ function newGoodsReturn() {
 
 <template>
     <section class="section-content">
-        <h1 class="page-title">Guia de Devolução de Artigos</h1>
+        <h1 class="page-title">
+            Guia de Saída de Artigos - #{{ goodsIssueNote.goodsIssueNoteId }}
+        </h1>
 
         <section class="space-y-4 mb-4">
             <div class="input-container">
