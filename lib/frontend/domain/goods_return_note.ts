@@ -1,10 +1,10 @@
 import { GoodsIssueNoteLine } from "./goods_issue_note_line";
-import { ReturnNoteLine } from "./return_note_line";
+import { GoodsReturnNoteLine } from "./goods_return_note_line";
 import { NoteLine } from "./note_line";
 import { Note } from "./note";
 
 export class GoodsReturnNote extends Note {
-    lines: ReturnNoteLine[] = [];
+    lines: GoodsReturnNoteLine[] = [];
 
     constructor(lines: NoteLine[] = []) {
         super();
@@ -36,7 +36,7 @@ export class GoodsReturnNote extends Note {
     }
 
     private createLine(line: NoteLine) {
-        const note = new ReturnNoteLine(
+        const note = new GoodsReturnNoteLine(
             line.itemId,
             line.name,
             line.quantity,

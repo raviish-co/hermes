@@ -1,6 +1,6 @@
 import { NoteLine } from "./note_line";
 
-export class ReturnNoteLine extends NoteLine {
+export class GoodsReturnNoteLine extends NoteLine {
     constructor(
         itemId: string,
         name: string,

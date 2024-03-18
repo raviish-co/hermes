@@ -50,8 +50,8 @@ const props = defineProps(["note", "requestedLines"]);
                         <td>
                             <ChooseQuantity
                                 :initital="line.quantity"
-                                :model-value="line.quantity"
                                 :limit="line.maxToReturn"
+                                :model-value="line.quantity"
                                 @update-quantity="line.changeQuantity($event)"
                             />
                         </td>

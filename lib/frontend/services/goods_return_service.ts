@@ -1,7 +1,11 @@
-import { ReturnNoteLine } from "../domain/return_note_line";
+import { GoodsReturnNoteLine } from "../domain/goods_return_note_line";
 
 export class GoodsReturnService {
-    async new(goodsIssueNoteId: string, retainedSecurityDeposit: string, lines: ReturnNoteLine[]) {
+    async new(
+        goodsIssueNoteId: string,
+        retainedSecurityDeposit: string,
+        lines: GoodsReturnNoteLine[]
+    ) {
         const data: GoodsReturnDTO = {
             goodsIssueNoteId,
             securityDepositWithHeld: retainedSecurityDeposit,
@@ -11,7 +15,7 @@ export class GoodsReturnService {
         return await $fetch("/api/goods-return", { method: "post", body: data });
     }
 
-    #toItemDTO(line: ReturnNoteLine): ItemDTO {
+    #toItemDTO(line: GoodsReturnNoteLine): ItemDTO {
         return {
             itemId: line.itemId,
             quantity: line.quantity,

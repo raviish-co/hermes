@@ -54,16 +54,7 @@ export class GoodsIssueNote extends Note {
     addLine(item: ItemModel, quantity: number) {
         if (this.isSameLine(item.itemId)) return;
 
-        const line = new GoodsIssueNoteLine(
-            item.itemId,
-            item.name,
-            quantity,
-            item.price,
-            item.quantity
-        );
-
-        line.variationValues = item.variationsValues;
-        line.condition = item.condition;
+        const line = this.createLine(item, quantity);
 
         line.calculate();
 
@@ -112,6 +103,19 @@ export class GoodsIssueNote extends Note {
     clear() {
         this.clearLines();
         this.purpose.clear();
+    }
+
+    private createLine(item: ItemModel, quantity: number) {
+        return new GoodsIssueNoteLine(
+            item.itemId,
+            item.name,
+            quantity,
+            item.price,
+            0,
+            item.variationsValues,
+            item.condition,
+            item.quantity
+        );
     }
 
     private calculate() {

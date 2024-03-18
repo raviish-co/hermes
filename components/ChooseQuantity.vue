@@ -35,6 +35,7 @@ function updateQuantity(e: Event) {
     <input
         type="number"
         class="input-number text-center"
+        placeholder="QTD"
         min="1"
         :value="modelValue === 0 ? 0 : modelValue"
         :max="limit"

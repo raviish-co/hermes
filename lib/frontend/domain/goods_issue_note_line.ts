@@ -14,14 +14,14 @@ export class GoodsIssueNoteLine extends NoteLine {
         name: string,
         quantity: number,
         price: string,
-        stock: number,
         quantityReturned?: number,
         variationsValues?: VariationValue[],
-        condition?: Condition
+        condition?: Condition,
+        stock?: number
     ) {
         super(itemId, name, quantity, quantityReturned, variationsValues, condition);
         this.price = convertToNumber(price);
-        this.stock = stock;
+        this.stock = stock ?? 0;
         this.total = 0;
     }
 

@@ -19,6 +19,7 @@ export abstract class NoteLine {
         variationValues?: VariationValue[],
         condition?: Condition
     ) {
+        console.log("NoteLine");
         this.itemId = itemId;
         this.name = name;
 
