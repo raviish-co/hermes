@@ -22,6 +22,8 @@ export class GoodsReturnNote extends Note {
     }
 
     addLine(line: GoodsIssueNoteLine, quantity: number) {
+        if (quantity === 0) return;
+
         const returnLine = this.createLine(line);
 
         returnLine.changeQuantity(quantity);

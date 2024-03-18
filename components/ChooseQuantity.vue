@@ -11,13 +11,18 @@ interface Emits {
     (e: "tab"): void;
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 const emits = defineEmits<Emits>();
 
 function updateQuantity(e: Event) {
     const value = parseInt((e.target as HTMLInputElement).value);
 
     if (!value) {
+        emits("update-quantity", 0);
+        return;
+    }
+
+    if (value > props.limit) {
         emits("update-quantity", 0);
         return;
     }
