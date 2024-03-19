@@ -12,6 +12,8 @@ import { SectionRepositoryStub } from "./tests/stubs/section_repository_stub";
 import { InmemGoodsReturnNoteRepository } from "./persistense/inmem/inmem_goods_return_note_repository";
 import { CategoryRepositoryStub } from "./tests/stubs/categoria_repository_stub";
 import { GoodsReturnService } from "./application/goods_return_service";
+import { GoodsReceiptService } from "./application/goods_receipt_service";
+import { InmemGoodsReceiptNoteRepository } from "./persistense/inmem/inmem_goods_receipt_note_repository";
 
 const itemRepository = new ItemRepositoryStub();
 const goodsIssueRepository = new InmemGoodsIssueNoteRepository();
@@ -22,6 +24,7 @@ const variationRepository = new VariationRepositoryStub();
 const sectionRepository = new SectionRepositoryStub();
 const purposeSpec = new DefaultPurposeSpecification();
 const goodsReturnRepository = new InmemGoodsReturnNoteRepository();
+const goodsReceiptRepository = new InmemGoodsReceiptNoteRepository();
 
 interface Services {
     goodsIssueService: GoodsIssueService;
@@ -29,6 +32,7 @@ interface Services {
     importService: ImportService;
     purposeService: PurposeService;
     goodsReturnService: GoodsReturnService;
+    goodsReceiptService: GoodsReceiptService;
 }
 
 export const makeServices = (): Services => {
@@ -58,11 +62,18 @@ export const makeServices = (): Services => {
         sequenceGenerator
     );
 
+    const goodsReceiptService = new GoodsReceiptService(
+        itemRepository,
+        goodsReceiptRepository,
+        sequenceGenerator
+    );
+
     return {
         goodsIssueService,
         catalogService,
         importService,
         purposeService,
         goodsReturnService,
+        goodsReceiptService,
     };
 };
