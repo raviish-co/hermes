@@ -16,19 +16,19 @@ export class GoodsIssueLine {
         itemId: ID,
         name: string,
         price: Decimal,
-        quantity: number,
-        variationsValues: Record<string, string>,
+        variations: Record<string, string>,
         fulltext: string,
+        quantity: number,
         quantityReturned?: number
     ) {
         this.issueLineId = ID.random();
         this.itemId = itemId;
         this.name = name;
-        this.variationsValues = variationsValues;
+        this.variationsValues = variations;
         this.fulltext = fulltext;
         this.price = price;
         this.#quantity = quantity;
-        this.quantityReturned = quantityReturned ?? 0;
+        this.quantityReturned = quantityReturned || 0;
         this.#netTotal = Decimal.fromString("0");
 
         this.#calculateTotal();
@@ -40,7 +40,7 @@ export class GoodsIssueLine {
     }
 
     checkQuantity(quantity: number): boolean {
-        return this.#quantity >= quantity;
+        return quantity >= 1 && quantity <= this.#range();
     }
 
     isFullyReturned(): boolean {
@@ -50,6 +50,10 @@ export class GoodsIssueLine {
     #calculateTotal(): void {
         const factor = Decimal.fromString(this.#quantity.toString());
         this.#netTotal = this.price.multiply(factor);
+    }
+
+    #range() {
+        return this.quantityRequested - this.quantityReturned;
     }
 
     get quantityRequested(): number {
