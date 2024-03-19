@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import type { Condition } from "~/lib/frontend/models/condition";
 import type { ChooseNoteLine, DescribeCondition } from "#build/components";
 import { formatVariationValues } from "@frontend/helpers/format_variation_values";
+import type { NoteLine } from "~/lib/frontend/domain/note_line";
 
 const describeConditionRef = ref<typeof DescribeCondition>();
 const chooseNoteLineRef = ref<typeof ChooseNoteLine>();
 
-function showDecribeCondition(itemId: string, condition?: Condition) {
-    describeConditionRef.value?.initializeCondition(itemId, condition);
+function showDecribeCondition(line: NoteLine) {
+    if (line.isFullyReturned()) return;
+
+    describeConditionRef.value?.initializeCondition(line.itemId, line.condition);
     describeConditionRef.value?.show();
 }
 
@@ -37,7 +39,7 @@ const props = defineProps(["note", "requestedLines"]);
                 <tbody>
                     <tr v-for="(line, idx) in note.lines" :key="idx" class="cursor-pointer">
                         <td>{{ line.itemId }}</td>
-                        <td @click="showDecribeCondition(line.itemId, line.condition)">
+                        <td @click="showDecribeCondition(line)">
                             {{ line.name }}
 
                             <br />
@@ -47,11 +49,12 @@ const props = defineProps(["note", "requestedLines"]);
                             </span>
                         </td>
 
-                        <td>
+                        <td class="text-center">
                             <ChooseQuantity
                                 :initital="line.quantity"
                                 :limit="line.maxToReturn"
                                 :model-value="line.quantity"
+                                :class="{ 'input-disabled border-none': line.isFullyReturned() }"
                                 @update-quantity="line.changeQuantity($event)"
                             />
                         </td>
@@ -60,11 +63,13 @@ const props = defineProps(["note", "requestedLines"]);
                         <td class="text-center">{{ line.quantityReturned }}</td>
 
                         <td
+                            v-if="!line.isFullyReturned()"
                             class="cursor-pointer text-center"
                             @click="note.removeLine(line.itemId)"
                         >
                             <span class="material-symbols-outlined">close</span>
                         </td>
+                        <td v-else></td>
                     </tr>
                 </tbody>
             </table>

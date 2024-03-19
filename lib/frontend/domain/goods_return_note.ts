@@ -14,9 +14,6 @@ export class GoodsReturnNote extends Note {
     addLines(lines: NoteLine[]) {
         lines.forEach((line) => {
             const returnLine = this.createLine(line);
-
-            if (returnLine.isFullyReturned()) return;
-
             this.lines.push(returnLine);
         });
     }
@@ -27,6 +24,10 @@ export class GoodsReturnNote extends Note {
         const returnLine = this.createLine(line);
 
         returnLine.changeQuantity(quantity);
+
+        if (line.isFullyReturned()) {
+            returnLine.changeQuantity(0);
+        }
 
         this.lines.push(returnLine);
     }
@@ -47,5 +48,9 @@ export class GoodsReturnNote extends Note {
         note.variationValues = line.variationValues;
 
         return note;
+    }
+
+    get returnLines() {
+        return this.lines.filter((line) => !line.isFullyReturned());
     }
 }
