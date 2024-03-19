@@ -7,36 +7,51 @@ import { GoodsReturnService } from "../../application/goods_return_service";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { describe, expect, it } from "vitest";
 import { ID } from "../../shared/id";
+import { InmemGoodsReturnNoteRepository } from "../../persistense/inmem/inmem_goods_return_note_repository";
+import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
+import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
 
 describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve efetuar a devolução de um conjunto de artigos", async () => {
         const goodsIssueNoteId = "GS - 1000";
+        const storage = new InmemSequenceStorage();
+        const generator = new SequenceGenerator(storage, 1001);
         const itemRepository = new ItemRepositoryStub();
         const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
 
-        const service = new GoodsReturnService(goodsIssueRepository, itemRepository);
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
 
         await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
 
-        const noteOrErr = await goodsIssueRepository.getById(ID.fromString(goodsIssueNoteId));
-
-        const note = <GoodsIssueNote>noteOrErr.value;
+        const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
 
         expect(note.goodsReturnLines.length).toBe(2);
     });
 
     it("Deve devolver as quantidades exactas dos artigos solicitados na guia de saída de mercadoria", async () => {
         const goodsIssueNoteId = "GS - 1000";
+        const storage = new InmemSequenceStorage();
+        const generator = new SequenceGenerator(storage, 1001);
         const itemRepository = new ItemRepositoryStub();
         const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
 
-        const service = new GoodsReturnService(goodsIssueRepository, itemRepository);
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
 
         await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
 
-        const noteOrErr = await goodsIssueRepository.getById(ID.fromString(goodsIssueNoteId));
-
-        const note = <GoodsIssueNote>noteOrErr.value;
+        const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
 
         expect(note.goodsReturnLines[0].quantityReturned).toBe(3);
         expect(note.goodsReturnLines[1].quantityReturned).toBe(2);
@@ -44,16 +59,22 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
     it("Deve armazenar os IDs dos artigos devolvidos nas devolução", async () => {
         const goodsIssueNoteId = "GS - 1000";
+        const storage = new InmemSequenceStorage();
+        const generator = new SequenceGenerator(storage, 1001);
         const itemRepository = new ItemRepositoryStub();
         const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
 
-        const service = new GoodsReturnService(goodsIssueRepository, itemRepository);
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
 
         await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
 
-        const noteOrErr = await goodsIssueRepository.getById(ID.fromString(goodsIssueNoteId));
-
-        const note = <GoodsIssueNote>noteOrErr.value;
+        const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
 
         expect(note.goodsReturnLines[0].itemId.toString()).toBe("1001");
         expect(note.goodsReturnLines[1].itemId.toString()).toBe("1002");
@@ -63,8 +84,14 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         const goodsIssueNoteId = "GS - 0001";
         const goodsIssueRepository = new GoodsIssueRepositoryStub();
         const itemRepository = new ItemRepositoryStub();
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
 
-        const service = new GoodsReturnService(goodsIssueRepository, itemRepository);
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
 
         const error = await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
 
@@ -76,16 +103,20 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         const goodsIssueNoteId = "GS - 1000";
         const goodsIssueRepository = new GoodsIssueRepositoryStub();
         const itemRepository = new ItemRepositoryStub();
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
 
-        const service = new GoodsReturnService(goodsIssueRepository, itemRepository);
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
 
         await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
 
-        const noteOrErr = await goodsIssueRepository.getById(ID.fromString(goodsIssueNoteId));
+        const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
 
-        const note = <GoodsIssueNote>noteOrErr.value;
-
-        expect(note.depositWithheld.value).toEqual(depositWithheld);
+        expect(note.securityDepositWithheld.value).toEqual(depositWithheld);
     });
 
     it("Deve actualizar o stock dos artigos devolvidos", async () => {
@@ -97,8 +128,14 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
             { itemId: "1004", quantity: 3, comment: "Riscado" },
             { itemId: "1005", quantity: 2 },
         ];
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
 
-        const service = new GoodsReturnService(goodsIssueRepository, itemRepository);
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
 
         await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
 
@@ -111,8 +148,14 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         const goodsIssueNoteId = "GS - 1000";
         const itemRepository = new ItemRepositoryStub();
         const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
 
-        const service = new GoodsReturnService(goodsIssueRepository, itemRepository);
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
 
         await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
 
@@ -132,8 +175,14 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         const itemRepository = new ItemRepositoryStub();
         const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
 
-        const service = new GoodsReturnService(goodsIssueRepository, itemRepository);
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
 
         const error = await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
 
@@ -145,8 +194,14 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         const goodsIssueNoteId = "GS - 1000";
         const itemRepository = new ItemRepositoryStub();
         const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
 
-        const service = new GoodsReturnService(goodsIssueRepository, itemRepository);
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
 
         await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
 
@@ -164,8 +219,14 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         const itemRepository = new ItemRepositoryStub();
         const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
 
-        const service = new GoodsReturnService(goodsIssueRepository, itemRepository);
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
 
         const error = await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
 
@@ -175,27 +236,41 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
     it("Deve efectuar a devolução parcial de um conjunto de artigos", async () => {
         const goodsIssueNoteId = "GS - 1000";
+        const storage = new InmemSequenceStorage();
+        const generator = new SequenceGenerator(storage, 1001);
         const itemRepository = new ItemRepositoryStub();
         const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
 
-        const service = new GoodsReturnService(goodsIssueRepository, itemRepository);
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
 
         await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsPartialData);
 
-        const noteOrErr = await goodsIssueRepository.getById(ID.fromString(goodsIssueNoteId));
-
-        const note = <GoodsIssueNote>noteOrErr.value;
+        const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
 
         expect(note.goodsReturnLines.length).toBe(1);
     });
 
     it("Deve actualizar o stock do artigo que foi devolvido parcialmente", async () => {
         const goodsIssueNoteId = "GS - 1002";
+        const storage = new InmemSequenceStorage();
+        const generator = new SequenceGenerator(storage, 1001);
         const itemRepository = new ItemRepositoryStub();
         const goodsIssueRepository = new GoodsIssueRepositoryStub();
-        const itemsData = [{ itemId: "1004", quantity: 1, comment: "Riscado" }];
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
 
-        const service = new GoodsReturnService(goodsIssueRepository, itemRepository);
+        const itemsData = [{ itemId: "1004", quantity: 1, comment: "Riscado" }];
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
 
         await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
 
@@ -206,10 +281,18 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
     it("Deve fechar a guida de saída de mercadoria se todos os artigos foram devolvidos", async () => {
         const goodsIssueNoteId = "GS - 1003";
+        const storage = new InmemSequenceStorage();
+        const generator = new SequenceGenerator(storage, 1001);
         const itemRepository = new ItemRepositoryStub();
         const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
 
-        const service = new GoodsReturnService(goodsIssueRepository, itemRepository);
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
 
         await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsPartialData1);
 
@@ -221,6 +304,162 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         expect(note.isReturned()).toBeTruthy();
     });
+
+    it("Deve registrar a devolução dos artigos no repositório", async () => {
+        const goodsIssueNoteId = "GS - 1000";
+        const storage = new InmemSequenceStorage();
+        const generator = new SequenceGenerator(storage, 1001);
+        const itemRepository = new ItemRepositoryStub();
+        const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
+
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
+
+        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+
+        const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+
+        expect(note.goodsReturnNoteId.toString()).toBe("GD - 1001");
+    });
+
+    it("Deve referenciar a guida de saída de mercadoria no documento de devolução", async () => {
+        const goodsIssueNoteId = "GS - 1000";
+        const storage = new InmemSequenceStorage();
+        const generator = new SequenceGenerator(storage, 1001);
+        const itemRepository = new ItemRepositoryStub();
+        const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
+
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
+
+        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+
+        const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+
+        expect(note.goodsIssueNoteId.toString()).toBe("GS - 1000");
+    });
+
+    it("Deve adicionar as linhas de devolução no documento de devolução", async () => {
+        const goodsIssueNoteId = "GS - 1000";
+        const storage = new InmemSequenceStorage();
+        const generator = new SequenceGenerator(storage, 1001);
+        const itemRepository = new ItemRepositoryStub();
+        const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
+
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
+
+        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+
+        const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+
+        expect(note.goodsReturnLines.length).toBe(2);
+    });
+
+    it("Deve guardar a caução retida no documento de devolução", async () => {
+        const goodsIssueNoteId = "GS - 1000";
+        const storage = new InmemSequenceStorage();
+        const generator = new SequenceGenerator(storage, 1001);
+        const itemRepository = new ItemRepositoryStub();
+        const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
+
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
+
+        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+
+        const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+
+        expect(note.securityDepositWithheld.value).toBe(depositWithheld);
+    });
+
+    it("Deve registrar o memento em que a devolução foi efectuada", async () => {
+        const goodsIssueNoteId = "GS - 1000";
+        const storage = new InmemSequenceStorage();
+        const generator = new SequenceGenerator(storage, 1001);
+        const itemRepository = new ItemRepositoryStub();
+        const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
+
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
+
+        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+
+        const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+
+        expect(note.issuedAt.getTime()).toBeLessThanOrEqual(new Date().getTime());
+    });
+
+    it("Deve gerar o identificador do documento de devolução", async () => {
+        const goodsIssueNoteId = "GS - 1000";
+        const storage = new InmemSequenceStorage();
+        const generator = new SequenceGenerator(storage, 1001);
+        const itemRepository = new ItemRepositoryStub();
+        const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
+
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
+
+        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+
+        const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+
+        expect(note.goodsReturnNoteId.toString()).toBe("GD - 1001");
+    });
+
+    it("Deve retornar o erro **Error** se a guia de saída de mercadoria já foi devolvida por completo", async () => {
+        const goodsIssueNoteId = "GS - 1003";
+        const itemsData = [{ itemId: "1006", quantity: 2, comment: "Riscado" }];
+
+        const storage = new InmemSequenceStorage();
+        const generator = new SequenceGenerator(storage, 1001);
+        const itemRepository = new ItemRepositoryStub();
+        const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
+
+        const service = new GoodsReturnService(
+            goodsIssueRepository,
+            itemRepository,
+            goodsReturnNoteRepository,
+            generator
+        );
+
+        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+
+        const error = await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+
+        expect(error.isLeft()).toBeTruthy();
+    });
 });
 
 const depositWithheld = "100,00";
@@ -230,3 +469,6 @@ const itemsData = [
 ];
 const itemsPartialData = [{ itemId: "1001", quantity: 1, comment: "Riscado" }];
 const itemsPartialData1 = [{ itemId: "1006", quantity: 1, comment: "Rasgado" }];
+
+const storage = new InmemSequenceStorage();
+const generator = new SequenceGenerator(storage, 1001);

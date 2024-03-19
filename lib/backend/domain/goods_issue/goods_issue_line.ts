@@ -18,7 +18,8 @@ export class GoodsIssueLine {
         price: Decimal,
         quantity: number,
         variationsValues: Record<string, string>,
-        fulltext: string
+        fulltext: string,
+        quantityReturned?: number
     ) {
         this.issueLineId = ID.random();
         this.itemId = itemId;
@@ -27,7 +28,7 @@ export class GoodsIssueLine {
         this.fulltext = fulltext;
         this.price = price;
         this.#quantity = quantity;
-        this.quantityReturned = 0;
+        this.quantityReturned = quantityReturned ?? 0;
         this.#netTotal = Decimal.fromString("0");
 
         this.#calculateTotal();

@@ -16,11 +16,10 @@ export class GoodsIssueNote {
     readonly goodsIssueLines: GoodsIssueLine[];
     readonly returnDate: Date;
     readonly issuedAt: Date;
-    goodsReturnLines: GoodsReturnLine[];
     status: GoodsIssueStatus;
     total: Decimal;
     securityDeposit: Decimal;
-    depositWithheld: Decimal;
+    securityDepositWithheld: Decimal;
 
     constructor(noteId: ID, purpose: Purpose, user: ID, returnDate: Date, lines: GoodsIssueLine[]) {
         this.goodsIssueNoteId = noteId;
@@ -32,8 +31,7 @@ export class GoodsIssueNote {
         this.total = Decimal.fromString("0");
         this.goodsIssueLines = [];
         this.securityDeposit = Decimal.fromString("0");
-        this.depositWithheld = Decimal.fromString("0");
-        this.goodsReturnLines = [];
+        this.securityDepositWithheld = Decimal.fromString("0");
 
         this.#addLines(lines);
     }
@@ -42,20 +40,12 @@ export class GoodsIssueNote {
         return !this.isSameTotal(total) || !this.isSameSecurityDeposit(securityDeposit);
     }
 
-    returnTheGoods(depositWithheld: string): void {
-        if (this.depositWithheld.isZero()) {
-            this.depositWithheld = Decimal.fromString(depositWithheld);
-        }
+    returnTheGoods(lines: GoodsReturnLine[]): void {
+        this.#returnLines(lines);
 
         if (!this.#allGoodsIssueWasReturned()) return;
 
         this.status = GoodsIssueStatus.Returned;
-    }
-
-    returnLines(lines: GoodsReturnLine[]): void {
-        for (const returnLine of lines) {
-            this.#addReturnLine(returnLine);
-        }
     }
 
     isSameTotal(total: string): boolean {
@@ -94,15 +84,15 @@ export class GoodsIssueNote {
         this.#calculateTotal(line.total);
     }
 
-    #addReturnLine(line: GoodsReturnLine): void {
-        this.goodsReturnLines.push(line);
-
-        this.#returnLine(line);
+    #returnLines(lines: GoodsReturnLine[]): void {
+        for (const line of lines) {
+            this.#returnLine(line.itemId, line.quantityReturned);
+        }
     }
 
-    #returnLine(returnLine: GoodsReturnLine) {
-        const line = this.#findGoodsIssueLineByItemId(returnLine.itemId);
-        line.returnLine(returnLine.quantityReturned);
+    #returnLine(itemId: ID, quantityReturned: number): void {
+        const line = this.#findLineByItemId(itemId);
+        line.returnLine(quantityReturned);
     }
 
     #allGoodsIssueWasReturned(): boolean {
@@ -118,7 +108,7 @@ export class GoodsIssueNote {
         this.securityDeposit = this.total.multiply(factor);
     }
 
-    #findGoodsIssueLineByItemId(itemId: ID): GoodsIssueLine {
+    #findLineByItemId(itemId: ID): GoodsIssueLine {
         return this.goodsIssueLines.find((line) => line.itemId.equals(itemId))!;
     }
 }
