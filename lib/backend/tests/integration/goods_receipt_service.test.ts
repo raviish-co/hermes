@@ -5,57 +5,36 @@ import { ID } from "../../shared/id";
 import type { ItemRepository } from "../../domain/catalog/item_repository";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import type { Item } from "../../domain/catalog/item";
+import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
+import { Sequence } from "../../domain/sequences/sequence";
+import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
 
 describe("Test Goods Receipt", () => {
     it("Deve retornar um erro **InvalidEntryDate** se a data de entrada de mercadoria não for definida", async () => {
-        const data = {
-            lines: [
-                {
-                    itemId: "RVS - 0001",
-                    quantity: 1,
-                    condition: { status: "Bom" },
-                },
-            ],
-            entryDate: "",
-            userId: "1000",
-        };
-        const goodsReceiptNoteRepository = new InmemGoodsReceiptNoteRepository();
-        const itemRepository = new ItemRepositoryStub();
-        const service = new GoodsReceiptService(itemRepository, goodsReceiptNoteRepository);
+        const { service } = makeService();
 
-        const error = await service.new(data);
+        const error = await service.new({ ...goodsReceiptData, entryDate: "" });
 
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(InvalidEntryDate);
     });
 
     it("Deve retornar um erro **InvaldLines** se linhas estiver vazia", async () => {
-        const data = {
-            lines: [],
-            entryDate: "2024-03-01T16:40:00",
-            userId: "1000",
-        };
-        const goodsReceiptNoteRepository = new InmemGoodsReceiptNoteRepository();
-        const itemRepository = new ItemRepositoryStub();
-        const service = new GoodsReceiptService(itemRepository, goodsReceiptNoteRepository);
+        const { service } = makeService();
 
-        const error = await service.new(data);
+        const error = await service.new({ ...goodsReceiptData, lines: [] });
 
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(InvalidLines);
     });
 
     it("Deve retornar um erro **ItemNotFound** se não existir", async () => {
-        const data = {
-            lines: [{ itemId: "123", quantity: 1 }],
-            entryDate: "2024-03-01T16:40:00",
-            userId: "1000",
-        };
-        const goodsReceiptNoteRepository = new InmemGoodsReceiptNoteRepository();
-        const itemRepository = new ItemRepositoryStub();
-        const service = new GoodsReceiptService(itemRepository, goodsReceiptNoteRepository);
+        const { service } = makeService();
 
-        const error = await service.new(data);
+        const error = await service.new({
+            ...goodsReceiptData,
+            lines: [{ itemId: "123", quantity: 1 }],
+        });
 
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(ItemNotFound);
@@ -66,9 +45,7 @@ describe("Test Goods Receipt", () => {
             entryDate: "2024-03-01T16:40:00",
             userId: "1000",
         };
-        const goodsReceiptNoteRepository = new InmemGoodsReceiptNoteRepository();
-        const itemRepository = new ItemRepositoryStub();
-        const service = new GoodsReceiptService(itemRepository, goodsReceiptNoteRepository);
+        const { service } = makeService();
 
         const error = await service.new(data as any);
 
@@ -77,19 +54,9 @@ describe("Test Goods Receipt", () => {
     });
 
     it("Deve atualizar a quantidade em stock dos artigos", async () => {
-        const data = {
-            lines: [
-                { itemId: "1001", quantity: 1 },
-                { itemId: "1002", quantity: 1 },
-            ],
-            entryDate: "2024-03-01T16:40:00",
-            userId: "1000",
-        };
-        const goodsReceiptNoteRepository = new InmemGoodsReceiptNoteRepository();
-        const itemRepository = new ItemRepositoryStub();
-        const service = new GoodsReceiptService(itemRepository, goodsReceiptNoteRepository);
+        const { service, itemRepository } = makeService();
 
-        await service.new(data);
+        await service.new(goodsReceiptData);
 
         const item1 = await itemRepository.getById(ID.fromString("1001"));
         const item2 = await itemRepository.getById(ID.fromString("1002"));
@@ -99,39 +66,18 @@ describe("Test Goods Receipt", () => {
     });
 
     it("Deve chamar o método **save** no repositório de entrada de mercadoria", async () => {
-        const data = {
-            lines: [
-                { itemId: "1001", quantity: 1 },
-                { itemId: "1002", quantity: 1 },
-            ],
-            entryDate: "2024-03-01T16:40:00",
-            userId: "1000",
-        };
-        const goodsReceiptNoteRepository = new InmemGoodsReceiptNoteRepository();
+        const { service, goodsReceiptNoteRepository } = makeService();
         const spy = vi.spyOn(goodsReceiptNoteRepository, "save");
-        const itemRepository = new ItemRepositoryStub();
-        const service = new GoodsReceiptService(itemRepository, goodsReceiptNoteRepository);
 
-        await service.new(data);
+        await service.new(goodsReceiptData);
 
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledTimes(1);
     });
 
     it("Deve efectuar a nota de entrada de mercadoria", async () => {
-        const data = {
-            lines: [
-                { itemId: "1001", quantity: 1 },
-                { itemId: "1002", quantity: 1 },
-            ],
-            entryDate: "2024-03-01T16:40:00",
-            userId: "1000",
-        };
-        const goodsReceiptNoteRepository = new InmemGoodsReceiptNoteRepository();
-        const itemRepository = new ItemRepositoryStub();
-        const service = new GoodsReceiptService(itemRepository, goodsReceiptNoteRepository);
-
-        await service.new(data);
+        const { service, goodsReceiptNoteRepository } = makeService();
+        await service.new(goodsReceiptData);
 
         const goodsReceipt = await goodsReceiptNoteRepository.last();
 
@@ -139,18 +85,32 @@ describe("Test Goods Receipt", () => {
         expect(goodsReceipt.goodsReceiptLines[0].itemId.toString()).toBe("1001");
         expect(goodsReceipt.goodsReceiptLines[1].itemId.toString()).toBe("1002");
     });
+
+    it("Deve gerar o ID para a nota de entrada de mercadoria", async () => {
+        const { service, goodsReceiptNoteRepository } = makeService();
+        await service.new(goodsReceiptData);
+
+        const goodsReceipt = await goodsReceiptNoteRepository.last();
+
+        expect(goodsReceipt.goodsReceiptNoteId).toBeDefined();
+        expect(goodsReceipt.goodsReceiptNoteId.toString()).toBe("GE - 0001");
+        expect(goodsReceipt.goodsReceiptNoteId).toBeInstanceOf(ID);
+    });
 });
 
 export class GoodsReceiptService {
     readonly #itemRepository: ItemRepository;
     readonly #goodsReceiptNoteRepository: GoodsReceiptNoteRepository;
+    readonly #sequenceGenerator: SequenceGenerator;
 
     constructor(
         itemRepository: ItemRepository,
-        goodsReceiptNoteRepository: GoodsReceiptNoteRepository
+        goodsReceiptNoteRepository: GoodsReceiptNoteRepository,
+        sequenceGenerator: SequenceGenerator
     ) {
         this.#itemRepository = itemRepository;
         this.#goodsReceiptNoteRepository = goodsReceiptNoteRepository;
+        this.#sequenceGenerator = sequenceGenerator;
     }
 
     async new(data: GoodsReceiptDTO): Promise<Either<GoodsReceiptError, void>> {
@@ -169,7 +129,7 @@ export class GoodsReceiptService {
         this.#itemRepository.updateAll(itemsOrError.value);
 
         const lines = this.#buildLines(itemsIds, data.lines);
-        const noteId = "xpto";
+        const noteId = this.#sequenceGenerator.generate(Sequence.GoodsReceiptNote);
         const noteOrError = new GoodsReceiptBuilder()
             .withGoodsReceiptNoteId(noteId)
             .withEntryDate(entryDate)
@@ -318,3 +278,26 @@ export class InvalidLines extends Error {
 }
 
 export type GoodsReceiptError = InvalidEntryDate | InvalidLines | ItemNotFound;
+
+const makeService = () => {
+    const storage = new InmemSequenceStorage();
+    const sequenceGenerator = new SequenceGenerator(storage);
+    const goodsReceiptNoteRepository = new InmemGoodsReceiptNoteRepository();
+    const itemRepository = new ItemRepositoryStub();
+    const service = new GoodsReceiptService(
+        itemRepository,
+        goodsReceiptNoteRepository,
+        sequenceGenerator
+    );
+
+    return { service, goodsReceiptNoteRepository, itemRepository };
+};
+
+const goodsReceiptData = {
+    lines: [
+        { itemId: "1001", quantity: 1 },
+        { itemId: "1002", quantity: 1 },
+    ],
+    entryDate: "2024-03-01T16:40:00",
+    userId: "1000",
+};
