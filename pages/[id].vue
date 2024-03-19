@@ -37,7 +37,7 @@ function newGoodsReturn() {
         .new(
             goodsIssueNote.value.goodsIssueNoteId,
             retainedSecurityDeposit.value,
-            goodsReturnNote.value.lines
+            goodsReturnNote.value.returnLines
         )
         .then(() => {
             alert("Devolução efetuada com sucesso!");

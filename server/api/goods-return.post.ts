@@ -2,6 +2,7 @@ import { GoodsIssueNoteNotFound } from "~/lib/backend/domain/goods_issue/goods_i
 import { makeServices } from "~/lib/backend/main";
 import { HttpStatus } from "./http_status";
 import { InvalidGoodsIssueLineQuantity } from "~/lib/backend/domain/goods_issue/invalid_goods_issue_line_quantity_error";
+import { GoodsIssueNoteHasBeenReturned } from "~/lib/backend/domain/goods_issue/goods_issue_note_has_been_returned_error";
 
 const { goodsReturnService } = makeServices();
 
@@ -22,6 +23,13 @@ export default defineEventHandler(async (event) => {
     }
 
     if (resultOrErr.value instanceof InvalidGoodsIssueLineQuantity) {
+        return createError({
+            message: resultOrErr.value.message,
+            statusCode: HttpStatus.BadRequest,
+        });
+    }
+
+    if (resultOrErr.value instanceof GoodsIssueNoteHasBeenReturned) {
         return createError({
             message: resultOrErr.value.message,
             statusCode: HttpStatus.BadRequest,
