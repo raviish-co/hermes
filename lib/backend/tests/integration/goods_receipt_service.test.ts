@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { left, right, type Either } from "../../shared/either";
 import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import { ID } from "../../shared/id";
@@ -19,8 +19,9 @@ describe("Test Goods Receipt", () => {
             entryDate: "",
             userId: "1000",
         };
+        const goodsReceiptNoteRepository = new InmemGoodsReceiptNoteRepository();
         const itemRepository = new ItemRepositoryStub();
-        const service = new GoodsReceiptService(itemRepository);
+        const service = new GoodsReceiptService(itemRepository, goodsReceiptNoteRepository);
 
         const error = await service.new(data);
 
@@ -28,14 +29,15 @@ describe("Test Goods Receipt", () => {
         expect(error.value).toBeInstanceOf(InvalidEntryDate);
     });
 
-    it("Deve retornar um erro **InvaldLines** se as linhas não forem definidos", async () => {
+    it("Deve retornar um erro **InvaldLines** se linhas estiver vazia", async () => {
         const data = {
             lines: [],
             entryDate: "2024-03-01T16:40:00",
             userId: "1000",
         };
+        const goodsReceiptNoteRepository = new InmemGoodsReceiptNoteRepository();
         const itemRepository = new ItemRepositoryStub();
-        const service = new GoodsReceiptService(itemRepository);
+        const service = new GoodsReceiptService(itemRepository, goodsReceiptNoteRepository);
 
         const error = await service.new(data);
 
@@ -49,8 +51,9 @@ describe("Test Goods Receipt", () => {
             entryDate: "2024-03-01T16:40:00",
             userId: "1000",
         };
+        const goodsReceiptNoteRepository = new InmemGoodsReceiptNoteRepository();
         const itemRepository = new ItemRepositoryStub();
-        const service = new GoodsReceiptService(itemRepository);
+        const service = new GoodsReceiptService(itemRepository, goodsReceiptNoteRepository);
 
         const error = await service.new(data);
 
@@ -63,8 +66,9 @@ describe("Test Goods Receipt", () => {
             entryDate: "2024-03-01T16:40:00",
             userId: "1000",
         };
+        const goodsReceiptNoteRepository = new InmemGoodsReceiptNoteRepository();
         const itemRepository = new ItemRepositoryStub();
-        const service = new GoodsReceiptService(itemRepository);
+        const service = new GoodsReceiptService(itemRepository, goodsReceiptNoteRepository);
 
         const error = await service.new(data as any);
 
@@ -81,8 +85,9 @@ describe("Test Goods Receipt", () => {
             entryDate: "2024-03-01T16:40:00",
             userId: "1000",
         };
+        const goodsReceiptNoteRepository = new InmemGoodsReceiptNoteRepository();
         const itemRepository = new ItemRepositoryStub();
-        const service = new GoodsReceiptService(itemRepository);
+        const service = new GoodsReceiptService(itemRepository, goodsReceiptNoteRepository);
 
         await service.new(data);
 
@@ -92,18 +97,43 @@ describe("Test Goods Receipt", () => {
         expect(item1.getStock().quantity).toBe(11);
         expect(item2.getStock().quantity).toBe(11);
     });
+
+    it("Deve chamar o método **save** no repositório de entrada de mercadoria", async () => {
+        const data = {
+            lines: [
+                { itemId: "1001", quantity: 1 },
+                { itemId: "1002", quantity: 1 },
+            ],
+            entryDate: "2024-03-01T16:40:00",
+            userId: "1000",
+        };
+        const goodsReceiptNoteRepository = new InmemGoodsReceiptNoteRepository();
+        const spy = vi.spyOn(goodsReceiptNoteRepository, "save");
+        const itemRepository = new ItemRepositoryStub();
+        const service = new GoodsReceiptService(itemRepository, goodsReceiptNoteRepository);
+
+        await service.new(data);
+
+        expect(spy).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalledTimes(1);
+    });
 });
 
 export class GoodsReceiptService {
     readonly #itemRepository: ItemRepository;
+    readonly #goodsReceiptNoteRepository: GoodsReceiptNoteRepository;
 
-    constructor(itemRepository: ItemRepository) {
+    constructor(
+        itemRepository: ItemRepository,
+        goodsReceiptNoteRepository: GoodsReceiptNoteRepository
+    ) {
         this.#itemRepository = itemRepository;
+        this.#goodsReceiptNoteRepository = goodsReceiptNoteRepository;
     }
 
     async new(data: GoodsReceiptDTO): Promise<Either<GoodsReceiptError, void>> {
         const entryDate = data.entryDate;
-        if (!entryDate) return left(new InvalidEntryDate(data.entryDate));
+        if (!entryDate) return left(new InvalidEntryDate(entryDate));
 
         if (!data.lines || data.lines.length === 0) {
             return left(new InvalidLines());
@@ -113,8 +143,12 @@ export class GoodsReceiptService {
         const itemsOrError = await this.#itemRepository.findAll(itemsIds);
         if (itemsOrError.isLeft()) return left(itemsOrError.value);
 
-        this.#incrementItemsStock(itemsOrError.value, data);
+        this.#incrementItemsStock(itemsOrError.value, data.lines);
         this.#itemRepository.updateAll(itemsOrError.value);
+
+        const note = new GoodsReceiptNote();
+
+        this.#goodsReceiptNoteRepository.save(note);
 
         return right(undefined);
     }
@@ -123,10 +157,22 @@ export class GoodsReceiptService {
         return lines.map((line) => ID.fromString(line.itemId));
     }
 
-    #incrementItemsStock(items: Item[], data: GoodsReceiptDTO) {
+    #incrementItemsStock(items: Item[], lines: GoodsReceiptLineDTO[]) {
         items.forEach((item, idx) => {
-            item.incrementStock(data.lines[idx].quantity);
+            item.incrementStock(lines[idx].quantity);
         });
+    }
+}
+
+export class GoodsReceiptNote {}
+
+export interface GoodsReceiptNoteRepository {
+    save(goodsReceipt: GoodsReceiptNote): Promise<void>;
+}
+
+export class InmemGoodsReceiptNoteRepository implements GoodsReceiptNoteRepository {
+    save(goodsReceipt: GoodsReceiptNote): Promise<void> {
+        return Promise.resolve(undefined);
     }
 }
 
