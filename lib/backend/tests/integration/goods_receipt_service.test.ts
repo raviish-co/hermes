@@ -132,43 +132,46 @@ export class GoodsReceiptService {
     }
 
     async new(data: GoodsReceiptDTO): Promise<Either<GoodsReceiptError, void>> {
-        const entryDate = data.entryDate;
-        if (!entryDate) return left(new InvalidEntryDate(entryDate));
-        if (!data.lines || data.lines.length === 0) {
-            return left(new InvalidLines());
-        }
+        if (!data.entryDate) return left(new InvalidEntryDate(data.entryDate));
+
+        if (this.#isValidLines(data)) return left(new InvalidLines());
 
         const itemsIds = this.#buildItemsIds(data.lines);
+
         const itemsOrError = await this.#itemRepository.findAll(itemsIds);
         if (itemsOrError.isLeft()) return left(itemsOrError.value);
 
         this.#incrementItemsStock(itemsOrError.value, data.lines);
+
         this.#updateItemsCondition(itemsOrError.value, data.lines);
+
         this.#itemRepository.updateAll(itemsOrError.value);
 
         const lines = this.#buildLines(itemsIds, data.lines);
         const noteId = this.#sequenceGenerator.generate(Sequence.GoodsReceiptNote);
-        const noteOrError = new GoodsReceiptBuilder()
+        const noteOrErr = new GoodsReceiptBuilder()
             .withGoodsReceiptNoteId(noteId)
-            .withEntryDate(entryDate)
+            .withEntryDate(data.entryDate)
             .withUser(data.userId)
             .withLines(lines)
             .build();
-        if (noteOrError.isLeft()) return left(noteOrError.value);
+        if (noteOrErr.isLeft()) return left(noteOrErr.value);
 
-        this.#goodsReceiptNoteRepository.save(noteOrError.value);
+        this.#goodsReceiptNoteRepository.save(noteOrErr.value);
 
         return right(undefined);
     }
 
-    #buildItemsIds(lines: GoodsReceiptLineDTO[]): ID[] {
-        return lines.map((line) => ID.fromString(line.itemId));
+    #isValidLines(data: GoodsReceiptDTO) {
+        return !data.lines || data.lines.length === 0;
+    }
+
+    #buildItemsIds(linesDTO: GoodsReceiptLineDTO[]): ID[] {
+        return linesDTO.map((line) => ID.fromString(line.itemId));
     }
 
     #incrementItemsStock(items: Item[], lines: GoodsReceiptLineDTO[]) {
-        items.forEach((item, idx) => {
-            item.incrementStock(lines[idx].quantity);
-        });
+        items.forEach((item, idx) => item.incrementStock(lines[idx].quantity));
     }
 
     #buildLines(itemsIds: ID[], lines: GoodsReceiptLineDTO[]): GoodsReceiptLine[] {
@@ -177,9 +180,9 @@ export class GoodsReceiptService {
 
     #updateItemsCondition(items: Item[], lines: GoodsReceiptLineDTO[]) {
         lines.forEach((line, idx) => {
-            if (line.condition) {
-                items[idx].updateCondition(line.condition.status, line.condition.comment);
-            }
+            if (!line.condition) return;
+
+            items[idx].updateCondition(line.condition.status, line.condition.comment);
         });
     }
 }
