@@ -45,17 +45,6 @@ const _item2 = new Item(
     { status: Status.Good }
 );
 
-const _item3 = new Item(
-    ID.fromString("1003"),
-    ID.random(),
-    "Item 1",
-    ID.random(),
-    Decimal.fromString("1000"),
-    { "1": "Cor: Preta" },
-    new ItemStock(8),
-    { status: Status.Good }
-);
-
 const _item4 = new Item(
     ID.fromString("1004"),
     ID.random(),
@@ -89,6 +78,17 @@ const _item6 = new Item(
     { status: Status.Good }
 );
 
+const _item7 = new Item(
+    ID.fromString("1007"),
+    ID.random(),
+    "Item 1",
+    ID.random(),
+    Decimal.fromString("1000"),
+    { "1": "Cor: Preta" },
+    new ItemStock(10),
+    { status: Status.Good }
+);
+
 const _goodsIssueData = [
     {
         noteId: ID.fromString("GS - 1000"),
@@ -104,37 +104,17 @@ const _goodsIssueData = [
                 _item.itemId,
                 _item.name,
                 _item.price,
-                3,
                 _item.variations,
-                _item.fulltext
+                _item.fulltext,
+                10
             ),
             new GoodsIssueLine(
                 _item2.itemId,
                 _item2.name,
                 _item2.price,
-                2,
                 _item2.variations,
-                _item2.fulltext
-            ),
-        ],
-    },
-    {
-        noteId: ID.fromString("GS - 1001"),
-        purpose: {
-            description: "Uso Pessoal",
-            details: "Uso Pessoal",
-            notes: "Uso Pessoal",
-        },
-        userId: ID.fromString("1"),
-        returnDate: new Date(),
-        lines: [
-            new GoodsIssueLine(
-                _item3.itemId,
-                _item3.name,
-                _item3.price,
-                2,
-                _item3.variations,
-                _item3.fulltext
+                _item2.fulltext,
+                10
             ),
         ],
     },
@@ -152,17 +132,17 @@ const _goodsIssueData = [
                 _item4.itemId,
                 _item4.name,
                 _item4.price,
-                3,
                 _item4.variations,
-                _item4.fulltext
+                _item4.fulltext,
+                3
             ),
             new GoodsIssueLine(
                 _item5.itemId,
                 _item5.name,
                 _item5.price,
-                2,
                 _item5.variations,
-                _item5.fulltext
+                _item5.fulltext,
+                2
             ),
         ],
     },
@@ -180,9 +160,29 @@ const _goodsIssueData = [
                 _item6.itemId,
                 _item6.name,
                 _item6.price,
-                2,
                 _item6.variations,
-                _item6.fulltext
+                _item6.fulltext,
+                2
+            ),
+        ],
+    },
+    {
+        noteId: ID.fromString("GS - 1004"),
+        purpose: {
+            description: "Uso Pessoal",
+            details: "Uso Pessoal",
+            notes: "Uso Pessoal",
+        },
+        userId: ID.fromString("1"),
+        returnDate: new Date(),
+        lines: [
+            new GoodsIssueLine(
+                _item7.itemId,
+                _item7.name,
+                _item7.price,
+                _item7.variations,
+                _item7.fulltext,
+                3
             ),
         ],
     },

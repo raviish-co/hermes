@@ -112,9 +112,9 @@ export class GoodsIssueService {
                 item.itemId,
                 item.name,
                 item.price,
-                quantity,
                 item.variations,
-                item.fulltext
+                item.fulltext,
+                quantity
             );
 
             goodsIssueLines.push(goodsIssueLine);

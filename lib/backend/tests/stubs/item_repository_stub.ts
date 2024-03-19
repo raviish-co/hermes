@@ -165,6 +165,17 @@ export class ItemRepositoryStub implements ItemRepository {
             { status: Status.Good }
         );
 
+        const item7 = new Item(
+            ID.fromString("1007"),
+            ID.random(),
+            "Casaco casual de inverno",
+            ID.random(),
+            Decimal.fromString("2500"),
+            { "1": "Cor: Castanho", "2": "Marca: Levis" },
+            new ItemStock(10),
+            { status: Status.Good }
+        );
+
         this.#items = {
             "1001": item1,
             "1002": item2,
@@ -172,6 +183,7 @@ export class ItemRepositoryStub implements ItemRepository {
             "1004": item4,
             "1005": item5,
             "1006": item6,
+            "1007": item7,
         };
     }
 }
