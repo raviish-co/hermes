@@ -106,7 +106,7 @@ const _goodsIssueData = [
                 _item.price,
                 _item.variations,
                 _item.fulltext,
-                10
+                15
             ),
             new GoodsIssueLine(
                 _item2.itemId,
@@ -114,7 +114,7 @@ const _goodsIssueData = [
                 _item2.price,
                 _item2.variations,
                 _item2.fulltext,
-                10
+                15
             ),
         ],
     },

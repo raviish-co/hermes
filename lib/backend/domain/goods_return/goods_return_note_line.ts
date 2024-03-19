@@ -1,6 +1,6 @@
 import { ID } from "../../shared/id";
 
-export class GoodsReturnLine {
+export class GoodsReturnNoteLine {
     readonly returnLineId: ID;
     readonly itemId: ID;
     readonly #quantity: number;

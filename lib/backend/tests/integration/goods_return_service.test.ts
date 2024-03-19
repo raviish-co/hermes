@@ -280,7 +280,32 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
     });
 });
 
+describe("GoodsReturnService - List of Goods Return Notes", () => {
+    it("Deve retornar a lista de notas de devolução de artigos", async () => {
+        const { service } = makeService();
+
+        const notes = await service.list();
+
+        expect(notes.length).toBe(0);
+    });
+
+    it("Deve retornar a lista de notas de devolução de artigos", async () => {
+        const { service } = makeService();
+        const itemsData = [
+            { itemId: "1001", quantity: 1, comment: "Riscado" },
+            { itemId: "1002", quantity: 1 },
+        ];
+
+        await service.returningGoods("GS - 1000", depositWithheld, itemsData);
+
+        const notes = await service.list();
+
+        expect(notes.length).toBe(1);
+    });
+});
+
 const depositWithheld = "100,00";
+
 const itemsData = [
     { itemId: "1001", quantity: 3, comment: "Riscado" },
     { itemId: "1002", quantity: 2 },

@@ -12,7 +12,7 @@ import type { ItemRepository } from "../../domain/catalog/item_repository";
 import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import { GoodsIssueRepositoryStub } from "../stubs/goods_issue_repository_stub";
 import type { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
-import { GoodsReturnLine } from "../../domain/goods_issue/goods_return_note_line";
+import { GoodsReturnNoteLine } from "../../domain/goods_return/goods_return_note_line";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { describe, expect, it, vi } from "vitest";
 import { ID } from "../../shared/id";
@@ -287,7 +287,7 @@ describe("Test Goods Issue", () => {
     });
 });
 
-describe("List Goods Issue Notes", () => {
+describe("Test list Goods Issue Notes", () => {
     it("Deve retornar uma lista vazia se não houver guias de saídas", async () => {
         const { service } = makeService();
 
@@ -310,7 +310,7 @@ describe("List Goods Issue Notes", () => {
     });
 });
 
-describe("Get Goods Issue Note", () => {
+describe("Test get Goods Issue Note", () => {
     it("Deve retornar **GoodsIssueNoteFound** se a guia de saída não existir", async () => {
         const goodsIssueRepository = new InmemGoodsIssueNoteRepository();
 
@@ -356,8 +356,6 @@ const goodsIssueData = {
     returnDate: "2021-01-01T16:40:00",
     userId: "1000",
 };
-
-const returnedLines = [new GoodsReturnLine(ID.fromString("1003"), 2)];
 
 interface Dependencies {
     itemRepository?: ItemRepository;

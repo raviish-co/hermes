@@ -5,10 +5,10 @@ import { GoodsReturnNote } from "~/lib/frontend/domain/goods_return_note";
 import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
 import { handleException } from "~/lib/frontend/helpers/error_handler";
 
-const retainedSecurityDeposit = ref<string>("0,00");
+const securityDepositWithHeld = ref<string>("0,00");
 const goodsReturnNote = ref<GoodsReturnNote>({} as GoodsReturnNote);
 const goodsIssueNote = ref<GoodsIssueNote>({} as GoodsIssueNote);
-const editRatainedSecurityDeposit = ref<boolean>(true);
+const editSecurityDeposit = ref<boolean>(true);
 
 const goodsReturnService = new GoodsReturnService();
 const goodsIssueService = new GoodsIssueService();
@@ -20,7 +20,7 @@ goodsIssueService
     .getById(noteId)
     .then((result) => {
         goodsIssueNote.value = GoodsIssueNote.build(result);
-        retainedSecurityDeposit.value = goodsIssueNote.value.formattedSecurityDeposit;
+        securityDepositWithHeld.value = goodsIssueNote.value.formattedSecurityDeposit;
         goodsReturnNote.value = new GoodsReturnNote(goodsIssueNote.value.lines);
     })
     .catch((err) => {
@@ -29,14 +29,14 @@ goodsIssueService
     });
 
 function toggleEdit() {
-    editRatainedSecurityDeposit.value = !editRatainedSecurityDeposit.value;
+    editSecurityDeposit.value = !editSecurityDeposit.value;
 }
 
 function newGoodsReturn() {
     goodsReturnService
         .new(
             goodsIssueNote.value.goodsIssueNoteId,
-            retainedSecurityDeposit.value,
+            securityDepositWithHeld.value,
             goodsReturnNote.value.returnLines
         )
         .then(() => {
@@ -91,8 +91,8 @@ function newGoodsReturn() {
                     <span class="font-medium">Caução a reter (Kz):</span>
                     <input
                         class="input-field max-w-32"
-                        v-model="retainedSecurityDeposit"
-                        :disabled="editRatainedSecurityDeposit"
+                        v-model="securityDepositWithHeld"
+                        :disabled="editSecurityDeposit"
                     />
                     <span class="material-symbols-outlined cursor-pointer" @click="toggleEdit">
                         edit

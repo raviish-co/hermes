@@ -2,7 +2,7 @@ import { GoodsIssueLine } from "./goods_issue_line";
 import { Decimal } from "../../shared/decimal";
 import { Purpose } from "./purpose";
 import { ID } from "../../shared/id";
-import type { GoodsReturnLine } from "./goods_return_note_line";
+import type { GoodsReturnNoteLine } from "../goods_return/goods_return_note_line";
 
 export enum GoodsIssueStatus {
     Pending = "Por Devolver",
@@ -40,7 +40,7 @@ export class GoodsIssueNote {
         return !this.isSameTotal(total) || !this.isSameSecurityDeposit(securityDeposit);
     }
 
-    returnTheGoods(lines: GoodsReturnLine[]): void {
+    returnTheGoods(lines: GoodsReturnNoteLine[]): void {
         this.#returnLines(lines);
 
         if (!this.#allGoodsIssueWasReturned()) return;
@@ -84,7 +84,7 @@ export class GoodsIssueNote {
         this.#calculateTotal(line.total);
     }
 
-    #returnLines(lines: GoodsReturnLine[]): void {
+    #returnLines(lines: GoodsReturnNoteLine[]): void {
         for (const line of lines) {
             this.#returnLine(line.itemId, line.quantityReturned);
         }

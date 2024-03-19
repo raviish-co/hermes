@@ -3,12 +3,12 @@ import { GoodsReturnNoteLine } from "../domain/goods_return_note_line";
 export class GoodsReturnService {
     async new(
         goodsIssueNoteId: string,
-        retainedSecurityDeposit: string,
+        securityDepositWithHeld: string,
         lines: GoodsReturnNoteLine[]
     ) {
         const data: GoodsReturnDTO = {
             goodsIssueNoteId,
-            securityDepositWithHeld: retainedSecurityDeposit,
+            securityDepositWithHeld: securityDepositWithHeld.replace(/\s/, ""),
             itemsData: lines.map(this.#toItemDTO),
         };
 

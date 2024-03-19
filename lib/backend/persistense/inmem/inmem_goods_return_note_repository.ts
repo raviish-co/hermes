@@ -13,4 +13,12 @@ export class InmemGoodsReturnNoteRepository implements GoodsReturnNoteRepository
     getById(id: ID): Promise<GoodsReturnNote> {
         return Promise.resolve(this.#notes[id.toString()]);
     }
+
+    getAll(): Promise<GoodsReturnNote[]> {
+        return Promise.resolve(this.records);
+    }
+
+    get records(): GoodsReturnNote[] {
+        return Object.values(this.#notes);
+    }
 }
