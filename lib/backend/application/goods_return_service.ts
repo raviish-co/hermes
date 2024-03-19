@@ -4,7 +4,7 @@ import type { GoodsIssueNoteRepository } from "../domain/goods_issue/goods_issue
 import { GoodsIssueLineNotFound } from "../domain/goods_issue/goods_lssue_line_not_found_error";
 import type { GoodsReturnNoteRepository } from "../domain/goods_return/goods_return_note_repository";
 import { GoodsReturnNoteLine } from "../domain/goods_return/goods_return_note_line";
-import type { GoodsIssueLine } from "../domain/goods_issue/goods_issue_line";
+import type { GoodsIssueNoteLine } from "../domain/goods_issue/goods_issue_note_line";
 import type { ItemRepository } from "../domain/catalog/item_repository";
 import { GoodsReturnNote } from "../domain/goods_return/goods_return_note";
 import type { Generator } from "../domain/sequences/generator";
@@ -34,7 +34,7 @@ export class GoodsReturnService {
 
     async returningGoods(
         noteId: string,
-        securityDepositWithheld: string,
+        securityDepositWithheld: number,
         itemsData: ItemData[]
     ): Promise<Either<GoodsReturnNoteError, void>> {
         const noteOrErr = await this.#goodsIssueRepository.getById(ID.fromString(noteId));
@@ -105,7 +105,7 @@ export class GoodsReturnService {
         });
     }
 
-    #verifyQuantities(items: ItemData[], lines: GoodsIssueLine[]): Either<Error, void> {
+    #verifyQuantities(items: ItemData[], lines: GoodsIssueNoteLine[]): Either<Error, void> {
         for (const item of items) {
             const line = this.#findGoodsIssueLine(ID.fromString(item.itemId), lines);
 
@@ -118,7 +118,7 @@ export class GoodsReturnService {
         return right(undefined);
     }
 
-    #findGoodsIssueLine(itemId: ID, lines: GoodsIssueLine[]): GoodsIssueLine {
+    #findGoodsIssueLine(itemId: ID, lines: GoodsIssueNoteLine[]): GoodsIssueNoteLine {
         return lines.find((line) => line.itemId.equals(itemId))!;
     }
 }

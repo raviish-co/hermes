@@ -1,6 +1,6 @@
+import type { GoodsReturnNoteLine } from "./goods_return_note_line";
 import { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
-import type { GoodsReturnNoteLine } from "./goods_return_note_line";
 
 export class GoodsReturnNote {
     readonly goodsReturnNoteId: ID;
@@ -13,12 +13,12 @@ export class GoodsReturnNote {
         goodsReturnNoteId: ID,
         goodsIssueNoteId: ID,
         returnLines: GoodsReturnNoteLine[],
-        securityDepositWithheld: string
+        securityDepositWithheld: number
     ) {
         this.goodsIssueNoteId = goodsIssueNoteId;
         this.goodsReturnNoteId = goodsReturnNoteId;
         this.goodsReturnLines = returnLines;
-        this.securityDepositWithheld = Decimal.fromString(securityDepositWithheld);
+        this.securityDepositWithheld = new Decimal(securityDepositWithheld);
         this.issuedAt = new Date();
     }
 }

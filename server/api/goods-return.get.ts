@@ -7,7 +7,7 @@ const { goodsReturnService } = makeServices();
 interface GoodsReturnNoteDTO {
     goodsIssueNoteId: string;
     goodsReturnNoteId: string;
-    securityDepositWithheld: string;
+    securityDepositWithHeld: number;
     issuedAt: string;
     lines: GoodsReturnNoteLineDTO[];
 }
@@ -22,7 +22,7 @@ function toGoodsReturnNoteDTO(note: GoodsReturnNote): GoodsReturnNoteDTO {
     return {
         goodsIssueNoteId: note.goodsIssueNoteId.toString(),
         goodsReturnNoteId: note.goodsReturnNoteId.toString(),
-        securityDepositWithheld: note.securityDepositWithheld.value.toString(),
+        securityDepositWithHeld: note.securityDepositWithheld.value,
         issuedAt: note.issuedAt.toISOString(),
         lines: note.goodsReturnLines.map(toGoodsReturnNoteLineDTO),
     };

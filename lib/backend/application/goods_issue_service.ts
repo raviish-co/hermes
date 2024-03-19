@@ -7,7 +7,7 @@ import { InsufficientStock } from "../domain/catalog/insufficient_stock_error";
 import { InvalidPurpose } from "../domain/goods_issue/invalid_purpose_error";
 import type { GoodsIssueNote } from "../domain/goods_issue/goods_issue_note";
 import { InvalidTotal } from "../domain/goods_issue/invalid_total_error";
-import { GoodsIssueLine } from "../domain/goods_issue/goods_issue_line";
+import { GoodsIssueNoteLine } from "../domain/goods_issue/goods_issue_note_line";
 import type { ItemRepository } from "../domain/catalog/item_repository";
 import { type Either, left, right } from "../shared/either";
 import type { GoodsIssueNoteError } from "../shared/errors";
@@ -91,8 +91,8 @@ export class GoodsIssueService {
     #buildGoodsIssueLines(
         items: Item[],
         lines: GoodIssueLineDTO[]
-    ): Either<InsufficientStock, GoodsIssueLine[]> {
-        const goodsIssueLines: GoodsIssueLine[] = [];
+    ): Either<InsufficientStock, GoodsIssueNoteLine[]> {
+        const goodsIssueLines: GoodsIssueNoteLine[] = [];
 
         for (const idx in items) {
             const { quantity, condition } = lines[idx];
@@ -108,7 +108,7 @@ export class GoodsIssueService {
 
             item.reduceStock(quantity);
 
-            const goodsIssueLine = new GoodsIssueLine(
+            const goodsIssueLine = new GoodsIssueNoteLine(
                 item.itemId,
                 item.name,
                 item.price,
@@ -128,7 +128,7 @@ type GoodsIssueNoteDTO = {
     purpose: PurposeDTO;
     lines: GoodIssueLineDTO[];
     userId: string;
-    total: string;
+    total: number;
     returnDate: string;
 };
 

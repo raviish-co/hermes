@@ -1,7 +1,7 @@
-import { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
+import { Decimal } from "../../shared/decimal";
 
-export class GoodsIssueLine {
+export class GoodsIssueNoteLine {
     readonly issueLineId: ID;
     readonly itemId: ID;
     readonly name: string;
@@ -29,7 +29,7 @@ export class GoodsIssueLine {
         this.price = price;
         this.#quantity = quantity;
         this.quantityReturned = quantityReturned || 0;
-        this.#netTotal = Decimal.fromString("0");
+        this.#netTotal = new Decimal(0);
 
         this.#calculateTotal();
     }
@@ -48,7 +48,7 @@ export class GoodsIssueLine {
     }
 
     #calculateTotal(): void {
-        const factor = Decimal.fromString(this.#quantity.toString());
+        const factor = new Decimal(this.#quantity);
         this.#netTotal = this.price.multiply(factor);
     }
 

@@ -31,7 +31,7 @@ export class GoodsIssueService {
 
     #toGoodsIssueDTO(note: GoodsIssueNote): GoodsIssueDTO {
         return {
-            total: note.formattedGrossTotal.replace(/\s/, ""),
+            total: note.grossTotal,
             returnDate: note.returnDate,
             purpose: note.purpose,
             lines: note.lines.map(this.#toGoodsIssueLine),
@@ -46,7 +46,7 @@ interface GoodsIssueLineDTO {
 }
 
 interface GoodsIssueDTO {
-    total: string;
+    total: number;
     returnDate: string;
     lines: GoodsIssueLineDTO[];
     purpose: Purpose;

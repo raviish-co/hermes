@@ -12,7 +12,6 @@ import type { ItemRepository } from "../../domain/catalog/item_repository";
 import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import { GoodsIssueRepositoryStub } from "../stubs/goods_issue_repository_stub";
 import type { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
-import { GoodsReturnNoteLine } from "../../domain/goods_return/goods_return_note_line";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { describe, expect, it, vi } from "vitest";
 import { ID } from "../../shared/id";
@@ -68,7 +67,7 @@ describe("Test Goods Issue", () => {
 
     it("Deve chamar o método **save** no repositório de guia de saída de mercadoria", async () => {
         const lines = [{ itemId: "1001", quantity: 1 }];
-        const total = "4500,00";
+        const total = 4500;
         const { service, goodsIssueRepository } = makeService();
 
         const spy = vi.spyOn(goodsIssueRepository, "save");
@@ -90,7 +89,7 @@ describe("Test Goods Issue", () => {
         await service.new({
             ...goodsIssueData,
             lines,
-            total: "4500,00",
+            total: 4500,
         });
 
         const goodsIssue = await goodsIssueRepository.last();
@@ -98,16 +97,16 @@ describe("Test Goods Issue", () => {
 
         expect(goodsIssue.goodsIssueLines.length).toBe(1);
         expect(goodsIssueLine.itemId.toString()).toEqual("1001");
-        expect(goodsIssueLine.total.value).toEqual("4500,00");
+        expect(goodsIssueLine.total.value).toEqual(4500);
         expect(goodsIssueLine.quantityRequested).toEqual(1);
     });
 
-    it("Deve efectuar a nota de saída de mercadoria, de mais de um artigo", async () => {
+    it("Deve criar uma guida de saída de mercadoria de mais de um artigo", async () => {
         const lines = [
             { itemId: "1001", quantity: 1 },
             { itemId: "1002", quantity: 1 },
         ];
-        const total = "20000,00";
+        const total = 20000;
         const { service, goodsIssueRepository } = makeService();
 
         await service.new({
@@ -122,7 +121,7 @@ describe("Test Goods Issue", () => {
     });
 
     it("Deve retornar **InvalidTotal** se o total enviado pelo solicitante for diferente do total a pagar da nota de saída de mercadoria,", async () => {
-        const total = "25,00";
+        const total = 25;
         const { service } = makeService();
 
         const error = await service.new({
@@ -153,7 +152,7 @@ describe("Test Goods Issue", () => {
         const goodsIssue = await goodsIssueRepository.last();
 
         expect(goodsIssue.goodsIssueLines.length).toBe(2);
-        expect(goodsIssue.getTotal().value).toEqual("55500,00");
+        expect(goodsIssue.getTotal().value).toEqual(55500);
     });
 
     it("Deve retornar **InsufficientStock** se a quantidade solicitada for maior que a quantidade em estoque", async () => {
@@ -352,7 +351,7 @@ const goodsIssueData = {
             condition: { status: "Mau", comment: "T-shirt rasgada" },
         },
     ],
-    total: "55500,00",
+    total: 55500,
     returnDate: "2021-01-01T16:40:00",
     userId: "1000",
 };

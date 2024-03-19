@@ -6,7 +6,7 @@ export interface GoodsIssueNoteLineModel {
     itemId: string;
     name: string;
     quantity: number;
-    price: string;
+    price: number;
     quantityReturned: number;
     variationValues?: VariationValue[];
     condition?: Condition;
@@ -15,9 +15,9 @@ export interface GoodsIssueNoteLineModel {
 export interface GoodsIssueNoteModel {
     goodsIssueNoteId: string;
     returnDate: string;
-    total: string;
+    total: number;
     purpose: Purpose;
     status: string;
-    securityDeposit: string;
+    securityDeposit: number;
     lines: GoodsIssueNoteLineModel[];
 }

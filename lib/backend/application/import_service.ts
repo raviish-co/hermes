@@ -95,7 +95,7 @@ export class ImportService {
         const itemOrErr = new ItemBuilder()
             .withItemId(itemId)
             .withName(name)
-            .withPrice(Decimal.fromString(price))
+            .withPrice(new Decimal(Number(price)))
             .withCategoryId(categoryOrErr.value.categoryId)
             .withCondition(condition)
             .withStock(Number(quantity))

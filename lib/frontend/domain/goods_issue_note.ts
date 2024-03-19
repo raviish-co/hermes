@@ -1,4 +1,3 @@
-import { convertToNumber } from "../helpers/convert_to_number";
 import { formatCurrency } from "../helpers/format_currency";
 import type { GoodsIssueNoteModel } from "../models/goods_issue_note";
 import type { ItemModel } from "../models/item";
@@ -30,8 +29,8 @@ export class GoodsIssueNote extends Note {
             data.purpose.details
         );
 
-        note.grossTotal = convertToNumber(data.total);
-        note.securityDeposit = convertToNumber(data.securityDeposit);
+        note.grossTotal = data.total;
+        note.securityDeposit = data.securityDeposit;
         note.status = data.status;
 
         for (const line of data.lines) {
@@ -106,6 +105,7 @@ export class GoodsIssueNote extends Note {
     }
 
     private createLine(item: ItemModel, quantity: number) {
+        console.log(item.price);
         return new GoodsIssueNoteLine(
             item.itemId,
             item.name,

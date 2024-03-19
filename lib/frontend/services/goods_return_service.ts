@@ -3,12 +3,12 @@ import { GoodsReturnNoteLine } from "../domain/goods_return_note_line";
 export class GoodsReturnService {
     async new(
         goodsIssueNoteId: string,
-        securityDepositWithHeld: string,
+        securityDepositWithHeld: number,
         lines: GoodsReturnNoteLine[]
     ) {
         const data: GoodsReturnDTO = {
             goodsIssueNoteId,
-            securityDepositWithHeld: securityDepositWithHeld.replace(/\s/, ""),
+            securityDepositWithHeld,
             itemsData: lines.map(this.#toItemDTO),
         };
 
@@ -32,6 +32,6 @@ interface ItemDTO {
 
 interface GoodsReturnDTO {
     goodsIssueNoteId: string;
-    securityDepositWithHeld: string;
+    securityDepositWithHeld: number;
     itemsData: ItemDTO[];
 }

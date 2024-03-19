@@ -8,7 +8,7 @@ interface VariationValues {
 export interface ItemDTO {
     itemId: string;
     name: string;
-    price: string;
+    price: number;
     categoryId: string;
     variationsValues: VariationValues[];
     quantity: number;

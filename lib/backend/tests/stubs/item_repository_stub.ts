@@ -104,7 +104,7 @@ export class ItemRepositoryStub implements ItemRepository {
             ID.random(),
             "T-shirt desportiva gola redonda",
             ID.random(),
-            Decimal.fromString("4500,00"),
+            new Decimal(4500),
             { "1": "Cor: Branco" },
             new ItemStock(10),
             { status: Status.Good }
@@ -115,7 +115,7 @@ export class ItemRepositoryStub implements ItemRepository {
             ID.random(),
             "Calça Jeans Skinny",
             ID.random(),
-            Decimal.fromString("15500,00"),
+            new Decimal(15500),
             { "1": "Cor: Castanho", "2": "Marca: Gucci" },
             new ItemStock(10),
             { status: Status.Good }
@@ -126,7 +126,7 @@ export class ItemRepositoryStub implements ItemRepository {
             ID.random(),
             "Moletom com Capuz",
             ID.random(),
-            Decimal.fromString("1000"),
+            new Decimal(1000),
             { "1": "Cor: Verde", "2": "Marca: Adidas" },
             new ItemStock(7),
             { status: Status.Good }
@@ -137,7 +137,7 @@ export class ItemRepositoryStub implements ItemRepository {
             ID.random(),
             "Shorts Esportivo",
             ID.random(),
-            Decimal.fromString("1000"),
+            new Decimal(1000),
             { "1": "Cor: Verde", "2": "Marca: Adidas" },
             new ItemStock(7),
             { status: Status.Good }
@@ -148,7 +148,7 @@ export class ItemRepositoryStub implements ItemRepository {
             ID.random(),
             "Casaco de Inverno",
             ID.random(),
-            Decimal.fromString("1000"),
+            new Decimal(1000),
             { "1": "Cor: Cinza", "2": "Tamanho: M", "3": "Marca: Polo" },
             new ItemStock(8),
             { status: Status.Good }
@@ -159,7 +159,7 @@ export class ItemRepositoryStub implements ItemRepository {
             ID.random(),
             "Camiseta Polo de Manga Longa",
             ID.random(),
-            Decimal.fromString("1000"),
+            new Decimal(1000),
             { "1": "Cor: Preta", "2": "Marca: Polo" },
             new ItemStock(8),
             { status: Status.Good }
@@ -170,7 +170,7 @@ export class ItemRepositoryStub implements ItemRepository {
             ID.random(),
             "Casaco casual de inverno",
             ID.random(),
-            Decimal.fromString("2500"),
+            new Decimal(2500),
             { "1": "Cor: Castanho", "2": "Marca: Levis" },
             new ItemStock(10),
             { status: Status.Good }

@@ -1,4 +1,4 @@
-import { GoodsIssueLine } from "../../domain/goods_issue/goods_issue_line";
+import { GoodsIssueNoteLine } from "./goods_issue_note_line";
 import { type Either, left, right } from "../../shared/either";
 import { Purpose } from "../../domain/goods_issue/purpose";
 import { GoodsIssueNote } from "./goods_issue_note";
@@ -7,7 +7,7 @@ import { ID } from "../../shared/id";
 export class GoodsIssueNoteBuilder {
     #goodsIssueNoteId?: ID;
     #purpose: Purpose = {} as Purpose;
-    #lines: GoodsIssueLine[] = [];
+    #lines: GoodsIssueNoteLine[] = [];
     #returnDate?: Date;
     #userId?: ID;
 
@@ -23,7 +23,7 @@ export class GoodsIssueNoteBuilder {
         return this;
     }
 
-    withLines(lines: GoodsIssueLine[]): GoodsIssueNoteBuilder {
+    withLines(lines: GoodsIssueNoteLine[]): GoodsIssueNoteBuilder {
         this.#lines = lines;
         return this;
     }

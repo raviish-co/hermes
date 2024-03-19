@@ -1,9 +1,11 @@
 import { Item, Status } from "../../domain/catalog/item";
 import { ItemStock } from "../../domain/catalog/item_stock";
-import { GoodsIssueLine } from "../../domain/goods_issue/goods_issue_line";
+import { GoodsIssueNoteLine } from "../../domain/goods_issue/goods_issue_note_line";
 import { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { InmemGoodsIssueNoteRepository } from "../../persistense/inmem/inmem_goods_issue_note_repository";
+// import { Decimal } from "../../shared/decimal";
 import { Decimal } from "../../shared/decimal";
+
 import { ID } from "../../shared/id";
 
 export class GoodsIssueRepositoryStub extends InmemGoodsIssueNoteRepository {
@@ -28,7 +30,7 @@ const _item = new Item(
     ID.random(),
     "Item 1",
     ID.random(),
-    Decimal.fromString("1000"),
+    new Decimal(1000),
     { "1": "Cor: Preta" },
     new ItemStock(1),
     { status: Status.Good }
@@ -39,7 +41,7 @@ const _item2 = new Item(
     ID.random(),
     "Item 1",
     ID.random(),
-    Decimal.fromString("1000"),
+    new Decimal(1000),
     { "1": "Cor: Preta" },
     new ItemStock(1),
     { status: Status.Good }
@@ -50,7 +52,7 @@ const _item4 = new Item(
     ID.random(),
     "Item 1",
     ID.random(),
-    Decimal.fromString("1000"),
+    new Decimal(1000),
     { "1": "Cor: Preta" },
     new ItemStock(7),
     { status: Status.Good }
@@ -61,7 +63,7 @@ const _item5 = new Item(
     ID.random(),
     "Item 1",
     ID.random(),
-    Decimal.fromString("1000"),
+    new Decimal(1000),
     { "1": "Cor: Preta" },
     new ItemStock(8),
     { status: Status.Good }
@@ -72,7 +74,7 @@ const _item6 = new Item(
     ID.random(),
     "Item 1",
     ID.random(),
-    Decimal.fromString("1000"),
+    new Decimal(1000),
     { "1": "Cor: Preta" },
     new ItemStock(8),
     { status: Status.Good }
@@ -83,7 +85,7 @@ const _item7 = new Item(
     ID.random(),
     "Item 1",
     ID.random(),
-    Decimal.fromString("1000"),
+    new Decimal(1000),
     { "1": "Cor: Preta" },
     new ItemStock(10),
     { status: Status.Good }
@@ -100,7 +102,7 @@ const _goodsIssueData = [
         userId: ID.fromString("1"),
         returnDate: new Date(),
         lines: [
-            new GoodsIssueLine(
+            new GoodsIssueNoteLine(
                 _item.itemId,
                 _item.name,
                 _item.price,
@@ -108,7 +110,7 @@ const _goodsIssueData = [
                 _item.fulltext,
                 15
             ),
-            new GoodsIssueLine(
+            new GoodsIssueNoteLine(
                 _item2.itemId,
                 _item2.name,
                 _item2.price,
@@ -128,7 +130,7 @@ const _goodsIssueData = [
         userId: ID.fromString("1"),
         returnDate: new Date(),
         lines: [
-            new GoodsIssueLine(
+            new GoodsIssueNoteLine(
                 _item4.itemId,
                 _item4.name,
                 _item4.price,
@@ -136,7 +138,7 @@ const _goodsIssueData = [
                 _item4.fulltext,
                 3
             ),
-            new GoodsIssueLine(
+            new GoodsIssueNoteLine(
                 _item5.itemId,
                 _item5.name,
                 _item5.price,
@@ -156,7 +158,7 @@ const _goodsIssueData = [
         userId: ID.fromString("1"),
         returnDate: new Date(),
         lines: [
-            new GoodsIssueLine(
+            new GoodsIssueNoteLine(
                 _item6.itemId,
                 _item6.name,
                 _item6.price,
@@ -176,7 +178,7 @@ const _goodsIssueData = [
         userId: ID.fromString("1"),
         returnDate: new Date(),
         lines: [
-            new GoodsIssueLine(
+            new GoodsIssueNoteLine(
                 _item7.itemId,
                 _item7.name,
                 _item7.price,

@@ -20,7 +20,7 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
-        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+        await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
 
         const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
 
@@ -35,7 +35,7 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
-        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+        await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
 
         const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
 
@@ -51,7 +51,7 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
-        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+        await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
 
         const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
 
@@ -63,7 +63,11 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         const goodsIssueNoteId = "GS - 0001";
         const { service } = makeService();
 
-        const error = await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+        const error = await service.returningGoods(
+            goodsIssueNoteId,
+            securityDepositWithHeld,
+            itemsData
+        );
 
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(GoodsIssueNoteNotFound);
@@ -77,11 +81,11 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
-        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+        await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
 
         const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
 
-        expect(note.securityDepositWithheld.value).toEqual(depositWithheld);
+        expect(note.securityDepositWithheld.value).toEqual(securityDepositWithHeld);
     });
 
     it("Deve actualizar o stock dos artigos devolvidos", async () => {
@@ -92,7 +96,7 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         ];
         const { service, itemRepository } = makeService();
 
-        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+        await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
 
         const item = await itemRepository.getById(ID.fromString("1004"));
         const item2 = await itemRepository.getById(ID.fromString("1005"));
@@ -109,7 +113,7 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         ];
         const { service, goodsIssueRepository } = makeService();
 
-        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+        await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
 
         const noteOrErr = await goodsIssueRepository.getById(ID.fromString(goodsIssueNoteId));
 
@@ -126,7 +130,11 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         ];
         const { service } = makeService();
 
-        const error = await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+        const error = await service.returningGoods(
+            goodsIssueNoteId,
+            securityDepositWithHeld,
+            itemsData
+        );
 
         expect(error.isLeft()).toBeTruthy();
 
@@ -141,7 +149,7 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         ];
         const { service, itemRepository } = makeService();
 
-        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+        await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
 
         const item = await itemRepository.getById(ID.fromString("1001"));
 
@@ -156,7 +164,11 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         ];
         const { service } = makeService();
 
-        const error = await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+        const error = await service.returningGoods(
+            goodsIssueNoteId,
+            securityDepositWithHeld,
+            itemsData
+        );
 
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(GoodsIssueLineNotFound);
@@ -167,7 +179,7 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         const itemsData = [{ itemId: "1006", quantity: 2, comment: "Rasgado" }];
         const { service, goodsIssueRepository } = makeService();
 
-        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+        await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
 
         const noteOrErr = await goodsIssueRepository.getById(ID.fromString(goodsIssueNoteId));
 
@@ -184,7 +196,7 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
-        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+        await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
 
         const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
 
@@ -199,7 +211,7 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
-        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+        await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
 
         const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
 
@@ -214,7 +226,7 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
-        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+        await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
 
         const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
 
@@ -229,7 +241,7 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
-        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+        await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
 
         const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
 
@@ -244,7 +256,7 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
-        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+        await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
 
         const note = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
 
@@ -257,9 +269,13 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         const { service } = makeService();
 
-        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+        await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
 
-        const error = await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+        const error = await service.returningGoods(
+            goodsIssueNoteId,
+            securityDepositWithHeld,
+            itemsData
+        );
 
         expect(error.isLeft()).toBeTruthy();
     });
@@ -271,9 +287,13 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         const { service } = makeService();
 
-        await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData);
+        await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
 
-        const error = await service.returningGoods(goodsIssueNoteId, depositWithheld, itemsData1);
+        const error = await service.returningGoods(
+            goodsIssueNoteId,
+            securityDepositWithHeld,
+            itemsData1
+        );
 
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(InvalidGoodsIssueLineQuantity);
@@ -296,7 +316,7 @@ describe("GoodsReturnService - List of Goods Return Notes", () => {
             { itemId: "1002", quantity: 1 },
         ];
 
-        await service.returningGoods("GS - 1000", depositWithheld, itemsData);
+        await service.returningGoods("GS - 1000", securityDepositWithHeld, itemsData);
 
         const notes = await service.list();
 
@@ -304,7 +324,7 @@ describe("GoodsReturnService - List of Goods Return Notes", () => {
     });
 });
 
-const depositWithheld = "100,00";
+const securityDepositWithHeld = 100;
 
 const itemsData = [
     { itemId: "1001", quantity: 3, comment: "Riscado" },

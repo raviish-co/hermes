@@ -4,7 +4,7 @@ import type { VariationValue } from "./variation_value";
 export interface ItemModel {
     itemId: string;
     name: string;
-    price: string;
+    price: number;
     categoryId: string;
     variationsValues?: VariationValue[];
     quantity: number;

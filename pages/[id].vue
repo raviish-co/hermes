@@ -5,7 +5,7 @@ import { GoodsReturnNote } from "~/lib/frontend/domain/goods_return_note";
 import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
 import { handleException } from "~/lib/frontend/helpers/error_handler";
 
-const securityDepositWithHeld = ref<string>("0,00");
+const securityDepositWithHeld = ref<number>(0);
 const goodsReturnNote = ref<GoodsReturnNote>({} as GoodsReturnNote);
 const goodsIssueNote = ref<GoodsIssueNote>({} as GoodsIssueNote);
 const editSecurityDeposit = ref<boolean>(true);
@@ -20,7 +20,7 @@ goodsIssueService
     .getById(noteId)
     .then((result) => {
         goodsIssueNote.value = GoodsIssueNote.build(result);
-        securityDepositWithHeld.value = goodsIssueNote.value.formattedSecurityDeposit;
+        securityDepositWithHeld.value = goodsIssueNote.value.securityDeposit;
         goodsReturnNote.value = new GoodsReturnNote(goodsIssueNote.value.lines);
     })
     .catch((err) => {

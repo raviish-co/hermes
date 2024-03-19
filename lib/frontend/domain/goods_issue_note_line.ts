@@ -1,5 +1,4 @@
 import type { VariationValue } from "../models/variation_value";
-import { convertToNumber } from "../helpers/convert_to_number";
 import { formatCurrency } from "../helpers/format_currency";
 import type { Condition } from "../models/condition";
 import { NoteLine } from "./note_line";
@@ -13,14 +12,14 @@ export class GoodsIssueNoteLine extends NoteLine {
         itemId: string,
         name: string,
         quantity: number,
-        price: string,
+        price: number,
         quantityReturned?: number,
         variationsValues?: VariationValue[],
         condition?: Condition,
         stock?: number
     ) {
         super(itemId, name, quantity, quantityReturned, variationsValues, condition);
-        this.price = convertToNumber(price);
+        this.price = price;
         this.stock = stock ?? 0;
         this.total = 0;
     }

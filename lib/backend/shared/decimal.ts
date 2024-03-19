@@ -1,47 +1,45 @@
 export class Decimal {
-    #value: string;
+    #value: number;
 
-    private constructor(value: string) {
+    constructor(value: number) {
         this.#value = value;
     }
 
-    static fromString(value: string): Decimal {
-        const formatter = new Intl.NumberFormat("pt-AO", {
-            useGrouping: false,
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-        });
-        return new Decimal(formatter.format(Number(value.replace(",", "."))));
-    }
-
-    add(number: Decimal): Decimal {
+    add(number: Decimal) {
         const { firstNumber, secondNumber } = this.#makeOperands(number);
-        const result = (firstNumber + secondNumber) / 100;
-        return Decimal.fromString(result.toString());
+
+        const result = (firstNumber + secondNumber) / this.#pow(10, 2);
+
+        return new Decimal(result);
     }
 
-    multiply(number: Decimal): Decimal {
+    multiply(number: Decimal) {
         const { firstNumber, secondNumber } = this.#makeOperands(number);
-        const result = (firstNumber * secondNumber) / 10000;
-        return Decimal.fromString(result.toString());
-    }
 
-    isZero(): boolean {
-        return this.#value === "0,00";
-    }
+        const result = (firstNumber * secondNumber) / this.#pow(10, 4);
 
-    #makeOperand(value: string): number {
-        return parseInt(value.replace(",", ""));
+        return new Decimal(this.#formatNumber(result));
     }
 
     #makeOperands(number: Decimal) {
-        return {
-            firstNumber: this.#makeOperand(number.value),
-            secondNumber: this.#makeOperand(this.#value),
-        };
+        const firstNumber = this.#convertToInteger(this.value);
+        const secondNumber = this.#convertToInteger(number.value);
+        return { firstNumber, secondNumber };
     }
 
-    get value(): string {
+    #convertToInteger(value: number) {
+        return value * this.#pow(10, 2);
+    }
+
+    #pow(value: number, pow: number) {
+        return Math.pow(value, pow);
+    }
+
+    #formatNumber(result: number) {
+        return Number((Math.floor(result * 100) / 100).toFixed(2));
+    }
+
+    get value() {
         return this.#value;
     }
 }
