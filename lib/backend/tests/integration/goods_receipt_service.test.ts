@@ -96,6 +96,24 @@ describe("Test Goods Receipt", () => {
         expect(goodsReceipt.goodsReceiptNoteId.toString()).toBe("GE - 0001");
         expect(goodsReceipt.goodsReceiptNoteId).toBeInstanceOf(ID);
     });
+
+    it("Deve atualizar a condição dos artigos", async () => {
+        const lines = [
+            { itemId: "1001", quantity: 2, condition: { status: "Bom" } },
+            { itemId: "1002", quantity: 2, condition: { status: "Mau", comment: "Gola rasgada" } },
+        ];
+        const { service, itemRepository } = makeService();
+
+        service.new({ ...goodsReceiptData, lines });
+
+        const item1 = await itemRepository.getById(ID.fromString("1001"));
+        const item2 = await itemRepository.getById(ID.fromString("1002"));
+
+        expect(item1.getCondition().status).toBe("Bom");
+        expect(item1.getCondition().comment).toBeUndefined();
+        expect(item2.getCondition().status).toBe("Mau");
+        expect(item2.getCondition().comment).toEqual("Gola rasgada");
+    });
 });
 
 export class GoodsReceiptService {
@@ -116,7 +134,6 @@ export class GoodsReceiptService {
     async new(data: GoodsReceiptDTO): Promise<Either<GoodsReceiptError, void>> {
         const entryDate = data.entryDate;
         if (!entryDate) return left(new InvalidEntryDate(entryDate));
-
         if (!data.lines || data.lines.length === 0) {
             return left(new InvalidLines());
         }
@@ -126,6 +143,7 @@ export class GoodsReceiptService {
         if (itemsOrError.isLeft()) return left(itemsOrError.value);
 
         this.#incrementItemsStock(itemsOrError.value, data.lines);
+        this.#updateItemsCondition(itemsOrError.value, data.lines);
         this.#itemRepository.updateAll(itemsOrError.value);
 
         const lines = this.#buildLines(itemsIds, data.lines);
@@ -155,6 +173,14 @@ export class GoodsReceiptService {
 
     #buildLines(itemsIds: ID[], lines: GoodsReceiptLineDTO[]): GoodsReceiptLine[] {
         return lines.map((line, idx) => new GoodsReceiptLine(itemsIds[idx], line.quantity));
+    }
+
+    #updateItemsCondition(items: Item[], lines: GoodsReceiptLineDTO[]) {
+        lines.forEach((line, idx) => {
+            if (line.condition) {
+                items[idx].updateCondition(line.condition.status, line.condition.comment);
+            }
+        });
     }
 }
 
