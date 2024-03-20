@@ -2,7 +2,11 @@ import type { Condition } from "../models/condition";
 import { NoteLine } from "./note_line";
 
 export abstract class Note {
-    lines: NoteLine[] = [];
+    lines: NoteLine[];
+
+    constructor() {
+        this.lines = [];
+    }
 
     removeLine(itemId: string) {
         this.lines = this.lines.filter((line) => line.itemId !== itemId);

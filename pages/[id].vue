@@ -9,6 +9,7 @@ const securityDepositWithHeld = ref<number>(0);
 const goodsReturnNote = ref<GoodsReturnNote>({} as GoodsReturnNote);
 const goodsIssueNote = ref<GoodsIssueNote>({} as GoodsIssueNote);
 const editSecurityDeposit = ref<boolean>(true);
+const invalidLine = ref<boolean>(false);
 
 const goodsReturnService = new GoodsReturnService();
 const goodsIssueService = new GoodsIssueService();
@@ -29,6 +30,10 @@ goodsIssueService
 
 function toggleEdit() {
     editSecurityDeposit.value = !editSecurityDeposit.value;
+}
+
+function isReturned() {
+    return goodsIssueNote.value.status === "Devolvido";
 }
 
 function newGoodsReturn() {
@@ -66,13 +71,24 @@ function newGoodsReturn() {
             <div class="input-disabled">{{ goodsIssueNote.purpose?.notes }}</div>
         </section>
 
-        <ReturnNote :note="goodsReturnNote" :requested-lines="goodsIssueNote.lines" />
+        <ReturnNote
+            :returnNote="(goodsReturnNote as GoodsReturnNote)"
+            :issue-note="(goodsIssueNote as GoodsIssueNote)"
+            :is-returned="isReturned()"
+            @invalid-line="invalidLine = $event"
+        />
     </section>
 
     <section class="footer">
         <div class="footer-container">
             <div class="flex flex-wrap gap-2 w-full pb-3 md:w-auto sm:flex-nowrap md:gap-4 md:pb-0">
-                <button class="btn-secondary" @click="newGoodsReturn()">Devolver</button>
+                <button
+                    class="btn-secondary"
+                    @click="newGoodsReturn()"
+                    :disabled="isReturned() || invalidLine"
+                >
+                    Devolver
+                </button>
                 <button class="btn-light">Cancelar</button>
             </div>
 
@@ -86,7 +102,10 @@ function newGoodsReturn() {
                     <span>{{ goodsIssueNote.formattedSecurityDeposit }}</span>
                 </p>
 
-                <p class="flex items-center text-center w-full md:w-auto md:text-right space-x-1">
+                <p
+                    class="flex items-center text-center w-full md:w-auto md:text-right space-x-1"
+                    :class="{ hidden: isReturned() }"
+                >
                     <span class="font-medium">Caução a reter (Kz):</span>
                     <input
                         class="input-field max-w-32"
