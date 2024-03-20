@@ -12,6 +12,7 @@ import type { GoodsIssueLineNotFound } from "../domain/goods_issue/goods_lssue_l
 import { GoodsIssueNoteHasBeenReturned } from "../domain/goods_issue/goods_issue_note_has_been_returned_error";
 import type { InvalidEntryDate } from "../domain/goods_receipt/invalid_entry_date_error";
 import type { InvalidLines } from "../domain/goods_receipt/invalid_lines_error";
+import type { MissingDependency } from "../domain/goods_receipt/missing_dependency_error";
 
 export type GoodsIssueNoteError = InvalidPurpose | ItemNotFound | InvalidTotal | InsufficientStock;
 
@@ -28,4 +29,4 @@ export type FileError =
     | InvalidVariationFormat
     | Error;
 
-export type GoodsReceiptError = InvalidEntryDate | InvalidLines | ItemNotFound;
+export type GoodsReceiptError = InvalidEntryDate | InvalidLines | ItemNotFound | MissingDependency;

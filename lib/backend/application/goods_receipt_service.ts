@@ -14,16 +14,16 @@ import { GoodsReceiptLine } from "../domain/goods_receipt/goods_receipt_line";
 export class GoodsReceiptService {
     readonly #itemRepository: ItemRepository;
     readonly #goodsReceiptNoteRepository: GoodsReceiptNoteRepository;
-    readonly #sequenceGenerator: SequenceGenerator;
+    readonly #generator: SequenceGenerator;
 
     constructor(
         itemRepository: ItemRepository,
         goodsReceiptNoteRepository: GoodsReceiptNoteRepository,
-        sequenceGenerator: SequenceGenerator
+        generator: SequenceGenerator
     ) {
         this.#itemRepository = itemRepository;
         this.#goodsReceiptNoteRepository = goodsReceiptNoteRepository;
-        this.#sequenceGenerator = sequenceGenerator;
+        this.#generator = generator;
     }
 
     async new(data: GoodsReceiptDTO): Promise<Either<GoodsReceiptError, void>> {
@@ -43,7 +43,7 @@ export class GoodsReceiptService {
         this.#itemRepository.updateAll(itemsOrError.value);
 
         const lines = this.#buildLines(itemsIds, data.lines);
-        const noteId = this.#sequenceGenerator.generate(Sequence.GoodsReceiptNote);
+        const noteId = this.#generator.generate(Sequence.GoodsReceiptNote);
         const noteOrErr = new GoodsReceiptBuilder()
             .withGoodsReceiptNoteId(noteId)
             .withEntryDate(data.entryDate)

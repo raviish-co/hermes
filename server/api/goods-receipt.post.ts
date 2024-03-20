@@ -3,6 +3,7 @@ import { HttpStatus } from "./http_status";
 import { InvalidEntryDate } from "~/lib/backend/domain/goods_receipt/invalid_entry_date_error";
 import { InvalidLines } from "~/lib/backend/domain/goods_receipt/invalid_lines_error";
 import { ItemNotFound } from "~/lib/backend/domain/catalog/item_not_found_error";
+import { MissingDependency } from "~/lib/backend/domain/goods_receipt/missing_dependency_error";
 
 const { goodsReceiptService } = makeServices();
 
@@ -29,6 +30,13 @@ export default defineEventHandler(async (event) => {
         throw createError({
             statusCode: HttpStatus.BadRequest,
             message: "Artigo não encontrado",
+        });
+    }
+
+    if (voidOrError.value instanceof MissingDependency) {
+        throw createError({
+            statusCode: HttpStatus.BadRequest,
+            message: "Erro ao efeturar saída de mercadoria",
         });
     }
 

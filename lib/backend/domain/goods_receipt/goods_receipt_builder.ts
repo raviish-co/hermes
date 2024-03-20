@@ -2,6 +2,7 @@ import { left, right, type Either } from "../../shared/either";
 import { ID } from "../../shared/id";
 import { GoodsReceiptLine } from "./goods_receipt_line";
 import { GoodsReceiptNote } from "./goods_receipt_note";
+import { MissingDependency } from "./missing_dependency_error";
 
 export class GoodsReceiptBuilder {
     #goodsReceiptNoteId?: ID;
@@ -29,12 +30,12 @@ export class GoodsReceiptBuilder {
         return this;
     }
 
-    build(): Either<Error, GoodsReceiptNote> {
-        if (!this.#goodsReceiptNoteId) return left(new Error("goodsReceiptId is required"));
+    build(): Either<MissingDependency, GoodsReceiptNote> {
+        if (!this.#goodsReceiptNoteId) return left(new MissingDependency("goodsReceiptId"));
 
-        if (!this.#entryDate) return left(new Error("entryDate is required"));
+        if (!this.#entryDate) return left(new MissingDependency("entryDate"));
 
-        if (!this.#userId) return left(new Error("userId is required"));
+        if (!this.#userId) return left(new MissingDependency("userId"));
 
         const goodsReceipt = new GoodsReceiptNote(
             this.#goodsReceiptNoteId,
