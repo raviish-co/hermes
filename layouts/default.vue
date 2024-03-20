@@ -56,6 +56,14 @@ function toggleMenu() {
                 </NuxtLink>
 
                 <NuxtLink
+                    to="/goods-receipt"
+                    class="flex gap-3 items-center p-2 hover:bg-black hover:text-white w-full"
+                >
+                    <span class="material-symbols-outlined text-xl"> add_shopping_cart </span>
+                    <span>Guia de entrda</span>
+                </NuxtLink>
+
+                <NuxtLink
                     to="/upload_item"
                     class="flex gap-3 items-center p-2 hover:bg-black hover:text-white w-full"
                 >

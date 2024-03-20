@@ -2,7 +2,7 @@
 interface Props {
     modelValue?: number;
     initital: number;
-    limit: number;
+    limit?: number;
 }
 
 interface Emits {
@@ -22,7 +22,7 @@ function updateQuantity(e: Event) {
         return;
     }
 
-    if (value > props.limit) {
+    if (props.limit && value > props.limit) {
         emits("update-quantity", 0);
         return;
     }

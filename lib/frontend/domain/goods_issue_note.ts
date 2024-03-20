@@ -105,7 +105,6 @@ export class GoodsIssueNote extends Note {
     }
 
     private createLine(item: ItemModel, quantity: number) {
-        console.log(item.price);
         return new GoodsIssueNoteLine(
             item.itemId,
             item.name,
