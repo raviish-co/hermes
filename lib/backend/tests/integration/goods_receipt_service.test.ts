@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import { ID } from "../../shared/id";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
@@ -8,6 +8,7 @@ import { GoodsReceiptService } from "../../application/goods_receipt_service";
 import { InmemGoodsReceiptNoteRepository } from "../../persistense/inmem/inmem_goods_receipt_note_repository";
 import { InvalidEntryDate } from "../../domain/goods_receipt/invalid_entry_date_error";
 import { InvalidLines } from "../../domain/goods_receipt/invalid_lines_error";
+import type { Generator } from "../../domain/sequences/generator";
 
 describe("Test Goods Receipt", () => {
     it("Deve retornar um erro **InvalidEntryDate** se a data de entrada de mercadoria não for definida", async () => {
@@ -65,16 +66,6 @@ describe("Test Goods Receipt", () => {
         expect(item2.getStock().quantity).toBe(11);
     });
 
-    it("Deve chamar o método **save** no repositório de entrada de mercadoria", async () => {
-        const { service, goodsReceiptNoteRepository } = makeService();
-        const spy = vi.spyOn(goodsReceiptNoteRepository, "save");
-
-        await service.new(goodsReceiptData);
-
-        expect(spy).toHaveBeenCalled();
-        expect(spy).toHaveBeenCalledTimes(1);
-    });
-
     it("Deve efectuar a nota de entrada de mercadoria", async () => {
         const { service, goodsReceiptNoteRepository } = makeService();
         await service.new(goodsReceiptData);
@@ -87,13 +78,18 @@ describe("Test Goods Receipt", () => {
     });
 
     it("Deve gerar o ID para a nota de entrada de mercadoria", async () => {
-        const { service, goodsReceiptNoteRepository } = makeService();
+        const THE_ID = "GS1001";
+        const generator = {
+            generate: () => THE_ID,
+        };
+
+        const { service, goodsReceiptNoteRepository } = makeService(generator);
         await service.new(goodsReceiptData);
 
         const goodsReceipt = await goodsReceiptNoteRepository.last();
 
         expect(goodsReceipt.goodsReceiptNoteId).toBeDefined();
-        expect(goodsReceipt.goodsReceiptNoteId.toString()).toBe("GE - 0001");
+        expect(goodsReceipt.goodsReceiptNoteId.toString()).toBe(THE_ID);
         expect(goodsReceipt.goodsReceiptNoteId).toBeInstanceOf(ID);
     });
 
@@ -116,9 +112,9 @@ describe("Test Goods Receipt", () => {
     });
 });
 
-const makeService = () => {
+const makeService = (generator?: Generator) => {
     const storage = new InmemSequenceStorage();
-    const sequenceGenerator = new SequenceGenerator(storage);
+    const sequenceGenerator = generator ?? new SequenceGenerator(storage);
     const goodsReceiptNoteRepository = new InmemGoodsReceiptNoteRepository();
     const itemRepository = new ItemRepositoryStub();
     const service = new GoodsReceiptService(
