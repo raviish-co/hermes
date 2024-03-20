@@ -2,13 +2,13 @@ import type { GoodsIssueNoteNotFound } from "../domain/goods_issue/goods_issue_n
 import type { GoodsIssueNoteRepository } from "../domain/goods_issue/goods_issue_note_repository";
 import type { PurposeSpecification } from "../domain/goods_issue/purpose_specification";
 import { GoodsIssueNoteBuilder } from "../domain/goods_issue/goods_issue_builder";
-import type { SequenceGenerator } from "../domain/sequences/sequence_generator";
 import { InsufficientStock } from "../domain/catalog/insufficient_stock_error";
 import { InvalidPurpose } from "../domain/goods_issue/invalid_purpose_error";
 import type { GoodsIssueNote } from "../domain/goods_issue/goods_issue_note";
 import { InvalidTotal } from "../domain/goods_issue/invalid_total_error";
 import { GoodsIssueNoteLine } from "../domain/goods_issue/goods_issue_note_line";
 import type { ItemRepository } from "../domain/catalog/item_repository";
+import type { Generator } from "../domain/sequences/generator";
 import { type Either, left, right } from "../shared/either";
 import type { GoodsIssueNoteError } from "../shared/errors";
 import { Sequence } from "../domain/sequences/sequence";
@@ -17,21 +17,21 @@ import { Item } from "../domain/catalog/item";
 import { ID } from "../shared/id";
 
 export class GoodsIssueService {
-    #itemRepository: ItemRepository;
     #goodsIssueNoteRepository: GoodsIssueNoteRepository;
-    #sequenceGenerator: SequenceGenerator;
     #purposeSpecification: PurposeSpecification;
+    #itemRepository: ItemRepository;
+    #generator: Generator;
 
     constructor(
         itemRepository: ItemRepository,
         goodsIssueNoteRepository: GoodsIssueNoteRepository,
-        sequenceGenerator: SequenceGenerator,
+        generator: Generator,
         purposeSpecification: PurposeSpecification
     ) {
-        this.#itemRepository = itemRepository;
         this.#goodsIssueNoteRepository = goodsIssueNoteRepository;
-        this.#sequenceGenerator = sequenceGenerator;
         this.#purposeSpecification = purposeSpecification;
+        this.#itemRepository = itemRepository;
+        this.#generator = generator;
     }
 
     async new(data: GoodsIssueNoteDTO): Promise<Either<GoodsIssueNoteError, void>> {
@@ -49,8 +49,8 @@ export class GoodsIssueService {
         if (linesOrErr.isLeft()) return left(linesOrErr.value);
 
         const lines = linesOrErr.value;
-        const noteId = this.#sequenceGenerator.generate(Sequence.GoodIssueNote);
-        const noteOrError = new GoodsIssueNoteBuilder()
+        const noteId = this.#buildNoteId();
+        const noteOrErr = new GoodsIssueNoteBuilder()
             .withGoodsIssueNoteId(noteId)
             .withPurpose(purpose)
             .withReturnDate(data.returnDate)
@@ -58,11 +58,11 @@ export class GoodsIssueService {
             .withLines(lines)
             .build();
 
-        if (noteOrError.isLeft()) return left(noteOrError.value);
+        if (noteOrErr.isLeft()) return left(noteOrErr.value);
 
-        if (!noteOrError.value.isSameTotal(data.total)) return left(new InvalidTotal());
+        if (!noteOrErr.value.isSameTotal(data.total)) return left(new InvalidTotal());
 
-        await this.#goodsIssueNoteRepository.save(noteOrError.value);
+        await this.#goodsIssueNoteRepository.save(noteOrErr.value);
 
         await this.#itemRepository.updateAll(items);
 
@@ -78,6 +78,10 @@ export class GoodsIssueService {
         if (noteOrErr.isLeft()) return left(noteOrErr.value);
 
         return right(noteOrErr.value);
+    }
+
+    #buildNoteId() {
+        return this.#generator.generate(Sequence.GoodIssueNote);
     }
 
     #buildPurpose(data: PurposeDTO) {
