@@ -1,5 +1,5 @@
 import type { Condition } from "./condition";
-import type { Purpose } from "./purpose";
+import type { PurposeModel } from "./purpose";
 import type { VariationValue } from "./variation_value";
 
 export interface GoodsIssueNoteLineModel {
@@ -16,7 +16,7 @@ export interface GoodsIssueNoteModel {
     goodsIssueNoteId: string;
     returnDate: string;
     total: number;
-    purpose: Purpose;
+    purpose: PurposeModel;
     status: string;
     securityDeposit: number;
     lines: GoodsIssueNoteLineModel[];

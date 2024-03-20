@@ -1,4 +1,4 @@
-export interface Purpose {
+export interface PurposeModel {
     description: string;
     details?: string;
     notes: string;
