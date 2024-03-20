@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { ChooseNoteLine, DescribeCondition } from "#build/components";
-import { formatVariationValues } from "@frontend/helpers/format_variation_values";
 import type { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
 import type { GoodsReturnNote } from "~/lib/frontend/domain/goods_return_note";
 import type { NoteLine } from "~/lib/frontend/domain/note_line";
@@ -66,7 +65,7 @@ function showRequestedLines() {
                             <br />
 
                             <span class="text-light-600 text-sm">
-                                {{ formatVariationValues(line.variationValues) }}
+                                {{ line.formattedVariationsValues }}
                             </span>
                         </td>
 

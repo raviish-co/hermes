@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { formatVariationValues } from "@frontend/helpers/format_variation_values";
 import type { AddLineDialog, DescribeCondition } from "#build/components";
 import type { Condition } from "~/lib/frontend/models/condition";
 import type { GoodsReceiptNote } from "~/lib/frontend/domain/goods_receipt_note";
@@ -40,7 +39,7 @@ defineProps<{ note: GoodsReceiptNote }>();
                             <br />
 
                             <span class="text-light-600 text-sm">
-                                {{ formatVariationValues(line.variationValues) }}
+                                {{ line.formattedVariationsValues }}
                             </span>
                         </td>
 
