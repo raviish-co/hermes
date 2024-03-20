@@ -13,7 +13,7 @@ import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
 import { GoodsIssueRepositoryStub } from "../stubs/goods_issue_repository_stub";
 import type { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { ID } from "../../shared/id";
 
 describe("Test Goods Issue", () => {
@@ -40,19 +40,7 @@ describe("Test Goods Issue", () => {
         expect(error.value).toBeInstanceOf(InvalidPurpose);
     });
 
-    it("Deve chamar o método **getAll** no repositório de artigos", async () => {
-        const lines = [{ itemId: "1001", quantity: 1 }];
-        const { service, itemRepository } = makeService();
-        const spy = vi.spyOn(itemRepository, "findAll");
-
-        await service.new({ ...goodsIssueData, lines });
-
-        expect(spy).toHaveBeenCalled();
-        expect(spy).toHaveBeenCalledTimes(1);
-        expect(spy).toHaveBeenCalledWith([ID.fromString("1001")]);
-    });
-
-    it("Deve retornar um erro **ItemNotFound** se não existir", async () => {
+    it("Deve retornar um erro **ItemNotFound** se o artigo não existir no repositório", async () => {
         const lines = [{ itemId: "1008", quantity: 1 }];
         const { service } = makeService();
 
@@ -65,24 +53,7 @@ describe("Test Goods Issue", () => {
         expect(error.value).toBeInstanceOf(ItemNotFound);
     });
 
-    it("Deve chamar o método **save** no repositório de guia de saída de mercadoria", async () => {
-        const lines = [{ itemId: "1001", quantity: 1 }];
-        const total = 4500;
-        const { service, goodsIssueRepository } = makeService();
-
-        const spy = vi.spyOn(goodsIssueRepository, "save");
-
-        await service.new({
-            ...goodsIssueData,
-            lines,
-            total,
-        });
-
-        expect(spy).toHaveBeenCalled();
-        expect(spy).toHaveBeenCalledTimes(1);
-    });
-
-    it("Deve efectuar a nota de saída de mercadoria, de um uníco artigo", async () => {
+    it("Deve efectuar a guia de saída de mercadoria de um uníco artigo", async () => {
         const lines = [{ itemId: "1001", quantity: 1 }];
         const { service, goodsIssueRepository } = makeService();
 
@@ -120,7 +91,7 @@ describe("Test Goods Issue", () => {
         expect(goodsIssue.getTotal().value).toEqual(total);
     });
 
-    it("Deve retornar **InvalidTotal** se o total enviado pelo solicitante for diferente do total a pagar da nota de saída de mercadoria,", async () => {
+    it("Deve retornar **InvalidTotal** se o total enviado pelo solicitante for diferente do total calculado na guida de saída de mercadoria,", async () => {
         const total = 25;
         const { service } = makeService();
 
@@ -133,7 +104,7 @@ describe("Test Goods Issue", () => {
         expect(error.value).toBeInstanceOf(InvalidTotal);
     });
 
-    it("Deve registrar a data de devolução da nota de saída de mercadoria,", async () => {
+    it("Deve registrar a data de devolução da guia de saída de mercadoria,", async () => {
         const { service, goodsIssueRepository } = makeService();
 
         await service.new(goodsIssueData);
@@ -155,7 +126,7 @@ describe("Test Goods Issue", () => {
         expect(goodsIssue.getTotal().value).toEqual(55500);
     });
 
-    it("Deve retornar **InsufficientStock** se a quantidade solicitada for maior que a quantidade em estoque", async () => {
+    it("Deve retornar **InsufficientStock** se a quantidade do artigo solicitado for maior que a sua quantidade em stock", async () => {
         const lines = [
             { itemId: "1001", quantity: 10 },
             { itemId: "1002", quantity: 15 },
@@ -171,18 +142,7 @@ describe("Test Goods Issue", () => {
         expect(error.value).toBeInstanceOf(InsufficientStock);
     });
 
-    it("Deve atualizar o estoque dos artigos solicitados no repositório", async () => {
-        const { service, itemRepository } = makeService({});
-
-        const spy = vi.spyOn(itemRepository, "updateAll");
-
-        await service.new(goodsIssueData);
-
-        expect(spy).toHaveBeenCalled();
-        expect(spy).toHaveBeenCalledTimes(1);
-    });
-
-    it("Deve diminuir o estoque dos artigos solicitados", async () => {
+    it("Deve diminuir o stock dos artigos solicitados", async () => {
         const { service, itemRepository } = makeService();
 
         await service.new(goodsIssueData);
@@ -194,7 +154,7 @@ describe("Test Goods Issue", () => {
         expect(stock.quantity).toEqual(8);
     });
 
-    it("Deve ser adicionada a nota de saída de mercadoria, caso a finalidade tenha uma seção", async () => {
+    it("Deve ser adicionada a seção a guia de saída de mercadoria", async () => {
         const { service, goodsIssueRepository } = makeService();
 
         await service.new(goodsIssueData);
@@ -205,7 +165,7 @@ describe("Test Goods Issue", () => {
         expect(goodsIssue.purpose.details).toEqual("Interna");
     });
 
-    it("Deve ser adicionada a nota de saída de mercadoria, caso a finalidade tenha um nota", async () => {
+    it("Deve ser adicionada a guia de saída de mercadoria, caso a finalidade tenha um guia", async () => {
         const data = {
             ...goodsIssueData,
             purpose: {
@@ -242,7 +202,7 @@ describe("Test Goods Issue", () => {
         expect(error.value).toBeInstanceOf(InsufficientStock);
     });
 
-    it("Deve gerar o ID da nota de saída de mercadoria,", async () => {
+    it("Deve gerar o ID da guia de saída de mercadoria,", async () => {
         const { service, goodsIssueRepository } = makeService();
 
         await service.new(goodsIssueData);
@@ -271,7 +231,7 @@ describe("Test Goods Issue", () => {
         expect(goodsIssue2.goodsIssueNoteId.toString()).toEqual("GS - 1001");
     });
 
-    it("Deve receber o estado atual dos artigos solicitados", async () => {
+    it("Deve receber o estado actual dos artigos solicitados", async () => {
         const { service, itemRepository } = makeService();
 
         await service.new(goodsIssueData);
@@ -287,7 +247,7 @@ describe("Test Goods Issue", () => {
 });
 
 describe("Test list Goods Issue Notes", () => {
-    it("Deve retornar uma lista vazia se não houver guias de saídas", async () => {
+    it("Deve retornar uma lista vazia se não houver guias de saídas no repositório", async () => {
         const { service } = makeService();
 
         const goodsIssues = await service.list();
@@ -310,7 +270,7 @@ describe("Test list Goods Issue Notes", () => {
 });
 
 describe("Test get Goods Issue Note", () => {
-    it("Deve retornar **GoodsIssueNoteFound** se a guia de saída não existir", async () => {
+    it("Deve retornar **GoodsIssueNoteFound** se a guia de saída não existir no repositório", async () => {
         const goodsIssueRepository = new InmemGoodsIssueNoteRepository();
 
         const { service } = makeService({ goodsIssueRepository });

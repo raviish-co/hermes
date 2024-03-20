@@ -5,10 +5,10 @@ import { InvalidFileHeader } from "../domain/readers/invalid_file_header_error";
 import { FileNotSupported } from "../domain/readers/file_not_supported_error";
 import type { SectionRepository } from "../domain/catalog/section_repository";
 import { CsvReader, VALID_CSV_HEADER } from "../domain/readers/csv_reader";
-import { SequenceGenerator } from "../domain/sequences/sequence_generator";
 import type { ItemRepository } from "../domain/catalog/item_repository";
 import { Item, type Condition, Status } from "../domain/catalog/item";
 import { FileEmpty } from "../domain/readers/file_empty_error";
+import type { Generator } from "../domain/sequences/generator";
 import type { Variation } from "../domain/catalog/variation";
 import { ItemBuilder } from "../domain/catalog/item_builder";
 import { left, right, type Either } from "../shared/either";
@@ -21,14 +21,14 @@ export class ImportService {
     #categoryRepository: CategoryRepository;
     #sectionRepository: SectionRepository;
     #variationRepository: VariationRepository;
-    #generator: SequenceGenerator;
+    #generator: Generator;
 
     constructor(
         itemRepository: ItemRepository,
         categoryRepository: CategoryRepository,
         sectionRepository: SectionRepository,
         variationRepository: VariationRepository,
-        generator: SequenceGenerator
+        generator: Generator
     ) {
         this.#categoryRepository = categoryRepository;
         this.#itemRepository = itemRepository;
@@ -43,13 +43,13 @@ export class ImportService {
         const csvReader = new CsvReader();
         const lines = await csvReader.read(file);
 
-        const validOrError = this.#isValidFile(lines);
-        if (validOrError.isLeft()) return Promise.resolve(left(validOrError.value));
+        const validOrErr = this.#isValidFile(lines);
+        if (validOrErr.isLeft()) return Promise.resolve(left(validOrErr.value));
 
-        const itemsOrError = await this.#buildItems(lines);
-        if (itemsOrError.isLeft()) return left(itemsOrError.value);
+        const itemsOrErr = await this.#buildItems(lines);
+        if (itemsOrErr.isLeft()) return left(itemsOrErr.value);
 
-        await this.#itemRepository.saveAll(itemsOrError.value);
+        await this.#itemRepository.saveAll(itemsOrErr.value);
 
         return Promise.resolve(right(undefined));
     }
@@ -58,9 +58,9 @@ export class ImportService {
         const items: Item[] = [];
 
         for (const line of lines.slice(1)) {
-            const itemOrError = await this.#parseLine(line);
-            if (itemOrError.isLeft()) return left(itemOrError.value);
-            items.push(itemOrError.value);
+            const itemOrErr = await this.#parseLine(line);
+            if (itemOrErr.isLeft()) return left(itemOrErr.value);
+            items.push(itemOrErr.value);
         }
 
         return right(items);
