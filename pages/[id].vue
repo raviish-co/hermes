@@ -20,7 +20,6 @@ goodsIssueService
     .getById(noteId)
     .then((result) => {
         goodsIssueNote.value = GoodsIssueNote.build(result);
-        securityDepositWithHeld.value = goodsIssueNote.value.securityDeposit;
         goodsReturnNote.value = new GoodsReturnNote(goodsIssueNote.value.lines);
     })
     .catch((err) => {
