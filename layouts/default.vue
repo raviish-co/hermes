@@ -60,7 +60,7 @@ function toggleMenu() {
                     class="flex gap-3 items-center p-2 hover:bg-black hover:text-white w-full"
                 >
                     <span class="material-symbols-outlined text-xl"> add_shopping_cart </span>
-                    <span>Guia de entrda</span>
+                    <span>Guia de entrada</span>
                 </NuxtLink>
 
                 <NuxtLink
