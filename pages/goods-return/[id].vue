@@ -7,7 +7,6 @@ import { formatCurrency } from "~/lib/frontend/helpers/format_currency";
 
 const route = useRoute();
 const noteId = route.params.id as string;
-
 const note = ref<GoodsReturnNoteModel>();
 
 const service = new GoodsReturnService();
@@ -29,8 +28,11 @@ onMounted(async () => {
                 <div class="input-container">
                     <div class="input-field flex justify-between">
                         <span>Guia de Saída:</span>
-                        <NuxtLink :to="{ path: '/' }" class="link">
-                            #{{ note?.goodsIssueNoteId }}
+                        <NuxtLink
+                            class="link"
+                            :to="{ path: `/goods-issue/${note?.goodsIssueNoteId}` }"
+                        >
+                            {{ note?.goodsIssueNoteId }}
                         </NuxtLink>
                     </div>
                     <div class="input-disabled flex justify-between">

@@ -55,8 +55,17 @@ function newGoodsReturn() {
 <template>
     <section class="section-content">
         <h1 class="page-title">
-            Guia de Saída de Artigos - #{{ goodsIssueNote.goodsIssueNoteId }}
+            Guia de Saída de Artigos #{{ goodsIssueNote.goodsIssueNoteId }} - ({{
+                goodsIssueNote.status
+            }})
         </h1>
+
+        <NuxtLink
+            :to="{ path: `/goods-return/`, query: { q: goodsIssueNote.goodsIssueNoteId } }"
+            class="link"
+        >
+            <h2 class="text-center mb-4">Ver devoluções</h2>
+        </NuxtLink>
 
         <section class="space-y-4 mb-4">
             <div class="input-container">

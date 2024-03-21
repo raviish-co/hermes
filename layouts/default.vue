@@ -64,7 +64,7 @@ function toggleMenu() {
                 </NuxtLink>
 
                 <NuxtLink
-                    to="/upload_item"
+                    to="/upload-item"
                     class="flex gap-3 items-center p-2 hover:bg-black hover:text-white w-full"
                 >
                     <span class="material-symbols-outlined text-xl"> upload </span>

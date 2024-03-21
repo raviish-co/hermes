@@ -30,6 +30,20 @@ export class GoodsReturnService {
         };
     }
 
+    async list(): Promise<GoodsReturnNoteModel[]> {
+        const response = await $fetch<GoodsReturnNoteModel[]>(`/api/goods-return`, {
+            method: "get",
+        });
+
+        return response.map((note) => ({
+            goodsIssueNoteId: note.goodsIssueNoteId,
+            goodsReturnNoteId: note.goodsReturnNoteId,
+            issuedAt: note.issuedAt,
+            securityDepositWithHeld: note.securityDepositWithHeld,
+            lines: note.lines,
+        }));
+    }
+
     #toItemDTO(line: GoodsReturnNoteLine): ItemDTO {
         return {
             itemId: line.itemId,
