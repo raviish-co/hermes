@@ -34,7 +34,7 @@ onMounted(async () => {
                 </thead>
                 <tbody>
                     <tr v-for="note in notes" :key="note.goodsIssueNoteId">
-                        <td class="text-secondary-600 underline">
+                        <td class="link">
                             <NuxtLink :to="note.goodsIssueNoteId">
                                 {{ note.goodsIssueNoteId }}
                             </NuxtLink>

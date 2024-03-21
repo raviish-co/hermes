@@ -4,6 +4,7 @@ import { GoodsReturnService } from "~/lib/frontend/services/goods_return_service
 import { GoodsReturnNote } from "~/lib/frontend/domain/goods_return_note";
 import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
 import { handleException } from "~/lib/frontend/helpers/error_handler";
+import { formatDate } from "~/lib/frontend/helpers/format_date";
 
 const securityDepositWithHeld = ref<number>(0);
 const goodsReturnNote = ref<GoodsReturnNote>({} as GoodsReturnNote);
@@ -60,7 +61,9 @@ function newGoodsReturn() {
         <section class="space-y-4 mb-4">
             <div class="input-container">
                 <div class="input-disabled">John Doe</div>
-                <div class="input-disabled">{{ goodsIssueNote.returnDate }}</div>
+                <div class="input-disabled">
+                    {{ goodsIssueNote.returnDate ? formatDate(goodsIssueNote.returnDate) : "" }}
+                </div>
             </div>
 
             <div class="input-container">

@@ -113,6 +113,10 @@ h1 {
     @apply badge text-green-500 bg-green-100;
 }
 
+.link {
+    @apply text-secondary-600 underline;
+}
+
 ::-webkit-scrollbar {
     background-color: transparent;
     width: 0.5rem;

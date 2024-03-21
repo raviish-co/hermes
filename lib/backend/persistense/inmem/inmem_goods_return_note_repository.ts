@@ -1,6 +1,8 @@
 import type { GoodsReturnNoteRepository } from "../../domain/goods_return/goods_return_note_repository";
+import { GoodsReturnNoteNotFound } from "../../domain/goods_return/goods_return_note_not_found_error";
 import { GoodsReturnNote } from "../../domain/goods_return/goods_return_note";
 import { ID } from "../../shared/id";
+import { left, right, type Either } from "../../shared/either";
 
 export class InmemGoodsReturnNoteRepository implements GoodsReturnNoteRepository {
     #notes: Record<string, GoodsReturnNote> = {};
@@ -10,8 +12,12 @@ export class InmemGoodsReturnNoteRepository implements GoodsReturnNoteRepository
         return Promise.resolve(undefined);
     }
 
-    getById(id: ID): Promise<GoodsReturnNote> {
-        return Promise.resolve(this.#notes[id.toString()]);
+    getById(id: ID): Promise<Either<GoodsReturnNoteNotFound, GoodsReturnNote>> {
+        const note = this.records.find((note) => note.goodsReturnNoteId.equals(id));
+
+        if (!note) return Promise.resolve(left(new GoodsReturnNoteNotFound()));
+
+        return Promise.resolve(right(note));
     }
 
     getAll(): Promise<GoodsReturnNote[]> {

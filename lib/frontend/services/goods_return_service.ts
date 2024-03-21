@@ -1,4 +1,5 @@
 import { GoodsReturnNoteLine } from "../domain/goods_return_note_line";
+import type { GoodsReturnNoteModel } from "../models/goods_return_note";
 
 export class GoodsReturnService {
     async new(
@@ -13,6 +14,20 @@ export class GoodsReturnService {
         };
 
         return await $fetch("/api/goods-return", { method: "post", body: data });
+    }
+
+    async get(noteId: string): Promise<GoodsReturnNoteModel> {
+        const response = await $fetch<GoodsReturnNoteModel>(`/api/goods-return/${noteId}`, {
+            method: "get",
+        });
+
+        return {
+            goodsIssueNoteId: response.goodsIssueNoteId,
+            goodsReturnNoteId: response.goodsReturnNoteId,
+            issuedAt: response.issuedAt,
+            securityDepositWithHeld: response.securityDepositWithHeld,
+            lines: response.lines,
+        };
     }
 
     #toItemDTO(line: GoodsReturnNoteLine): ItemDTO {
