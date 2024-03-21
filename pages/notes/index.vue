@@ -21,20 +21,20 @@ onMounted(async () => {
     <div class="section-content">
         <h1 class="page-title">Guias de Saída</h1>
 
-        <div class="overflow-y-auto space-y-2">
+        <div v-if="notes.length > 0" class="overflow-y-auto space-y-2">
             <p class="p-2">Filtro:</p>
             <table class="table text-center">
                 <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>Data de devolução</th>
-                        <th>Descrição</th>
-                        <th>Estado</th>
+                        <th class="min-w-20 w-20">ID</th>
+                        <th class="min-w-40 w-40">Data de devolução</th>
+                        <th class="min-w-60 w-60">Descrição</th>
+                        <th class="min-w-40 w-40">Estado</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="note in notes" :key="note.goodsIssueNoteId">
-                        <td class="text-secondary-600 underline font-semibold">
+                        <td class="text-secondary-600 underline">
                             <NuxtLink :to="note.goodsIssueNoteId">
                                 {{ note.goodsIssueNoteId }}
                             </NuxtLink>
@@ -53,9 +53,13 @@ onMounted(async () => {
             </table>
         </div>
 
+        <p v-else class="text-gray-500 text-center">
+            Não existem guias de saída no momento. Crie uma nova
+        </p>
+
         <NuxtLink :to="{ path: '/' }">
             <button class="btn-circle mt-8 ml-auto block">
-                <span class="material-symbols-outlined"> add</span>
+                <span class="material-symbols-outlined">add</span>
             </button>
         </NuxtLink>
     </div>
