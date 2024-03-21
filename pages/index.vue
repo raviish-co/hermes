@@ -4,10 +4,9 @@ import { getCurrentLocalDateTime } from "@frontend/helpers/current_local_date_ti
 import { GoodsIssueService } from "@frontend/services/goods_issue_service";
 import { GoodsIssueNote } from "@frontend/domain/goods_issue_note";
 import { handleException } from "@frontend/helpers/error_handler";
-const returnDate = ref<string>(getCurrentLocalDateTime());
 
 const goodsIssueService = new GoodsIssueService();
-const note = reactive<GoodsIssueNote>(new GoodsIssueNote(returnDate.value));
+const note = reactive<GoodsIssueNote>(new GoodsIssueNote(getCurrentLocalDateTime()));
 
 function newGoodsIssue() {
     goodsIssueService
@@ -27,7 +26,7 @@ function newGoodsIssue() {
         <section class="space-y-4 mb-4">
             <div class="input-container">
                 <div class="input-disabled">John Doe</div>
-                <input v-model="returnDate" type="datetime-local" class="input-field" />
+                <input v-model="note.returnDate" type="datetime-local" class="input-field" />
             </div>
 
             <ChoosePurpose @choosed="note.setPurpose($event)" />

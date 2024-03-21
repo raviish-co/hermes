@@ -4,9 +4,7 @@ import { getCurrentLocalDateTime } from "~/lib/frontend/helpers/current_local_da
 import { handleException } from "~/lib/frontend/helpers/error_handler";
 import { GoodsReceiptService } from "~/lib/frontend/services/goods_receipt_service";
 
-const entryDate = ref<string>(getCurrentLocalDateTime());
-const note = reactive<GoodsReceiptNote>(new GoodsReceiptNote(entryDate.value));
-
+const note = reactive<GoodsReceiptNote>(new GoodsReceiptNote(getCurrentLocalDateTime()));
 const goodsReceiptService = new GoodsReceiptService();
 
 function newGoodsReceipt() {
@@ -27,7 +25,7 @@ function newGoodsReceipt() {
         <section class="space-y-4 mb-4">
             <div class="input-container">
                 <div class="input-disabled">John Doe</div>
-                <input v-model="entryDate" type="datetime-local" class="input-field" />
+                <input v-model="note.entryDate" type="datetime-local" class="input-field" />
             </div>
 
             <ReceiptNote :note="(note as GoodsReceiptNote)" />
