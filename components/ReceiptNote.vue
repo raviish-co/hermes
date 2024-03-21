@@ -63,7 +63,7 @@ defineProps<{ note: GoodsReceiptNote }>();
         </div>
     </VNote>
 
-    <AddLineDialog ref="addLineDialogRef" :note="note" />
+    <AddLineDialog ref="addLineDialogRef" :note="note" :define-limit="false" />
 
     <DescribeCondition ref="describeConditionRef" :note="note" />
 </template>

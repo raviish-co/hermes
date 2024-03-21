@@ -5,7 +5,12 @@ import { CatalogService } from "@frontend/services/catalog_service";
 import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
 import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_values";
 import { initializeQuantities } from "@frontend/helpers/initialize_quantities";
-import type { GoodsReceiptNote } from "~/lib/frontend/domain/goods_receipt_note";
+import { GoodsReceiptNote } from "~/lib/frontend/domain/goods_receipt_note";
+
+interface Props {
+    note: GoodsIssueNote | GoodsReceiptNote;
+    defineLimit?: boolean;
+}
 
 const dialogRef = ref<typeof VDialog>();
 const searchText = ref<string>("");
@@ -14,7 +19,9 @@ const items = ref<ItemModel[]>([]);
 const pages = ref<number>(1);
 const catalogService = new CatalogService();
 
-defineProps<{ note: GoodsIssueNote | GoodsReceiptNote }>();
+withDefaults(defineProps<Props>(), {
+    defineLimit: true,
+});
 
 function show() {
     listItems();
@@ -107,7 +114,7 @@ defineExpose({ show });
                                 placeholder="QTD"
                                 min="0"
                                 class="input-number text-center"
-                                :max="item.quantity"
+                                :max="defineLimit ? item.quantity : undefined"
                                 @keypress.enter="note.addLine(item, quantities[idx])"
                                 @keydown.tab="note.addLine(item, quantities[idx])"
                             />
