@@ -89,6 +89,10 @@ h1 {
     @apply btn bg-light-500;
 }
 
+.btn-circle {
+    @apply w-12 h-12 bg-secondary-600 text-white rounded-full text-4xl;
+}
+
 .footer {
     @apply fixed shadow-top bottom-0 w-full shadow-light-500 bg-white;
 }
@@ -103,6 +107,10 @@ h1 {
 
 .badge-danger {
     @apply badge text-red-500 bg-red-100;
+}
+
+.badge-success {
+    @apply badge text-green-500 bg-green-100;
 }
 
 ::-webkit-scrollbar {
