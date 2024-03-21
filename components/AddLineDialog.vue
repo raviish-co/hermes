@@ -5,8 +5,9 @@ import { CatalogService } from "@frontend/services/catalog_service";
 import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
 import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_values";
 import { initializeQuantities } from "@frontend/helpers/initialize_quantities";
-import type { GoodsReceiptNote } from "~/lib/frontend/domain/goods_receipt_note";
+import { GoodsReceiptNote } from "~/lib/frontend/domain/goods_receipt_note";
 
+const noteType = ref<"GoodsIssueNote" | "GoodsReceiptNote">("GoodsIssueNote");
 const dialogRef = ref<typeof VDialog>();
 const searchText = ref<string>("");
 const quantities = ref<number[]>([]);
@@ -14,7 +15,7 @@ const items = ref<ItemModel[]>([]);
 const pages = ref<number>(1);
 const catalogService = new CatalogService();
 
-defineProps<{ note: GoodsIssueNote | GoodsReceiptNote }>();
+const props = defineProps<{ note: GoodsIssueNote | GoodsReceiptNote }>();
 
 function show() {
     listItems();
@@ -57,6 +58,12 @@ function changePageToken(pageToken: number) {
 }
 
 defineExpose({ show });
+
+onMounted(() => {
+    if (props.note instanceof GoodsReceiptNote) {
+        noteType.value = "GoodsReceiptNote";
+    }
+});
 </script>
 
 <template>
@@ -107,7 +114,7 @@ defineExpose({ show });
                                 placeholder="QTD"
                                 min="0"
                                 class="input-number text-center"
-                                :max="item.quantity"
+                                :max="noteType === 'GoodsIssueNote' ? item.quantity : undefined"
                                 @keypress.enter="note.addLine(item, quantities[idx])"
                                 @keydown.tab="note.addLine(item, quantities[idx])"
                             />
