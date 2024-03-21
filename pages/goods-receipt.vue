@@ -27,9 +27,8 @@ function newGoodsReceipt() {
                 <div class="input-disabled">John Doe</div>
                 <input v-model="note.entryDate" type="datetime-local" class="input-field" />
             </div>
-
-            <ReceiptNote :note="(note as GoodsReceiptNote)" />
         </section>
+        <ReceiptNote :note="(note as GoodsReceiptNote)" />
     </section>
 
     <section class="footer">
