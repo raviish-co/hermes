@@ -7,7 +7,11 @@ import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_v
 import { initializeQuantities } from "@frontend/helpers/initialize_quantities";
 import { GoodsReceiptNote } from "~/lib/frontend/domain/goods_receipt_note";
 
-const noteType = ref<"GoodsIssueNote" | "GoodsReceiptNote">("GoodsIssueNote");
+interface Props {
+    note: GoodsIssueNote | GoodsReceiptNote;
+    defineLimit?: boolean;
+}
+
 const dialogRef = ref<typeof VDialog>();
 const searchText = ref<string>("");
 const quantities = ref<number[]>([]);
@@ -15,7 +19,9 @@ const items = ref<ItemModel[]>([]);
 const pages = ref<number>(1);
 const catalogService = new CatalogService();
 
-const props = defineProps<{ note: GoodsIssueNote | GoodsReceiptNote }>();
+withDefaults(defineProps<Props>(), {
+    defineLimit: true,
+});
 
 function show() {
     listItems();
@@ -58,12 +64,6 @@ function changePageToken(pageToken: number) {
 }
 
 defineExpose({ show });
-
-onMounted(() => {
-    if (props.note instanceof GoodsReceiptNote) {
-        noteType.value = "GoodsReceiptNote";
-    }
-});
 </script>
 
 <template>
@@ -114,7 +114,7 @@ onMounted(() => {
                                 placeholder="QTD"
                                 min="0"
                                 class="input-number text-center"
-                                :max="noteType === 'GoodsIssueNote' ? item.quantity : undefined"
+                                :max="defineLimit ? item.quantity : undefined"
                                 @keypress.enter="note.addLine(item, quantities[idx])"
                                 @keydown.tab="note.addLine(item, quantities[idx])"
                             />
