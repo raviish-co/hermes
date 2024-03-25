@@ -1,4 +1,4 @@
-import type { Condition } from "../models/condition";
+import type { ConditionModel } from "../models/condition";
 import type { GoodsIssueNoteModel } from "../models/goods_issue_note";
 import type { GoodsIssueNoteLine } from "../domain/goods_issue_note_line";
 import type { GoodsIssueNote } from "../domain/goods_issue_note";
@@ -58,7 +58,7 @@ export class GoodsIssueService {
 interface GoodsIssueLineDTO {
     itemId: string;
     quantity: number;
-    condition?: Condition;
+    condition?: ConditionModel;
 }
 
 interface GoodsIssueDTO {

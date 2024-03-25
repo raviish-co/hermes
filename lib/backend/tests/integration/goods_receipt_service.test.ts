@@ -86,8 +86,8 @@ describe("Test Goods Receipt", () => {
         const item1 = await itemRepository.getById(ID.fromString("1001"));
         const item2 = await itemRepository.getById(ID.fromString("1002"));
 
-        expect(item1.getStock().quantity).toBe(60);
-        expect(item2.getStock().quantity).toBe(30);
+        expect(item1.stock.quantity).toBe(60);
+        expect(item2.stock.quantity).toBe(30);
     });
 
     it("Deve gravar a nota de entrada de mercadoria no repositório", async () => {

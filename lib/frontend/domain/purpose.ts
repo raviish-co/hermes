@@ -3,8 +3,8 @@ const RECORD = "Gravação";
 
 export class Purpose {
     description: string;
-    notes: string;
     details?: string;
+    notes: string;
 
     constructor(description: string, notes: string, details?: string) {
         this.description = description;

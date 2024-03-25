@@ -1,13 +1,13 @@
-import type { Condition } from "./condition";
-import type { VariationValue } from "./variation_value";
+import type { ConditionModel } from "./condition";
+import type { VariationValueModel } from "./variation_value";
 
 interface GoodsReturnLineNoteModel {
     returnLineId: string;
     itemId: string;
     name: string;
     quantity: number;
-    variationValues: VariationValue[];
-    condition: Condition;
+    variationValues?: VariationValueModel[];
+    condition?: ConditionModel;
 }
 
 export interface GoodsReturnNoteModel {

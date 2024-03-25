@@ -102,8 +102,8 @@ defineExpose({ show });
                         </td>
 
                         <td class="text-center">
-                            <span :class="{ 'badge-danger': item.quantity === 0 }">
-                                {{ item.quantity === 0 ? "Esgotado" : item.quantity }}
+                            <span :class="{ 'badge-danger': item.stock === 0 }">
+                                {{ item.stock === 0 ? "Esgotado" : item.stock }}
                             </span>
                         </td>
 
@@ -114,7 +114,7 @@ defineExpose({ show });
                                 placeholder="QTD"
                                 min="0"
                                 class="input-number text-center"
-                                :max="defineLimit ? item.quantity : undefined"
+                                :max="defineLimit ? item.stock : undefined"
                                 @keypress.enter="note.addLine(item, quantities[idx])"
                                 @keydown.tab="note.addLine(item, quantities[idx])"
                             />

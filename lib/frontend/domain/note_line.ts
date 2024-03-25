@@ -1,5 +1,5 @@
-import type { VariationValue } from "../models/variation_value";
-import type { Condition } from "../models/condition";
+import type { VariationValueModel } from "../models/variation_value";
+import type { ConditionModel } from "../models/condition";
 import { formatVariationValues } from "../helpers/format_variation_values";
 
 export abstract class NoteLine {
@@ -8,16 +8,16 @@ export abstract class NoteLine {
     quantity: number;
     quantityReturned: number;
     quantityRequested: number;
-    variationValues?: VariationValue[];
-    condition?: Condition;
+    variationValues?: VariationValueModel[];
+    condition?: ConditionModel;
 
     constructor(
         itemId: string,
         name: string,
         quantity: number,
         quantityReturned?: number,
-        variationValues?: VariationValue[],
-        condition?: Condition
+        variationValues?: VariationValueModel[],
+        condition?: ConditionModel
     ) {
         this.itemId = itemId;
         this.name = name;

@@ -1,4 +1,4 @@
-export interface VariationValue {
+export interface VariationValueModel {
     variationId: string;
     value: string;
 }

@@ -78,10 +78,6 @@ export class Item {
         return this.#condition;
     }
 
-    getStock(): ItemStock {
-        return this.#stock;
-    }
-
     updateStock(quantity: number): void {
         const result = this.#stock.quantity + quantity;
         this.#stock = new ItemStock(result);
@@ -97,6 +93,10 @@ export class Item {
 
     get fulltext(): string {
         return this.#fulltext;
+    }
+
+    get stock(): ItemStock {
+        return this.#stock;
     }
 
     get variations(): Record<string, string> {

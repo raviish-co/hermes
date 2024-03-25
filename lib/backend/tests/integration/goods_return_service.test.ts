@@ -107,8 +107,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         const item = await itemRepository.getById(ID.fromString("1004"));
         const item2 = await itemRepository.getById(ID.fromString("1005"));
 
-        expect(item.getStock().quantity).toBe(8);
-        expect(item2.getStock().quantity).toBe(9);
+        expect(item.stock.quantity).toBe(8);
+        expect(item2.stock.quantity).toBe(9);
     });
 
     it("Deve definir a guida de saída de artigos como devolvida", async () => {

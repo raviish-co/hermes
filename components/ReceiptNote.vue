@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { AddLineDialog, DescribeCondition } from "#build/components";
-import type { Condition } from "~/lib/frontend/models/condition";
+import type { ConditionModel } from "~/lib/frontend/models/condition";
 import type { GoodsReceiptNote } from "~/lib/frontend/domain/goods_receipt_note";
 
 const describeConditionRef = ref<typeof DescribeCondition>();
 const addLineDialogRef = ref<typeof AddLineDialog>();
 
-function showDecribeCondition(itemId: string, condition?: Condition) {
+function showDecribeCondition(itemId: string, condition?: ConditionModel) {
     describeConditionRef.value?.initializeCondition(itemId, condition);
     describeConditionRef.value?.show();
 }

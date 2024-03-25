@@ -1,6 +1,6 @@
-import type { VariationValue } from "../models/variation_value";
+import type { VariationValueModel } from "../models/variation_value";
 import { formatCurrency } from "../helpers/format_currency";
-import type { Condition } from "../models/condition";
+import type { ConditionModel } from "../models/condition";
 import { NoteLine } from "./note_line";
 
 export class GoodsIssueNoteLine extends NoteLine {
@@ -14,8 +14,8 @@ export class GoodsIssueNoteLine extends NoteLine {
         quantity: number,
         price: number,
         quantityReturned?: number,
-        variationsValues?: VariationValue[],
-        condition?: Condition,
+        variationsValues?: VariationValueModel[],
+        condition?: ConditionModel,
         stock?: number
     ) {
         super(itemId, name, quantity, quantityReturned, variationsValues, condition);

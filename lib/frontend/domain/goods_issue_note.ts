@@ -1,9 +1,9 @@
-import { formatCurrency } from "../helpers/format_currency";
 import type { GoodsIssueNoteModel } from "../models/goods_issue_note";
-import type { ItemModel } from "../models/item";
 import { GoodsIssueNoteLine } from "./goods_issue_note_line";
-import { Note } from "./note";
+import { formatCurrency } from "../helpers/format_currency";
+import type { ItemModel } from "../models/item";
 import { Purpose } from "./purpose";
+import { Note } from "./note";
 
 export class GoodsIssueNote extends Note {
     goodsIssueNoteId: string = "";
@@ -113,7 +113,7 @@ export class GoodsIssueNote extends Note {
             0,
             item.variationsValues,
             item.condition,
-            item.quantity
+            item.stock
         );
     }
 

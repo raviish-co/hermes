@@ -149,9 +149,7 @@ describe("Test Goods Issue", () => {
 
         const item = await itemRepository.getById(ID.fromString("1001"));
 
-        const stock = item.getStock();
-
-        expect(stock.quantity).toEqual(8);
+        expect(item.stock.quantity).toEqual(8);
     });
 
     it("Deve ser adicionada a seção a guia de saída de mercadoria", async () => {

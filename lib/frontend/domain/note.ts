@@ -1,4 +1,4 @@
-import type { Condition } from "../models/condition";
+import type { ConditionModel } from "../models/condition";
 import { NoteLine } from "./note_line";
 
 export abstract class Note {
@@ -24,7 +24,7 @@ export abstract class Note {
         return this.lines.find((line) => line.itemId === itemId);
     }
 
-    updateCondition(itemId: string, condition: Condition) {
+    updateCondition(itemId: string, condition: ConditionModel) {
         const line = this.findLine(itemId);
         if (!line) return;
 

@@ -1,6 +1,6 @@
 import type { GoodsReceiptNote } from "../domain/goods_receipt_note";
 import type { GoodsReceiptNoteLine } from "../domain/goods_receipt_note_line";
-import type { Condition } from "../models/condition";
+import type { ConditionModel } from "../models/condition";
 
 export class GoodsReceiptService {
     async new(note: GoodsReceiptNote) {
@@ -36,5 +36,5 @@ type GoodsReceiptDTO = {
 type GoodsReceiptLineDTO = {
     itemId: string;
     quantity: number;
-    condition?: Condition;
+    condition?: ConditionModel;
 };
