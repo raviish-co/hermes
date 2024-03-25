@@ -5,23 +5,23 @@ import { HttpStatus } from "../http_status";
 const { goodsIssueService } = makeServices();
 
 export default defineEventHandler(async (event) => {
-    const goodsIssueNoteId = getRouterParam(event, "id", { decode: true });
+    const noteId = getRouterParam(event, "id", { decode: true });
 
-    if (!goodsIssueNoteId) {
+    if (!noteId) {
         return createError({
             message: "goods issue note id is required",
             status: HttpStatus.BadRequest,
         });
     }
 
-    const goodsIssueNoteOrErr = await goodsIssueService.get(goodsIssueNoteId);
+    const noteOrErr = await goodsIssueService.get(noteId);
 
-    if (goodsIssueNoteOrErr.isLeft()) {
+    if (noteOrErr.isLeft()) {
         return createError({
-            message: goodsIssueNoteOrErr.value.message,
+            message: noteOrErr.value.message,
             status: HttpStatus.NotFound,
         });
     }
 
-    return toGoodsIssueNoteDTO(goodsIssueNoteOrErr.value);
+    return toGoodsIssueNoteDTO(noteOrErr.value);
 });

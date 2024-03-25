@@ -16,7 +16,7 @@ export class GoodsReturnService {
         return await $fetch("/api/goods-return", { method: "post", body: data });
     }
 
-    async get(noteId: string): Promise<GoodsReturnNoteModel> {
+    async getById(noteId: string): Promise<GoodsReturnNoteModel> {
         const response = await $fetch<GoodsReturnNoteModel>(`/api/goods-return/${noteId}`, {
             method: "get",
         });
@@ -35,12 +35,12 @@ export class GoodsReturnService {
             method: "get",
         });
 
-        return response.map((note) => ({
-            goodsIssueNoteId: note.goodsIssueNoteId,
-            goodsReturnNoteId: note.goodsReturnNoteId,
-            issuedAt: note.issuedAt,
-            securityDepositWithHeld: note.securityDepositWithHeld,
-            lines: note.lines,
+        return response.map((data) => ({
+            goodsIssueNoteId: data.goodsIssueNoteId,
+            goodsReturnNoteId: data.goodsReturnNoteId,
+            issuedAt: data.issuedAt,
+            securityDepositWithHeld: data.securityDepositWithHeld,
+            lines: data.lines,
         }));
     }
 

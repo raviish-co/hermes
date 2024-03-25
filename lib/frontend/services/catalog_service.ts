@@ -7,12 +7,14 @@ export class CatalogService {
         pageToken: number = 1,
         perPage: number = 8
     ): Promise<{ items: ItemModel[]; total: number }> {
-        const response = await $fetch(
-            `/api/search-items?query=${query}&pageToken=${pageToken}&perPage=${perPage}`,
-            {
-                method: "get",
-            }
-        );
+        const response = await $fetch("/api/search-items", {
+            method: "get",
+            query: {
+                query,
+                pageToken,
+                perPage,
+            },
+        });
 
         return { items: response.items, total: response.total };
     }
@@ -21,8 +23,12 @@ export class CatalogService {
         pageToken: number = 1,
         perPage: number = 8
     ): Promise<{ items: ItemModel[]; total: number }> {
-        const response = await $fetch(`/api/items?pageToken=${pageToken}&perPage=${perPage}`, {
+        const response = await $fetch("/api/items", {
             method: "get",
+            query: {
+                pageToken,
+                perPage,
+            },
         });
 
         return { items: response.items, total: response.total };

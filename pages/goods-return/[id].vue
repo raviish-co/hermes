@@ -12,7 +12,7 @@ const note = ref<GoodsReturnNoteModel>();
 const service = new GoodsReturnService();
 
 onMounted(async () => {
-    note.value = await service.get(noteId);
+    note.value = await service.getById(noteId);
 });
 </script>
 <template>

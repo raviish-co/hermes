@@ -28,12 +28,12 @@ export class GoodsReceiptService {
     }
 }
 
-export type GoodsReceiptDTO = {
+type GoodsReceiptDTO = {
     lines: GoodsReceiptLineDTO[];
     entryDate: string;
 };
 
-export type GoodsReceiptLineDTO = {
+type GoodsReceiptLineDTO = {
     itemId: string;
     quantity: number;
     condition?: Condition;

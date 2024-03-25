@@ -5,8 +5,8 @@ import type { GoodsIssueNote } from "../domain/goods_issue_note";
 import type { PurposeModel } from "@frontend/models/purpose";
 
 export class GoodsIssueService {
-    async new(goodsIssueNote: GoodsIssueNote) {
-        const data = this.#toGoodsIssueDTO(goodsIssueNote);
+    async new(note: GoodsIssueNote) {
+        const data = this.#toGoodsIssueDTO(note);
 
         return await $fetch("/api/goods-issue", {
             method: "post",
@@ -14,30 +14,24 @@ export class GoodsIssueService {
         });
     }
 
-    async getById(id: string): Promise<GoodsIssueNoteModel> {
-        return await $fetch(`/api/goods-issue/${id}`, { method: "get" });
+    async getById(noteId: string): Promise<GoodsIssueNoteModel> {
+        return await $fetch(`/api/goods-issue/${noteId}`, {
+            method: "get",
+        });
     }
 
     async list(): Promise<GoodsIssueNoteModel[]> {
         const response = await $fetch("/api/goods-issue", { method: "get" });
 
-        const notes = [];
-
-        for (const data of response) {
-            const note: GoodsIssueNoteModel = {
-                goodsIssueNoteId: data.goodsIssueNoteId,
-                purpose: data.purpose as PurposeModel,
-                returnDate: data.returnDate,
-                status: data.status,
-                securityDeposit: data.securityDeposit,
-                total: data.total,
-                lines: data.lines,
-            };
-
-            notes.push(note);
-        }
-
-        return notes;
+        return response.map((data) => ({
+            goodsIssueNoteId: data.goodsIssueNoteId,
+            purpose: data.purpose as PurposeModel,
+            returnDate: data.returnDate,
+            status: data.status,
+            securityDeposit: data.securityDeposit,
+            total: data.total,
+            lines: data.lines,
+        }));
     }
 
     #toGoodsIssueLine(line: GoodsIssueNoteLine): GoodsIssueLineDTO {
