@@ -34,7 +34,7 @@ const isEmpty = computed(() => {
 function choosePurpose(event: Event): void {
     const el = event.target as HTMLSelectElement;
 
-    purpose.value = new Purpose(el.value, "");
+    purpose.value = new Purpose(el.value);
 
     const specification = specitications.value.find((s) => s.description === el.value);
 
