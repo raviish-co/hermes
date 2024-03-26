@@ -12,8 +12,9 @@ interface GoodsIssueLineDTO {
     itemId: string;
     name: string;
     price: number;
-    quantity: number;
+    quantityRequested: number;
     quantityReturned: number;
+    quantityToReturn: number;
     fulltext: string;
     variationValues: VariationValues[];
 }
@@ -33,8 +34,9 @@ function toGoodsIssueLineDTO(line: GoodsIssueNoteLine): GoodsIssueLineDTO {
         itemId: line.itemId.toString(),
         name: line.name,
         price: line.price.value,
-        quantity: line.quantityRequested,
+        quantityRequested: line.quantityRequested,
         quantityReturned: line.quantityReturned,
+        quantityToReturn: line.maxToReturn,
         fulltext: line.fulltext,
         variationValues: toVariationValuesDTO(line.variationsValues),
     };

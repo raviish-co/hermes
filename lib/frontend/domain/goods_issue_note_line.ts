@@ -11,17 +11,24 @@ export class GoodsIssueNoteLine extends NoteLine {
     constructor(
         itemId: string,
         name: string,
-        quantity: number,
         price: number,
+        variationsValues: VariationValueModel[],
+        condition: ConditionModel,
+        stock?: number,
+        quantityRequested?: number,
         quantityReturned?: number,
-        variationsValues?: VariationValueModel[],
-        condition?: ConditionModel,
-        stock?: number
+        quantityToReturn?: number
     ) {
-        super(itemId, name, quantity, quantityReturned, variationsValues, condition);
+        super(itemId, name, variationsValues, condition);
+
         this.price = price;
-        this.stock = stock ?? 0;
         this.total = 0;
+
+        this.quantityRequested = quantityRequested ?? 0;
+        this.quantityReturned = quantityReturned ?? 0;
+        this.quantity = quantityToReturn ?? 0;
+
+        this.stock = stock ?? 0;
     }
 
     calculate() {
@@ -38,7 +45,7 @@ export class GoodsIssueNoteLine extends NoteLine {
     }
 
     totalIsZero() {
-        return this.total == 0;
+        return this.total === 0;
     }
 
     get formattedPrice() {

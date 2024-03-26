@@ -5,11 +5,12 @@ import type { PurposeModel } from "./purpose";
 export interface GoodsIssueNoteLineModel {
     itemId: string;
     name: string;
-    quantity: number;
     price: number;
+    quantityRequested: number;
     quantityReturned: number;
-    variationValues?: VariationValueModel[];
-    condition?: ConditionModel;
+    quantityToReturn: number;
+    variationValues: VariationValueModel[];
+    condition: ConditionModel;
 }
 
 export interface GoodsIssueNoteModel {

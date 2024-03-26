@@ -55,7 +55,7 @@ onMounted(async () => {
         </div>
 
         <p v-else class="text-gray-500 text-center">
-            Não existem guias de saída no momento. Crie uma nova
+            Não existem devoluções da guia de saída no momento.
         </p>
     </div>
 </template>

@@ -84,7 +84,7 @@ function newGoodsReturn() {
         </section>
 
         <ReturnNote
-            :returnNote="(goodsReturnNote as GoodsReturnNote)"
+            :return-note="(goodsReturnNote as GoodsReturnNote)"
             :issue-note="(goodsIssueNote as GoodsIssueNote)"
             :is-returned="isReturned()"
             @invalid-line="invalidLine = $event"

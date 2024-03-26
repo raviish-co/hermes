@@ -9,7 +9,7 @@ import { GoodsReceiptNote } from "~/lib/frontend/domain/goods_receipt_note";
 
 interface Props {
     note: GoodsIssueNote | GoodsReceiptNote;
-    defineLimit?: boolean;
+    hasLimit?: boolean;
 }
 
 const dialogRef = ref<typeof VDialog>();
@@ -20,7 +20,7 @@ const pages = ref<number>(1);
 const catalogService = new CatalogService();
 
 withDefaults(defineProps<Props>(), {
-    defineLimit: true,
+    hasLimit: true,
 });
 
 function show() {
@@ -90,8 +90,8 @@ defineExpose({ show });
                     <tr
                         v-for="(item, idx) in items"
                         :key="item.itemId"
-                        class="hover:bg-gray-50"
                         :class="{ hidden: note.isSameLine(item.itemId) }"
+                        class="hover:bg-gray-50"
                     >
                         <td class="cursor-pointer" @click="note.addLine(item, quantities[idx])">
                             <span>{{ item.name }}</span>
@@ -114,7 +114,7 @@ defineExpose({ show });
                                 placeholder="QTD"
                                 min="0"
                                 class="input-number text-center"
-                                :max="defineLimit ? item.stock : undefined"
+                                :max="hasLimit ? item.stock : undefined"
                                 @keypress.enter="note.addLine(item, quantities[idx])"
                                 @keydown.tab="note.addLine(item, quantities[idx])"
                             />

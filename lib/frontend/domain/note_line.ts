@@ -1,33 +1,30 @@
+import { formatVariationValues } from "../helpers/format_variation_values";
 import type { VariationValueModel } from "../models/variation_value";
 import type { ConditionModel } from "../models/condition";
-import { formatVariationValues } from "../helpers/format_variation_values";
 
-export abstract class NoteLine {
+export class NoteLine {
     itemId: string;
     name: string;
-    quantity: number;
-    quantityReturned: number;
-    quantityRequested: number;
-    variationValues?: VariationValueModel[];
-    condition?: ConditionModel;
+    quantity: number = 0;
+    quantityReturned: number = 0;
+    quantityRequested: number = 0;
+    variationValues: VariationValueModel[];
+    condition: ConditionModel;
 
     constructor(
         itemId: string,
         name: string,
-        quantity: number,
-        quantityReturned?: number,
-        variationValues?: VariationValueModel[],
-        condition?: ConditionModel
+        variationValues: VariationValueModel[],
+        condition: ConditionModel
     ) {
         this.itemId = itemId;
         this.name = name;
-
-        this.quantity = quantity;
-        this.quantityRequested = quantity;
-        this.quantityReturned = quantityReturned ?? 0;
-
         this.variationValues = variationValues;
         this.condition = condition;
+
+        if (this.isFullyReturned()) {
+            this.changeQuantity(0);
+        }
     }
 
     changeQuantity(quantity: number) {
@@ -36,10 +33,6 @@ export abstract class NoteLine {
 
     updateCondition(status: "Bom" | "Mau", comment?: string) {
         this.condition = { status, comment };
-    }
-
-    calculate() {
-        this.quantity -= this.quantityReturned;
     }
 
     isFullyReturned() {

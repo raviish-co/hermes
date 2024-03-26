@@ -63,4 +63,8 @@ export class GoodsIssueNoteLine {
     get total(): Decimal {
         return this.#netTotal;
     }
+
+    get maxToReturn(): number {
+        return this.#range();
+    }
 }

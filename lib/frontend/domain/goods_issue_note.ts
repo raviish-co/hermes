@@ -1,18 +1,17 @@
 import type { GoodsIssueNoteModel } from "../models/goods_issue_note";
 import { GoodsIssueNoteLine } from "./goods_issue_note_line";
 import { formatCurrency } from "../helpers/format_currency";
-import type { ItemModel } from "../models/item";
+import { Note, type LineOptions } from "./note";
 import { Purpose } from "./purpose";
-import { Note } from "./note";
 
 export class GoodsIssueNote extends Note {
     goodsIssueNoteId: string = "";
-    lines: GoodsIssueNoteLine[] = [];
+    purpose: Purpose = {} as Purpose;
+    status: string = "";
+    returnDate: string;
     grossTotal: number = 0;
     securityDeposit: number = 0;
-    returnDate: string;
-    purpose: Purpose = new Purpose("", "");
-    status: string = "";
+    lines: GoodsIssueNoteLine[] = [];
 
     constructor(returnDate: string) {
         super();
@@ -37,23 +36,29 @@ export class GoodsIssueNote extends Note {
             const noteLine = new GoodsIssueNoteLine(
                 line.itemId,
                 line.name,
-                line.quantity,
                 line.price,
-                line.quantityReturned
+                line.variationValues,
+                line.condition
             );
 
-            noteLine.variationValues = line.variationValues;
-            noteLine.condition = line.condition;
+            noteLine.quantity = line.quantityToReturn;
+            noteLine.quantityRequested = line.quantityRequested;
+            noteLine.quantityReturned = line.quantityReturned;
+
+            if (line.quantityReturned === 0) {
+                noteLine.changeQuantity(line.quantityRequested);
+            }
+
             note.lines.push(noteLine);
         }
 
         return note;
     }
 
-    addLine(item: ItemModel, quantity: number) {
-        if (this.isSameLine(item.itemId)) return;
+    addLine(options: LineOptions, quantity: number) {
+        if (this.isSameLine(options.itemId)) return;
 
-        const line = this.createLine(item, quantity);
+        const line = this.createLine(options, quantity);
 
         line.calculate();
 
@@ -104,17 +109,23 @@ export class GoodsIssueNote extends Note {
         this.purpose.clear();
     }
 
-    private createLine(item: ItemModel, quantity: number) {
-        return new GoodsIssueNoteLine(
-            item.itemId,
-            item.name,
-            quantity,
-            item.price,
-            0,
-            item.variationsValues,
-            item.condition,
-            item.stock
+    findLine(itemId: string) {
+        return this.lines.find((line) => line.itemId === itemId);
+    }
+
+    createLine(options: LineOptions, quantity: number) {
+        const line = new GoodsIssueNoteLine(
+            options.itemId,
+            options.name,
+            options.price,
+            options.variationValues,
+            options.condition,
+            options.stock
         );
+
+        line.changeQuantity(quantity);
+
+        return line;
     }
 
     private calculate() {
@@ -132,8 +143,8 @@ export class GoodsIssueNote extends Note {
         this.securityDeposit = 0;
     }
 
-    private calculateSecurityDeposit(factor: number = 2) {
-        this.securityDeposit = this.grossTotal * factor;
+    private calculateSecurityDeposit() {
+        this.securityDeposit = this.grossTotal * 2;
     }
 
     private hasNotSameInvalidLine() {
