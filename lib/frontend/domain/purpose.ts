@@ -13,12 +13,27 @@ export class Purpose {
     }
 
     isValid() {
-        if (!this.description || !this.notes) return false;
+        console.log(this);
 
-        if ((this.description === LAUNDRAY || this.description === RECORD) && !this.details)
-            return false;
+        if (!this.description) return false;
+
+        if (!this.notes) return false;
+
+        if (!this.isLaundrayOrRecord()) return false;
 
         return true;
+    }
+
+    private isLaundrayOrRecord() {
+        return this.isLaundray() || this.isRecord();
+    }
+
+    private isLaundray(): boolean {
+        return this.description === LAUNDRAY && this.details !== undefined;
+    }
+
+    private isRecord(): boolean {
+        return this.description === RECORD && this.details !== undefined;
     }
 
     clear() {

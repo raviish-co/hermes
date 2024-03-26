@@ -1,29 +1,40 @@
 <script lang="ts" setup>
-import { Purpose } from "~/lib/frontend/domain/purpose";
 import type { PurposeSpecificationModel } from "~/lib/frontend/models/purpose_specification";
 import { PurposeService } from "~/lib/frontend/services/purpose_service";
+import { Purpose } from "~/lib/frontend/domain/purpose";
 
-const purpose = ref<Purpose>(new Purpose("", ""));
+interface Emits {
+    (e: "choosed", purpose: Purpose): void;
+}
+
+const emits = defineEmits<Emits>();
+
 const specitications = ref<PurposeSpecificationModel[]>([]);
+const purpose = ref<Purpose>({} as Purpose);
 const detailsConstraint = ref<string[]>([]);
 const notesType = ref<string>("");
-const emits = defineEmits<{ (e: "choosed", purpose: Purpose): void }>();
-
-const disableDetailsConstraint = computed(
-    () => detailsConstraint.value.length <= 0 || purpose.value.description == ""
-);
-const isEmptyDescription = computed(() => purpose.value.description === "");
-const isEmptyDetails = computed(
-    () => purpose.value.details === "" && !disableDetailsConstraint.value
-);
-const isEmptyNotes = computed(() => purpose.value.notes === "" && !isEmptyDescription.value);
 
 const service = new PurposeService();
-specitications.value = await service.listPurposes();
 
-function chooseDetails(evt: Event): void {
-    const el = evt.target as HTMLSelectElement;
-    purpose.value.description = el.value;
+const disableDetailsConstraint = computed(() => {
+    if (detailsConstraint.value.length <= 0 || purpose.value.description == "") return true;
+    return false;
+});
+
+const isEmpty = computed(() => {
+    if (!purpose.value.description) return true;
+
+    if (!purpose.value.notes && !purpose.value.description) return true;
+
+    if (!purpose.value.details && !disableDetailsConstraint) return true;
+
+    return false;
+});
+
+function choosePurpose(event: Event): void {
+    const el = event.target as HTMLSelectElement;
+
+    purpose.value = new Purpose(el.value, "");
 
     const specification = specitications.value.find((s) => s.description === el.value);
 
@@ -36,13 +47,17 @@ function chooseDetails(evt: Event): void {
     detailsConstraint.value = specification.detailsConstraint ?? [];
     notesType.value = specification.notesType;
 
-    emits("choosed", purpose.value);
+    emits("choosed", purpose.value as Purpose);
 }
 
-function selectDetails(evt: Event) {
-    const target = evt.target as HTMLSelectElement;
+function selectDetails(event: Event) {
+    const target = event.target as HTMLSelectElement;
     purpose.value.details = target.value;
 }
+
+onMounted(async () => {
+    specitications.value = await service.listPurposes();
+});
 </script>
 
 <template>
@@ -51,8 +66,7 @@ function selectDetails(evt: Event) {
             <select
                 class="input-field"
                 :value="purpose.description || 'Finalidade'"
-                :class="{ invalid: isEmptyDescription }"
-                @change="chooseDetails"
+                @change="choosePurpose"
             >
                 <option selected disabled>Finalidade</option>
                 <option v-for="spec in specitications" :key="spec.description">
@@ -65,7 +79,6 @@ function selectDetails(evt: Event) {
                 :class="{
                     'input-field': !disableDetailsConstraint,
                     'input-disabled': disableDetailsConstraint,
-                    invalid: isEmptyDetails,
                 }"
                 @change="selectDetails"
             >
@@ -75,15 +88,13 @@ function selectDetails(evt: Event) {
                 </option>
             </select>
         </div>
+
         <input
             v-model="purpose.notes"
-            :class="{
-                'input-field': !isEmptyDescription,
-                'input-disabled': isEmptyDescription,
-                invalid: isEmptyNotes,
-            }"
+            class="input-field"
+            :class="{ 'input-disabled': isEmpty }"
             :placeholder="notesType"
-            @input="$emit('choosed', purpose)"
+            @input="$emit('choosed', purpose as Purpose)"
         />
     </div>
 </template>
