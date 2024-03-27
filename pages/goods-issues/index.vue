@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { PurposeModel } from "~/lib/frontend/models/purpose";
 import type { GoodsIssueNoteModel } from "~/lib/frontend/models/goods_issue_note";
 import { GoodsIssueService } from "~/lib/frontend/services/goods_issue_service";
+import type { PurposeModel } from "~/lib/frontend/models/purpose";
 import { formatDate } from "@frontend/helpers/format_date";
 
 const notes = ref<GoodsIssueNoteModel[]>([]);

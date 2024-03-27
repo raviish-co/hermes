@@ -67,7 +67,7 @@ onMounted(async () => {
                                         {{ formatVariationValues(line.variationValues) }}
                                     </span>
                                 </td>
-                                <td>{{ line.condition.status }}</td>
+                                <td>{{ line.condition?.status }}</td>
                             </tr>
                         </tbody>
                     </table>

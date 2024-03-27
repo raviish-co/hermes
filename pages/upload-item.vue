@@ -1,18 +1,18 @@
 <script lang="ts" setup>
-import { handleException } from "@frontend/helpers/error_handler";
-import { UploadService } from "@frontend/services/upload_service";
+import { handleException } from "~/lib/frontend/helpers/error_handler";
+import { UploadService } from "~/lib/frontend/services/upload_service";
 
-const currentFormData = ref<FormData | null>(null);
-const uploadService = new UploadService();
-const currentFileName = ref<string>("Selecione o ficheiro CSV");
+const formData = ref<FormData | null>(null);
+const fileName = ref<string>("Selecione o ficheiro CSV");
+const isValidFile = computed(() => formData.value !== null);
 
-const isValidFile = computed(() => currentFormData.value !== null);
+const service = new UploadService();
 
 function uploadFile() {
-    if (!currentFormData.value) return;
+    if (!formData.value) return;
 
-    uploadService
-        .upload(currentFormData.value)
+    service
+        .upload(formData.value)
         .then((res) => alert(res.message))
         .catch(handleException);
 }
@@ -22,14 +22,14 @@ function updateFile(e: Event) {
     const file = target.files?.[0] as File;
 
     if (!file) {
-        currentFormData.value = null;
-        currentFileName.value = "Selecione o ficheiro CSV";
+        formData.value = null;
+        fileName.value = "Selecione o ficheiro CSV";
         return;
     }
 
-    currentFormData.value = new FormData();
-    currentFormData.value.append("file", file);
-    currentFileName.value = file.name;
+    formData.value = new FormData();
+    formData.value.append("file", file);
+    fileName.value = file.name;
 }
 </script>
 
@@ -45,7 +45,7 @@ function updateFile(e: Event) {
                         class="w-full border-2 border-dashed border-light-500 flex items-center justify-center flex-col h-28 cursor-pointer text-light-600"
                     >
                         <span class="material-symbols-outlined text-4xl mt-4"> attach_file </span>
-                        {{ currentFileName }}
+                        {{ fileName }}
                     </label>
                     <input
                         type="file"

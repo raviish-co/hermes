@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import { GoodsReceiptNote } from "~/lib/frontend/domain/goods_receipt_note";
 import { getCurrentLocalDateTime } from "~/lib/frontend/helpers/current_local_date_time";
-import { handleException } from "~/lib/frontend/helpers/error_handler";
 import { GoodsReceiptService } from "~/lib/frontend/services/goods_receipt_service";
+import { GoodsReceiptNote } from "~/lib/frontend/domain/goods_receipt_note";
+import { handleException } from "~/lib/frontend/helpers/error_handler";
 
-const note = reactive<GoodsReceiptNote>(new GoodsReceiptNote(getCurrentLocalDateTime()));
-const goodsReceiptService = new GoodsReceiptService();
+const entryDate = getCurrentLocalDateTime();
+const note = reactive(new GoodsReceiptNote(entryDate));
+const service = new GoodsReceiptService();
 
 function newGoodsReceipt() {
-    goodsReceiptService
+    service
         .new(note as GoodsReceiptNote)
         .then(({ message }) => {
             alert(message);
-            note.clear();
+            note.clearLines();
         })
         .catch(handleException);
 }
@@ -41,7 +42,7 @@ function newGoodsReceipt() {
                 >
                     Dar entrada
                 </button>
-                <button class="btn-light" @click="note.clear()">Cancelar</button>
+                <button class="btn-light" @click="note.clearLines()">Cancelar</button>
             </div>
         </div>
     </section>

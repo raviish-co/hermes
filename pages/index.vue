@@ -1,15 +1,16 @@
 <script lang="ts" setup>
+import { getCurrentLocalDateTime } from "~/lib/frontend/helpers/current_local_date_time";
+import { GoodsIssueService } from "~/lib/frontend/services/goods_issue_service";
+import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
+import { handleException } from "~/lib/frontend/helpers/error_handler";
 import type { ChoosePurpose } from "#build/components";
-import { getCurrentLocalDateTime } from "@frontend/helpers/current_local_date_time";
-import { GoodsIssueService } from "@frontend/services/goods_issue_service";
-import { GoodsIssueNote } from "@frontend/domain/goods_issue_note";
-import { handleException } from "@frontend/helpers/error_handler";
 
-const goodsIssueService = new GoodsIssueService();
-const note = reactive<GoodsIssueNote>(new GoodsIssueNote(getCurrentLocalDateTime()));
+const returnDate = getCurrentLocalDateTime();
+const service = new GoodsIssueService();
+const note = reactive(new GoodsIssueNote(returnDate));
 
 function newGoodsIssue() {
-    goodsIssueService
+    service
         .new(note as GoodsIssueNote)
         .then(({ message }) => {
             alert(message);
