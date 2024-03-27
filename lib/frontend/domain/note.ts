@@ -6,8 +6,8 @@ export type LineOptions = {
     itemId: string;
     name: string;
     price: number;
-    variationValues: VariationValueModel[];
-    condition: ConditionModel;
+    variationsValues?: VariationValueModel[];
+    condition?: ConditionModel;
     stock?: number;
     quantityRequested?: number;
     quantityReturned?: number;
@@ -69,7 +69,7 @@ export class Note {
         const line = new NoteLine(
             options.itemId,
             options.name,
-            options.variationValues,
+            options.variationsValues,
             options.condition
         );
 

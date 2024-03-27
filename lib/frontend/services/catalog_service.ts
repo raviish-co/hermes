@@ -34,8 +34,16 @@ export class CatalogService {
         return { items: response.items, total: response.total };
     }
 
+    async registerItem(data: ItemDTO) {}
+
     async listVariations(): Promise<VariationModel[]> {
         const response = await $fetch("/api/variations", { method: "get" });
         return response;
     }
 }
+
+type ItemDTO = {
+    name: string;
+    price: number;
+    comment?: string;
+};

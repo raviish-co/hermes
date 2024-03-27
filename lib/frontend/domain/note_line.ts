@@ -8,18 +8,18 @@ export class NoteLine {
     quantity: number = 0;
     quantityReturned: number = 0;
     quantityRequested: number = 0;
-    variationValues: VariationValueModel[];
-    condition: ConditionModel;
+    variationsValues?: VariationValueModel[];
+    condition?: ConditionModel;
 
     constructor(
         itemId: string,
         name: string,
-        variationValues: VariationValueModel[],
-        condition: ConditionModel
+        variationsValues?: VariationValueModel[],
+        condition?: ConditionModel
     ) {
         this.itemId = itemId;
         this.name = name;
-        this.variationValues = variationValues;
+        this.variationsValues = variationsValues;
         this.condition = condition;
 
         if (this.isFullyReturned()) {
@@ -44,6 +44,6 @@ export class NoteLine {
     }
 
     get formattedVariationsValues() {
-        return formatVariationValues(this.variationValues);
+        return formatVariationValues(this.variationsValues);
     }
 }

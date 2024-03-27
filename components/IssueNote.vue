@@ -40,7 +40,7 @@ defineProps(["note"]);
                             <br />
 
                             <span class="text-light-600 text-sm">
-                                {{ line.formatVariationValues }}
+                                {{ line.formattedVariationsValues }}
                             </span>
                         </td>
 

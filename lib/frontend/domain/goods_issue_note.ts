@@ -6,7 +6,7 @@ import { Purpose } from "./purpose";
 
 export class GoodsIssueNote extends Note {
     goodsIssueNoteId: string = "";
-    purpose: Purpose = {} as Purpose;
+    purpose: Purpose;
     status: string = "";
     returnDate: string;
     grossTotal: number = 0;
@@ -15,6 +15,7 @@ export class GoodsIssueNote extends Note {
 
     constructor(returnDate: string) {
         super();
+        this.purpose = new Purpose("");
         this.returnDate = returnDate;
     }
 
@@ -118,7 +119,7 @@ export class GoodsIssueNote extends Note {
             options.itemId,
             options.name,
             options.price,
-            options.variationValues,
+            options.variationsValues,
             options.condition,
             options.stock
         );
