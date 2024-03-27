@@ -22,7 +22,7 @@ onMounted(async () => {
     <div class="section-content">
         <h1 class="page-title">Guias de Devoluções</h1>
 
-        <div v-if="notes.length > 0" class="overflow-y-auto space-y-2">
+        <div v-if="notes.length > 0" class="table-container space-y-2">
             <p class="p-2">Filtro: {{ noteId }}</p>
             <table class="table text-center">
                 <thead>

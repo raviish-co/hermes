@@ -21,7 +21,7 @@ onMounted(async () => {
     <div class="section-content">
         <h1 class="page-title">Guias de Saída</h1>
 
-        <div v-if="notes.length > 0" class="overflow-y-auto space-y-2">
+        <div v-if="notes.length > 0" class="table-container overflow-y-auto">
             <p class="p-2">Filtro:</p>
             <table class="table text-center">
                 <thead>

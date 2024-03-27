@@ -74,7 +74,7 @@ h1 {
 }
 
 .table-container {
-    @apply h-[36rem] space-y-2 border border-light-500 p-3 overflow-hidden;
+    @apply h-[36rem] space-y-2;
 }
 
 .btn {
