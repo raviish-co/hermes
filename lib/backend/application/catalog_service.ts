@@ -1,4 +1,5 @@
 import type { VariationRepository } from "../domain/catalog/variation_repository";
+import type { CategoryRepository } from "../domain/catalog/category_repository";
 import type { ItemRepository } from "../domain/catalog/item_repository";
 import type { Generator } from "../domain/sequences/generator";
 import { ItemBuilder } from "../domain/catalog/item_builder";
@@ -12,15 +13,18 @@ import { Decimal } from "../shared/decimal";
 export class CatalogService {
     #itemRepository: ItemRepository;
     #variationRepository: VariationRepository;
+    #categoryRepository: CategoryRepository;
     #generator: Generator;
 
     constructor(
         itemRepository: ItemRepository,
         variationRepository: VariationRepository,
+        categoryRepository: CategoryRepository,
         generator: Generator
     ) {
         this.#itemRepository = itemRepository;
         this.#variationRepository = variationRepository;
+        this.#categoryRepository = categoryRepository;
         this.#generator = generator;
     }
 
@@ -36,19 +40,18 @@ export class CatalogService {
         return await this.#itemRepository.search(query, pageToken, perPage);
     }
 
-    async registerItem(
-        name: string,
-        price: number,
-        comment?: string
-    ): Promise<Either<Error, void>> {
+    async registerItem(data: RegisterItemDTO): Promise<Either<Error, void>> {
         const itemId = this.#generator.generate(Sequence.Item);
 
+        const variationsValues = this.#buildVariationsValues(data.variations);
         const itemOrErr = new ItemBuilder()
             .withItemId(itemId)
-            .withName(name)
-            .withPrice(new Decimal(price))
+            .withName(data.name)
+            .withPrice(new Decimal(data.price))
             .withStock(0)
-            .withCondition(comment)
+            .withCondition(data.comment)
+            .withCategoryId(data.categoryId)
+            .withVariationsValues(variationsValues)
             .build();
 
         if (itemOrErr.isLeft()) return left(itemOrErr.value);
@@ -63,4 +66,29 @@ export class CatalogService {
     async getVariations(): Promise<Variation[]> {
         return await this.#variationRepository.getAll();
     }
+
+    #buildVariationsValues(data?: VariationDTO[]): Record<string, string> {
+        if (!data) return {};
+
+        const variations: Record<string, string> = {};
+        for (const variation of data) {
+            variations[variation.variationId] = `${variation.name}: ${variation.value}`;
+        }
+
+        return variations;
+    }
 }
+
+type RegisterItemDTO = {
+    name: string;
+    price: number;
+    comment?: string;
+    categoryId?: string;
+    variations?: VariationDTO[];
+};
+
+type VariationDTO = {
+    variationId: string;
+    name: string;
+    value: string;
+};

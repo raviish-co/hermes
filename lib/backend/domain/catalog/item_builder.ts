@@ -27,8 +27,9 @@ export class ItemBuilder {
         return this;
     }
 
-    withCategoryId(categoryId: ID): ItemBuilder {
-        this.#categoryId = categoryId;
+    withCategoryId(categoryId?: string): ItemBuilder {
+        if (!categoryId) return this;
+        this.#categoryId = ID.fromString(categoryId);
         return this;
     }
 

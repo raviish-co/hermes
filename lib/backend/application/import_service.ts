@@ -89,12 +89,13 @@ export class ImportService {
             variationsOrErr.value,
             resultOrErr.value.values
         );
+        const categoryId = categoryOrErr.value.categoryId.toString();
         const itemId = this.#generator.generate(Sequence.Item);
         const itemOrErr = new ItemBuilder()
             .withItemId(itemId)
             .withName(name)
             .withPrice(new Decimal(Number(price)))
-            .withCategoryId(categoryOrErr.value.categoryId)
+            .withCategoryId(categoryId)
             .withCondition(comment)
             .withStock(Number(quantity))
             .withSectionId(sectionOrErr.value.sectionId)

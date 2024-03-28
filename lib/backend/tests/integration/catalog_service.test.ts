@@ -7,6 +7,7 @@ import { describe, it, expect } from "vitest";
 import { ID } from "../../shared/id";
 import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
+import { CategoryRepositoryStub } from "../stubs/categoria_repository_stub";
 
 describe("Test ListItems", () => {
     it("Deve buscar os artigos no repositório", async () => {
@@ -14,7 +15,13 @@ describe("Test ListItems", () => {
         const variationRepository = new InmemVariationRepository();
         const storage = new InmemSequenceStorage();
         const generator = new SequenceGenerator(storage);
-        const service = new CatalogService(itemRepository, variationRepository, generator);
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
 
         const { result: items } = await service.listItems();
 
@@ -27,7 +34,13 @@ describe("Test ListItems", () => {
         const variationRepository = new InmemVariationRepository();
         const storage = new InmemSequenceStorage();
         const generator = new SequenceGenerator(storage);
-        const service = new CatalogService(itemRepository, variationRepository, generator);
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
 
         const { result: items } = await service.listItems();
 
@@ -41,7 +54,13 @@ describe("Test SearchItems", () => {
         const variationRepository = new InmemVariationRepository();
         const storage = new InmemSequenceStorage();
         const generator = new SequenceGenerator(storage);
-        const service = new CatalogService(itemRepository, variationRepository, generator);
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
 
         const { result: items } = await service.searchItems("T-shirt");
 
@@ -54,7 +73,13 @@ describe("Test SearchItems", () => {
         const variationRepository = new InmemVariationRepository();
         const storage = new InmemSequenceStorage();
         const generator = new SequenceGenerator(storage);
-        const service = new CatalogService(itemRepository, variationRepository, generator);
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
 
         const { result: items } = await service.searchItems("1002");
 
@@ -67,7 +92,13 @@ describe("Test SearchItems", () => {
         const variationRepository = new InmemVariationRepository();
         const storage = new InmemSequenceStorage();
         const generator = new SequenceGenerator(storage);
-        const service = new CatalogService(itemRepository, variationRepository, generator);
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
 
         const { result: items } = await service.searchItems("Teste");
 
@@ -79,7 +110,13 @@ describe("Test SearchItems", () => {
         const variationRepository = new InmemVariationRepository();
         const storage = new InmemSequenceStorage();
         const generator = new SequenceGenerator(storage);
-        const service = new CatalogService(itemRepository, variationRepository, generator);
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
 
         const items = await service.listItems();
 
@@ -94,7 +131,13 @@ describe("Test SearchItems", () => {
         const variationRepository = new InmemVariationRepository();
         const storage = new InmemSequenceStorage();
         const generator = new SequenceGenerator(storage);
-        const service = new CatalogService(itemRepository, variationRepository, generator);
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
 
         const items = await service.listItems(pageToken);
 
@@ -110,7 +153,13 @@ describe("Test SearchItems", () => {
         const variationRepository = new InmemVariationRepository();
         const storage = new InmemSequenceStorage();
         const generator = new SequenceGenerator(storage);
-        const service = new CatalogService(itemRepository, variationRepository, generator);
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
 
         const items = await service.listItems(pageToken, perPage);
 
@@ -124,7 +173,13 @@ describe("Test SearchItems", () => {
         const variationRepository = new InmemVariationRepository();
         const storage = new InmemSequenceStorage();
         const generator = new SequenceGenerator(storage);
-        const service = new CatalogService(itemRepository, variationRepository, generator);
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
 
         const items = await service.searchItems("T-shirt");
 
@@ -139,7 +194,13 @@ describe("Test SearchItems", () => {
         const variationRepository = new InmemVariationRepository();
         const storage = new InmemSequenceStorage();
         const generator = new SequenceGenerator(storage);
-        const service = new CatalogService(itemRepository, variationRepository, generator);
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
 
         const items = await service.searchItems("T-shirt", 1, perPage);
 
@@ -154,7 +215,13 @@ describe("Test SearchItems", () => {
         const variationRepository = new InmemVariationRepository();
         const storage = new InmemSequenceStorage();
         const generator = new SequenceGenerator(storage);
-        const service = new CatalogService(itemRepository, variationRepository, generator);
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
 
         const items = await service.searchItems("Teste", pageToken, 12);
 
@@ -169,7 +236,13 @@ describe("Test SearchItems", () => {
         const variationRepository = new InmemVariationRepository();
         const storage = new InmemSequenceStorage();
         const generator = new SequenceGenerator(storage);
-        const service = new CatalogService(itemRepository, variationRepository, generator);
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
 
         const items = await service.searchItems(query);
 
@@ -183,7 +256,13 @@ describe("Test SearchItems", () => {
         const variationRepository = new InmemVariationRepository();
         const storage = new InmemSequenceStorage();
         const generator = new SequenceGenerator(storage);
-        const service = new CatalogService(itemRepository, variationRepository, generator);
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
 
         const items = await service.searchItems(query);
 
@@ -200,7 +279,13 @@ describe("Test Get All Variations", () => {
         const generator = new SequenceGenerator(storage);
         variationRepository.save(variation);
 
-        const service = new CatalogService(itemRepository, variationRepository, generator);
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
 
         const variations = await service.getVariations();
 
@@ -214,14 +299,26 @@ describe("CatalogService - Registrar artigo", () => {
         const generator = new SequenceGenerator(storage);
         const variationRepository = new InmemVariationRepository();
         const itemRepository = new InmemItemRepository();
-        const service = new CatalogService(itemRepository, variationRepository, generator);
-        const name = "Artigo 1";
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
 
-        await service.registerItem(name, 100);
+        const data = {
+            name: "Camisa gola longa",
+            price: 100,
+        };
+
+        await service.registerItem(data);
+
+        await service.registerItem(data);
 
         const item = await itemRepository.last();
 
-        expect(item.name).toEqual(name);
+        expect(item.name).toEqual(data.name);
     });
 
     it("Deve registrar o artigo com o seu preço", async () => {
@@ -229,15 +326,24 @@ describe("CatalogService - Registrar artigo", () => {
         const generator = new SequenceGenerator(storage);
         const variationRepository = new InmemVariationRepository();
         const itemRepository = new InmemItemRepository();
-        const service = new CatalogService(itemRepository, variationRepository, generator);
-        const name = "Artigo 1";
-        const price = 100;
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
 
-        await service.registerItem(name, price);
+        const data = {
+            name: "Artigo 1",
+            price: 1000,
+        };
+
+        await service.registerItem(data);
 
         const item = await itemRepository.last();
 
-        expect(item.price.value).toEqual(price);
+        expect(item.price.value).toEqual(data.price);
     });
 
     it("Deve registrar a condição do artigo", async () => {
@@ -245,11 +351,20 @@ describe("CatalogService - Registrar artigo", () => {
         const generator = new SequenceGenerator(storage);
         const variationRepository = new InmemVariationRepository();
         const itemRepository = new InmemItemRepository();
-        const service = new CatalogService(itemRepository, variationRepository, generator);
-        const name = "Artigo 1";
-        const price = 100;
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
 
-        await service.registerItem(name, price);
+        const data = {
+            name: "Artigo 1",
+            price: 100,
+        };
+
+        await service.registerItem(data);
 
         const item = await itemRepository.last();
 
@@ -261,12 +376,21 @@ describe("CatalogService - Registrar artigo", () => {
         const generator = new SequenceGenerator(storage);
         const variationRepository = new InmemVariationRepository();
         const itemRepository = new InmemItemRepository();
-        const service = new CatalogService(itemRepository, variationRepository, generator);
-        const name = "Artigo 1";
-        const price = 100;
-        const comment = "Danificado";
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
 
-        await service.registerItem(name, price, comment);
+        const data = {
+            name: "Artigo 1",
+            price: 100,
+            comment: "Danificado",
+        };
+
+        await service.registerItem(data);
 
         const item = await itemRepository.last();
 
@@ -279,15 +403,82 @@ describe("CatalogService - Registrar artigo", () => {
         const generator = new SequenceGenerator(storage, 1000);
         const variationRepository = new InmemVariationRepository();
         const itemRepository = new InmemItemRepository();
-        const service = new CatalogService(itemRepository, variationRepository, generator);
-        const name = "Artigo 1";
-        const price = 100;
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
+        const data = {
+            name: "Artigo 1",
+            price: 100,
+        };
 
-        await service.registerItem(name, price);
+        await service.registerItem(data);
 
         const item = await itemRepository.last();
 
         expect(item.itemId.toString()).toEqual("RVS - 1000");
+    });
+
+    it("Deve registrar o artigo com a categoria", async () => {
+        const storage = new InmemSequenceStorage();
+        const generator = new SequenceGenerator(storage);
+        const variationRepository = new InmemVariationRepository();
+        const itemRepository = new InmemItemRepository();
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
+
+        const data = {
+            name: "Artigo 1",
+            price: 100,
+            categoryId: "1",
+        };
+
+        await service.registerItem(data);
+
+        const item = await itemRepository.last();
+
+        expect(item.categoryId?.toString()).toEqual(data.categoryId);
+    });
+
+    it("Deve registrar as variações do artigo", async () => {
+        const storage = new InmemSequenceStorage();
+        const generator = new SequenceGenerator(storage);
+        const variationRepository = new InmemVariationRepository();
+        const itemRepository = new InmemItemRepository();
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
+
+        const data = {
+            name: "Artigo 1",
+            price: 100,
+            categoryId: "1",
+            variations: [
+                { variationId: "1", name: "Cor", value: "Preto" },
+                { variationId: "2", name: "Tamanho", value: "M" },
+            ],
+        };
+
+        await service.registerItem(data);
+
+        const item = await itemRepository.last();
+
+        const variations = Object.entries(item.variations!);
+
+        expect(variations[0]).toEqual(["1", "Cor: Preto"]);
+        expect(variations[1]).toEqual(["2", "Tamanho: M"]);
     });
 });
 

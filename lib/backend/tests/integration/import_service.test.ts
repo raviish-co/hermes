@@ -106,7 +106,7 @@ describe("Test Upload Items", async () => {
 
         const item = await itemRepository.last();
 
-        expect(item.categoryId).toBeDefined();
+        expect(item.categoryId?.toString()).toBeDefined();
     });
 
     it("Deve associar o ID da seção ao artigo a ser importado", async () => {

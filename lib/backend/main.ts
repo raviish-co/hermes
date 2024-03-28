@@ -46,6 +46,7 @@ export const makeServices = (): Services => {
     const catalogService = new CatalogService(
         itemRepository,
         variationRepository,
+        categoryRepository,
         sequenceGenerator
     );
 
