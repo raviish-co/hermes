@@ -47,26 +47,22 @@ function toggleMenu() {
             </div>
 
             <div class="flex flex-col w-full">
-                <NuxtLink
-                    to="/"
-                    class="flex gap-3 items-center p-2 hover:bg-black hover:text-white w-full"
-                >
-                    <span class="material-symbols-outlined text-xl"> shopping_cart_checkout </span>
-                    <span>Guia de saída</span>
+                <NuxtLink to="/items" class="nuxt-link">
+                    <span class="material-symbols-outlined text-xl"> add_shopping_cart </span>
+                    <span>Artigos</span>
                 </NuxtLink>
 
-                <NuxtLink
-                    to="/goods-receipt"
-                    class="flex gap-3 items-center p-2 hover:bg-black hover:text-white w-full"
-                >
+                <NuxtLink to="/goods-issues" class="nuxt-link">
+                    <span class="material-symbols-outlined text-xl"> shopping_cart_checkout </span>
+                    <span>Guias de saída</span>
+                </NuxtLink>
+
+                <NuxtLink to="/goods-receipt" class="nuxt-link">
                     <span class="material-symbols-outlined text-xl"> add_shopping_cart </span>
                     <span>Guia de entrada</span>
                 </NuxtLink>
 
-                <NuxtLink
-                    to="/upload-item"
-                    class="flex gap-3 items-center p-2 hover:bg-black hover:text-white w-full"
-                >
+                <NuxtLink to="/upload-item" class="nuxt-link">
                     <span class="material-symbols-outlined text-xl"> upload </span>
                     <span>Importar</span>
                 </NuxtLink>

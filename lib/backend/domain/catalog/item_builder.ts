@@ -66,8 +66,12 @@ export class ItemBuilder {
         return this;
     }
 
-    withCondition(condition: Condition): ItemBuilder {
-        this.#condition = condition;
+    withCondition(comment?: string): ItemBuilder {
+        this.withGoodCondition();
+
+        if (!comment) return this;
+
+        this.withBadCondition(comment);
         return this;
     }
 
@@ -82,16 +86,12 @@ export class ItemBuilder {
     }
 
     build(): Either<Error, Item> {
-        if (!this.#categoryId) {
-            return left(new Error("Category Id is required"));
+        if (!this.#itemId) {
+            return left(new Error("Item ID is required"));
         }
 
         if (!this.#name) {
             return left(new Error("Name is required"));
-        }
-
-        if (!this.#sectionId) {
-            return left(new Error("Section Id is required"));
         }
 
         if (!this.#price) {
@@ -101,13 +101,13 @@ export class ItemBuilder {
         return right(
             new Item(
                 this.#itemId,
-                this.#categoryId,
                 this.#name,
-                this.#sectionId,
                 this.#price,
-                this.#variationsValues,
                 this.#stock,
-                this.#condition
+                this.#condition,
+                this.#categoryId,
+                this.#sectionId,
+                this.#variationsValues
             )
         );
     }

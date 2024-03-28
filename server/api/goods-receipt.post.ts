@@ -10,30 +10,30 @@ const { goodsReceiptService } = makeServices();
 export default defineEventHandler(async (event) => {
     const { data } = await readBody(event);
 
-    const voidOrError = await goodsReceiptService.new(data);
+    const voidOrErr = await goodsReceiptService.new(data);
 
-    if (voidOrError.value instanceof InvalidEntryDate) {
+    if (voidOrErr.value instanceof InvalidEntryDate) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
             message: "A data de entrada de mercadoria é inválida",
         });
     }
 
-    if (voidOrError.value instanceof InvalidLines) {
+    if (voidOrErr.value instanceof InvalidLines) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
             message: "Linhas inválidas",
         });
     }
 
-    if (voidOrError.value instanceof ItemNotFound) {
+    if (voidOrErr.value instanceof ItemNotFound) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
             message: "Artigo não encontrado",
         });
     }
 
-    if (voidOrError.value instanceof MissingDependency) {
+    if (voidOrErr.value instanceof MissingDependency) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
             message: "Erro ao efeturar saída de mercadoria",

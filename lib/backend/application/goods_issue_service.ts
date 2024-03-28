@@ -85,7 +85,7 @@ export class GoodsIssueService {
     }
 
     #buildPurpose(data: PurposeDTO) {
-        return new Purpose(data.description, data.details, data.notes);
+        return new Purpose(data.description, data.notes, data.details);
     }
 
     #buildItemsIds(lines: GoodIssueLineDTO[]): ID[] {
@@ -116,9 +116,9 @@ export class GoodsIssueService {
                 item.itemId,
                 item.name,
                 item.price,
-                item.variations,
                 item.fulltext,
-                quantity
+                quantity,
+                item.variations
             );
 
             goodsIssueLines.push(goodsIssueLine);

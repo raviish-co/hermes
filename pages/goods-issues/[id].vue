@@ -61,7 +61,7 @@ function newGoodsReturn() {
         </h1>
 
         <NuxtLink
-            :to="{ path: `/goods-return/`, query: { q: goodsIssueNote.goodsIssueNoteId } }"
+            :to="{ path: `/goods-returns/`, query: { q: goodsIssueNote.goodsIssueNoteId } }"
             class="link"
         >
             <h2 class="text-center mb-4">Ver devoluções</h2>

@@ -30,7 +30,7 @@ onMounted(async () => {
                         <span>Guia de Saída:</span>
                         <NuxtLink
                             class="link"
-                            :to="{ path: `/goods-issue/${note?.goodsIssueNoteId}` }"
+                            :to="{ path: `/goods-issues/${note?.goodsIssueNoteId}` }"
                         >
                             {{ note?.goodsIssueNoteId }}
                         </NuxtLink>

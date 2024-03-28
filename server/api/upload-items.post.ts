@@ -11,39 +11,37 @@ export default defineEventHandler(async (event) => {
 
     const file = formData.get("file") as File;
 
-    const resultOrErr = await importService.uploadItems(file);
+    const voidOrErr = await importService.uploadItems(file);
 
-    if (resultOrErr.value instanceof InvalidFileHeader) {
+    if (voidOrErr.value instanceof InvalidFileHeader) {
         return createError({
             statusCode: HttpStatus.BadRequest,
-            message: resultOrErr.value.message,
+            message: voidOrErr.value.message,
         });
     }
 
-    if (resultOrErr.value instanceof FileEmpty) {
+    if (voidOrErr.value instanceof FileEmpty) {
         return createError({
             statusCode: HttpStatus.BadRequest,
-            message: resultOrErr.value.message,
+            message: voidOrErr.value.message,
         });
     }
 
-    if (resultOrErr.value instanceof FileNotSupported) {
+    if (voidOrErr.value instanceof FileNotSupported) {
         return createError({
             statusCode: HttpStatus.BadRequest,
-            message: resultOrErr.value.message,
+            message: voidOrErr.value.message,
         });
     }
 
-    if (resultOrErr.value instanceof Error) {
+    if (voidOrErr.value instanceof Error) {
         return createError({
             statusCode: HttpStatus.BadRequest,
-            message: resultOrErr.value.message,
+            message: voidOrErr.value.message,
         });
     }
 
     setResponseStatus(event, HttpStatus.Created);
 
-    return {
-        message: "Artigos importados com sucesso!",
-    };
+    return { message: "Artigos importados com sucesso!" };
 });

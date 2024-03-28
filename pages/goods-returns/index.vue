@@ -36,13 +36,13 @@ onMounted(async () => {
                 <tbody>
                     <tr v-for="note in notes" :key="note.goodsReturnNoteId">
                         <td class="link">
-                            <NuxtLink :to="note.goodsReturnNoteId">
+                            <NuxtLink :to="`/goods-returns/${note.goodsReturnNoteId}`">
                                 {{ note.goodsReturnNoteId }}
                             </NuxtLink>
                         </td>
                         <td class="text-gray-500">{{ formatDate(note.issuedAt) }}</td>
                         <td class="link">
-                            <NuxtLink :to="`/goods-issue/${note.goodsIssueNoteId}`">
+                            <NuxtLink :to="`/goods-issues/${note.goodsIssueNoteId}`">
                                 {{ note.goodsIssueNoteId }}
                             </NuxtLink>
                         </td>

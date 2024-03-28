@@ -10,6 +10,7 @@ export interface ItemRepository {
     list(pageToken: number, perPage: number): Promise<Pagination<Item>>;
     search(query: string, pageToken: number, perPage: number): Promise<Pagination<Item>>;
     updateAll(items: Item[]): Promise<void>;
+    save(item: Item): Promise<void>;
     saveAll(items: Item[]): Promise<void>;
     last(): Promise<Item>;
 }

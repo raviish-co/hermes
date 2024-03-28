@@ -130,8 +130,8 @@ describe("Test Upload Items", async () => {
 
         const item = await itemRepository.last();
 
-        expect(item.variations["1"]).toBeDefined();
-        expect(item.variations["1"]).toEqual("Cor: Preto");
+        expect(item.variations!["1"]).toBeDefined();
+        expect(item.variations!["1"]).toEqual("Cor: Preto");
     });
 
     it("Deve retornar **InvalidVariationFormat** se a variação não estiver no formato correto", async () => {
@@ -154,10 +154,10 @@ describe("Test Upload Items", async () => {
 
         const item = await itemRepository.last();
 
-        expect(item.variations["1"]).toBeDefined();
-        expect(item.variations["1"]).toEqual("Cor: Preto");
-        expect(item.variations["2"]).toBeDefined();
-        expect(item.variations["2"]).toEqual("Marca: Rebock");
+        expect(item.variations!["1"]).toBeDefined();
+        expect(item.variations!["1"]).toEqual("Cor: Preto");
+        expect(item.variations!["2"]).toBeDefined();
+        expect(item.variations!["2"]).toEqual("Marca: Rebock");
     });
 
     it("Deve gerar o ID para os items ao serem carragados na base de dados", async () => {

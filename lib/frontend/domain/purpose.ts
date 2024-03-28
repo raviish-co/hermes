@@ -4,12 +4,12 @@ const RECORD = "Gravação";
 export class Purpose {
     description: string;
     details?: string;
-    notes?: string;
+    notes: string;
 
-    constructor(description: string, notes?: string, details?: string) {
+    constructor(description: string) {
         this.description = description;
-        this.details = details;
-        this.notes = notes;
+        this.details = "";
+        this.notes = "";
     }
 
     isValid() {

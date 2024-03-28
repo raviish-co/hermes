@@ -3,7 +3,6 @@ import { ItemStock } from "../../domain/catalog/item_stock";
 import { GoodsIssueNoteLine } from "../../domain/goods_issue/goods_issue_note_line";
 import { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { InmemGoodsIssueNoteRepository } from "../../persistense/inmem/inmem_goods_issue_note_repository";
-// import { Decimal } from "../../shared/decimal";
 import { Decimal } from "../../shared/decimal";
 
 import { ID } from "../../shared/id";
@@ -27,68 +26,68 @@ export class GoodsIssueRepositoryStub extends InmemGoodsIssueNoteRepository {
 
 const _item = new Item(
     ID.fromString("1001"),
-    ID.random(),
     "Item 1",
-    ID.random(),
     new Decimal(1000),
-    { "1": "Cor: Preta" },
     new ItemStock(1),
-    { status: Status.Good }
+    { status: Status.Good },
+    ID.random(),
+    ID.random(),
+    { "1": "Cor: Preta" }
 );
 
 const _item2 = new Item(
     ID.fromString("1002"),
-    ID.random(),
     "Item 1",
-    ID.random(),
     new Decimal(1000),
-    { "1": "Cor: Preta" },
     new ItemStock(1),
-    { status: Status.Good }
+    { status: Status.Good },
+    ID.random(),
+    ID.random(),
+    { "1": "Cor: Preta" }
 );
 
 const _item4 = new Item(
     ID.fromString("1004"),
-    ID.random(),
     "Item 1",
-    ID.random(),
     new Decimal(1000),
-    { "1": "Cor: Preta" },
     new ItemStock(7),
-    { status: Status.Good }
+    { status: Status.Good },
+    ID.random(),
+    ID.random(),
+    { "1": "Cor: Preta" }
 );
 
 const _item5 = new Item(
     ID.fromString("1005"),
-    ID.random(),
     "Item 1",
-    ID.random(),
     new Decimal(1000),
-    { "1": "Cor: Preta" },
     new ItemStock(8),
-    { status: Status.Good }
+    { status: Status.Good },
+    ID.random(),
+    ID.random(),
+    { "1": "Cor: Preta" }
 );
 
 const _item6 = new Item(
     ID.fromString("1006"),
-    ID.random(),
     "Item 1",
-    ID.random(),
     new Decimal(1000),
-    { "1": "Cor: Preta" },
     new ItemStock(8),
-    { status: Status.Good }
+    { status: Status.Good },
+    ID.random(),
+    ID.random(),
+    { "1": "Cor: Preta" }
 );
 
 const _item7 = new Item(
     ID.fromString("1007"),
-    ID.random(),
     "Item 1",
-    ID.random(),
     new Decimal(1000),
-    { "1": "Cor: Preta" },
     new ItemStock(10),
-    { status: Status.Good }
+    { status: Status.Good },
+    ID.random(),
+    ID.random(),
+    { "1": "Cor: Preta" }
 );
 
 const _goodsIssueData = [
@@ -106,17 +105,17 @@ const _goodsIssueData = [
                 _item.itemId,
                 _item.name,
                 _item.price,
-                _item.variations,
                 _item.fulltext,
-                15
+                15,
+                _item.variations!
             ),
             new GoodsIssueNoteLine(
                 _item2.itemId,
                 _item2.name,
                 _item2.price,
-                _item2.variations,
                 _item2.fulltext,
-                15
+                15,
+                _item2.variations!
             ),
         ],
     },
@@ -134,17 +133,17 @@ const _goodsIssueData = [
                 _item4.itemId,
                 _item4.name,
                 _item4.price,
-                _item4.variations,
                 _item4.fulltext,
-                3
+                3,
+                _item4.variations!
             ),
             new GoodsIssueNoteLine(
                 _item5.itemId,
                 _item5.name,
                 _item5.price,
-                _item5.variations,
                 _item5.fulltext,
-                2
+                2,
+                _item5.variations!
             ),
         ],
     },
@@ -162,9 +161,9 @@ const _goodsIssueData = [
                 _item6.itemId,
                 _item6.name,
                 _item6.price,
-                _item6.variations,
                 _item6.fulltext,
-                2
+                2,
+                _item6.variations!
             ),
         ],
     },
@@ -182,9 +181,9 @@ const _goodsIssueData = [
                 _item7.itemId,
                 _item7.name,
                 _item7.price,
-                _item7.variations,
                 _item7.fulltext,
-                3
+                3,
+                _item7.variations!
             ),
         ],
     },

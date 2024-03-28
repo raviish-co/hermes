@@ -75,6 +75,11 @@ export class ItemRepositoryStub implements ItemRepository {
         });
     }
 
+    save(item: Item): Promise<void> {
+        this.#items[item.itemId.toString()] = item;
+        return Promise.resolve(undefined);
+    }
+
     updateAll(items: Item[]): Promise<void> {
         for (const item of items) {
             this.#items[item.itemId.toString()] = item;
@@ -101,79 +106,79 @@ export class ItemRepositoryStub implements ItemRepository {
     #populate() {
         const item1 = new Item(
             ID.fromString("1001"),
-            ID.random(),
             "T-shirt desportiva gola redonda",
-            ID.random(),
             new Decimal(4500),
-            { "1": "Cor: Branco" },
             new ItemStock(10),
-            { status: Status.Good }
+            { status: Status.Good },
+            ID.random(),
+            ID.random(),
+            { "1": "Cor: Branco" }
         );
 
         const item2 = new Item(
             ID.fromString("1002"),
-            ID.random(),
             "Calça Jeans Skinny",
-            ID.random(),
             new Decimal(15500),
-            { "1": "Cor: Castanho", "2": "Marca: Gucci" },
             new ItemStock(10),
-            { status: Status.Good }
+            { status: Status.Good },
+            ID.random(),
+            ID.random(),
+            { "1": "Cor: Castanho", "2": "Marca: Gucci" }
         );
 
         const item3 = new Item(
             ID.fromString("1003"),
-            ID.random(),
             "Moletom com Capuz",
-            ID.random(),
             new Decimal(1000),
-            { "1": "Cor: Verde", "2": "Marca: Adidas" },
             new ItemStock(7),
-            { status: Status.Good }
+            { status: Status.Good },
+            ID.random(),
+            ID.random(),
+            { "1": "Cor: Verde", "2": "Marca: Adidas" }
         );
 
         const item4 = new Item(
             ID.fromString("1004"),
-            ID.random(),
             "Shorts Esportivo",
-            ID.random(),
             new Decimal(1000),
-            { "1": "Cor: Verde", "2": "Marca: Adidas" },
             new ItemStock(7),
-            { status: Status.Good }
+            { status: Status.Good },
+            ID.random(),
+            ID.random(),
+            { "1": "Cor: Verde", "2": "Marca: Adidas" }
         );
 
         const item5 = new Item(
             ID.fromString("1005"),
-            ID.random(),
             "Casaco de Inverno",
-            ID.random(),
             new Decimal(1000),
-            { "1": "Cor: Cinza", "2": "Tamanho: M", "3": "Marca: Polo" },
             new ItemStock(8),
-            { status: Status.Good }
+            { status: Status.Good },
+            ID.random(),
+            ID.random(),
+            { "1": "Cor: Cinza", "2": "Tamanho: M", "3": "Marca: Polo" }
         );
 
         const item6 = new Item(
             ID.fromString("1006"),
-            ID.random(),
             "Camiseta Polo de Manga Longa",
-            ID.random(),
             new Decimal(1000),
-            { "1": "Cor: Preta", "2": "Marca: Polo" },
             new ItemStock(8),
-            { status: Status.Good }
+            { status: Status.Good },
+            ID.random(),
+            ID.random(),
+            { "1": "Cor: Preta", "2": "Marca: Polo" }
         );
 
         const item7 = new Item(
             ID.fromString("1007"),
-            ID.random(),
             "Casaco casual de inverno",
-            ID.random(),
             new Decimal(2500),
-            { "1": "Cor: Castanho", "2": "Marca: Levis" },
             new ItemStock(10),
-            { status: Status.Good }
+            { status: Status.Good },
+            ID.random(),
+            ID.random(),
+            { "1": "Cor: Castanho", "2": "Marca: Levis" }
         );
 
         this.#items = {

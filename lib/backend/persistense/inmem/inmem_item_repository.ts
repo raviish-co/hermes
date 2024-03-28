@@ -69,6 +69,11 @@ export class InmemItemRepository implements ItemRepository {
         });
     }
 
+    save(item: Item): Promise<void> {
+        this.#items[item.itemId.toString()] = item;
+        return Promise.resolve(undefined);
+    }
+
     updateAll(items: Item[]): Promise<void> {
         for (const item of items) {
             this.#items[item.itemId.toString()] = item;

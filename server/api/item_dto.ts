@@ -9,8 +9,8 @@ export interface ItemDTO {
     itemId: string;
     name: string;
     price: number;
-    categoryId: string;
-    variationsValues: VariationValues[];
+    categoryId?: string;
+    variationsValues?: VariationValues[];
     stock: number;
     condition: {
         status: "Bom" | "Mau";
@@ -23,7 +23,7 @@ export function toItemDTO(item: Item): ItemDTO {
         itemId: item.itemId.toString(),
         name: item.name,
         price: item.price.value,
-        categoryId: item.categoryId.toString(),
+        categoryId: item.categoryId?.toString(),
         variationsValues: toVariationValuesDTO(item.variations),
         stock: item.stock.quantity,
         condition: {
@@ -33,7 +33,9 @@ export function toItemDTO(item: Item): ItemDTO {
     };
 }
 
-export function toVariationValuesDTO(variations: Record<string, string>): VariationValues[] {
+export function toVariationValuesDTO(variations?: Record<string, string>): VariationValues[] {
+    if (!variations) return [];
+
     return Object.entries(variations).map(([variationId, value]) => ({
         variationId,
         value,

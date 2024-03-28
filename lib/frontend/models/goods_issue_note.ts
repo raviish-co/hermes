@@ -9,8 +9,8 @@ export interface GoodsIssueNoteLineModel {
     quantityRequested: number;
     quantityReturned: number;
     quantityToReturn: number;
-    variationValues: VariationValueModel[];
-    condition: ConditionModel;
+    variationValues?: VariationValueModel[];
+    condition?: ConditionModel;
 }
 
 export interface GoodsIssueNoteModel {

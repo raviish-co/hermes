@@ -6,14 +6,14 @@ export class GoodsReturnNoteLine {
     readonly itemId: ID;
     readonly name: string;
     readonly #quantity: number;
-    readonly variationsValues: Record<string, string>;
+    readonly variationsValues?: Record<string, string>;
     condition: Condition;
 
     constructor(
         itemId: ID,
         name: string,
         quantity: number,
-        variationsValues: Record<string, string>,
+        variationsValues?: Record<string, string>,
         comment?: string
     ) {
         this.returnLineId = ID.random();

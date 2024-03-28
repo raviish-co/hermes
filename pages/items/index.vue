@@ -53,5 +53,11 @@ onMounted(async () => {
             </table>
         </div>
         <ThePagination :total="pages" @changed="changePage" />
+
+        <NuxtLink :to="{ path: '/items/register' }">
+            <button class="btn-circle mt-8 ml-auto block">
+                <span class="material-symbols-outlined">add</span>
+            </button>
+        </NuxtLink>
     </div>
 </template>

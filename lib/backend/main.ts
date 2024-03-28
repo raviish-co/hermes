@@ -43,7 +43,11 @@ export const makeServices = (): Services => {
         purposeSpec
     );
 
-    const catalogService = new CatalogService(itemRepository, variationRepository);
+    const catalogService = new CatalogService(
+        itemRepository,
+        variationRepository,
+        sequenceGenerator
+    );
 
     const importService = new ImportService(
         itemRepository,

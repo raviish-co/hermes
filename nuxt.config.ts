@@ -24,7 +24,6 @@ export default defineNuxtConfig({
             ],
         },
     },
-
     pwa: {
         manifest: {
             name: "Raviish",

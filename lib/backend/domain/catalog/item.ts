@@ -14,24 +14,24 @@ export enum Status {
 
 export class Item {
     readonly itemId: ID;
-    readonly categoryId: ID;
+    readonly categoryId?: ID;
     #name: string;
-    #sectionId: ID;
+    #sectionId?: ID;
     #price: Decimal;
-    #variationsValues: Record<string, string>;
+    #variationsValues?: Record<string, string>;
     #stock: ItemStock;
     #condition: Condition;
     #fulltext: string = "";
 
     constructor(
         itemId: ID,
-        categoryId: ID,
         name: string,
-        sectionId: ID,
         price: Decimal,
-        variationsValues: Record<string, string>,
         stock: ItemStock,
-        condition: Condition
+        condition: Condition,
+        categoryId?: ID,
+        sectionId?: ID,
+        variationsValues?: Record<string, string>
     ) {
         this.itemId = itemId;
         this.categoryId = categoryId;
@@ -45,7 +45,7 @@ export class Item {
     }
 
     #buildFullText(): string {
-        const tokens = [this.#name, ...Object.values(this.#variationsValues)];
+        const tokens = [this.#name, ...Object.values(this.#variationsValues ?? "")];
         return tokens.join(" ").toLowerCase();
     }
 
@@ -99,11 +99,11 @@ export class Item {
         return this.#stock;
     }
 
-    get variations(): Record<string, string> {
+    get variations() {
         return this.#variationsValues;
     }
 
-    get sectionId(): ID {
+    get sectionId() {
         return this.#sectionId;
     }
 }

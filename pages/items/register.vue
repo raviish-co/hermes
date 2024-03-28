@@ -12,19 +12,16 @@ const isGood = ref<boolean>(true);
 
 const service = new CatalogService();
 
-async function register() {
+function register() {
     if (!name.value || !price.value) {
         alert("Preencha todos os campos.");
         return;
     }
 
-    const item = {
-        name: name.value,
-        price: price.value,
-        comment: condition.value.comment,
-    };
-
-    await service.registerItem(item);
+    service
+        .registerItem(name.value, price.value, condition.value.comment)
+        .then(() => alert("Artigo registrado com sucesso."))
+        .catch((err) => alert(err.statusMessage));
 }
 
 function changeStatus(event: Event) {

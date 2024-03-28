@@ -6,7 +6,6 @@ import { FileNotSupported } from "../domain/readers/file_not_supported_error";
 import type { SectionRepository } from "../domain/catalog/section_repository";
 import { CsvReader, VALID_CSV_HEADER } from "../domain/readers/csv_reader";
 import type { ItemRepository } from "../domain/catalog/item_repository";
-import { Item, type Condition, Status } from "../domain/catalog/item";
 import { FileEmpty } from "../domain/readers/file_empty_error";
 import type { Generator } from "../domain/sequences/generator";
 import type { Variation } from "../domain/catalog/variation";
@@ -14,6 +13,7 @@ import { ItemBuilder } from "../domain/catalog/item_builder";
 import { left, right, type Either } from "../shared/either";
 import { Sequence } from "../domain/sequences/sequence";
 import type { FileError } from "../shared/errors";
+import { Item } from "../domain/catalog/item";
 import { Decimal } from "../shared/decimal";
 
 export class ImportService {
@@ -85,8 +85,6 @@ export class ImportService {
 
         if (variationsOrErr.isLeft()) return left(variationsOrErr.value);
 
-        const condition = this.#makeItemCondition(comment);
-
         const variations = this.#makeItemVariationsValues(
             variationsOrErr.value,
             resultOrErr.value.values
@@ -97,7 +95,7 @@ export class ImportService {
             .withName(name)
             .withPrice(new Decimal(Number(price)))
             .withCategoryId(categoryOrErr.value.categoryId)
-            .withCondition(condition)
+            .withCondition(comment)
             .withStock(Number(quantity))
             .withSectionId(sectionOrErr.value.sectionId)
             .withVariationsValues(variations)
@@ -106,15 +104,6 @@ export class ImportService {
         if (itemOrErr.isLeft()) return left(itemOrErr.value);
 
         return right(itemOrErr.value);
-    }
-
-    #makeItemCondition(comment: string) {
-        const condition: Condition = { status: Status.Good };
-        if (comment) {
-            condition.status = Status.Bad;
-            condition.comment = comment;
-        }
-        return condition;
     }
 
     #makeItemVariationsValues(variations: Variation[], values: string[]): Record<string, string> {

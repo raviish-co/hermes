@@ -1,14 +1,10 @@
-import { GoodsReturnNoteLine } from "../domain/goods_return_note_line";
 import type { GoodsReturnNoteModel } from "../models/goods_return_note";
+import type { NoteLine } from "../domain/note_line";
 
 export class GoodsReturnService {
-    async new(
-        goodsIssueNoteId: string,
-        securityDepositWithHeld: number,
-        lines: GoodsReturnNoteLine[]
-    ) {
+    async new(noteId: string, securityDepositWithHeld: number, lines: NoteLine[]) {
         const data: GoodsReturnDTO = {
-            goodsIssueNoteId,
+            noteId,
             securityDepositWithHeld,
             itemsData: lines.map(this.#toItemDTO),
         };
@@ -44,7 +40,7 @@ export class GoodsReturnService {
         }));
     }
 
-    #toItemDTO(line: GoodsReturnNoteLine): ItemDTO {
+    #toItemDTO(line: NoteLine): ItemDTO {
         return {
             itemId: line.itemId,
             quantity: line.quantity,
@@ -60,7 +56,7 @@ interface ItemDTO {
 }
 
 interface GoodsReturnDTO {
-    goodsIssueNoteId: string;
+    noteId: string;
     securityDepositWithHeld: number;
     itemsData: ItemDTO[];
 }

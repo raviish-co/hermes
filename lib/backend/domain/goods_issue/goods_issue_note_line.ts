@@ -8,7 +8,7 @@ export class GoodsIssueNoteLine {
     readonly fulltext: string;
     readonly price: Decimal;
     readonly #quantity: number;
-    readonly variationsValues: Record<string, string>;
+    readonly variationsValues?: Record<string, string>;
     quantityReturned: number;
     #netTotal: Decimal;
 
@@ -16,9 +16,9 @@ export class GoodsIssueNoteLine {
         itemId: ID,
         name: string,
         price: Decimal,
-        variations: Record<string, string>,
         fulltext: string,
         quantity: number,
+        variations?: Record<string, string>,
         quantityReturned?: number
     ) {
         this.issueLineId = ID.random();

@@ -10,33 +10,33 @@ const { goodsIssueService } = makeServices();
 export default defineEventHandler(async (event) => {
     const { data } = await readBody(event);
 
-    const voidOrError = await goodsIssueService.new(data);
+    const voidOrErr = await goodsIssueService.new(data);
 
-    if (voidOrError.value instanceof InvalidPurpose) {
+    if (voidOrErr.value instanceof InvalidPurpose) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            message: voidOrError.value.message,
+            statusMessage: voidOrErr.value.message,
         });
     }
 
-    if (voidOrError.value instanceof ItemNotFound) {
+    if (voidOrErr.value instanceof ItemNotFound) {
         throw createError({
             statusCode: HttpStatus.NotFound,
-            message: voidOrError.value.message,
+            statusMessage: voidOrErr.value.message,
         });
     }
 
-    if (voidOrError.value instanceof InvalidTotal) {
+    if (voidOrErr.value instanceof InvalidTotal) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            message: voidOrError.value.message,
+            statusMessage: voidOrErr.value.message,
         });
     }
 
-    if (voidOrError.value instanceof InsufficientStock) {
+    if (voidOrErr.value instanceof InsufficientStock) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            message: voidOrError.value.message,
+            statusMessage: voidOrErr.value.message,
         });
     }
 

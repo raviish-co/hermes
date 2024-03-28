@@ -1,6 +1,6 @@
 import { GoodsReturnNoteLine } from "~/lib/backend/domain/goods_return/goods_return_note_line";
 import { GoodsReturnNote } from "~/lib/backend/domain/goods_return/goods_return_note";
-import { toVariationValuesDTO } from "./item_dto";
+import { toVariationValuesDTO } from "../item_dto";
 
 interface VariationValues {
     variationId: string;

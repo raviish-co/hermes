@@ -1,6 +1,6 @@
 import type { GoodsReceiptNote } from "../domain/goods_receipt_note";
-import type { GoodsReceiptNoteLine } from "../domain/goods_receipt_note_line";
 import type { ConditionModel } from "../models/condition";
+import type { NoteLine } from "../domain/note_line";
 
 export class GoodsReceiptService {
     async new(note: GoodsReceiptNote) {
@@ -12,7 +12,7 @@ export class GoodsReceiptService {
         });
     }
 
-    #toGoodsReceiptLineDTO(line: GoodsReceiptNoteLine): GoodsReceiptLineDTO {
+    #toGoodsReceiptLineDTO(line: NoteLine): GoodsReceiptLineDTO {
         return {
             itemId: line.itemId,
             quantity: line.quantity,
@@ -29,8 +29,8 @@ export class GoodsReceiptService {
 }
 
 type GoodsReceiptDTO = {
-    lines: GoodsReceiptLineDTO[];
     entryDate: string;
+    lines: GoodsReceiptLineDTO[];
 };
 
 type GoodsReceiptLineDTO = {
