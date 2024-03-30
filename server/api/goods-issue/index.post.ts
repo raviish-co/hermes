@@ -1,5 +1,5 @@
-import { InsufficientStock } from "@backend/domain/catalog/insufficient_stock_error";
-import { ItemNotFound } from "@backend/domain/catalog/item_not_found_error";
+import { InsufficientStock } from "@backend/domain/catalog/items/insufficient_stock_error";
+import { ItemNotFound } from "@backend/domain/catalog/items/item_not_found_error";
 import { InvalidPurpose } from "~/lib/backend/domain/goods_issue/invalid_purpose_error";
 import { InvalidTotal } from "@backend/domain/goods_issue/invalid_total_error";
 import { HttpStatus } from "~/server/api/http_status";

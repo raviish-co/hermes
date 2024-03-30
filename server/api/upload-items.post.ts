@@ -1,6 +1,6 @@
-import { InvalidFileHeader } from "@backend/domain/readers/invalid_file_header_error";
-import { FileNotSupported } from "@backend/domain/readers/file_not_supported_error";
-import { FileEmpty } from "@backend/domain/readers/file_empty_error";
+import { InvalidFileHeader } from "@backend/adapters/readers/invalid_file_header_error";
+import { FileNotSupported } from "@backend/adapters/readers/file_not_supported_error";
+import { FileEmpty } from "@backend/adapters/readers/file_empty_error";
 import { HttpStatus } from "~/server/api/http_status";
 import { makeServices } from "@backend/main";
 
