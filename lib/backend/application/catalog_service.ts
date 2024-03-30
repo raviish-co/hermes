@@ -1,5 +1,6 @@
 import type { VariationRepository } from "../domain/catalog/variation_repository";
 import type { CategoryRepository } from "../domain/catalog/category_repository";
+import { InvalidVariations } from "../domain/catalog/invalid_variations_error";
 import type { ItemRepository } from "../domain/catalog/item_repository";
 import type { Generator } from "../domain/sequences/generator";
 import { ItemBuilder } from "../domain/catalog/item_builder";
@@ -43,6 +44,8 @@ export class CatalogService {
     async registerItem(data: RegisterItemDTO): Promise<Either<Error, void>> {
         const itemId = this.#generator.generate(Sequence.Item);
 
+        if (this.#isInvalidCategory(data)) return left(new InvalidVariations());
+
         const variationsValues = this.#buildVariationsValues(data.variations);
         const itemOrErr = new ItemBuilder()
             .withItemId(itemId)
@@ -65,6 +68,10 @@ export class CatalogService {
 
     async getVariations(): Promise<Variation[]> {
         return await this.#variationRepository.getAll();
+    }
+
+    #isInvalidCategory(data: RegisterItemDTO) {
+        return data.categoryId && !data.variations;
     }
 
     #buildVariationsValues(data?: VariationDTO[]): Record<string, string> {

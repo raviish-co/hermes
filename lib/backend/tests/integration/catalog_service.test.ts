@@ -8,6 +8,7 @@ import { ID } from "../../shared/id";
 import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
 import { CategoryRepositoryStub } from "../stubs/categoria_repository_stub";
+import { InvalidVariations } from "../../domain/catalog/invalid_variations_error";
 
 describe("Test ListItems", () => {
     it("Deve buscar os artigos no repositório", async () => {
@@ -439,6 +440,10 @@ describe("CatalogService - Registrar artigo", () => {
             name: "Artigo 1",
             price: 100,
             categoryId: "1",
+            variations: [
+                { variationId: "1", name: "Cor", value: "Preto" },
+                { variationId: "2", name: "Tamanho", value: "M" },
+            ],
         };
 
         await service.registerItem(data);
@@ -479,6 +484,30 @@ describe("CatalogService - Registrar artigo", () => {
 
         expect(variations[0]).toEqual(["1", "Cor: Preto"]);
         expect(variations[1]).toEqual(["2", "Tamanho: M"]);
+    });
+
+    it("Deve retornar erro **InvalidVariations** quando escolher a categoria, mas não informar as variações", async () => {
+        const storage = new InmemSequenceStorage();
+        const generator = new SequenceGenerator(storage);
+        const variationRepository = new InmemVariationRepository();
+        const itemRepository = new InmemItemRepository();
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
+        const data = {
+            name: "Artigo 1",
+            price: 100,
+            categoryId: "1",
+        };
+
+        const error = await service.registerItem(data);
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(InvalidVariations);
     });
 });
 
