@@ -10,6 +10,7 @@ import { Variation } from "../domain/catalog/variations/variation";
 import type { Pagination } from "../shared/pagination";
 import { Item } from "../domain/catalog/items/item";
 import { Decimal } from "../shared/decimal";
+import type { Category } from "../domain/catalog/categories/category";
 
 export class CatalogService {
     #itemRepository: ItemRepository;
@@ -31,6 +32,14 @@ export class CatalogService {
 
     async listItems(pageToken: number = 1, perPage: number = 12): Promise<Pagination<Item>> {
         return await this.#itemRepository.list(pageToken, perPage);
+    }
+
+    async listCategories(): Promise<Category[]> {
+        return await this.#categoryRepository.getAll();
+    }
+
+    async listVariations(): Promise<Variation[]> {
+        return await this.#variationRepository.getAll();
     }
 
     async searchItems(
@@ -64,10 +73,6 @@ export class CatalogService {
         await this.#itemRepository.save(item);
 
         return right(undefined);
-    }
-
-    async getVariations(): Promise<Variation[]> {
-        return await this.#variationRepository.getAll();
     }
 
     #isInvalidCategory(data: RegisterItemDTO) {

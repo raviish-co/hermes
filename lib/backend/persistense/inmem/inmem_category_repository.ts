@@ -13,6 +13,9 @@ export class InmemCategoryRepository implements CategoryRepository {
             });
         }
     }
+    getAll(): Promise<Category[]> {
+        return Promise.resolve(this.records);
+    }
 
     findByName(name: string): Promise<Either<CategoryNotFound, Category>> {
         const category = this.records.find((c) => c.name === name);

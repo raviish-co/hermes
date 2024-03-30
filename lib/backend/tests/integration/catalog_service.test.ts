@@ -10,7 +10,7 @@ import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_sto
 import { CategoryRepositoryStub } from "../stubs/categoria_repository_stub";
 import { InvalidVariations } from "../../domain/catalog/variations/invalid_variations_error";
 
-describe("Test ListItems", () => {
+describe("CatalogService - Recuperar artigos", () => {
     it("Deve buscar os artigos no repositório", async () => {
         const itemRepository = new ItemRepositoryStub();
         const variationRepository = new InmemVariationRepository();
@@ -49,7 +49,7 @@ describe("Test ListItems", () => {
     });
 });
 
-describe("Test SearchItems", () => {
+describe("CatalogService - Pesquisar artigos", () => {
     it("Deve pesquisar o artigo pelo seu nome", async () => {
         const itemRepository = new ItemRepositoryStub();
         const variationRepository = new InmemVariationRepository();
@@ -272,7 +272,7 @@ describe("Test SearchItems", () => {
     });
 });
 
-describe("Test Get All Variations", () => {
+describe("CatalogService - Recuperar todas as variações", () => {
     it("Deve recuperar as variações da base de dados", async () => {
         const itemRepository = new ItemRepositoryStub();
         const variationRepository = new InmemVariationRepository();
@@ -288,7 +288,7 @@ describe("Test Get All Variations", () => {
             generator
         );
 
-        const variations = await service.getVariations();
+        const variations = await service.listVariations();
 
         expect(variations.length).toBeGreaterThanOrEqual(1);
     });
@@ -508,6 +508,26 @@ describe("CatalogService - Registrar artigo", () => {
 
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(InvalidVariations);
+    });
+});
+
+describe("CatalogService - Recuperar todas as categorias", () => {
+    it("Deve recuperar as categorias do repositório", async () => {
+        const itemRepository = new ItemRepositoryStub();
+        const variationRepository = new InmemVariationRepository();
+        const storage = new InmemSequenceStorage();
+        const generator = new SequenceGenerator(storage);
+        const categoryRepository = new CategoryRepositoryStub();
+        const service = new CatalogService(
+            itemRepository,
+            variationRepository,
+            categoryRepository,
+            generator
+        );
+
+        const categorias = await service.listCategories();
+
+        expect(categorias.length).toBeGreaterThanOrEqual(1);
     });
 });
 

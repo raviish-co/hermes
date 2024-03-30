@@ -18,5 +18,5 @@ function toVariationDTO(v: Variation): VariationDTO {
 }
 
 export default defineEventHandler(async () => {
-    return (await catalogService.getVariations()).map(toVariationDTO);
+    return (await catalogService.listVariations()).map(toVariationDTO);
 });

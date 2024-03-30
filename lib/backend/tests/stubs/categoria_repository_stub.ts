@@ -4,7 +4,7 @@ import { ID } from "../../shared/id";
 
 export class CategoryRepositoryStub extends InmemCategoryRepository {
     constructor() {
-        super(_categoriesData.map((v) => new Category(v.id, v.name)));
+        super(_categoriesData.map((v) => new Category(v.id, v.name, v.variationsIds)));
     }
 }
 
@@ -12,11 +12,11 @@ const _categoriesData = [
     {
         id: ID.fromString("1"),
         name: "Diversos",
-        departmentId: ID.fromString("2"),
+        variationsIds: [ID.fromString("1"), ID.fromString("2")],
     },
     {
-        id: ID.fromString("3"),
+        id: ID.fromString("2"),
         name: "Sapatos",
-        departmentId: ID.fromString("3"),
+        variationsIds: [ID.fromString("1"), ID.fromString("2")],
     },
 ];

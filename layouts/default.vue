@@ -52,6 +52,11 @@ function toggleMenu() {
                     <span>Artigos</span>
                 </NuxtLink>
 
+                <NuxtLink to="/categories" class="nuxt-link">
+                    <span class="material-symbols-outlined text-xl"> add_shopping_cart </span>
+                    <span>Categorias</span>
+                </NuxtLink>
+
                 <NuxtLink to="/goods-issues" class="nuxt-link">
                     <span class="material-symbols-outlined text-xl"> shopping_cart_checkout </span>
                     <span>Guias de saída</span>
