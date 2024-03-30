@@ -1,7 +1,7 @@
-import type { CategoryRepository } from "../../domain/catalog/category_repository";
-import { CategoryNotFound } from "../../domain/catalog/category_not_found_error";
+import type { CategoryRepository } from "../../domain/catalog/categories/category_repository";
+import { CategoryNotFound } from "../../domain/catalog/categories/category_not_found_error";
 import { type Either, left, right } from "../../shared/either";
-import { Category } from "../../domain/catalog/category";
+import { Category } from "../../domain/catalog/categories/category";
 
 export class InmemCategoryRepository implements CategoryRepository {
     #categories: Record<string, Category> = {};

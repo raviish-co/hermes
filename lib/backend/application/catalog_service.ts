@@ -1,14 +1,14 @@
-import type { VariationRepository } from "../domain/catalog/variation_repository";
-import type { CategoryRepository } from "../domain/catalog/category_repository";
-import { InvalidVariations } from "../domain/catalog/invalid_variations_error";
-import type { ItemRepository } from "../domain/catalog/item_repository";
-import type { Generator } from "../domain/sequences/generator";
-import { ItemBuilder } from "../domain/catalog/item_builder";
+import type { VariationRepository } from "../domain/catalog/variations/variation_repository";
+import type { CategoryRepository } from "../domain/catalog/categories/category_repository";
+import { InvalidVariations } from "../domain/catalog/variations/invalid_variations_error";
+import type { ItemRepository } from "../domain/catalog/items/item_repository";
+import type { Generator } from "../adapters/sequences/generator";
+import { ItemBuilder } from "../domain/catalog/items/item_builder";
 import { left, right, type Either } from "../shared/either";
-import { Sequence } from "../domain/sequences/sequence";
-import { Variation } from "../domain/catalog/variation";
+import { Sequence } from "../adapters/sequences/sequence";
+import { Variation } from "../domain/catalog/variations/variation";
 import type { Pagination } from "../shared/pagination";
-import { Item } from "../domain/catalog/item";
+import { Item } from "../domain/catalog/items/item";
 import { Decimal } from "../shared/decimal";
 
 export class CatalogService {

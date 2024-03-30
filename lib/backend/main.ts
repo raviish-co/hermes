@@ -2,7 +2,7 @@ import { DefaultPurposeSpecification } from "./adapters/default_purpose_specific
 import { InmemGoodsIssueNoteRepository } from "./persistense/inmem/inmem_goods_issue_note_repository";
 import { VariationRepositoryStub } from "./tests/stubs/variation_repository_stub";
 import { InmemSequenceStorage } from "./persistense/inmem/inmem_sequence_storage";
-import { SequenceGenerator } from "./domain/sequences/sequence_generator";
+import { SequenceGenerator } from "./adapters/sequences/sequence_generator";
 import { ItemRepositoryStub } from "./tests/stubs/item_repository_stub";
 import { GoodsIssueService } from "./application/goods_issue_service";
 import { CatalogService } from "./application/catalog_service";

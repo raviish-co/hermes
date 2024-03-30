@@ -1,5 +1,5 @@
 import { ID } from "../../shared/id";
-import { type Condition, Status } from "../catalog/item";
+import { type Condition, Status } from "../catalog/items/item";
 
 export class GoodsReturnNoteLine {
     readonly returnLineId: ID;

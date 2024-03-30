@@ -2,18 +2,18 @@ import type { GoodsIssueNoteNotFound } from "../domain/goods_issue/goods_issue_n
 import type { GoodsIssueNoteRepository } from "../domain/goods_issue/goods_issue_note_repository";
 import type { PurposeSpecification } from "../domain/goods_issue/purpose_specification";
 import { GoodsIssueNoteBuilder } from "../domain/goods_issue/goods_issue_builder";
-import { InsufficientStock } from "../domain/catalog/insufficient_stock_error";
+import { InsufficientStock } from "../domain/catalog/items/insufficient_stock_error";
 import { InvalidPurpose } from "../domain/goods_issue/invalid_purpose_error";
 import type { GoodsIssueNote } from "../domain/goods_issue/goods_issue_note";
 import { InvalidTotal } from "../domain/goods_issue/invalid_total_error";
 import { GoodsIssueNoteLine } from "../domain/goods_issue/goods_issue_note_line";
-import type { ItemRepository } from "../domain/catalog/item_repository";
-import type { Generator } from "../domain/sequences/generator";
+import type { ItemRepository } from "../domain/catalog/items/item_repository";
+import type { Generator } from "../adapters/sequences/generator";
 import { type Either, left, right } from "../shared/either";
 import type { GoodsIssueNoteError } from "../shared/errors";
-import { Sequence } from "../domain/sequences/sequence";
+import { Sequence } from "../adapters/sequences/sequence";
 import { Purpose } from "../domain/goods_issue/purpose";
-import { Item } from "../domain/catalog/item";
+import { Item } from "../domain/catalog/items/item";
 import { ID } from "../shared/id";
 
 export class GoodsIssueService {

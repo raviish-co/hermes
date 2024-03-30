@@ -3,13 +3,13 @@ import type { GoodsIssueNoteRepository } from "../../domain/goods_issue/goods_is
 import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
 import { DefaultPurposeSpecification } from "../../adapters/default_purpose_specification";
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
-import { InsufficientStock } from "../../domain/catalog/insufficient_stock_error";
+import { InsufficientStock } from "../../domain/catalog/items/insufficient_stock_error";
 import { InvalidPurpose } from "../../domain/goods_issue/invalid_purpose_error";
-import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
+import { SequenceGenerator } from "../../adapters/sequences/sequence_generator";
 import { InvalidTotal } from "../../domain/goods_issue/invalid_total_error";
 import { GoodsIssueService } from "../../application/goods_issue_service";
-import type { ItemRepository } from "../../domain/catalog/item_repository";
-import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
+import type { ItemRepository } from "../../domain/catalog/items/item_repository";
+import { ItemNotFound } from "../../domain/catalog/items/item_not_found_error";
 import { GoodsIssueRepositoryStub } from "../stubs/goods_issue_repository_stub";
 import type { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";

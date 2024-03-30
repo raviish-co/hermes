@@ -6,13 +6,13 @@ import type { GoodsIssueNoteRepository } from "../domain/goods_issue/goods_issue
 import { GoodsIssueLineNotFound } from "../domain/goods_issue/goods_lssue_line_not_found_error";
 import { GoodsReturnNoteLine } from "../domain/goods_return/goods_return_note_line";
 import type { GoodsIssueNoteLine } from "../domain/goods_issue/goods_issue_note_line";
-import type { ItemRepository } from "../domain/catalog/item_repository";
+import type { ItemRepository } from "../domain/catalog/items/item_repository";
 import { GoodsReturnNote } from "../domain/goods_return/goods_return_note";
-import type { Generator } from "../domain/sequences/generator";
+import type { Generator } from "../adapters/sequences/generator";
 import type { GoodsReturnNoteError } from "../shared/errors";
 import { left, right, type Either } from "../shared/either";
-import { Sequence } from "../domain/sequences/sequence";
-import type { Item } from "../domain/catalog/item";
+import { Sequence } from "../adapters/sequences/sequence";
+import type { Item } from "../domain/catalog/items/item";
 import { ID } from "../shared/id";
 
 export class GoodsReturnService {

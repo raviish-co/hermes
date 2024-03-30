@@ -1,4 +1,4 @@
-import { ID } from "../../shared/id";
+import { ID } from "../../../shared/id";
 
 export class Variation {
     readonly variationId: ID;

@@ -1,15 +1,15 @@
 import { left, right, type Either } from "../shared/either";
 import { ID } from "../shared/id";
-import type { ItemRepository } from "../domain/catalog/item_repository";
-import type { Item } from "../domain/catalog/item";
-import { Sequence } from "../domain/sequences/sequence";
+import type { ItemRepository } from "../domain/catalog/items/item_repository";
+import type { Item } from "../domain/catalog/items/item";
+import { Sequence } from "../adapters/sequences/sequence";
 import type { GoodsReceiptError } from "../shared/errors";
 import { InvalidLines } from "../domain/goods_receipt/invalid_lines_error";
 import { InvalidEntryDate } from "../domain/goods_receipt/invalid_entry_date_error";
 import type { GoodsReceiptNoteRepository } from "../domain/goods_receipt/goods_receipt_note_repository";
 import { GoodsReceiptBuilder } from "../domain/goods_receipt/goods_receipt_builder";
 import { GoodsReceiptLine } from "../domain/goods_receipt/goods_receipt_line";
-import type { Generator } from "../domain/sequences/generator";
+import type { Generator } from "../adapters/sequences/generator";
 
 export class GoodsReceiptService {
     readonly #itemRepository: ItemRepository;

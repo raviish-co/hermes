@@ -1,5 +1,5 @@
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
-import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
+import { SequenceGenerator } from "../../adapters/sequences/sequence_generator";
 import { describe, expect, it } from "vitest";
 
 describe("Test ID generation", () => {

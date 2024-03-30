@@ -1,4 +1,4 @@
-import { Variation } from "../../domain/catalog/variation";
+import { Variation } from "../../domain/catalog/variations/variation";
 import { InmemVariationRepository } from "../../persistense/inmem/inmem_variation_repository";
 import { ID } from "../../shared/id";
 

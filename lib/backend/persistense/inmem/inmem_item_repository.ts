@@ -1,8 +1,8 @@
-import type { ItemRepository as ItemRepository } from "../../domain/catalog/item_repository";
-import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
+import type { ItemRepository as ItemRepository } from "../../domain/catalog/items/item_repository";
+import { ItemNotFound } from "../../domain/catalog/items/item_not_found_error";
 import { type Either, left, right } from "../../shared/either";
 import type { Pagination } from "../../shared/pagination";
-import { Item } from "../../domain/catalog/item";
+import { Item } from "../../domain/catalog/items/item";
 import { ID } from "../../shared/id";
 
 export class InmemItemRepository implements ItemRepository {

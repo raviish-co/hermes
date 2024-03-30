@@ -1,4 +1,4 @@
-import type { SequenceStorage } from "../../domain/sequences/sequence_storage";
+import type { SequenceStorage } from "../../adapters/sequences/sequence_storage";
 
 export class InmemSequenceStorage implements SequenceStorage {
     #sequences: Record<string, number> = {};

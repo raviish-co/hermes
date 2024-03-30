@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
+import { ItemNotFound } from "../../domain/catalog/items/item_not_found_error";
 import { ID } from "../../shared/id";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
-import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
+import { SequenceGenerator } from "../../adapters/sequences/sequence_generator";
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
 import { GoodsReceiptService } from "../../application/goods_receipt_service";
 import { InmemGoodsReceiptNoteRepository } from "../../persistense/inmem/inmem_goods_receipt_note_repository";
 import { InvalidEntryDate } from "../../domain/goods_receipt/invalid_entry_date_error";
 import { InvalidLines } from "../../domain/goods_receipt/invalid_lines_error";
-import type { Generator } from "../../domain/sequences/generator";
+import type { Generator } from "../../adapters/sequences/generator";
 
 describe("Test Goods Receipt", () => {
     it("Deve retornar um erro **InvalidEntryDate** se a data de entrada de mercadoria não for definida", async () => {

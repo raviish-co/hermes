@@ -1,6 +1,6 @@
-import type { Section } from "../../domain/catalog/section";
-import { SectionNotFound } from "../../domain/catalog/section_not_found_error";
-import type { SectionRepository } from "../../domain/catalog/section_repository";
+import type { Section } from "../../domain/catalog/sections/section";
+import { SectionNotFound } from "../../domain/catalog/sections/section_not_found_error";
+import type { SectionRepository } from "../../domain/catalog/sections/section_repository";
 import { type Either, left, right } from "../../shared/either";
 
 export class InmemSectionRepository implements SectionRepository {

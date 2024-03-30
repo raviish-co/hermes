@@ -1,4 +1,4 @@
-import type { ID } from "../../shared/id";
+import type { ID } from "../../../shared/id";
 
 export class Section {
     readonly sectionId: ID;

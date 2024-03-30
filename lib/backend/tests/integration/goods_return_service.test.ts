@@ -7,7 +7,7 @@ import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_sto
 import type { GoodsReturnNote } from "../../domain/goods_return/goods_return_note";
 import type { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { GoodsIssueRepositoryStub } from "../stubs/goods_issue_repository_stub";
-import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
+import { SequenceGenerator } from "../../adapters/sequences/sequence_generator";
 import { GoodsReturnService } from "../../application/goods_return_service";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { describe, expect, it } from "vitest";

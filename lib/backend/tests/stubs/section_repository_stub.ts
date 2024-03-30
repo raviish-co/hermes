@@ -1,5 +1,5 @@
 import { InmemSectionRepository } from "../../persistense/inmem/inmem_section_repository";
-import { Section } from "../../domain/catalog/section";
+import { Section } from "../../domain/catalog/sections/section";
 import { ID } from "../../shared/id";
 
 export class SectionRepositoryStub extends InmemSectionRepository {

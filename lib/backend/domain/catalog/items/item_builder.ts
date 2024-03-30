@@ -1,9 +1,9 @@
-import { left, right, type Either } from "../../shared/either";
+import { left, right, type Either } from "../../../shared/either";
 import { type Condition, Status, Item } from "./item";
-import { Decimal } from "../../shared/decimal";
+import { Decimal } from "../../../shared/decimal";
 
 import { ItemStock } from "./item_stock";
-import { ID } from "../../shared/id";
+import { ID } from "../../../shared/id";
 
 export class ItemBuilder {
     #itemId: ID;

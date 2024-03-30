@@ -1,6 +1,6 @@
-import type { VariationRepository } from "../../domain/catalog/variation_repository";
-import { Variation } from "../../domain/catalog/variation";
-import { VariationNotFound } from "../../domain/catalog/variation_not_found_error";
+import type { VariationRepository } from "../../domain/catalog/variations/variation_repository";
+import { Variation } from "../../domain/catalog/variations/variation";
+import { VariationNotFound } from "../../domain/catalog/variations/variation_not_found_error";
 import { left, right, type Either } from "../../shared/either";
 
 export class InmemVariationRepository implements VariationRepository {

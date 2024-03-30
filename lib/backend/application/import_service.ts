@@ -1,19 +1,19 @@
-import { InvalidVariationFormat } from "../domain/catalog/invalid_variation_format_error";
-import type { VariationRepository } from "../domain/catalog/variation_repository";
-import type { CategoryRepository } from "../domain/catalog/category_repository";
-import { InvalidFileHeader } from "../domain/readers/invalid_file_header_error";
-import { FileNotSupported } from "../domain/readers/file_not_supported_error";
-import type { SectionRepository } from "../domain/catalog/section_repository";
-import { CsvReader, VALID_CSV_HEADER } from "../domain/readers/csv_reader";
-import type { ItemRepository } from "../domain/catalog/item_repository";
-import { FileEmpty } from "../domain/readers/file_empty_error";
-import type { Generator } from "../domain/sequences/generator";
-import type { Variation } from "../domain/catalog/variation";
-import { ItemBuilder } from "../domain/catalog/item_builder";
+import { InvalidVariationFormat } from "../domain/catalog/variations/invalid_variation_format_error";
+import type { VariationRepository } from "../domain/catalog/variations/variation_repository";
+import type { CategoryRepository } from "../domain/catalog/categories/category_repository";
+import { InvalidFileHeader } from "../adapters/readers/invalid_file_header_error";
+import { FileNotSupported } from "../adapters/readers/file_not_supported_error";
+import type { SectionRepository } from "../domain/catalog/sections/section_repository";
+import { CsvReader, VALID_CSV_HEADER } from "../adapters/readers/csv_reader";
+import type { ItemRepository } from "../domain/catalog/items/item_repository";
+import { FileEmpty } from "../adapters/readers/file_empty_error";
+import type { Generator } from "../adapters/sequences/generator";
+import type { Variation } from "../domain/catalog/variations/variation";
+import { ItemBuilder } from "../domain/catalog/items/item_builder";
 import { left, right, type Either } from "../shared/either";
-import { Sequence } from "../domain/sequences/sequence";
+import { Sequence } from "../adapters/sequences/sequence";
 import type { FileError } from "../shared/errors";
-import { Item } from "../domain/catalog/item";
+import { Item } from "../domain/catalog/items/item";
 import { Decimal } from "../shared/decimal";
 
 export class ImportService {

@@ -2,13 +2,13 @@ import { InmemVariationRepository } from "../../persistense/inmem/inmem_variatio
 import { InmemItemRepository } from "../../persistense/inmem/inmem_item_repository";
 import { CatalogService } from "../../application/catalog_service";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
-import { Variation } from "../../domain/catalog/variation";
+import { Variation } from "../../domain/catalog/variations/variation";
 import { describe, it, expect } from "vitest";
 import { ID } from "../../shared/id";
-import { SequenceGenerator } from "../../domain/sequences/sequence_generator";
+import { SequenceGenerator } from "../../adapters/sequences/sequence_generator";
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
 import { CategoryRepositoryStub } from "../stubs/categoria_repository_stub";
-import { InvalidVariations } from "../../domain/catalog/invalid_variations_error";
+import { InvalidVariations } from "../../domain/catalog/variations/invalid_variations_error";
 
 describe("Test ListItems", () => {
     it("Deve buscar os artigos no repositório", async () => {

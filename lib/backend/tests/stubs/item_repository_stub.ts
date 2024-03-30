@@ -1,9 +1,9 @@
-import { ItemNotFound } from "../../domain/catalog/item_not_found_error";
-import type { ItemRepository } from "../../domain/catalog/item_repository";
+import { ItemNotFound } from "../../domain/catalog/items/item_not_found_error";
+import type { ItemRepository } from "../../domain/catalog/items/item_repository";
 import { type Either, left, right } from "../../shared/either";
-import { ItemStock } from "../../domain/catalog/item_stock";
+import { ItemStock } from "../../domain/catalog/items/item_stock";
 import type { Pagination } from "../../shared/pagination";
-import { Item, Status } from "../../domain/catalog/item";
+import { Item, Status } from "../../domain/catalog/items/item";
 import { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
 

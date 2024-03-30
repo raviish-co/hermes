@@ -1,5 +1,5 @@
-import { Item, Status } from "../../domain/catalog/item";
-import { ItemStock } from "../../domain/catalog/item_stock";
+import { Item, Status } from "../../domain/catalog/items/item";
+import { ItemStock } from "../../domain/catalog/items/item_stock";
 import { GoodsIssueNoteLine } from "../../domain/goods_issue/goods_issue_note_line";
 import { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { InmemGoodsIssueNoteRepository } from "../../persistense/inmem/inmem_goods_issue_note_repository";

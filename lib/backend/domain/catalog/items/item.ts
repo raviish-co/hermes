@@ -1,6 +1,6 @@
-import { Decimal } from "../../shared/decimal";
+import { Decimal } from "../../../shared/decimal";
 import { ItemStock } from "./item_stock";
-import { ID } from "../../shared/id";
+import { ID } from "../../../shared/id";
 
 export type Condition = {
     status: Status;

@@ -1,5 +1,5 @@
 import { InmemCategoryRepository } from "../../persistense/inmem/inmem_category_repository";
-import { Category } from "../../domain/catalog/category";
+import { Category } from "../../domain/catalog/categories/category";
 import { ID } from "../../shared/id";
 
 export class CategoryRepositoryStub extends InmemCategoryRepository {
