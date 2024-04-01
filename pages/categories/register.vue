@@ -24,9 +24,12 @@ function isSelected(variationId: string) {
     return selectedVariations.value.some((v) => v.variationId === variationId);
 }
 
-async function register() {
+function register() {
     const variationsIds = selectedVariations.value.map((v) => v.variationId);
-    await service.registerCategory(name.value, variationsIds);
+    service
+        .registerCategory(name.value, variationsIds)
+        .then((res) => alert(res.message))
+        .catch((err) => alert(err.statusMessage));
 }
 
 onMounted(async () => {
@@ -72,7 +75,9 @@ onMounted(async () => {
                 </div>
             </div>
 
-            <button class="btn bg-secondary-500" @click="register()">Registrar</button>
+            <button class="btn bg-secondary-500" :disabled="name.length === 0" @click="register()">
+                Registrar
+            </button>
         </div>
     </div>
 </template>

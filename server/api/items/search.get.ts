@@ -1,4 +1,4 @@
-import { makeServices } from "@backend/main";
+import { makeServices } from "~/lib/backend/main";
 import { toItemDTO } from "./item_dto";
 
 const { catalogService } = makeServices();

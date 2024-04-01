@@ -1,9 +1,9 @@
-import { InsufficientStock } from "@backend/domain/catalog/items/insufficient_stock_error";
-import { ItemNotFound } from "@backend/domain/catalog/items/item_not_found_error";
+import { InsufficientStock } from "~/lib/backend/domain/catalog/items/insufficient_stock_error";
+import { ItemNotFound } from "~/lib/backend/domain/catalog/items/item_not_found_error";
 import { InvalidPurpose } from "~/lib/backend/domain/goods_issue/invalid_purpose_error";
-import { InvalidTotal } from "@backend/domain/goods_issue/invalid_total_error";
+import { InvalidTotal } from "~/lib/backend/domain/goods_issue/invalid_total_error";
 import { HttpStatus } from "~/server/api/http_status";
-import { makeServices } from "@backend/main";
+import { makeServices } from "~/lib/backend/main";
 
 const { goodsIssueService } = makeServices();
 
@@ -15,28 +15,35 @@ export default defineEventHandler(async (event) => {
     if (voidOrErr.value instanceof InvalidPurpose) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: voidOrErr.value.message,
+            statusMessage: "Finalidade inválida",
         });
     }
 
     if (voidOrErr.value instanceof ItemNotFound) {
         throw createError({
             statusCode: HttpStatus.NotFound,
-            statusMessage: voidOrErr.value.message,
+            statusMessage: "Artigo não encontrado",
         });
     }
 
     if (voidOrErr.value instanceof InvalidTotal) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: voidOrErr.value.message,
+            statusMessage: "Total da Guia é inválido",
         });
     }
 
     if (voidOrErr.value instanceof InsufficientStock) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: voidOrErr.value.message,
+            statusMessage: "Stock insuficiente",
+        });
+    }
+
+    if (voidOrErr.isLeft()) {
+        throw createError({
+            statusCode: HttpStatus.ServerError,
+            statusMessage: "Erro ao efetuar a saída de artigos",
         });
     }
 

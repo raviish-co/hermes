@@ -1,7 +1,7 @@
 import { GoodsIssueNoteLine } from "~/lib/backend/domain/goods_issue/goods_issue_note_line";
 import { GoodsIssueNote } from "~/lib/backend/domain/goods_issue/goods_issue_note";
 import { Purpose } from "~/lib/backend/domain/goods_issue/purpose";
-import { toVariationValuesDTO } from "../item_dto";
+import { toVariationValuesDTO } from "../items/item_dto";
 
 interface VariationValues {
     variationId: string;

@@ -1,6 +1,7 @@
+import { GoodsReturnNoteNotFound } from "~/lib/backend/domain/goods_return/goods_return_note_not_found_error";
+import { toGoodsReturnNoteDTO } from "./goods_return_dto";
 import { makeServices } from "~/lib/backend/main";
 import { HttpStatus } from "../http_status";
-import { toGoodsReturnNoteDTO } from "./goods_return_dto";
 
 const { goodsReturnService } = makeServices();
 
@@ -16,10 +17,17 @@ export default defineEventHandler(async (event) => {
 
     const noteOrErr = await goodsReturnService.get(noteId);
 
-    if (noteOrErr.isLeft()) {
+    if (noteOrErr.value instanceof GoodsReturnNoteNotFound) {
         throw createError({
             statusCode: HttpStatus.NotFound,
             statusMessage: "Guia de Devolução não encontrada",
+        });
+    }
+
+    if (noteOrErr.isLeft()) {
+        throw createError({
+            statusCode: HttpStatus.ServerError,
+            statusMessage: "Erro ao buscar a Guia de Devolução",
         });
     }
 

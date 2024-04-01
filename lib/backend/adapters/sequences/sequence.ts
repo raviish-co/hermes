@@ -3,4 +3,5 @@ export enum Sequence {
     GoodsReturnNote = "GD",
     GoodsReceiptNote = "GE",
     Item = "RVS",
+    Category = "RVSC",
 }

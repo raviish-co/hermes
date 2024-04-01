@@ -1,8 +1,8 @@
-import { InvalidFileHeader } from "@backend/adapters/readers/invalid_file_header_error";
-import { FileNotSupported } from "@backend/adapters/readers/file_not_supported_error";
-import { FileEmpty } from "@backend/adapters/readers/file_empty_error";
+import { InvalidFileHeader } from "~/lib/backend/adapters/readers/invalid_file_header_error";
+import { FileNotSupported } from "~/lib/backend/adapters/readers/file_not_supported_error";
+import { FileEmpty } from "~/lib/backend/adapters/readers/file_empty_error";
 import { HttpStatus } from "~/server/api/http_status";
-import { makeServices } from "@backend/main";
+import { makeServices } from "~/lib/backend/main";
 
 const { importService } = makeServices();
 
@@ -14,34 +14,34 @@ export default defineEventHandler(async (event) => {
     const voidOrErr = await importService.uploadItems(file);
 
     if (voidOrErr.value instanceof InvalidFileHeader) {
-        return createError({
+        throw createError({
             statusCode: HttpStatus.BadRequest,
-            message: voidOrErr.value.message,
+            statusMessage: "Cabeçalho do arquivo inválido.",
         });
     }
 
     if (voidOrErr.value instanceof FileEmpty) {
-        return createError({
+        throw createError({
             statusCode: HttpStatus.BadRequest,
-            message: voidOrErr.value.message,
+            statusMessage: "Arquivo vazio.",
         });
     }
 
     if (voidOrErr.value instanceof FileNotSupported) {
-        return createError({
+        throw createError({
             statusCode: HttpStatus.BadRequest,
-            message: voidOrErr.value.message,
+            statusMessage: "Tipo de arquivo não suportado.",
         });
     }
 
     if (voidOrErr.value instanceof Error) {
-        return createError({
-            statusCode: HttpStatus.BadRequest,
-            message: voidOrErr.value.message,
+        throw createError({
+            statusCode: HttpStatus.ServerError,
+            statusMessage: "Erro ao importar artigos.",
         });
     }
 
     setResponseStatus(event, HttpStatus.Created);
 
-    return { message: "Artigos importados com sucesso!" };
+    return { statusMessage: "Artigos importados com sucesso!" };
 });

@@ -47,6 +47,7 @@ export const makeServices = (): Services => {
         itemRepository,
         variationRepository,
         categoryRepository,
+        sectionRepository,
         sequenceGenerator
     );
 

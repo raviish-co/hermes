@@ -1,6 +1,7 @@
 import type { VariationModel } from "@frontend/models/variation";
 import type { CategoryModel } from "../models/category";
 import type { ItemModel } from "@frontend/models/item";
+import type { SectionModel } from "../models/section";
 
 export class CatalogService {
     async listItems(
@@ -28,12 +29,17 @@ export class CatalogService {
         return categories;
     }
 
+    async listSections(): Promise<SectionModel[]> {
+        const sections = await $fetch("/api/sections", { method: "get" });
+        return sections;
+    }
+
     async searchItems(
         query: string,
         pageToken: number = 1,
         perPage: number = 8
     ): Promise<{ items: ItemModel[]; total: number }> {
-        const response = await $fetch("/api/search-items", {
+        const response = await $fetch("/api/items/search", {
             method: "get",
             query: {
                 query,
@@ -45,21 +51,23 @@ export class CatalogService {
         return { items: response.items, total: response.total };
     }
 
-    async registerItem(data: RegisterItemDTO): Promise<void> {
-        await $fetch("/api/items", { method: "post", body: data });
+    async registerItem(data: RegisterItemDTO) {
+        return await $fetch("/api/items", { method: "post", body: data });
     }
 
     async registerCategory(name: string, variationsIds: string[]) {
-        console.log(name, variationsIds);
+        const data = { name, variationsIds };
+        return await $fetch("/api/categories", { method: "post", body: data });
     }
 }
 
 interface RegisterItemDTO {
     name: string;
     price: number;
-    comment?: string;
     categoryId?: string;
+    sectionId?: string;
     variations?: VariationDTO[];
+    comment?: string;
 }
 
 interface VariationDTO {

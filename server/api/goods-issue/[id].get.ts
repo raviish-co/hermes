@@ -1,3 +1,4 @@
+import { GoodsIssueNoteNotFound } from "~/lib/backend/domain/goods_issue/goods_issue_note_not_found_error";
 import { toGoodsIssueNoteDTO } from "./goods_issue_note_dto";
 import { makeServices } from "~/lib/backend/main";
 import { HttpStatus } from "../http_status";
@@ -16,10 +17,17 @@ export default defineEventHandler(async (event) => {
 
     const noteOrErr = await goodsIssueService.get(noteId);
 
-    if (noteOrErr.isLeft()) {
+    if (noteOrErr.value instanceof GoodsIssueNoteNotFound) {
         throw createError({
             statusMessage: "Guia de saída não encontrada.",
             statusCode: HttpStatus.NotFound,
+        });
+    }
+
+    if (noteOrErr.isLeft()) {
+        throw createError({
+            statusMessage: "Erro ao buscar guia de saída.",
+            statusCode: HttpStatus.ServerError,
         });
     }
 

@@ -1,5 +1,5 @@
-import { Variation } from "@backend/domain/catalog/variation";
-import { makeServices } from "@backend/main";
+import { Variation } from "~/lib/backend/domain/catalog/variations/variation";
+import { makeServices } from "~/lib/backend/main";
 
 const { catalogService } = makeServices();
 
@@ -18,5 +18,6 @@ function toVariationDTO(v: Variation): VariationDTO {
 }
 
 export default defineEventHandler(async () => {
-    return (await catalogService.listVariations()).map(toVariationDTO);
+    const variations = await catalogService.listVariations();
+    return variations.map(toVariationDTO);
 });

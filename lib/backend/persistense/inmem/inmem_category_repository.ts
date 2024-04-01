@@ -25,6 +25,10 @@ export class InmemCategoryRepository implements CategoryRepository {
         return Promise.resolve(right(category));
     }
 
+    exists(name: string): Promise<boolean> {
+        return Promise.resolve(this.records.some((c) => c.name === name));
+    }
+
     save(category: Category): Promise<void> {
         this.#categories[category.categoryId.toString()] = category;
         return Promise.resolve(undefined);

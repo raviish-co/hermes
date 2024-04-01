@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { ConditionModel } from "~/lib/frontend/models/condition";
 import { CatalogService } from "~/lib/frontend/services/catalog_service";
+import type { ConditionModel } from "~/lib/frontend/models/condition";
+import type { SectionModel } from "~/lib/frontend/models/section";
 
 type Variation = {
     variationId: string;
@@ -14,26 +15,54 @@ const BAD = "Mau";
 
 const name = ref<string>("");
 const price = ref<number>();
-const categoryId = ref<string>();
+const categoryId = ref<string>("");
+const sectionId = ref<string>("");
 const condition = ref<ConditionModel>({ status: "Bom" });
 
-const showVariations = ref<boolean>(false);
 const selectedVariations = ref<Variation[]>([]);
+const selectedSections = ref<SectionModel[]>([]);
+const showVariations = ref<boolean>(false);
 const isGood = ref<boolean>(true);
 
 const service = new CatalogService();
-
 const variations = await service.listVariations();
 const categories = await service.listCategories();
+const sections = await service.listSections();
+
+const isValid = computed(() => {
+    if (!categoryId.value) return !!name.value && !!price.value;
+
+    if (isGood.value) return isNotEmpy() && hasVariations();
+
+    return isNotEmpy() && !!condition.value.comment && hasVariations();
+});
+
+function isNotEmpy() {
+    return !!name.value && !!price.value && !!categoryId.value && !!sectionId.value;
+}
+
+function hasVariations() {
+    return (
+        selectedVariations.value.length > 0 &&
+        selectedVariations.value.every((variation) => !!variation.value)
+    );
+}
 
 function chooseCategory(event: Event) {
     const value = (event.target as HTMLSelectElement).value;
+    const category = categories.find((category) => category.name === value)!;
+    categoryId.value = category.categoryId;
+
+    selectedSections.value = sections.filter(
+        (section) => section.categoryId === category.categoryId
+    );
+
+    if (category.variationsIds.length === 0) {
+        showVariations.value = false;
+        return;
+    }
 
     showVariations.value = true;
-
-    const category = categories.find((category) => category.name === value)!;
-
-    categoryId.value = category.categoryId;
 
     const variationsIds = category.variationsIds;
 
@@ -42,35 +71,22 @@ function chooseCategory(event: Event) {
     name.value = category.name;
 }
 
-function chooseVariation(event: Event, variation: any) {
+function chooseSection(event: Event) {
+    const value = (event.target as HTMLSelectElement).value;
+    sectionId.value = value;
+}
+
+function chooseVariation(event: Event, variation: Variation) {
     const value = (event.target as HTMLSelectElement).value;
     variation.value = value;
 }
 
-function register() {
-    if (!name.value || !price.value) {
-        alert("Preencha todos os campos.");
-        return;
-    }
-
-    const variationValues = selectedVariations.value.map((v) => ({
-        variationId: v.variationId,
-        name: v.name,
-        value: v.value!,
+function makeVariations() {
+    return selectedVariations.value.map((variation) => ({
+        variationId: variation.variationId,
+        name: variation.name,
+        value: variation.value!,
     }));
-
-    const data = {
-        name: name.value,
-        price: price.value,
-        comment: condition.value.comment,
-        categoryId: categoryId.value,
-        variations: variationValues,
-    };
-
-    service
-        .registerItem(data)
-        .then(() => alert("Artigo registrado com sucesso."))
-        .catch((err) => alert(err.statusMessage));
 }
 
 function changeStatus(event: Event) {
@@ -78,11 +94,30 @@ function changeStatus(event: Event) {
 
     if (value === GOOD) {
         isGood.value = true;
+        condition.value = { status: GOOD, comment: "" };
         return;
     }
 
     isGood.value = false;
     condition.value.status = BAD;
+}
+
+function register() {
+    const variationValues = makeVariations();
+
+    const data = {
+        name: name.value,
+        price: price.value!,
+        categoryId: categoryId.value,
+        sectionId: sectionId.value,
+        variations: variationValues,
+        comment: condition.value.comment,
+    };
+
+    service
+        .registerItem(data)
+        .then((res) => alert(res.message))
+        .catch((err) => alert(err.statusMessage));
 }
 </script>
 <template>
@@ -93,6 +128,17 @@ function changeStatus(event: Event) {
                 <option value selected disabled>Categoria</option>
                 <option v-for="category in categories" :key="category.categoryId">
                     {{ category.name }}
+                </option>
+            </select>
+
+            <select
+                class="input-field"
+                :class="{ 'input-disabled': !categoryId }"
+                @change="chooseSection"
+            >
+                <option value selected disabled>Secção</option>
+                <option v-for="section in selectedSections" :key="section.sectionId">
+                    {{ section.name }}
                 </option>
             </select>
 
@@ -124,7 +170,9 @@ function changeStatus(event: Event) {
                 />
             </div>
 
-            <button class="btn bg-secondary-500" @click="register()">Registrar</button>
+            <button class="btn bg-secondary-500" :disabled="!isValid" @click="register()">
+                Registrar
+            </button>
         </div>
     </div>
 </template>

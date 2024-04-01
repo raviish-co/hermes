@@ -38,8 +38,10 @@ export class ItemBuilder {
         return this;
     }
 
-    withSectionId(sectionId: ID): ItemBuilder {
-        this.#sectionId = sectionId;
+    withSectionId(sectionId?: string): ItemBuilder {
+        if (!sectionId) return this;
+
+        this.#sectionId = ID.fromString(sectionId);
         return this;
     }
 

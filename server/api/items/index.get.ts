@@ -5,7 +5,6 @@ const { catalogService } = makeServices();
 
 export default defineEventHandler(async (event) => {
     const query = getQuery(event);
-
     const pageToken = Number(query.pageToken);
     const perPage = Number(query.perPage);
 

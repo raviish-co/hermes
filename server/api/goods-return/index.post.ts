@@ -16,23 +16,30 @@ export default defineEventHandler(async (event) => {
     );
 
     if (voidOrErr.value instanceof GoodsIssueNoteNotFound) {
-        return createError({
-            message: voidOrErr.value.message,
-            statusCode: HttpStatus.BadRequest,
+        throw createError({
+            statusMessage: voidOrErr.value.message,
+            statusCode: HttpStatus.NotFound,
         });
     }
 
     if (voidOrErr.value instanceof InvalidGoodsIssueLineQuantity) {
-        return createError({
-            message: voidOrErr.value.message,
+        throw createError({
+            statusMessage: voidOrErr.value.message,
             statusCode: HttpStatus.BadRequest,
         });
     }
 
     if (voidOrErr.value instanceof GoodsIssueNoteHasBeenReturned) {
-        return createError({
-            message: voidOrErr.value.message,
+        throw createError({
+            statusMessage: voidOrErr.value.message,
             statusCode: HttpStatus.BadRequest,
+        });
+    }
+
+    if (voidOrErr.isLeft()) {
+        throw createError({
+            statusMessage: "Erro ao registrar a devolução.",
+            statusCode: HttpStatus.ServerError,
         });
     }
 

@@ -1,9 +1,8 @@
-import { MissingDependency } from "~/lib/backend/domain/goods_receipt/missing_dependency_error";
 import { InvalidEntryDate } from "~/lib/backend/domain/goods_receipt/invalid_entry_date_error";
 import { InvalidLines } from "~/lib/backend/domain/goods_receipt/invalid_lines_error";
 import { ItemNotFound } from "~/lib/backend/domain/catalog/items/item_not_found_error";
 import { makeServices } from "~/lib/backend/main";
-import { HttpStatus } from "./http_status";
+import { HttpStatus } from "../http_status";
 
 const { goodsReceiptService } = makeServices();
 
@@ -15,32 +14,31 @@ export default defineEventHandler(async (event) => {
     if (voidOrErr.value instanceof InvalidEntryDate) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            message: "A data de entrada de mercadoria é inválida",
+            statusMessage: "A data de entrada de mercadoria é inválida",
         });
     }
 
     if (voidOrErr.value instanceof InvalidLines) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            message: "Linhas inválidas",
+            statusMessage: "Linhas inválidas",
         });
     }
 
     if (voidOrErr.value instanceof ItemNotFound) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            message: "Artigo não encontrado",
+            statusMessage: "Artigo não encontrado",
         });
     }
 
-    if (voidOrErr.value instanceof MissingDependency) {
+    if (voidOrErr.isLeft()) {
         throw createError({
-            statusCode: HttpStatus.BadRequest,
-            message: "Erro ao efeturar saída de mercadoria",
+            statusCode: HttpStatus.ServerError,
+            statusMessage: "Erro ao efeturar saída de mercadoria",
         });
     }
 
     setResponseStatus(event, HttpStatus.Created);
-
     return { message: "Entrada de mercadoria efetuada com sucesso" };
 });
