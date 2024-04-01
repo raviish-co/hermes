@@ -48,6 +48,10 @@ export class CatalogService {
     async registerItem(data: RegisterItemDTO): Promise<void> {
         await $fetch("/api/items", { method: "post", body: data });
     }
+
+    async registerCategory(name: string, variationsIds: string[]) {
+        console.log(name, variationsIds);
+    }
 }
 
 interface RegisterItemDTO {
