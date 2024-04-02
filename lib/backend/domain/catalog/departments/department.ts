@@ -8,4 +8,8 @@ export class Department {
         this.id = id;
         this.#name = name;
     }
+
+    get name() {
+        return this.#name;
+    }
 }

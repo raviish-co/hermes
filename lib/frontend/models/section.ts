@@ -1,5 +1,5 @@
 export interface SectionModel {
     sectionId: string;
-    categoryId: string;
+    departmentId: string;
     name: string;
 }

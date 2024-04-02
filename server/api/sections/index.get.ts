@@ -1,18 +1,18 @@
-import { Section } from "~/lib/backend/domain/catalog/sections/section";
+import { Section } from "~/lib/backend/domain/catalog/departments/section";
 import { makeServices } from "~/lib/backend/main";
 
 const { catalogService } = makeServices();
 
 interface SectionDTO {
     sectionId: string;
-    categoryId: string;
+    departmentId: string;
     name: string;
 }
 
 function toSectionDTO(section: Section): SectionDTO {
     return {
         sectionId: section.sectionId.toString(),
-        categoryId: section.categoryId.toString(),
+        departmentId: section.departmentId.toString(),
         name: section.name,
     };
 }

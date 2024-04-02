@@ -11,7 +11,7 @@ export class CategoryRepositoryStub extends InmemCategoryRepository {
 const _categoriesData = [
     {
         id: ID.fromString("1"),
-        name: "Diversos",
+        name: "Camisas",
         variationsIds: [ID.fromString("1"), ID.fromString("2")],
     },
     {
@@ -21,33 +21,21 @@ const _categoriesData = [
     },
     {
         id: ID.fromString("3"),
-        name: "Efeitos especiais",
+        name: "Ternos",
+        variationsIds: [ID.fromString("1"), ID.fromString("2")],
     },
     {
         id: ID.fromString("4"),
-        name: "Olhos",
+        name: "Calças",
+        variationsIds: [ID.fromString("1"), ID.fromString("2")],
     },
     {
-        id: ID.fromString("7"),
-        name: "Pele",
+        id: ID.fromString("5"),
+        name: "Vestidos",
+        variationsIds: [ID.fromString("1"), ID.fromString("2")],
     },
     {
-        id: ID.fromString("8"),
-        name: "Corretivos",
-    },
-    {
-        id: ID.fromString("9"),
-        name: "Boca",
-        variationsIds: [ID.fromString("1"), ID.fromString("3")],
-    },
-    {
-        id: ID.fromString("10"),
-        name: "Roupas",
-        variationsIds: [
-            ID.fromString("1"),
-            ID.fromString("2"),
-            ID.fromString("4"),
-            ID.fromString("5"),
-        ],
+        id: ID.fromString("6"),
+        name: "Saias",
     },
 ];

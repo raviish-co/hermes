@@ -1,7 +1,7 @@
+import { VariationNotFound } from "~/lib/backend/domain/catalog/variations/variation_not_found_error";
+import { SectionNotFound } from "~/lib/backend/domain/catalog/departments/section_not_found_error";
 import { makeServices } from "~/lib/backend/main";
 import { HttpStatus } from "../http_status";
-import { SectionNotFound } from "~/lib/backend/domain/catalog/sections/section_not_found_error";
-import { VariationNotFound } from "~/lib/backend/domain/catalog/variations/variation_not_found_error";
 
 const { catalogService } = makeServices();
 

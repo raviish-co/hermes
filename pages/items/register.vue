@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { CatalogService } from "~/lib/frontend/services/catalog_service";
 import type { ConditionModel } from "~/lib/frontend/models/condition";
-import type { SectionModel } from "~/lib/frontend/models/section";
 
 type Variation = {
     variationId: string;
@@ -20,7 +19,6 @@ const sectionId = ref<string>("");
 const condition = ref<ConditionModel>({ status: "Bom" });
 
 const selectedVariations = ref<Variation[]>([]);
-const selectedSections = ref<SectionModel[]>([]);
 const showVariations = ref<boolean>(false);
 const isGood = ref<boolean>(true);
 
@@ -32,32 +30,31 @@ const sections = await service.listSections();
 const isValid = computed(() => {
     if (!categoryId.value) return !!name.value && !!price.value;
 
-    if (isGood.value) return isNotEmpy() && hasVariations();
+    if (isGood.value) return isNotEmpy() && verifyVariations();
 
-    return isNotEmpy() && !!condition.value.comment && hasVariations();
+    return isNotEmpy() && !!condition.value.comment && verifyVariations();
 });
 
 function isNotEmpy() {
-    return !!name.value && !!price.value && !!categoryId.value && !!sectionId.value;
+    return !!name.value && !!price.value && !!categoryId.value;
 }
 
-function hasVariations() {
-    return (
-        selectedVariations.value.length > 0 &&
-        selectedVariations.value.every((variation) => !!variation.value)
-    );
+function verifyVariations() {
+    if (selectedVariations.value.length === 0) return true;
+
+    return selectedVariations.value.every((variation) => !!variation.value);
 }
 
 function chooseCategory(event: Event) {
     const value = (event.target as HTMLSelectElement).value;
     const category = categories.find((category) => category.name === value)!;
+
     categoryId.value = category.categoryId;
 
-    selectedSections.value = sections.filter(
-        (section) => section.categoryId === category.categoryId
-    );
+    name.value = category.name;
 
     if (category.variationsIds.length === 0) {
+        selectedVariations.value = [];
         showVariations.value = false;
         return;
     }
@@ -67,8 +64,6 @@ function chooseCategory(event: Event) {
     const variationsIds = category.variationsIds;
 
     selectedVariations.value = variations.filter((v) => variationsIds.includes(v.variationId));
-
-    name.value = category.name;
 }
 
 function chooseSection(event: Event) {
@@ -131,14 +126,10 @@ function register() {
                 </option>
             </select>
 
-            <select
-                class="input-field"
-                :class="{ 'input-disabled': !categoryId }"
-                @change="chooseSection"
-            >
+            <select class="input-field" @change="chooseSection">
                 <option value selected disabled>Secção</option>
                 <option
-                    v-for="section in selectedSections"
+                    v-for="section in sections"
                     :key="section.sectionId"
                     :value="section.sectionId"
                 >

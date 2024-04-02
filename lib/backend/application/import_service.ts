@@ -3,7 +3,7 @@ import type { VariationRepository } from "../domain/catalog/variations/variation
 import type { CategoryRepository } from "../domain/catalog/categories/category_repository";
 import { InvalidFileHeader } from "../adapters/readers/invalid_file_header_error";
 import { FileNotSupported } from "../adapters/readers/file_not_supported_error";
-import type { SectionRepository } from "../domain/catalog/sections/section_repository";
+import type { SectionRepository } from "../domain/catalog/departments/section_repository";
 import { CsvReader, VALID_CSV_HEADER } from "../adapters/readers/csv_reader";
 import type { ItemRepository } from "../domain/catalog/items/item_repository";
 import { FileEmpty } from "../adapters/readers/file_empty_error";
@@ -98,7 +98,7 @@ export class ImportService {
             .withCategoryId(categoryId)
             .withCondition(comment)
             .withStock(Number(quantity))
-            .withSectionId(sectionOrErr.value.sectionId)
+            .withSectionId(sectionOrErr.value.sectionId.toString())
             .withVariationsValues(variations)
             .build();
 

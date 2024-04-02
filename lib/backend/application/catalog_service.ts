@@ -2,13 +2,13 @@ import { CategoryAlreadyExists } from "../domain/catalog/categories/category_alr
 import type { VariationNotFound } from "../domain/catalog/variations/variation_not_found_error";
 import type { VariationRepository } from "../domain/catalog/variations/variation_repository";
 import type { CategoryRepository } from "../domain/catalog/categories/category_repository";
-import type { SectionNotFound } from "../domain/catalog/sections/section_not_found_error";
-import type { SectionRepository } from "../domain/catalog/sections/section_repository";
+import type { SectionNotFound } from "../domain/catalog/departments/section_not_found_error";
+import type { SectionRepository } from "../domain/catalog/departments/section_repository";
 import type { RegisterCategoryError, RegisterItemError } from "../shared/errors";
 import type { ItemRepository } from "../domain/catalog/items/item_repository";
 import { Variation } from "../domain/catalog/variations/variation";
 import { ItemBuilder } from "../domain/catalog/items/item_builder";
-import type { Section } from "../domain/catalog/sections/section";
+import type { Section } from "../domain/catalog/departments/section";
 import type { Generator } from "../adapters/sequences/generator";
 import { Category } from "../domain/catalog/categories/category";
 import { left, right, type Either } from "../shared/either";
