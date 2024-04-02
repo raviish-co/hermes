@@ -1,6 +1,6 @@
-import type { Section } from "../../domain/catalog/sections/section";
-import { SectionNotFound } from "../../domain/catalog/sections/section_not_found_error";
-import type { SectionRepository } from "../../domain/catalog/sections/section_repository";
+import type { Section } from "../../domain/catalog/departments/section";
+import { SectionNotFound } from "../../domain/catalog/departments/section_not_found_error";
+import type { SectionRepository } from "../../domain/catalog/departments/section_repository";
 import { type Either, left, right } from "../../shared/either";
 import type { ID } from "../../shared/id";
 

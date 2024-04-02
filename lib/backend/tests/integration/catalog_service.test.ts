@@ -12,13 +12,13 @@ import { InmemCategoryRepository } from "../../persistense/inmem/inmem_category_
 import { CategoryAlreadyExists } from "../../domain/catalog/categories/category_already_exists_error";
 import { VariationNotFound } from "../../domain/catalog/variations/variation_not_found_error";
 import { VariationRepositoryStub } from "../stubs/variation_repository_stub";
-import { SectionNotFound } from "../../domain/catalog/sections/section_not_found_error";
+import { SectionNotFound } from "../../domain/catalog/departments/section_not_found_error";
 import { InmemSectionRepository } from "../../persistense/inmem/inmem_section_repository";
 import { SectionRepositoryStub } from "../stubs/section_repository_stub";
 import type { ItemRepository } from "../../domain/catalog/items/item_repository";
 import type { VariationRepository } from "../../domain/catalog/variations/variation_repository";
 import type { CategoryRepository } from "../../domain/catalog/categories/category_repository";
-import type { SectionRepository } from "../../domain/catalog/sections/section_repository";
+import type { SectionRepository } from "../../domain/catalog/departments/section_repository";
 
 describe("CatalogService - Recuperar artigos", () => {
     it("Deve buscar os artigos no repositório", async () => {
