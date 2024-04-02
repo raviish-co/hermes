@@ -137,7 +137,11 @@ function register() {
                 @change="chooseSection"
             >
                 <option value selected disabled>Secção</option>
-                <option v-for="section in selectedSections" :key="section.sectionId">
+                <option
+                    v-for="section in selectedSections"
+                    :key="section.sectionId"
+                    :value="section.sectionId"
+                >
                     {{ section.name }}
                 </option>
             </select>
