@@ -13,14 +13,14 @@ export default defineEventHandler(async (event) => {
     if (voidOrErr.value instanceof SectionNotFound) {
         throw createError({
             statusCode: HttpStatus.NotFound,
-            statusMessage: "Seção não encontrada.",
+            statusMessage: "Seccao nao encontrada.",
         });
     }
 
     if (voidOrErr.value instanceof VariationNotFound) {
         throw createError({
             statusCode: HttpStatus.NotFound,
-            statusMessage: "Variação não encontrada.",
+            statusMessage: "Variacao nao encontrada.",
         });
     }
 

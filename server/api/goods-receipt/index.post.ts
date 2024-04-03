@@ -14,28 +14,28 @@ export default defineEventHandler(async (event) => {
     if (voidOrErr.value instanceof InvalidEntryDate) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "A data de entrada de mercadoria é inválida",
+            statusMessage: "A data de entrada de mercadoria invalida",
         });
     }
 
     if (voidOrErr.value instanceof InvalidLines) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Linhas inválidas",
+            statusMessage: "Linhas invalidas",
         });
     }
 
     if (voidOrErr.value instanceof ItemNotFound) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Artigo não encontrado",
+            statusMessage: "Artigo nao encontrado",
         });
     }
 
     if (voidOrErr.isLeft()) {
         throw createError({
             statusCode: HttpStatus.ServerError,
-            statusMessage: "Erro ao efeturar saída de mercadoria",
+            statusMessage: "Erro ao efeturar saida de mercadoria",
         });
     }
 

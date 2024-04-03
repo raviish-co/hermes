@@ -2,7 +2,6 @@
 import { getCurrentLocalDateTime } from "~/lib/frontend/helpers/current_local_date_time";
 import { GoodsReceiptService } from "~/lib/frontend/services/goods_receipt_service";
 import { GoodsReceiptNote } from "~/lib/frontend/domain/goods_receipt_note";
-import { handleException } from "~/lib/frontend/helpers/error_handler";
 
 const entryDate = getCurrentLocalDateTime();
 const note = reactive(new GoodsReceiptNote(entryDate));
@@ -11,11 +10,11 @@ const service = new GoodsReceiptService();
 function newGoodsReceipt() {
     service
         .new(note as GoodsReceiptNote)
-        .then(({ message }) => {
-            alert(message);
+        .then((res) => {
+            alert(res.message);
             note.clearLines();
         })
-        .catch(handleException);
+        .catch((err) => alert(err.statusMessage));
 }
 </script>
 

@@ -1,17 +1,29 @@
 <script setup lang="ts">
 import type VDialog from "./VDialog.vue";
-import { formatVariationValues } from "@frontend/helpers/format_variation_values";
 import { initializeQuantities } from "@frontend/helpers/initialize_quantities";
+import type { GoodsIssueNoteLine } from "~/lib/frontend/domain/goods_issue_note_line";
+import type { GoodsReturnNote } from "~/lib/frontend/domain/goods_return_note";
+
+interface Props {
+    note: GoodsReturnNote;
+    lines: GoodsIssueNoteLine[];
+}
+
+interface Emits {
+    (e: "chooseLine", line: GoodsIssueNoteLine, quantity: number): void;
+}
 
 const dialogRef = ref<typeof VDialog>();
 const quantities = ref<number[]>([]);
-const props = defineProps(["note", "lines"]);
+
+const props = defineProps<Props>();
 
 function show() {
     quantities.value = initializeQuantities(props.lines.length);
     dialogRef.value?.show();
 }
 
+defineEmits<Emits>();
 defineExpose({ show });
 </script>
 
@@ -35,11 +47,14 @@ defineExpose({ show });
                         :class="{ hidden: note.isSameLine(line.itemId) }"
                     >
                         <td>{{ line.itemId }}</td>
-                        <td class="cursor-pointer" @click="note.addLine(line, quantities[idx])">
+                        <td
+                            class="cursor-pointer"
+                            @click="$emit('chooseLine', line, quantities[idx])"
+                        >
                             <span>{{ line.name }}</span>
                             <br />
                             <span class="text-light-600 text-xs sm:text-sm">
-                                {{ formatVariationValues(line.variationValues) }}
+                                {{ line.formattedVariationsValues }}
                             </span>
                         </td>
                         <td>
@@ -48,8 +63,8 @@ defineExpose({ show });
                                 :limit="line.maxToReturn"
                                 :model-value="quantities[idx]"
                                 @update-quantity="quantities[idx] = $event"
-                                @enter="note.addLine(line, quantities[idx])"
-                                @tab="note.addLine(line, quantities[idx])"
+                                @enter="$emit('chooseLine', line, quantities[idx])"
+                                @tab="$emit('chooseLine', line, quantities[idx])"
                             />
                         </td>
                     </tr>

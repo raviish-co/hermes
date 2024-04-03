@@ -3,7 +3,6 @@ import { GoodsIssueService } from "~/lib/frontend/services/goods_issue_service";
 import { GoodsReturnService } from "~/lib/frontend/services/goods_return_service";
 import { GoodsReturnNote } from "~/lib/frontend/domain/goods_return_note";
 import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
-import { handleException } from "~/lib/frontend/helpers/error_handler";
 import { formatDate } from "~/lib/frontend/helpers/format_date";
 
 const securityDepositWithHeld = ref<number>(0);
@@ -24,10 +23,7 @@ goodsIssueService
         goodsIssueNote.value = GoodsIssueNote.build(result);
         goodsReturnNote.value = new GoodsReturnNote(goodsIssueNote.value.lines);
     })
-    .catch((err) => {
-        handleException(err);
-        navigateTo("/");
-    });
+    .catch((err) => alert(err.statusMessage));
 
 function toggleEdit() {
     editSecurityDeposit.value = !editSecurityDeposit.value;
@@ -44,11 +40,8 @@ function newGoodsReturn() {
             securityDepositWithHeld.value,
             goodsReturnNote.value.returnLines
         )
-        .then(() => {
-            alert("Devolução efetuada com sucesso!");
-            navigateTo("/");
-        })
-        .catch(handleException);
+        .then((res) => alert(res.message))
+        .catch((err) => alert(err.statusMessage));
 }
 </script>
 
@@ -84,8 +77,8 @@ function newGoodsReturn() {
         </section>
 
         <ReturnNote
-            :return-note="(goodsReturnNote as GoodsReturnNote)"
-            :issue-note="(goodsIssueNote as GoodsIssueNote)"
+            :goods-return-note="(goodsReturnNote as GoodsReturnNote)"
+            :goods-issue-note="(goodsIssueNote as GoodsIssueNote)"
             :is-returned="isReturned()"
             @invalid-line="invalidLine = $event"
         />

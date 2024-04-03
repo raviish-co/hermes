@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
     if (voidOrErr.value instanceof InvalidFileHeader) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Cabeçalho do arquivo inválido.",
+            statusMessage: "Cabecalho do arquivo invalido.",
         });
     }
 
@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
     if (voidOrErr.value instanceof FileNotSupported) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Tipo de arquivo não suportado.",
+            statusMessage: "Tipo de arquivo nao suportado.",
         });
     }
 
@@ -43,5 +43,5 @@ export default defineEventHandler(async (event) => {
 
     setResponseStatus(event, HttpStatus.Created);
 
-    return { statusMessage: "Artigos importados com sucesso!" };
+    return { message: "Artigos importados com sucesso!" };
 });

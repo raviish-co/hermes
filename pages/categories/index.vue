@@ -7,8 +7,7 @@ const categories = ref<CategoryModel[]>([]);
 const service = new CatalogService();
 
 onMounted(async () => {
-    const res = await service.listCategories();
-    categories.value = res;
+    categories.value = await service.listCategories();
 });
 </script>
 

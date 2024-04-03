@@ -15,21 +15,21 @@ export default defineEventHandler(async (event) => {
     if (voidOrErr.value instanceof InvalidPurpose) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Finalidade inválida",
+            statusMessage: "Finalidade invalida",
         });
     }
 
     if (voidOrErr.value instanceof ItemNotFound) {
         throw createError({
             statusCode: HttpStatus.NotFound,
-            statusMessage: "Artigo não encontrado",
+            statusMessage: "Artigo nao encontrado",
         });
     }
 
     if (voidOrErr.value instanceof InvalidTotal) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Total da Guia é inválido",
+            statusMessage: "Total da guia de saida invalido",
         });
     }
 
@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
     if (voidOrErr.isLeft()) {
         throw createError({
             statusCode: HttpStatus.ServerError,
-            statusMessage: "Erro ao efetuar a saída de artigos",
+            statusMessage: "Erro ao efetuar a saida de artigos",
         });
     }
 

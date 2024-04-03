@@ -2,6 +2,7 @@ import type { VariationModel } from "@frontend/models/variation";
 import type { CategoryModel } from "../models/category";
 import type { ItemModel } from "@frontend/models/item";
 import type { SectionModel } from "../models/section";
+import type { Either } from "~/lib/backend/shared/either";
 
 export class CatalogService {
     async listItems(

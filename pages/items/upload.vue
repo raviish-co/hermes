@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { handleException } from "~/lib/frontend/helpers/error_handler";
 import { UploadService } from "~/lib/frontend/services/upload_service";
 
 const formData = ref<FormData | null>(null);
@@ -7,15 +6,6 @@ const fileName = ref<string>("Selecione o ficheiro CSV");
 const isValidFile = computed(() => formData.value !== null);
 
 const service = new UploadService();
-
-function uploadFile() {
-    if (!formData.value) return;
-
-    service
-        .upload(formData.value)
-        .then((res) => alert(res.message))
-        .catch(handleException);
-}
 
 function updateFile(e: Event) {
     const target = e.target as HTMLInputElement;
@@ -30,6 +20,15 @@ function updateFile(e: Event) {
     formData.value = new FormData();
     formData.value.append("file", file);
     fileName.value = file.name;
+}
+
+function uploadFile() {
+    if (!formData.value) return;
+
+    service
+        .upload(formData.value)
+        .then((res) => alert(res.message))
+        .catch((err) => alert(err.statusMessage));
 }
 </script>
 

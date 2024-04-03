@@ -62,12 +62,12 @@ function toggleMenu() {
                     <span>Guias de saída</span>
                 </NuxtLink>
 
-                <NuxtLink to="/goods-receipt" class="nuxt-link">
+                <NuxtLink to="/goods-receipts/register" class="nuxt-link">
                     <span class="material-symbols-outlined text-xl"> add_shopping_cart </span>
                     <span>Guia de entrada</span>
                 </NuxtLink>
 
-                <NuxtLink to="/upload-item" class="nuxt-link">
+                <NuxtLink to="/items/upload" class="nuxt-link">
                     <span class="material-symbols-outlined text-xl"> upload </span>
                     <span>Importar</span>
                 </NuxtLink>

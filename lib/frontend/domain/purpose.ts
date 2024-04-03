@@ -1,3 +1,5 @@
+import type { PurposeModel } from "../models/purpose";
+
 const LAUNDRAY = "Lavandaria";
 const RECORD = "Gravação";
 
@@ -10,6 +12,14 @@ export class Purpose {
         this.description = description;
         this.details = "";
         this.notes = "";
+    }
+
+    static build(data: PurposeModel): Purpose {
+        const purpose = new Purpose(data.description);
+        purpose.details = data.details;
+        purpose.notes = data.notes;
+
+        return purpose;
     }
 
     isValid() {

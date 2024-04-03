@@ -23,12 +23,7 @@ export class GoodsIssueNote extends Note {
         const note = new GoodsIssueNote(data.returnDate);
 
         note.goodsIssueNoteId = data.goodsIssueNoteId;
-        note.purpose = new Purpose(
-            data.purpose.description,
-            data.purpose.notes,
-            data.purpose.details
-        );
-
+        note.purpose = Purpose.build(data.purpose);
         note.grossTotal = data.total;
         note.securityDeposit = data.securityDeposit;
         note.status = data.status;

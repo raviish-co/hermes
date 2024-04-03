@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
     if (!noteId) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "ID da Guia de Devolução não informado.",
+            statusMessage: "ID da Guia de devolucao nao informado.",
         });
     }
 
@@ -20,14 +20,14 @@ export default defineEventHandler(async (event) => {
     if (noteOrErr.value instanceof GoodsReturnNoteNotFound) {
         throw createError({
             statusCode: HttpStatus.NotFound,
-            statusMessage: "Guia de Devolução não encontrada",
+            statusMessage: "Guia de devolucao nao encontrada",
         });
     }
 
     if (noteOrErr.isLeft()) {
         throw createError({
             statusCode: HttpStatus.ServerError,
-            statusMessage: "Erro ao buscar a Guia de Devolução",
+            statusMessage: "Erro ao buscar a Guia de Devolucao",
         });
     }
 

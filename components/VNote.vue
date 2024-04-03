@@ -4,13 +4,20 @@ interface Emits {
     (e: "clearLines"): void;
 }
 
+interface Props {
+    showButtons?: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+    showButtons: true,
+});
+
 defineEmits<Emits>();
-defineProps(["isReturned"]);
 </script>
 <template>
     <div class="pb-24 sm:pb-5 md:pb-[4.5rem]">
         <div class="table-container p-3 border border-light-500 overflow-hidden">
-            <div v-if="!isReturned" class="flex items-center w-full">
+            <div v-if="showButtons" class="flex items-center w-full">
                 <span
                     class="material-symbols-outlined hover:text-secondary-600 cursor-pointer"
                     @click="$emit('add')"

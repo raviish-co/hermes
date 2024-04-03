@@ -11,6 +11,16 @@ export class GoodsReturnNote extends Note {
         lines.forEach((line) => this.lines.push(line));
     }
 
+    addLine(line: GoodsIssueNoteLine, quantity: number) {
+        if (!quantity) return;
+
+        if (line.isFullyReturned()) return;
+
+        line.changeQuantity(quantity);
+
+        this.lines.push(line);
+    }
+
     get returnLines() {
         return this.lines.filter((line) => !line.isFullyReturned());
     }

@@ -17,31 +17,33 @@ export default defineEventHandler(async (event) => {
 
     if (voidOrErr.value instanceof GoodsIssueNoteNotFound) {
         throw createError({
-            statusMessage: voidOrErr.value.message,
+            statusMessage: "Guia de saida nao encontrada.",
             statusCode: HttpStatus.NotFound,
         });
     }
 
     if (voidOrErr.value instanceof InvalidGoodsIssueLineQuantity) {
         throw createError({
-            statusMessage: voidOrErr.value.message,
+            statusMessage: "Quantidade invalida.",
             statusCode: HttpStatus.BadRequest,
         });
     }
 
     if (voidOrErr.value instanceof GoodsIssueNoteHasBeenReturned) {
         throw createError({
-            statusMessage: voidOrErr.value.message,
+            statusMessage: "Guia de saida ja foi devolvida.",
             statusCode: HttpStatus.BadRequest,
         });
     }
 
     if (voidOrErr.isLeft()) {
         throw createError({
-            statusMessage: "Erro ao registrar a devolução.",
+            statusMessage: "Erro ao registrar a devolucao.",
             statusCode: HttpStatus.ServerError,
         });
     }
 
     setResponseStatus(event, HttpStatus.Created);
+
+    return { message: "Devolucao efetuada com sucesso." };
 });

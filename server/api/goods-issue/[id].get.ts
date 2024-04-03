@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
 
     if (!noteId) {
         throw createError({
-            statusMessage: "ID da Guia de Saída não informado.",
+            statusMessage: "ID da Guia de Saida nao informado.",
             statusCode: HttpStatus.BadRequest,
         });
     }
@@ -19,14 +19,14 @@ export default defineEventHandler(async (event) => {
 
     if (noteOrErr.value instanceof GoodsIssueNoteNotFound) {
         throw createError({
-            statusMessage: "Guia de saída não encontrada.",
+            statusMessage: "Guia de saida nao encontrada.",
             statusCode: HttpStatus.NotFound,
         });
     }
 
     if (noteOrErr.isLeft()) {
         throw createError({
-            statusMessage: "Erro ao buscar guia de saída.",
+            statusMessage: "Erro ao buscar guia de saida.",
             statusCode: HttpStatus.ServerError,
         });
     }

@@ -8,7 +8,7 @@ const { catalogService } = makeServices();
 export default defineEventHandler(async (event) => {
     const data = await readBody(event);
 
-    const voidOrErr = await catalogService.registerCategory(data.name, data.variations);
+    const voidOrErr = await catalogService.registerCategory(data.name, data.variationsIds);
 
     if (voidOrErr.value instanceof CategoryAlreadyExists) {
         throw createError({
@@ -20,11 +20,10 @@ export default defineEventHandler(async (event) => {
     if (voidOrErr.value instanceof VariationNotFound) {
         throw createError({
             statusCode: HttpStatus.NotFound,
-            statusMessage: "Variação não foi encontrada",
+            statusMessage: "Variacao nao encontrada",
         });
     }
 
     setResponseStatus(event, HttpStatus.Created);
-
     return { message: "Categoria registada com sucesso" };
 });
