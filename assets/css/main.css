@@ -21,7 +21,7 @@ h1 {
 }
 
 .page-title {
-    @apply text-xl text-center sm:text-2xl sm:my-10 my-8;
+    @apply text-xl text-center sm:text-2xl mt-8 mb-6;
 }
 
 .input-field {

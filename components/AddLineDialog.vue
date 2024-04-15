@@ -2,13 +2,12 @@
 import type { VDialog } from "#build/components";
 import type { ItemModel } from "@frontend/models/item";
 import { CatalogService } from "@frontend/services/catalog_service";
-import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
 import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_values";
 import { initializeQuantities } from "@frontend/helpers/initialize_quantities";
-import { GoodsReceiptNote } from "~/lib/frontend/domain/goods_receipt_note";
+import type { Note } from "~/lib/frontend/domain/note";
 
 interface Props {
-    note: GoodsIssueNote | GoodsReceiptNote;
+    note: Note;
     hasLimit?: boolean;
 }
 
@@ -25,9 +24,6 @@ withDefaults(defineProps<Props>(), {
 
 function show() {
     listItems();
-
-    quantities.value = initializeQuantities(items.value.length);
-
     dialogRef.value?.show();
 }
 
