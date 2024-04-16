@@ -7,11 +7,11 @@ export class InmemCategoryRepository implements CategoryRepository {
     #categories: Record<string, Category> = {};
 
     constructor(categories?: Category[]) {
-        if (categories) {
-            categories.forEach((category) => {
-                this.#categories[category.categoryId.toString()] = category;
-            });
-        }
+        if (!categories) return;
+
+        categories.forEach((category) => {
+            this.#categories[category.categoryId.toString()] = category;
+        });
     }
     getAll(): Promise<Category[]> {
         return Promise.resolve(this.records);

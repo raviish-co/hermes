@@ -211,6 +211,17 @@ describe("CatalogService - Pesquisar artigos", () => {
         expect(items.result.length).toBeGreaterThanOrEqual(1);
         expect(items.result[0].name).toEqual("T-shirt desportiva gola redonda");
     });
+
+    it("Deve pesquirar items por tags", async () => {
+        const itemRepository = new ItemRepositoryStub();
+
+        const { service } = makeService({ itemRepository });
+
+        const { result: items } = await service.searchItems("Verão");
+
+        expect(items.length).toBeGreaterThanOrEqual(1);
+        expect(items[0].itemId.toString()).toEqual("1004");
+    });
 });
 
 describe("CatalogService - Recuperar todas as variações", () => {

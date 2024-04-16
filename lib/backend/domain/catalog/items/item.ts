@@ -43,12 +43,16 @@ export class Item {
         this.#variationsValues = variationsValues;
         this.#stock = stock;
         this.#condition = condition;
-        this.#fulltext = this.#buildFullText();
         this.#tags = tags;
+        this.#fulltext = this.#buildFullText();
     }
 
     #buildFullText(): string {
-        const tokens = [this.#name, ...Object.values(this.#variationsValues ?? "")];
+        const tokens = [
+            this.#name,
+            ...Object.values(this.#variationsValues ?? ""),
+            ...(this.#tags ?? ""),
+        ];
         return tokens.join(" ").toLowerCase();
     }
 

@@ -8,6 +8,14 @@ import { ID } from "../../shared/id";
 export class InmemItemRepository implements ItemRepository {
     #items: Record<string, Item> = {};
 
+    constructor(items?: Item[]) {
+        if (!items) return;
+
+        items.forEach((item) => {
+            this.#items[item.itemId.toString()] = item;
+        });
+    }
+
     getById(itemId: ID): Promise<Item> {
         return Promise.resolve(this.#items[itemId.toString()]);
     }

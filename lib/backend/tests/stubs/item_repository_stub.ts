@@ -1,194 +1,100 @@
-import { ItemNotFound } from "../../domain/catalog/items/item_not_found_error";
-import type { ItemRepository } from "../../domain/catalog/items/item_repository";
-import { type Either, left, right } from "../../shared/either";
+import { InmemItemRepository } from "../../persistense/inmem/inmem_item_repository";
 import { ItemStock } from "../../domain/catalog/items/item_stock";
-import type { Pagination } from "../../shared/pagination";
 import { Item, Status } from "../../domain/catalog/items/item";
 import { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
 
-export class ItemRepositoryStub implements ItemRepository {
-    #items: Record<string, Item> = {};
-
+export class ItemRepositoryStub extends InmemItemRepository {
     constructor() {
-        this.#populate();
-    }
-
-    getById(itemId: ID): Promise<Item> {
-        return Promise.resolve(this.#items[itemId.toString()]);
-    }
-
-    findAll(queries: ID[]): Promise<Either<ItemNotFound, Item[]>> {
-        const items: Item[] = [];
-
-        for (const query of queries) {
-            const filtered = this.records.find(
-                (item) => item.itemId.toString() === query.toString()
-            );
-
-            if (!filtered) return Promise.resolve(left(new ItemNotFound(query.toString())));
-
-            items.push(filtered);
-        }
-        return Promise.resolve(right(items));
-    }
-
-    list(pageToken: number, perPage: number): Promise<Pagination<Item>> {
-        const startIndex = (pageToken - 1) * perPage;
-
-        const endIndex = startIndex + perPage;
-
-        const result = this.records.slice(startIndex, endIndex);
-
-        const total = Math.ceil(this.records.length / perPage);
-
-        return Promise.resolve({
-            pageToken,
-            perPage,
-            total,
-            result,
-        });
-    }
-
-    search(query: string, pageToken: number, perPage: number): Promise<Pagination<Item>> {
-        const items = this.records.filter((i) => {
-            return (
-                i.name.toLowerCase().includes(query.toLowerCase()) ||
-                i.itemId.toString().includes(query) ||
-                i.fulltext.includes(query.toLowerCase())
-            );
-        });
-
-        const startIndex = (pageToken - 1) * perPage;
-
-        const endIndex = startIndex + perPage;
-
-        const result = items.slice(startIndex, endIndex);
-
-        const total = Math.ceil(items.length / perPage);
-
-        return Promise.resolve({
-            pageToken,
-            perPage,
-            total,
-            result,
-        });
-    }
-
-    save(item: Item): Promise<void> {
-        this.#items[item.itemId.toString()] = item;
-        return Promise.resolve(undefined);
-    }
-
-    updateAll(items: Item[]): Promise<void> {
-        for (const item of items) {
-            this.#items[item.itemId.toString()] = item;
-        }
-
-        return Promise.resolve(undefined);
-    }
-
-    saveAll(items: Item[]): Promise<void> {
-        for (const item of items) {
-            this.#items[item.itemId.toString()] = item;
-        }
-        return Promise.resolve(undefined);
-    }
-
-    get records(): Item[] {
-        return Object.values(this.#items);
-    }
-
-    last(): Promise<Item> {
-        return Promise.resolve(this.records[this.records.length - 1]);
-    }
-
-    #populate() {
-        const item1 = new Item(
-            ID.fromString("1001"),
-            "T-shirt desportiva gola redonda",
-            new Decimal(4500),
-            new ItemStock(10),
-            { status: Status.Good },
-            ID.random(),
-            ID.random(),
-            { "1": "Cor: Branco" }
+        super(
+            _itemData.map(
+                (i) =>
+                    new Item(
+                        ID.fromString(i.itemId),
+                        i.name,
+                        new Decimal(i.price),
+                        new ItemStock(i.stock),
+                        i.condition,
+                        ID.fromString(i.categoryId),
+                        ID.fromString(i.sectionId),
+                        i.variationsValues as Record<string, string>,
+                        i.tags
+                    )
+            )
         );
-
-        const item2 = new Item(
-            ID.fromString("1002"),
-            "Calça Jeans Skinny",
-            new Decimal(15500),
-            new ItemStock(10),
-            { status: Status.Good },
-            ID.random(),
-            ID.random(),
-            { "1": "Cor: Castanho", "2": "Marca: Gucci" }
-        );
-
-        const item3 = new Item(
-            ID.fromString("1003"),
-            "Moletom com Capuz",
-            new Decimal(1000),
-            new ItemStock(7),
-            { status: Status.Good },
-            ID.random(),
-            ID.random(),
-            { "1": "Cor: Verde", "2": "Marca: Adidas" }
-        );
-
-        const item4 = new Item(
-            ID.fromString("1004"),
-            "Shorts Esportivo",
-            new Decimal(1000),
-            new ItemStock(7),
-            { status: Status.Good },
-            ID.random(),
-            ID.random(),
-            { "1": "Cor: Verde", "2": "Marca: Adidas" }
-        );
-
-        const item5 = new Item(
-            ID.fromString("1005"),
-            "Casaco de Inverno",
-            new Decimal(1000),
-            new ItemStock(8),
-            { status: Status.Good },
-            ID.random(),
-            ID.random(),
-            { "1": "Cor: Cinza", "2": "Tamanho: M", "3": "Marca: Polo" }
-        );
-
-        const item6 = new Item(
-            ID.fromString("1006"),
-            "Camiseta Polo de Manga Longa",
-            new Decimal(1000),
-            new ItemStock(8),
-            { status: Status.Good },
-            ID.random(),
-            ID.random(),
-            { "1": "Cor: Preta", "2": "Marca: Polo" }
-        );
-
-        const item7 = new Item(
-            ID.fromString("1007"),
-            "Casaco casual de inverno",
-            new Decimal(2500),
-            new ItemStock(10),
-            { status: Status.Good },
-            ID.random(),
-            ID.random(),
-            { "1": "Cor: Castanho", "2": "Marca: Levis" }
-        );
-
-        this.#items = {
-            "1001": item1,
-            "1002": item2,
-            "1003": item3,
-            "1004": item4,
-            "1005": item5,
-            "1006": item6,
-            "1007": item7,
-        };
     }
 }
+
+const _itemData = [
+    {
+        itemId: "1001",
+        name: "T-shirt desportiva gola redonda",
+        price: 4500,
+        stock: 10,
+        condition: { status: Status.Good },
+        categoryId: "1001",
+        sectionId: "1001",
+        variationsValues: { "1": "Cor: Branco" },
+    },
+    {
+        itemId: "1002",
+        name: "Calça Jeans Skinny",
+        price: 15500,
+        stock: 10,
+        condition: { status: Status.Good },
+        categoryId: "1002",
+        sectionId: "1002",
+        variationsValues: { "1": "Cor: Castanho", "2": "Marca: Gucci" },
+    },
+    {
+        itemId: "1003",
+        name: "Moletom com Capuz",
+        price: 1000,
+        stock: 7,
+        condition: { status: Status.Good },
+        categoryId: "1003",
+        sectionId: "1003",
+        variationsValues: { "1": "Cor: Verde", "2": "Marca: Adidas" },
+    },
+    {
+        itemId: "1004",
+        name: "Shorts Desportivo",
+        price: 1000,
+        stock: 7,
+        condition: { status: Status.Good },
+        categoryId: "1004",
+        sectionId: "1004",
+        variationsValues: { "1": "Cor: Verde", "2": "Marca: Adidas" },
+        tags: ["Verão", "Desporto"],
+    },
+    {
+        itemId: "1005",
+        name: "Casaco de Inverno",
+        price: 1000,
+        stock: 8,
+        condition: { status: Status.Good },
+        categoryId: "1005",
+        sectionId: "1005",
+        variationsValues: { "1": "Cor: Cinza", "2": "Tamanho: M", "3": "Marca: Polo" },
+    },
+    {
+        itemId: "1006",
+        name: "Camiseta Polo de Manga Longa",
+        price: 1000,
+        stock: 8,
+        condition: { status: Status.Good },
+        categoryId: "1006",
+        sectionId: "1006",
+        variationsValues: { "1": "Cor: Preta", "2": "Marca: Polo" },
+    },
+    {
+        itemId: "1007",
+        name: "Casaco casual de inverno",
+        price: 2500,
+        stock: 10,
+        condition: { status: Status.Good },
+        categoryId: "1007",
+        sectionId: "1007",
+        variationsValues: { "1": "Cor: Castanho", "2": "Marca: Levis" },
+    },
+];

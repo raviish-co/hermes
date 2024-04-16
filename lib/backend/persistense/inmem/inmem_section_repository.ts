@@ -8,11 +8,11 @@ export class InmemSectionRepository implements SectionRepository {
     #sections: Record<string, Section> = {};
 
     constructor(sections?: Section[]) {
-        if (sections) {
-            sections.forEach((section) => {
-                this.#sections[section.sectionId.toString()] = section;
-            });
-        }
+        if (!sections) return;
+
+        sections.forEach((section) => {
+            this.#sections[section.sectionId.toString()] = section;
+        });
     }
 
     getAll(): Promise<Section[]> {

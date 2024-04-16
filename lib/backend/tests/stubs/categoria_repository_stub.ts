@@ -4,7 +4,7 @@ import { ID } from "../../shared/id";
 
 export class CategoryRepositoryStub extends InmemCategoryRepository {
     constructor() {
-        super(_categoriesData.map((v) => new Category(v.id, v.name, v.variationsIds)));
+        super(_categoriesData.map((c) => new Category(c.id, c.name, c.variationsIds)));
     }
 }
 
