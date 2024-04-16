@@ -69,6 +69,7 @@ interface RegisterItemDTO {
     sectionId?: string;
     variations?: VariationDTO[];
     comment?: string;
+    tags?: string[];
 }
 
 interface VariationDTO {

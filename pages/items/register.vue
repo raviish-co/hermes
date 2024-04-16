@@ -17,6 +17,8 @@ const price = ref<number>();
 const categoryId = ref<string>("");
 const sectionId = ref<string>("");
 const condition = ref<ConditionModel>({ status: "Bom" });
+const tag = ref<string>("");
+const tags = ref<string[]>([]);
 
 const selectedVariations = ref<Variation[]>([]);
 const showVariations = ref<boolean>(false);
@@ -45,12 +47,22 @@ function verifyVariations() {
     return selectedVariations.value.every((variation) => !!variation.value);
 }
 
+function addTag() {
+    if (!tag.value) return;
+
+    tags.value.push(tag.value);
+    tag.value = "";
+}
+
+function removeTag(index: number) {
+    tags.value.splice(index, 1);
+}
+
 function chooseCategory(event: Event) {
     const value = (event.target as HTMLSelectElement).value;
     const category = categories.find((category) => category.name === value)!;
 
     categoryId.value = category.categoryId;
-
     name.value = category.name;
 
     if (category.variationsIds.length === 0) {
@@ -107,6 +119,7 @@ function register() {
         sectionId: sectionId.value,
         variations: variationValues,
         comment: condition.value.comment,
+        tags: tags.value,
     };
 
     service
@@ -162,6 +175,32 @@ function register() {
                     placeholder="Escreva uma nota sobre o estado atual do artigo."
                     v-model="condition.comment"
                     :class="isGood ? 'input-disabled' : 'input-field'"
+                />
+            </div>
+
+            <div
+                class="flex flex-col flex-wrap sm:flex-row border border-light-500 bg-white placeholder:text-light-500 focus:ring-0 focus:border-primary"
+            >
+                <div
+                    class="flex flex-wrap gap-2"
+                    :class="{
+                        'p-0': tags.length === 0,
+                        'p-2': tags.length > 0,
+                    }"
+                >
+                    <span
+                        v-for="(tag, idx) in tags"
+                        class="badge-light cursor-pointer"
+                        @click="removeTag(idx)"
+                    >
+                        {{ tag }}
+                    </span>
+                </div>
+                <input
+                    class="w-full border-0 bg-transparent focus:ring-0 focus:border-primary"
+                    placeholder="Tags para o artigo"
+                    v-model="tag"
+                    @keypress.enter="addTag()"
                 />
             </div>
 

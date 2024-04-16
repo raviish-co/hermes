@@ -109,6 +109,10 @@ h1 {
     @apply badge text-red-500 bg-red-100;
 }
 
+.badge-light {
+    @apply badge text-white bg-light-500;
+}
+
 .badge-success {
     @apply badge text-green-500 bg-green-100;
 }

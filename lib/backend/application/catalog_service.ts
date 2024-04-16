@@ -83,6 +83,7 @@ export class CatalogService {
             .withSectionId(data.sectionId)
             .withVariationsValues(variationsValues)
             .withCondition(data.comment)
+            .withTags(data.tags)
             .build();
 
         if (itemOrErr.isLeft()) return left(itemOrErr.value);
@@ -162,6 +163,7 @@ type RegisterItemDTO = {
     sectionId?: string;
     variations?: VariationDTO[];
     comment?: string;
+    tags?: string[];
 };
 
 type VariationDTO = {

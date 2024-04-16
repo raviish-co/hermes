@@ -432,6 +432,23 @@ describe("CatalogService - Registrar artigo", () => {
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(SectionNotFound);
     });
+
+    it("Deve registrar o artigo com as suas tags", async () => {
+        const { service, itemRepository } = makeService();
+
+        const data = {
+            name: "Artigo 1",
+            price: 100,
+            tags: ["tag1", "tag2"],
+        };
+
+        await service.registerItem(data);
+
+        const item = await itemRepository.last();
+
+        expect(item.tags).toBeDefined();
+        expect(item.tags).toEqual(data.tags);
+    });
 });
 
 describe("CatalogService - Registrar categoria", () => {

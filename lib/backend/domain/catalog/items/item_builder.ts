@@ -14,6 +14,7 @@ export class ItemBuilder {
     #variationsValues: Record<string, string>;
     #stock: ItemStock;
     #condition: Condition;
+    #tags?: string[];
 
     constructor() {
         this.#itemId = ID.random();
@@ -88,6 +89,11 @@ export class ItemBuilder {
         return this;
     }
 
+    withTags(tags?: string[]): ItemBuilder {
+        this.#tags = tags;
+        return this;
+    }
+
     build(): Either<Error, Item> {
         if (!this.#itemId) {
             return left(new Error("Item ID is required"));
@@ -110,7 +116,8 @@ export class ItemBuilder {
                 this.#condition,
                 this.#categoryId,
                 this.#sectionId,
-                this.#variationsValues
+                this.#variationsValues,
+                this.#tags
             )
         );
     }

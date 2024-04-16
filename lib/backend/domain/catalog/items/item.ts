@@ -22,6 +22,7 @@ export class Item {
     #stock: ItemStock;
     #condition: Condition;
     #fulltext: string = "";
+    #tags?: string[];
 
     constructor(
         itemId: ID,
@@ -31,7 +32,8 @@ export class Item {
         condition: Condition,
         categoryId?: ID,
         sectionId?: ID,
-        variationsValues?: Record<string, string>
+        variationsValues?: Record<string, string>,
+        tags?: string[]
     ) {
         this.itemId = itemId;
         this.categoryId = categoryId;
@@ -42,6 +44,7 @@ export class Item {
         this.#stock = stock;
         this.#condition = condition;
         this.#fulltext = this.#buildFullText();
+        this.#tags = tags;
     }
 
     #buildFullText(): string {
@@ -105,5 +108,9 @@ export class Item {
 
     get sectionId() {
         return this.#sectionId;
+    }
+
+    get tags() {
+        return this.#tags;
     }
 }

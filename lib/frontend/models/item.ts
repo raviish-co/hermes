@@ -9,4 +9,5 @@ export interface ItemModel {
     categoryId?: string;
     variationsValues?: VariationValueModel[];
     condition?: ConditionModel;
+    tags?: string[];
 }
