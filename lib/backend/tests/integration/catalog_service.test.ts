@@ -19,6 +19,9 @@ import type { ItemRepository } from "../../domain/catalog/items/item_repository"
 import type { VariationRepository } from "../../domain/catalog/variations/variation_repository";
 import type { CategoryRepository } from "../../domain/catalog/categories/category_repository";
 import type { SectionRepository } from "../../domain/catalog/departments/section_repository";
+import { Item, Status } from "../../domain/catalog/items/item";
+import { Decimal } from "../../shared/decimal";
+import { ItemStock } from "../../domain/catalog/items/item_stock";
 
 describe("CatalogService - Recuperar artigos", () => {
     it("Deve buscar os artigos no repositório", async () => {
@@ -221,6 +224,16 @@ describe("CatalogService - Pesquisar artigos", () => {
 
         expect(items.length).toBeGreaterThanOrEqual(1);
         expect(items[0].itemId.toString()).toEqual("1004");
+    });
+
+    it("Deve pesquisar items pelo seu ID com letras minúsculas", async () => {
+        const { service, itemRepository } = makeService();
+        await itemRepository.save(item);
+
+        const { result: items } = await service.searchItems("rvs");
+
+        expect(items.length).toBeGreaterThanOrEqual(1);
+        expect(items[0].itemId.toString()).toEqual("RVS - 10001");
     });
 });
 
@@ -593,6 +606,13 @@ describe("CatalogService - Recuperar todas as secções", () => {
 });
 
 const variation = new Variation(ID.fromString("1"), "Cor", ["Preto", "Branco", "Vermelho"]);
+const item = new Item(
+    ID.fromString("RVS - 10001"),
+    "T-shirt desportiva gola redonda",
+    new Decimal(100),
+    new ItemStock(10),
+    { status: Status.Good }
+);
 
 interface Dependecies {
     itemRepository?: ItemRepository;

@@ -56,7 +56,7 @@ export class InmemItemRepository implements ItemRepository {
         const items = this.records.filter((i) => {
             return (
                 i.name.toLowerCase().includes(query.toLowerCase()) ||
-                i.itemId.toString().includes(query) ||
+                i.itemId.toString().toLowerCase().includes(query.toLowerCase()) ||
                 i.fulltext.includes(query.toLowerCase())
             );
         });
