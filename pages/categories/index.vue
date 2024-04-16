@@ -1,13 +1,9 @@
 <script setup lang="ts">
-import { CatalogService } from "~/lib/frontend/services/catalog_service";
-import type { CategoryModel } from "~/lib/frontend/models/category";
-
-const categories = ref<CategoryModel[]>([]);
-
-const service = new CatalogService();
+const catalog = useCatalog();
 
 onMounted(async () => {
-    categories.value = await service.listCategories();
+    catalog.listCategories();
+    catalog.listVariations();
 });
 </script>
 
@@ -18,24 +14,33 @@ onMounted(async () => {
             <table class="table">
                 <thead>
                     <tr>
-                        <th class="min-w-20 w-20">ID</th>
-                        <th class="min-w-60 w-60 text-left">Descrição</th>
-                        <th class="min-w-40 w-40"></th>
-                        <th class="min-w-40 w-40"></th>
-                        <th class="min-w-40 w-40"></th>
+                        <th class="min-w-40 w-40">ID</th>
+                        <th class="min-w-40 w-40 text-left">Nome</th>
+                        <th class="min-w-40 w-40 text-left">Variações</th>
+                        <th class="min-w-40 w-40 text-left">Descrição</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr
-                        v-for="category in categories"
+                        v-for="category in toValue(catalog.categories)"
                         :key="category.categoryId"
                         class="text-center"
                     >
                         <td>{{ category.categoryId }}</td>
                         <td class="text-left">{{ category.name }}</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
+                        <td class="text-left">
+                            <div class="flex flex-wrap gap-2">
+                                <span
+                                    v-for="variation in catalog.filterVariations(
+                                        category.variationsIds
+                                    )"
+                                    :key="variation.variationId"
+                                >
+                                    <span class="badge-light">{{ variation.name }} <br /></span>
+                                </span>
+                            </div>
+                        </td>
+                        <td class="text-left">{{ category.description }}</td>
                     </tr>
                 </tbody>
             </table>
