@@ -5,6 +5,7 @@ import { CatalogService } from "~/lib/frontend/services/catalog_service";
 const selectedVariations = ref<VariationModel[]>([]);
 const variations = ref<VariationModel[]>([]);
 const name = ref<string>("");
+const description = ref<string>("");
 
 const service = new CatalogService();
 
@@ -27,7 +28,7 @@ function isSelected(variationId: string) {
 function register() {
     const variationsIds = selectedVariations.value.map((v) => v.variationId);
     service
-        .registerCategory(name.value, variationsIds)
+        .registerCategory(name.value, variationsIds, description.value)
         .then((res) => alert(res.message))
         .catch((err) => alert(err.statusMessage));
 }
@@ -43,7 +44,9 @@ onMounted(async () => {
 
         <div class="space-y-4">
             <input class="input-field" type="text" placeholder="Categoria" v-model="name" />
-            <div class="grid grid-cols-2 gap-8">
+            <input class="input-field" type="text" placeholder="Descrição" v-model="description" />
+
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-8">
                 <div class="h-64 border border-light-500 overflow-y-auto">
                     <h2 class="p-2 bg-gray-400 text-white">Variações disponíveis</h2>
                     <ul class="space-y-1">

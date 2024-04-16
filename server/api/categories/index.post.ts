@@ -8,7 +8,11 @@ const { catalogService } = makeServices();
 export default defineEventHandler(async (event) => {
     const data = await readBody(event);
 
-    const voidOrErr = await catalogService.registerCategory(data.name, data.variationsIds);
+    const voidOrErr = await catalogService.registerCategory(
+        data.name,
+        data.variationsIds,
+        data.description
+    );
 
     if (voidOrErr.value instanceof CategoryAlreadyExists) {
         throw createError({

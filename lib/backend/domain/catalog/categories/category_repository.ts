@@ -7,4 +7,5 @@ export interface CategoryRepository {
     findByName(name: string): Promise<Either<CategoryNotFound, Category>>;
     save(category: Category): Promise<void>;
     exists(name: string): Promise<boolean>;
+    last(): Promise<Category>;
 }

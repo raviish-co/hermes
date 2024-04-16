@@ -97,7 +97,8 @@ export class CatalogService {
 
     async registerCategory(
         name: string,
-        variations?: string[]
+        variations?: string[],
+        description?: string
     ): Promise<Either<RegisterCategoryError, void>> {
         const exists = await this.#categoryRepository.exists(name);
 
@@ -111,7 +112,7 @@ export class CatalogService {
 
         const categoryId = this.#generator.generate(Sequence.Category);
 
-        const category = new Category(ID.fromString(categoryId), name, variationsIds);
+        const category = new Category(ID.fromString(categoryId), name, variationsIds, description);
 
         await this.#categoryRepository.save(category);
 

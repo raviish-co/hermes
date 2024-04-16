@@ -483,9 +483,9 @@ describe("CatalogService - Registrar categoria", () => {
 
         await service.registerCategory(name);
 
-        const categories = await categoryRepository.getAll();
+        const category = await categoryRepository.last();
 
-        expect(categories[0].name).toEqual(name);
+        expect(category.name).toEqual(name);
     });
 
     it("Deve retornar erro **CategoryAlreadyExists** se a categoria já existir", async () => {
@@ -513,11 +513,11 @@ describe("CatalogService - Registrar categoria", () => {
 
         await service.registerCategory(name, variationsIds);
 
-        const categories = await categoryRepository.getAll();
+        const category = await categoryRepository.last();
 
-        expect(categories[0].variationsIds).toBeDefined();
-        expect(categories[0].variationsIds.length).toEqual(2);
-        expect(categories[0].variationsIds[0].toString()).toEqual("1");
+        expect(category.variationsIds).toBeDefined();
+        expect(category.variationsIds.length).toEqual(2);
+        expect(category.variationsIds[0].toString()).toEqual("1");
     });
 
     it("Deve retornar erro **VariationNotFound** se uma das variações não existir no repositório", async () => {
@@ -545,9 +545,27 @@ describe("CatalogService - Registrar categoria", () => {
 
         await service.registerCategory(name, variationsIds);
 
-        const categories = await categoryRepository.getAll();
+        const category = await categoryRepository.last();
 
-        expect(categories[0].categoryId.toString()).toEqual("RVSC - 1000");
+        expect(category.categoryId.toString()).toEqual("RVSC - 1000");
+    });
+
+    it("Deve registrar a descrição da categoria", async () => {
+        const name = "Sapatos";
+        const variationsIds = ["1", "2"];
+        const description = "Categoria de sapatos";
+        const itemRepository = new ItemRepositoryStub();
+        const variationRepository = new VariationRepositoryStub();
+        const { service, categoryRepository } = makeService({
+            itemRepository,
+            variationRepository,
+        });
+
+        await service.registerCategory(name, variationsIds, description);
+
+        const category = await categoryRepository.last();
+
+        expect(category.description).toEqual(description);
     });
 });
 

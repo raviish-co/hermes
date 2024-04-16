@@ -34,6 +34,10 @@ export class InmemCategoryRepository implements CategoryRepository {
         return Promise.resolve(undefined);
     }
 
+    last(): Promise<Category> {
+        return Promise.resolve(this.records[this.records.length - 1]);
+    }
+
     get records(): Category[] {
         return Object.values(this.#categories);
     }

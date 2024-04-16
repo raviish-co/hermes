@@ -56,8 +56,8 @@ export class CatalogService {
         return await $fetch("/api/items", { method: "post", body: data });
     }
 
-    async registerCategory(name: string, variationsIds: string[]) {
-        const data = { name, variationsIds };
+    async registerCategory(name: string, variationsIds: string[], description?: string) {
+        const data = { name, variationsIds, description };
         return await $fetch("/api/categories", { method: "post", body: data });
     }
 }

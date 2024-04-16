@@ -7,6 +7,7 @@ interface CategoryDTO {
     categoryId: string;
     name: string;
     variationsIds: string[];
+    description?: string;
 }
 
 function toCategoryDTO(category: Category): CategoryDTO {
@@ -14,6 +15,7 @@ function toCategoryDTO(category: Category): CategoryDTO {
         categoryId: category.categoryId.toString(),
         name: category.name,
         variationsIds: category.variationsIds.map((id) => id.toString()),
+        description: category.description,
     };
 }
 
