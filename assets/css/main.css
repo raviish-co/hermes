@@ -48,6 +48,10 @@ h1 {
     @apply flex flex-wrap items-center gap-4 sm:flex-nowrap;
 }
 
+.input-tags {
+    @apply flex flex-col flex-wrap sm:flex-row border border-light-500 bg-white placeholder:text-light-500 focus:ring-0 focus:border-primary;
+}
+
 .invalid {
     @apply border-red-500 !important;
 }

@@ -1,5 +1,6 @@
 import type { CategoryModel } from "~/lib/frontend/models/category";
 import type { ItemModel } from "~/lib/frontend/models/item";
+import type { SectionModel } from "~/lib/frontend/models/section";
 import type { VariationModel } from "~/lib/frontend/models/variation";
 import { CatalogService } from "~/lib/frontend/services/catalog_service";
 
@@ -9,6 +10,7 @@ export function useCatalog() {
     const items = ref<ItemModel[]>([]);
     const variations = ref<VariationModel[]>([]);
     const categories = ref<CategoryModel[]>([]);
+    const sections = ref<SectionModel[]>([]);
 
     const pages = ref<number>(1);
 
@@ -50,19 +52,33 @@ export function useCatalog() {
         });
     };
 
+    const listSections = () => {
+        service.listSections().then((res) => {
+            sections.value = res;
+        });
+    };
+
     const filterVariations = (ids: string[]) => {
         return variations.value.filter((v) => ids.includes(v.variationId));
+    };
+
+    const findCategory = (id: string) => {
+        return categories.value.find((c) => c.categoryId === id);
     };
 
     return {
         items,
         pages,
         categories,
-        searchItems,
+        variations,
+        sections,
         listItems,
+        searchItems,
         listCategories,
+        findCategory,
         listVariations,
         filterVariations,
         changePage,
+        listSections,
     };
 }

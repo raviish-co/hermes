@@ -7,6 +7,7 @@ export interface ItemModel {
     price: number;
     stock: number;
     categoryId?: string;
+    sectionId?: string;
     variationsValues?: VariationValueModel[];
     condition?: ConditionModel;
     tags?: string[];

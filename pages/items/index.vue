@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_values";
 import { formatCurrency } from "~/lib/frontend/helpers/format_currency";
+import type { ItemModel } from "~/lib/frontend/models/item";
 
 const criteria = ref<string>("");
 const catalog = useCatalog();
-const { items, pages } = catalog;
+const state = useState<ItemModel>("item");
 
-onMounted(async () => {
-    catalog.listItems();
-});
+function chooseItem(item: ItemModel) {
+    state.value = item;
+}
+
+onMounted(() => catalog.listItems());
 </script>
 
 <template>
@@ -33,26 +36,37 @@ onMounted(async () => {
                         <th class="min-w-40 w-40">Preço Kz</th>
                         <th class="min-w-40 w-40">Stock</th>
                         <th class="min-w-40 w-40">Estado</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="item in items" :key="item.itemId" class="text-center">
+                    <tr
+                        v-for="item in toValue(catalog.items)"
+                        :key="item.itemId"
+                        class="text-center"
+                    >
                         <td>{{ item.itemId }}</td>
                         <td class="text-left">
                             {{ item.name }} <br />
-                            <span class="text-light-600 text-xs sm:text-sm">
+                            <span class="text-light-600 break-words text-xs sm:text-sm">
                                 {{ formatVariationValues(item.variationsValues) }}
                             </span>
                         </td>
                         <td class="text-gray-500">{{ formatCurrency(item.price) }}</td>
                         <td>{{ item.stock }}</td>
                         <td>{{ item.condition?.status }}</td>
+
+                        <td>
+                            <NuxtLink to="/items/edit" @click="chooseItem(item)">
+                                <span class="material-symbols-outlined"> edit </span>
+                            </NuxtLink>
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <ThePagination :total="pages" @changed="catalog.changePage($event)" />
+        <ThePagination :total="toValue(catalog.pages)" @changed="catalog.changePage($event)" />
 
         <NuxtLink :to="{ path: '/items/register' }">
             <button class="btn-circle block ml-auto">

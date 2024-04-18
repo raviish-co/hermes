@@ -21,8 +21,8 @@ const _categoriesData = [
     },
     {
         id: ID.fromString("3"),
-        name: "Ternos",
-        variationsIds: [ID.fromString("1"), ID.fromString("2")],
+        name: "Casacos",
+        variationsIds: [ID.fromString("1"), ID.fromString("2"), ID.fromString("5")],
     },
     {
         id: ID.fromString("4"),
@@ -37,5 +37,10 @@ const _categoriesData = [
     {
         id: ID.fromString("6"),
         name: "Saias",
+    },
+    {
+        id: ID.fromString("7"),
+        name: "Calções",
+        variationsIds: [ID.fromString("1"), ID.fromString("2")],
     },
 ];
