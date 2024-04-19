@@ -22,6 +22,7 @@ import type { SectionRepository } from "../../domain/catalog/departments/section
 import { Item, Status } from "../../domain/catalog/items/item";
 import { Decimal } from "../../shared/decimal";
 import { ItemStock } from "../../domain/catalog/items/item_stock";
+import { ItemNotFound } from "../../domain/catalog/items/item_not_found_error";
 
 describe("CatalogService - Recuperar artigos", () => {
     it("Deve buscar os artigos no repositório", async () => {
@@ -602,6 +603,28 @@ describe("CatalogService - Recuperar todas as secções", () => {
         const sections = await service.listSections();
 
         expect(sections.length).toBeGreaterThanOrEqual(1);
+    });
+});
+
+describe("CatalogService - Recuperar artigo pelo ID", () => {
+    it("Deve recuperar o artigo pelo seu ID", async () => {
+        const itemRepository = new ItemRepositoryStub();
+        const { service } = makeService({ itemRepository });
+
+        const itemOrErr = await service.getItem("1001");
+
+        const item = <Item>itemOrErr.value;
+
+        expect(item.itemId.toString()).toEqual("1001");
+    });
+
+    it('Deve retornar erro "ItemNotFound" se o artigo não existir', async () => {
+        const { service } = makeService();
+
+        const error = await service.getItem("1002");
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(ItemNotFound);
     });
 });
 

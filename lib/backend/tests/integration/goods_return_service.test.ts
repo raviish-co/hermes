@@ -12,6 +12,7 @@ import { GoodsReturnService } from "../../application/goods_return_service";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { describe, expect, it } from "vitest";
 import { ID } from "../../shared/id";
+import type { Item } from "../../domain/catalog/items/item";
 
 describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve efetuar a devolução de um conjunto de artigos", async () => {
@@ -104,8 +105,11 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
 
-        const item = await itemRepository.getById(ID.fromString("1004"));
-        const item2 = await itemRepository.getById(ID.fromString("1005"));
+        const itemOrErr = await itemRepository.getById(ID.fromString("1004"));
+        const item2OrErr = await itemRepository.getById(ID.fromString("1005"));
+
+        const item = <Item>itemOrErr.value;
+        const item2 = <Item>item2OrErr.value;
 
         expect(item.stock.quantity).toBe(8);
         expect(item2.stock.quantity).toBe(9);
@@ -157,7 +161,9 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
 
-        const item = await itemRepository.getById(ID.fromString("1001"));
+        const itemOrErr = await itemRepository.getById(ID.fromString("1001"));
+
+        const item = <Item>itemOrErr.value;
 
         expect(item.getCondition().comment).toBe("Riscado");
     });
@@ -337,7 +343,10 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         const noteOrErr = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
         const note = <GoodsReturnNote>noteOrErr.value;
 
-        expect(note.goodsReturnLines[0].variationsValues).toEqual({ "1": "Cor: Branco" });
+        expect(note.goodsReturnLines[0].variationsValues).toEqual({
+            "1": "Cor: Branco",
+            "2": "Marca: Nike",
+        });
         expect(note.goodsReturnLines[1].variationsValues).toEqual({
             "1": "Cor: Castanho",
             "2": "Marca: Gucci",

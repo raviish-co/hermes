@@ -17,6 +17,7 @@ import type { Pagination } from "../shared/pagination";
 import { Item } from "../domain/catalog/items/item";
 import { Decimal } from "../shared/decimal";
 import { ID } from "../shared/id";
+import type { ItemNotFound } from "../domain/catalog/items/item_not_found_error";
 
 export class CatalogService {
     #itemRepository: ItemRepository;
@@ -61,6 +62,12 @@ export class CatalogService {
         perPage: number = 12
     ): Promise<Pagination<Item>> {
         return await this.#itemRepository.search(query, pageToken, perPage);
+    }
+
+    async getItem(itemId: string): Promise<Either<ItemNotFound, Item>> {
+        const itemOrErr = await this.#itemRepository.getById(ID.fromString(itemId));
+        if (itemOrErr.isLeft()) return left(itemOrErr.value);
+        return right(itemOrErr.value);
     }
 
     async registerItem(data: RegisterItemDTO): Promise<Either<RegisterItemError, void>> {

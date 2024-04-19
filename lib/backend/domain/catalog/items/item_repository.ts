@@ -6,7 +6,7 @@ import { Item } from "./item";
 
 export interface ItemRepository {
     findAll(itemsIds: ID[]): Promise<Either<ItemNotFound, Item[]>>;
-    getById(itemId: ID): Promise<Item>;
+    getById(itemId: ID): Promise<Either<ItemNotFound, Item>>;
     list(pageToken: number, perPage: number): Promise<Pagination<Item>>;
     search(query: string, pageToken: number, perPage: number): Promise<Pagination<Item>>;
     updateAll(items: Item[]): Promise<void>;
