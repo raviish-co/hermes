@@ -4,7 +4,7 @@ import { VariationNotFound } from "../../../domain/catalog/variations/variation_
 import { CategoryRepositoryStub } from "../../stubs/categoria_repository_stub";
 import { VariationRepositoryStub } from "../../stubs/variation_repository_stub";
 import { ItemRepositoryStub } from "../../stubs/item_repository_stub";
-import { catalogService } from "../services";
+import { catalogService } from "./service";
 
 describe("CatalogService - Registrar categoria", () => {
     it("Deve registrar uma categoria", async () => {

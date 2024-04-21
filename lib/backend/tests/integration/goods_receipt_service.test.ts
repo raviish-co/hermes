@@ -11,7 +11,7 @@ import { InvalidLines } from "../../domain/goods_receipt/invalid_lines_error";
 import type { Generator } from "../../adapters/sequences/generator";
 import type { Item } from "../../domain/catalog/items/item";
 
-describe("Test Goods Receipt", () => {
+describe("GoodsReceiptService - Entrada de mercadorias", () => {
     it("Deve retornar um erro **InvalidEntryDate** se a data de entrada de mercadoria não for definida", async () => {
         const data = {
             lines: [

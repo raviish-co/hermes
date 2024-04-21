@@ -4,7 +4,7 @@ import { InmemVariationRepository } from "../../../persistense/inmem/inmem_varia
 import { ID } from "../../../shared/id";
 import { CategoryRepositoryStub } from "../../stubs/categoria_repository_stub";
 import { ItemRepositoryStub } from "../../stubs/item_repository_stub";
-import { catalogService } from "../services";
+import { catalogService } from "./service";
 
 describe("CatalogService - Recuperar todas as variações", () => {
     it("Deve recuperar as variações da base de dados", async () => {

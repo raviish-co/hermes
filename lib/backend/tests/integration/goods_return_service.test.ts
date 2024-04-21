@@ -1,18 +1,18 @@
-import { InvalidGoodsIssueLineQuantity } from "../../domain/goods_issue/invalid_goods_issue_line_quantity_error";
-import { InmemGoodsReturnNoteRepository } from "../../persistense/inmem/inmem_goods_return_note_repository";
-import { GoodsReturnNoteNotFound } from "../../domain/goods_return/goods_return_note_not_found_error";
-import { GoodsIssueLineNotFound } from "../../domain/goods_issue/goods_lssue_line_not_found_error";
-import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
-import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
-import type { GoodsReturnNote } from "../../domain/goods_return/goods_return_note";
-import type { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
-import { GoodsIssueRepositoryStub } from "../stubs/goods_issue_repository_stub";
+import { describe, expect, it } from "vitest";
 import { SequenceGenerator } from "../../adapters/sequences/sequence_generator";
 import { GoodsReturnService } from "../../application/goods_return_service";
-import { ItemRepositoryStub } from "../stubs/item_repository_stub";
-import { describe, expect, it } from "vitest";
-import { ID } from "../../shared/id";
 import type { Item } from "../../domain/catalog/items/item";
+import type { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
+import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
+import { GoodsIssueLineNotFound } from "../../domain/goods_issue/goods_lssue_line_not_found_error";
+import { InvalidGoodsIssueLineQuantity } from "../../domain/goods_issue/invalid_goods_issue_line_quantity_error";
+import type { GoodsReturnNote } from "../../domain/goods_return/goods_return_note";
+import { GoodsReturnNoteNotFound } from "../../domain/goods_return/goods_return_note_not_found_error";
+import { InmemGoodsReturnNoteRepository } from "../../persistense/inmem/inmem_goods_return_note_repository";
+import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
+import { ID } from "../../shared/id";
+import { GoodsIssueRepositoryStub } from "../stubs/goods_issue_repository_stub";
+import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 
 describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve efetuar a devolução de um conjunto de artigos", async () => {
@@ -373,7 +373,7 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
     });
 });
 
-describe("GoodsReturnService - List of Goods Return Notes", () => {
+describe("GoodsReturnService - Recuperar guias de devoluções", () => {
     it("Deve retornar a lista de guias de devolução de artigos", async () => {
         const { service } = makeService();
 
@@ -397,7 +397,7 @@ describe("GoodsReturnService - List of Goods Return Notes", () => {
     });
 });
 
-describe("GoodsReturnService - Get Goods Return Note", () => {
+describe("GoodsReturnService - Recuperar guia de devolução", () => {
     it("Deve retornar a guia de devolução de artigos com base no ID", async () => {
         const itemsData = [
             { itemId: "1001", quantity: 1, comment: "Riscado" },

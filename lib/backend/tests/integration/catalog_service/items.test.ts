@@ -10,7 +10,7 @@ import { CategoryRepositoryStub } from "../../stubs/categoria_repository_stub";
 import { ItemRepositoryStub } from "../../stubs/item_repository_stub";
 import { SectionRepositoryStub } from "../../stubs/section_repository_stub";
 import { VariationRepositoryStub } from "../../stubs/variation_repository_stub";
-import { catalogService } from "../services";
+import { catalogService } from "./service";
 
 describe("CatalogService - Recuperar artigos", () => {
     it("Deve buscar os artigos no repositório", async () => {

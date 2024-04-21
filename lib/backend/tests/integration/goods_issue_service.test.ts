@@ -17,7 +17,7 @@ import { describe, expect, it } from "vitest";
 import { ID } from "../../shared/id";
 import type { Item } from "../../domain/catalog/items/item";
 
-describe("Test Goods Issue", () => {
+describe("GoodsIssueService - Saída de mercadoria", () => {
     it("Deve retornar error **InvalidPurpose** se não existir", async () => {
         const data = { ...goodsIssueData, purpose: { description: "Alguel", notes: "some-note" } };
         const { service } = makeService();
@@ -249,7 +249,7 @@ describe("Test Goods Issue", () => {
     });
 });
 
-describe("Test list Goods Issue Notes", () => {
+describe("GoodsIssueService - Recuperar as guias de saída de mercadorias", () => {
     it("Deve retornar uma lista vazia se não houver guias de saídas no repositório", async () => {
         const { service } = makeService();
 
@@ -272,7 +272,7 @@ describe("Test list Goods Issue Notes", () => {
     });
 });
 
-describe("Test get Goods Issue Note", () => {
+describe("GoodsIssueService - Recuperar guia de saída de mercadoria ", () => {
     it("Deve retornar **GoodsIssueNoteFound** se a guia de saída não existir no repositório", async () => {
         const goodsIssueRepository = new InmemGoodsIssueNoteRepository();
 
