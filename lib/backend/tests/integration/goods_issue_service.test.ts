@@ -15,6 +15,7 @@ import type { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { describe, expect, it } from "vitest";
 import { ID } from "../../shared/id";
+import type { Item } from "../../domain/catalog/items/item";
 
 describe("Test Goods Issue", () => {
     it("Deve retornar error **InvalidPurpose** se não existir", async () => {
@@ -147,7 +148,8 @@ describe("Test Goods Issue", () => {
 
         await service.new(goodsIssueData);
 
-        const item = await itemRepository.getById(ID.fromString("1001"));
+        const itemOrErr = await itemRepository.getById(ID.fromString("1001"));
+        const item = <Item>itemOrErr.value;
 
         expect(item.stock.quantity).toEqual(8);
     });
@@ -234,8 +236,11 @@ describe("Test Goods Issue", () => {
 
         await service.new(goodsIssueData);
 
-        const item1 = await itemRepository.getById(ID.fromString("1001"));
-        const item2 = await itemRepository.getById(ID.fromString("1002"));
+        const item1OrErr = await itemRepository.getById(ID.fromString("1001"));
+        const item2OrErr = await itemRepository.getById(ID.fromString("1002"));
+
+        const item1 = <Item>item1OrErr.value;
+        const item2 = <Item>item2OrErr.value;
 
         expect(item1.getCondition().status).toEqual("Bom");
         expect(item2.getCondition().status).toEqual("Mau");

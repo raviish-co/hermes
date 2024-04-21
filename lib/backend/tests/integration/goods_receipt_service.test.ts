@@ -9,6 +9,7 @@ import { InmemGoodsReceiptNoteRepository } from "../../persistense/inmem/inmem_g
 import { InvalidEntryDate } from "../../domain/goods_receipt/invalid_entry_date_error";
 import { InvalidLines } from "../../domain/goods_receipt/invalid_lines_error";
 import type { Generator } from "../../adapters/sequences/generator";
+import type { Item } from "../../domain/catalog/items/item";
 
 describe("Test Goods Receipt", () => {
     it("Deve retornar um erro **InvalidEntryDate** se a data de entrada de mercadoria não for definida", async () => {
@@ -83,8 +84,11 @@ describe("Test Goods Receipt", () => {
 
         await service.new(data);
 
-        const item1 = await itemRepository.getById(ID.fromString("1001"));
-        const item2 = await itemRepository.getById(ID.fromString("1002"));
+        const item1OrErr = await itemRepository.getById(ID.fromString("1001"));
+        const item2OrErr = await itemRepository.getById(ID.fromString("1002"));
+
+        const item1 = <Item>item1OrErr.value;
+        const item2 = <Item>item2OrErr.value;
 
         expect(item1.stock.quantity).toBe(60);
         expect(item2.stock.quantity).toBe(30);
@@ -153,8 +157,11 @@ describe("Test Goods Receipt", () => {
 
         service.new(data);
 
-        const item1 = await itemRepository.getById(ID.fromString("1001"));
-        const item2 = await itemRepository.getById(ID.fromString("1002"));
+        const item1OrErr = await itemRepository.getById(ID.fromString("1001"));
+        const item2OrErr = await itemRepository.getById(ID.fromString("1002"));
+
+        const item1 = <Item>item1OrErr.value;
+        const item2 = <Item>item2OrErr.value;
 
         expect(item1.getCondition().status).toBe("Bom");
         expect(item1.getCondition().comment).toBeUndefined();

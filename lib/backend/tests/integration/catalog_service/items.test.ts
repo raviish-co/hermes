@@ -1,34 +1,22 @@
-import { InmemVariationRepository } from "../../persistense/inmem/inmem_variation_repository";
-import { InmemItemRepository } from "../../persistense/inmem/inmem_item_repository";
-import { CatalogService } from "../../application/catalog_service";
-import { ItemRepositoryStub } from "../stubs/item_repository_stub";
-import { Variation } from "../../domain/catalog/variations/variation";
-import { describe, it, expect } from "vitest";
-import { ID } from "../../shared/id";
-import { SequenceGenerator } from "../../adapters/sequences/sequence_generator";
-import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
-import { CategoryRepositoryStub } from "../stubs/categoria_repository_stub";
-import { InmemCategoryRepository } from "../../persistense/inmem/inmem_category_repository";
-import { CategoryAlreadyExists } from "../../domain/catalog/categories/category_already_exists_error";
-import { VariationNotFound } from "../../domain/catalog/variations/variation_not_found_error";
-import { VariationRepositoryStub } from "../stubs/variation_repository_stub";
-import { SectionNotFound } from "../../domain/catalog/departments/section_not_found_error";
-import { InmemSectionRepository } from "../../persistense/inmem/inmem_section_repository";
-import { SectionRepositoryStub } from "../stubs/section_repository_stub";
-import type { ItemRepository } from "../../domain/catalog/items/item_repository";
-import type { VariationRepository } from "../../domain/catalog/variations/variation_repository";
-import type { CategoryRepository } from "../../domain/catalog/categories/category_repository";
-import type { SectionRepository } from "../../domain/catalog/departments/section_repository";
-import { Item, Status } from "../../domain/catalog/items/item";
-import { Decimal } from "../../shared/decimal";
-import { ItemStock } from "../../domain/catalog/items/item_stock";
-import { ItemNotFound } from "../../domain/catalog/items/item_not_found_error";
+import { describe, expect, it } from "vitest";
+import { SectionNotFound } from "../../../domain/catalog/departments/section_not_found_error";
+import { Item, Status } from "../../../domain/catalog/items/item";
+import { ItemNotFound } from "../../../domain/catalog/items/item_not_found_error";
+import { ItemStock } from "../../../domain/catalog/items/item_stock";
+import { VariationNotFound } from "../../../domain/catalog/variations/variation_not_found_error";
+import { Decimal } from "../../../shared/decimal";
+import { ID } from "../../../shared/id";
+import { CategoryRepositoryStub } from "../../stubs/categoria_repository_stub";
+import { ItemRepositoryStub } from "../../stubs/item_repository_stub";
+import { SectionRepositoryStub } from "../../stubs/section_repository_stub";
+import { VariationRepositoryStub } from "../../stubs/variation_repository_stub";
+import { catalogService } from "../services";
 
 describe("CatalogService - Recuperar artigos", () => {
     it("Deve buscar os artigos no repositório", async () => {
         const itemRepository = new ItemRepositoryStub();
         const categoryRepository = new CategoryRepositoryStub();
-        const { service } = makeService({
+        const { service } = catalogService({
             categoryRepository,
             itemRepository,
         });
@@ -41,7 +29,7 @@ describe("CatalogService - Recuperar artigos", () => {
 
     it("Deve retornar um array vazio se não existir artigos", async () => {
         const categoryRepository = new CategoryRepositoryStub();
-        const { service } = makeService({ categoryRepository });
+        const { service } = catalogService({ categoryRepository });
 
         const { result: items } = await service.listItems();
 
@@ -53,7 +41,7 @@ describe("CatalogService - Pesquisar artigos", () => {
     it("Deve pesquisar o artigo pelo seu nome", async () => {
         const itemRepository = new ItemRepositoryStub();
         const categoryRepository = new CategoryRepositoryStub();
-        const { service } = makeService({
+        const { service } = catalogService({
             categoryRepository,
             itemRepository,
         });
@@ -67,7 +55,7 @@ describe("CatalogService - Pesquisar artigos", () => {
     it("Deve pesquisar o artigo pelo seu identificador", async () => {
         const itemRepository = new ItemRepositoryStub();
         const categoryRepository = new CategoryRepositoryStub();
-        const { service } = makeService({
+        const { service } = catalogService({
             categoryRepository,
             itemRepository,
         });
@@ -81,7 +69,7 @@ describe("CatalogService - Pesquisar artigos", () => {
     it("Deve retornar um array vazio se não existir artigos", async () => {
         const itemRepository = new ItemRepositoryStub();
         const categoryRepository = new CategoryRepositoryStub();
-        const { service } = makeService({
+        const { service } = catalogService({
             categoryRepository,
             itemRepository,
         });
@@ -94,7 +82,7 @@ describe("CatalogService - Pesquisar artigos", () => {
     it("Deve paginar o resultado da listagem de artigos por 12 artigos por página", async () => {
         const itemRepository = new ItemRepositoryStub();
         const categoryRepository = new CategoryRepositoryStub();
-        const { service } = makeService({
+        const { service } = catalogService({
             categoryRepository,
             itemRepository,
         });
@@ -110,7 +98,7 @@ describe("CatalogService - Pesquisar artigos", () => {
         const pageToken = 2;
         const itemRepository = new ItemRepositoryStub();
         const categoryRepository = new CategoryRepositoryStub();
-        const { service } = makeService({
+        const { service } = catalogService({
             categoryRepository,
             itemRepository,
         });
@@ -127,7 +115,7 @@ describe("CatalogService - Pesquisar artigos", () => {
         const perPage = 30;
         const itemRepository = new ItemRepositoryStub();
         const categoryRepository = new CategoryRepositoryStub();
-        const { service } = makeService({
+        const { service } = catalogService({
             categoryRepository,
             itemRepository,
         });
@@ -142,7 +130,7 @@ describe("CatalogService - Pesquisar artigos", () => {
     it("Deve paginar o resultado da pesquisa de artigos por 12 artigos por página", async () => {
         const itemRepository = new ItemRepositoryStub();
         const categoryRepository = new CategoryRepositoryStub();
-        const { service } = makeService({
+        const { service } = catalogService({
             categoryRepository,
             itemRepository,
         });
@@ -158,7 +146,7 @@ describe("CatalogService - Pesquisar artigos", () => {
         const perPage = 30;
         const itemRepository = new ItemRepositoryStub();
         const categoryRepository = new CategoryRepositoryStub();
-        const { service } = makeService({
+        const { service } = catalogService({
             categoryRepository,
             itemRepository,
         });
@@ -174,7 +162,7 @@ describe("CatalogService - Pesquisar artigos", () => {
         const pageToken = 2;
         const itemRepository = new ItemRepositoryStub();
         const categoryRepository = new CategoryRepositoryStub();
-        const { service } = makeService({
+        const { service } = catalogService({
             categoryRepository,
             itemRepository,
         });
@@ -190,7 +178,7 @@ describe("CatalogService - Pesquisar artigos", () => {
         const query = "Branco";
         const itemRepository = new ItemRepositoryStub();
         const categoryRepository = new CategoryRepositoryStub();
-        const { service } = makeService({
+        const { service } = catalogService({
             categoryRepository,
             itemRepository,
         });
@@ -205,7 +193,7 @@ describe("CatalogService - Pesquisar artigos", () => {
         const query = "branco";
         const itemRepository = new ItemRepositoryStub();
         const categoryRepository = new CategoryRepositoryStub();
-        const { service } = makeService({
+        const { service } = catalogService({
             categoryRepository,
             itemRepository,
         });
@@ -219,7 +207,7 @@ describe("CatalogService - Pesquisar artigos", () => {
     it("Deve pesquirar items por tags", async () => {
         const itemRepository = new ItemRepositoryStub();
 
-        const { service } = makeService({ itemRepository });
+        const { service } = catalogService({ itemRepository });
 
         const { result: items } = await service.searchItems("Verão");
 
@@ -228,7 +216,7 @@ describe("CatalogService - Pesquisar artigos", () => {
     });
 
     it("Deve pesquisar items pelo seu ID com letras minúsculas", async () => {
-        const { service, itemRepository } = makeService();
+        const { service, itemRepository } = catalogService();
         await itemRepository.save(item);
 
         const { result: items } = await service.searchItems("rvs");
@@ -238,29 +226,10 @@ describe("CatalogService - Pesquisar artigos", () => {
     });
 });
 
-describe("CatalogService - Recuperar todas as variações", () => {
-    it("Deve recuperar as variações da base de dados", async () => {
-        const itemRepository = new ItemRepositoryStub();
-        const variationRepository = new InmemVariationRepository();
-        variationRepository.save(variation);
-
-        const categoryRepository = new CategoryRepositoryStub();
-        const { service } = makeService({
-            categoryRepository,
-            itemRepository,
-            variationRepository,
-        });
-
-        const variations = await service.listVariations();
-
-        expect(variations.length).toBeGreaterThanOrEqual(1);
-    });
-});
-
 describe("CatalogService - Registrar artigo", () => {
     it("Deve registrar o artigo no repositório", async () => {
         const categoryRepository = new CategoryRepositoryStub();
-        const { service, itemRepository } = makeService({
+        const { service, itemRepository } = catalogService({
             categoryRepository,
         });
 
@@ -280,7 +249,7 @@ describe("CatalogService - Registrar artigo", () => {
 
     it("Deve registrar o artigo com o seu preço", async () => {
         const categoryRepository = new CategoryRepositoryStub();
-        const { service, itemRepository } = makeService({
+        const { service, itemRepository } = catalogService({
             categoryRepository,
         });
 
@@ -298,7 +267,7 @@ describe("CatalogService - Registrar artigo", () => {
 
     it("Deve registrar a condição do artigo", async () => {
         const categoryRepository = new CategoryRepositoryStub();
-        const { service, itemRepository } = makeService({
+        const { service, itemRepository } = catalogService({
             categoryRepository,
         });
 
@@ -316,7 +285,7 @@ describe("CatalogService - Registrar artigo", () => {
 
     it("Deve modificar o estado do artigo para **Mau** quando tem uma nota a descrever os danos", async () => {
         const categoryRepository = new CategoryRepositoryStub();
-        const { service, itemRepository } = makeService({
+        const { service, itemRepository } = catalogService({
             categoryRepository,
         });
 
@@ -336,7 +305,7 @@ describe("CatalogService - Registrar artigo", () => {
 
     it("Deve gerar o identificador do artigo", async () => {
         const categoryRepository = new CategoryRepositoryStub();
-        const { service, itemRepository } = makeService({
+        const { service, itemRepository } = catalogService({
             categoryRepository,
         });
 
@@ -356,7 +325,7 @@ describe("CatalogService - Registrar artigo", () => {
         const variationRepository = new VariationRepositoryStub();
         const categoryRepository = new CategoryRepositoryStub();
 
-        const { service, itemRepository } = makeService({
+        const { service, itemRepository } = catalogService({
             variationRepository,
             categoryRepository,
         });
@@ -382,7 +351,7 @@ describe("CatalogService - Registrar artigo", () => {
     it("Deve registrar as variações do artigo", async () => {
         const variationRepository = new VariationRepositoryStub();
         const categoryRepository = new CategoryRepositoryStub();
-        const { service, itemRepository } = makeService({
+        const { service, itemRepository } = catalogService({
             variationRepository,
             categoryRepository,
         });
@@ -409,7 +378,7 @@ describe("CatalogService - Registrar artigo", () => {
 
     it("Deve retornar erro **VariationNotFound** se uma variação não for encontrada no repositório", async () => {
         const categoryRepository = new CategoryRepositoryStub();
-        const { service } = makeService({ categoryRepository });
+        const { service } = catalogService({ categoryRepository });
 
         const data = {
             name: "Artigo 1",
@@ -427,7 +396,10 @@ describe("CatalogService - Registrar artigo", () => {
     it("Deve registrar o artigo com a sua secção", async () => {
         const categoryRepository = new CategoryRepositoryStub();
         const sectionRepository = new SectionRepositoryStub();
-        const { service, itemRepository } = makeService({ categoryRepository, sectionRepository });
+        const { service, itemRepository } = catalogService({
+            categoryRepository,
+            sectionRepository,
+        });
 
         const data = {
             name: "Artigo 1",
@@ -444,7 +416,7 @@ describe("CatalogService - Registrar artigo", () => {
 
     it("Deve retornar erro **SectionNotFound** se a seção não for encontrada no repositório", async () => {
         const categoryRepository = new CategoryRepositoryStub();
-        const { service } = makeService({ categoryRepository });
+        const { service } = catalogService({ categoryRepository });
 
         const data = {
             name: "Artigo 1",
@@ -459,7 +431,7 @@ describe("CatalogService - Registrar artigo", () => {
     });
 
     it("Deve registrar o artigo com as suas tags", async () => {
-        const { service, itemRepository } = makeService();
+        const { service, itemRepository } = catalogService();
 
         const data = {
             name: "Artigo 1",
@@ -476,140 +448,10 @@ describe("CatalogService - Registrar artigo", () => {
     });
 });
 
-describe("CatalogService - Registrar categoria", () => {
-    it("Deve registrar uma categoria", async () => {
-        const itemRepository = new ItemRepositoryStub();
-
-        const { service, categoryRepository } = makeService({ itemRepository });
-
-        await service.registerCategory("");
-
-        const categories = await categoryRepository.getAll();
-
-        expect(categories.length).toEqual(1);
-    });
-
-    it("Deve registrar uma categoria com o seu nome no repositório", async () => {
-        const name = "Sapatos";
-        const itemRepository = new ItemRepositoryStub();
-
-        const { service, categoryRepository } = makeService({ itemRepository });
-
-        await service.registerCategory(name);
-
-        const category = await categoryRepository.last();
-
-        expect(category.name).toEqual(name);
-    });
-
-    it("Deve retornar erro **CategoryAlreadyExists** se a categoria já existir", async () => {
-        const name = "Sapatos";
-        const itemRepository = new ItemRepositoryStub();
-        const categoryRepository = new CategoryRepositoryStub();
-
-        const { service } = makeService({ itemRepository, categoryRepository });
-
-        const error = await service.registerCategory(name);
-
-        expect(error.isLeft()).toBeTruthy();
-        expect(error.value).toBeInstanceOf(CategoryAlreadyExists);
-    });
-
-    it("Deve registar as variações da categoria", async () => {
-        const name = "Sapatos";
-        const variationsIds = ["1", "2"];
-        const itemRepository = new ItemRepositoryStub();
-        const variationRepository = new VariationRepositoryStub();
-        const { service, categoryRepository } = makeService({
-            itemRepository,
-            variationRepository,
-        });
-
-        await service.registerCategory(name, variationsIds);
-
-        const category = await categoryRepository.last();
-
-        expect(category.variationsIds).toBeDefined();
-        expect(category.variationsIds.length).toEqual(2);
-        expect(category.variationsIds[0].toString()).toEqual("1");
-    });
-
-    it("Deve retornar erro **VariationNotFound** se uma das variações não existir no repositório", async () => {
-        const name = "Sapatos";
-        const variationsIds = ["1", "3"];
-        const itemRepository = new ItemRepositoryStub();
-
-        const { service } = makeService({ itemRepository });
-
-        const error = await service.registerCategory(name, variationsIds);
-
-        expect(error.isLeft()).toBeTruthy();
-        expect(error.value).toBeInstanceOf(VariationNotFound);
-    });
-
-    it("Deve gerar o identificador da categoria", async () => {
-        const name = "Sapatos";
-        const variationsIds = ["1", "2"];
-        const itemRepository = new ItemRepositoryStub();
-        const variationRepository = new VariationRepositoryStub();
-        const { service, categoryRepository } = makeService({
-            itemRepository,
-            variationRepository,
-        });
-
-        await service.registerCategory(name, variationsIds);
-
-        const category = await categoryRepository.last();
-
-        expect(category.categoryId.toString()).toEqual("RVSC - 1000");
-    });
-
-    it("Deve registrar a descrição da categoria", async () => {
-        const name = "Sapatos";
-        const variationsIds = ["1", "2"];
-        const description = "Categoria de sapatos";
-        const itemRepository = new ItemRepositoryStub();
-        const variationRepository = new VariationRepositoryStub();
-        const { service, categoryRepository } = makeService({
-            itemRepository,
-            variationRepository,
-        });
-
-        await service.registerCategory(name, variationsIds, description);
-
-        const category = await categoryRepository.last();
-
-        expect(category.description).toEqual(description);
-    });
-});
-
-describe("CatalogService - Recuperar todas as categorias", () => {
-    it("Deve recuperar as categorias do repositório", async () => {
-        const itemRepository = new ItemRepositoryStub();
-        const categoryRepository = new CategoryRepositoryStub();
-        const { service } = makeService({ itemRepository, categoryRepository });
-
-        const categorias = await service.listCategories();
-
-        expect(categorias.length).toBeGreaterThanOrEqual(1);
-    });
-});
-
-describe("CatalogService - Recuperar todas as secções", () => {
-    it("Deve recuperar as secções do repositório", async () => {
-        const sectionRepository = new SectionRepositoryStub();
-        const { service } = makeService({ sectionRepository });
-
-        const sections = await service.listSections();
-
-        expect(sections.length).toBeGreaterThanOrEqual(1);
-    });
-});
-
 describe("CatalogService - Recuperar artigo pelo ID", () => {
     it("Deve recuperar o artigo pelo seu ID", async () => {
         const itemRepository = new ItemRepositoryStub();
-        const { service } = makeService({ itemRepository });
+        const { service } = catalogService({ itemRepository });
 
         const itemOrErr = await service.getItem("1001");
 
@@ -619,7 +461,7 @@ describe("CatalogService - Recuperar artigo pelo ID", () => {
     });
 
     it('Deve retornar erro "ItemNotFound" se o artigo não existir', async () => {
-        const { service } = makeService();
+        const { service } = catalogService();
 
         const error = await service.getItem("1002");
 
@@ -628,7 +470,6 @@ describe("CatalogService - Recuperar artigo pelo ID", () => {
     });
 });
 
-const variation = new Variation(ID.fromString("1"), "Cor", ["Preto", "Branco", "Vermelho"]);
 const item = new Item(
     ID.fromString("RVS - 10001"),
     "T-shirt desportiva gola redonda",
@@ -636,30 +477,3 @@ const item = new Item(
     new ItemStock(10),
     { status: Status.Good }
 );
-
-interface Dependecies {
-    itemRepository?: ItemRepository;
-    variationRepository?: VariationRepository;
-    categoryRepository?: CategoryRepository;
-    sectionRepository?: SectionRepository;
-}
-
-function makeService(deps?: Dependecies) {
-    const storage = new InmemSequenceStorage();
-    const generator = new SequenceGenerator(storage, 1000);
-
-    const itemRepository = deps?.itemRepository ?? new InmemItemRepository();
-    const variationRepository = deps?.variationRepository ?? new InmemVariationRepository();
-    const categoryRepository = deps?.categoryRepository ?? new InmemCategoryRepository();
-    const sectionRepository = deps?.sectionRepository ?? new InmemSectionRepository();
-
-    const service = new CatalogService(
-        itemRepository,
-        variationRepository,
-        categoryRepository,
-        sectionRepository,
-        generator
-    );
-
-    return { service, itemRepository, variationRepository, categoryRepository, sectionRepository };
-}
