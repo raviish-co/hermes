@@ -1,18 +1,29 @@
 <script setup lang="ts">
 import type { ItemModel } from "~/lib/frontend/models/item";
 
-const item = toValue(useState<ItemModel>("item"));
+const item = ref<ItemModel>({
+    itemId: "",
+    name: "",
+    price: 0,
+    stock: 0,
+    sectionId: "",
+    categoryId: "",
+    variationsValues: [],
+});
+
 const variations = ref<object[]>([]);
 const catalog = useCatalog();
+const route = useRoute();
 
 const isDisabled = computed(() => {
-    if (item.name.length === 0) return true;
+    if (item.value.name.length === 0) return true;
 
-    if (!item.price) return true;
+    if (!item.value.price) return true;
 
-    if (item.condition?.status !== "Bom" && item.condition!.comment!.length === 0) return true;
+    if (item.value.condition?.status !== "Bom" && item.value.condition!.comment!.length === 0)
+        return true;
 
-    const category = catalog.findCategory(item.categoryId!);
+    const category = catalog.findCategory(item.value.categoryId!);
     if (category && category.variationsIds.length > variations.value.length) return true;
 
     return false;
@@ -23,21 +34,32 @@ function save() {
     navigateTo("/items");
 }
 
-onMounted(() => {
+let oldVariation: any[] = [];
+onBeforeMount(() => {
+    catalog
+        .getItem(route.params.id as string)
+        .then((res) => {
+            item.value = res;
+            oldVariation = res.variationsValues ?? [];
+        })
+        .catch(() => {
+            navigateTo("/items");
+        });
+
     catalog.listCategories();
-    variations.value = item.variationsValues ?? [];
 });
 </script>
 
 <template>
     <div class="section-content">
         <h1 class="page-title">Editar artigo</h1>
+
         <div class="space-y-4">
             <ChooseCategory
-                :category-id="item.categoryId"
-                :old-variations="item.variationsValues"
+                :category="catalog.findCategory(item.categoryId ?? '')"
+                :old-variation="oldVariation"
                 @category="item.categoryId = $event"
-                @variation="variations = $event"
+                @variation="item.variationsValues = $event"
             />
 
             <ChooseSection :sectionId="item.sectionId" @section="item.sectionId = $event" />
@@ -46,7 +68,7 @@ onMounted(() => {
 
             <input class="input-field" type="number" placeholder="Preço" v-model="item.price" />
 
-            <ChooseCondition :condition="item.condition" @condition="item.condition = $event" />
+            <ChooseCondition :condition="item?.condition" @condition="item.condition = $event" />
 
             <InputTags :tags="item.tags ? item.tags : []" />
 

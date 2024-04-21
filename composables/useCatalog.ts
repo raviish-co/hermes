@@ -40,6 +40,10 @@ export function useCatalog() {
         });
     };
 
+    const getItem = async (id: string) => {
+        return await service.getItem(id);
+    };
+
     const listVariations = () => {
         service.listVariations().then((res) => {
             variations.value = res;
@@ -58,7 +62,8 @@ export function useCatalog() {
         });
     };
 
-    const filterVariations = (ids: string[]) => {
+    const filterVariations = (ids?: string[]) => {
+        if (!ids) return [];
         return variations.value.filter((v) => ids.includes(v.variationId));
     };
 
@@ -72,6 +77,7 @@ export function useCatalog() {
         categories,
         variations,
         sections,
+        getItem,
         listItems,
         searchItems,
         listCategories,

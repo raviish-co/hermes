@@ -2,7 +2,6 @@ import type { VariationModel } from "@frontend/models/variation";
 import type { CategoryModel } from "../models/category";
 import type { ItemModel } from "@frontend/models/item";
 import type { SectionModel } from "../models/section";
-import type { Either } from "~/lib/backend/shared/either";
 
 export class CatalogService {
     async listItems(
@@ -52,6 +51,11 @@ export class CatalogService {
         return { items: response.items, total: response.total };
     }
 
+    async getItem(itemId: string): Promise<ItemModel> {
+        const item = await $fetch(`/api/items/${itemId}`, { method: "get" });
+        return this.#toItemModel(item);
+    }
+
     async registerItem(data: RegisterItemDTO) {
         return await $fetch("/api/items", { method: "post", body: data });
     }
@@ -59,6 +63,20 @@ export class CatalogService {
     async registerCategory(name: string, variationsIds: string[], description?: string) {
         const data = { name, variationsIds, description };
         return await $fetch("/api/categories", { method: "post", body: data });
+    }
+
+    #toItemModel(data: any): ItemModel {
+        return {
+            itemId: data.itemId,
+            name: data.name,
+            price: data.price,
+            stock: data.stock,
+            condition: data.condition,
+            categoryId: data.categoryId,
+            sectionId: data.sectionId,
+            variationsValues: data.variationsValues,
+            tags: data.tags,
+        };
     }
 }
 

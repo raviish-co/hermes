@@ -1,15 +1,9 @@
 <script setup lang="ts">
 import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_values";
 import { formatCurrency } from "~/lib/frontend/helpers/format_currency";
-import type { ItemModel } from "~/lib/frontend/models/item";
 
 const criteria = ref<string>("");
 const catalog = useCatalog();
-const state = useState<ItemModel>("item");
-
-function chooseItem(item: ItemModel) {
-    state.value = item;
-}
 
 onMounted(() => catalog.listItems());
 </script>
@@ -57,7 +51,7 @@ onMounted(() => catalog.listItems());
                         <td>{{ item.condition?.status }}</td>
 
                         <td>
-                            <NuxtLink to="/items/edit" @click="chooseItem(item)">
+                            <NuxtLink :to="`/items/${item.itemId}/`">
                                 <span class="material-symbols-outlined"> edit </span>
                             </NuxtLink>
                         </td>
