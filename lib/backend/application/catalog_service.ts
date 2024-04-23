@@ -1,23 +1,24 @@
+import type { Generator } from "../adapters/sequences/generator";
+import { Sequence } from "../adapters/sequences/sequence";
+import { Category } from "../domain/catalog/categories/category";
 import { CategoryAlreadyExists } from "../domain/catalog/categories/category_already_exists_error";
-import type { VariationNotFound } from "../domain/catalog/variations/variation_not_found_error";
-import type { VariationRepository } from "../domain/catalog/variations/variation_repository";
+import type { CategoryNotFound } from "../domain/catalog/categories/category_not_found_error";
 import type { CategoryRepository } from "../domain/catalog/categories/category_repository";
+import type { Section } from "../domain/catalog/departments/section";
 import type { SectionNotFound } from "../domain/catalog/departments/section_not_found_error";
 import type { SectionRepository } from "../domain/catalog/departments/section_repository";
-import type { RegisterCategoryError, RegisterItemError } from "../shared/errors";
+import { Item } from "../domain/catalog/items/item";
+import { ItemBuilder } from "../domain/catalog/items/item_builder";
+import type { ItemNotFound } from "../domain/catalog/items/item_not_found_error";
 import type { ItemRepository } from "../domain/catalog/items/item_repository";
 import { Variation } from "../domain/catalog/variations/variation";
-import { ItemBuilder } from "../domain/catalog/items/item_builder";
-import type { Section } from "../domain/catalog/departments/section";
-import type { Generator } from "../adapters/sequences/generator";
-import { Category } from "../domain/catalog/categories/category";
-import { left, right, type Either } from "../shared/either";
-import { Sequence } from "../adapters/sequences/sequence";
-import type { Pagination } from "../shared/pagination";
-import { Item } from "../domain/catalog/items/item";
+import type { VariationNotFound } from "../domain/catalog/variations/variation_not_found_error";
+import type { VariationRepository } from "../domain/catalog/variations/variation_repository";
 import { Decimal } from "../shared/decimal";
+import { left, right, type Either } from "../shared/either";
+import type { ItemError, RegisterCategoryError } from "../shared/errors";
 import { ID } from "../shared/id";
-import type { ItemNotFound } from "../domain/catalog/items/item_not_found_error";
+import type { Pagination } from "../shared/pagination";
 
 export class CatalogService {
     #itemRepository: ItemRepository;
@@ -70,15 +71,18 @@ export class CatalogService {
         return right(itemOrErr.value);
     }
 
-    async registerItem(data: RegisterItemDTO): Promise<Either<RegisterItemError, void>> {
+    async registerItem(data: ItemDTO): Promise<Either<ItemError, void>> {
         const itemId = this.#generator.generate(Sequence.Item);
 
-        const sectionOrErr = await this.#verifySectionId(data.sectionId);
-        if (sectionOrErr.isLeft()) return left(sectionOrErr.value);
+        const voidOrSectionErr = await this.#verifySectionId(data.sectionId);
+        if (voidOrSectionErr.isLeft()) return left(voidOrSectionErr.value);
+
+        const voidOrCategoryErr = await this.#verifyCategory(data.categoryId);
+        if (voidOrCategoryErr.isLeft()) return left(voidOrCategoryErr.value);
 
         const variationsIds = data.variations?.map((v) => ID.fromString(v.variationId));
-        const voidOrErr = await this.#verifyVariationsIds(variationsIds);
-        if (voidOrErr.isLeft()) return left(voidOrErr.value);
+        const voidOrVariationsErr = await this.#verifyVariationsIds(variationsIds);
+        if (voidOrVariationsErr.isLeft()) return left(voidOrVariationsErr.value);
 
         const variationsValues = this.#buildVariationsValues(data.variations);
         const itemOrErr = new ItemBuilder()
@@ -108,13 +112,11 @@ export class CatalogService {
         description?: string
     ): Promise<Either<RegisterCategoryError, void>> {
         const exists = await this.#categoryRepository.exists(name);
-
         if (exists) return left(new CategoryAlreadyExists());
 
         const variationsIds = this.#buildVariationsIds(variations);
 
         const voidOrErr = await this.#verifyVariationsIds(variationsIds);
-
         if (voidOrErr.isLeft()) return left(voidOrErr.value);
 
         const categoryId = this.#generator.generate(Sequence.Category);
@@ -122,6 +124,53 @@ export class CatalogService {
         const category = new Category(ID.fromString(categoryId), name, variationsIds, description);
 
         await this.#categoryRepository.save(category);
+
+        return right(undefined);
+    }
+
+    async updateItem(
+        itemId: string,
+        data: ItemDTO
+    ): Promise<Either<ItemNotFound | SectionNotFound, void>> {
+        const itemOrErr = await this.#itemRepository.getById(ID.fromString(itemId));
+        if (itemOrErr.isLeft()) return left(itemOrErr.value);
+
+        const voidOrSectionErr = await this.#verifySectionId(data.sectionId);
+        if (voidOrSectionErr.isLeft()) return left(voidOrSectionErr.value);
+
+        const voidOrCategoryErr = await this.#verifyCategory(data.categoryId);
+        if (voidOrCategoryErr.isLeft()) return left(voidOrCategoryErr.value);
+
+        const variationsIds = data.variations?.map((v) => ID.fromString(v.variationId));
+        const voidOrVariationsErr = await this.#verifyVariationsIds(variationsIds);
+        if (voidOrVariationsErr.isLeft()) return left(voidOrVariationsErr.value);
+
+        const variationsValues = this.#buildVariationsValues(data.variations);
+
+        const item = new ItemBuilder()
+            .withItemId(itemOrErr.value.itemId.toString())
+            .withName(data.name)
+            .withPrice(new Decimal(data.price))
+            .withSectionId(data.sectionId)
+            .withCategoryId(data.categoryId)
+            .withVariationsValues(variationsValues)
+            .withCondition(data.comment)
+            .withTags(data.tags)
+            .build();
+
+        if (item.isLeft()) return left(item.value);
+
+        this.#itemRepository.update(item.value);
+
+        return right(undefined);
+    }
+
+    async #verifyCategory(categoryId?: string): Promise<Either<CategoryNotFound, void>> {
+        if (!categoryId) return right(undefined);
+
+        const category = await this.#categoryRepository.getById(ID.fromString(categoryId));
+
+        if (category.isLeft()) return left(category.value);
 
         return right(undefined);
     }
@@ -164,7 +213,7 @@ export class CatalogService {
     }
 }
 
-type RegisterItemDTO = {
+type ItemDTO = {
     name: string;
     price: number;
     categoryId?: string;

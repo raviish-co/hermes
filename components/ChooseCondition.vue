@@ -13,6 +13,15 @@ const condition = reactive<ConditionModel>({ status: "Bom", comment: "" });
 const emits = defineEmits<Emits>();
 const props = defineProps<Props>();
 
+const result = computed(() => {
+    if (props.condition) {
+        condition.status = props.condition.status;
+        condition.comment = props.condition.comment;
+    }
+
+    return condition;
+});
+
 function changeStatus(event: Event) {
     const value = (event.target as HTMLSelectElement).value;
 
@@ -26,18 +35,11 @@ function changeStatus(event: Event) {
     condition.comment = "";
     emits("condition", condition);
 }
-
-onMounted(() => {
-    if (!props.condition) return;
-
-    condition.status = props.condition.status;
-    condition.comment = props.condition.comment;
-});
 </script>
 
 <template>
     <div class="input-container">
-        <select class="input-field" v-model="condition!.status" @change="changeStatus">
+        <select class="input-field" v-model="result.status" @change="changeStatus">
             <option selected value="Bom">Bom</option>
             <option value="Mau">Mau</option>
         </select>
@@ -45,7 +47,7 @@ onMounted(() => {
         <input
             type="text"
             placeholder="Escreva uma nota sobre o estado atual do artigo."
-            v-model="condition.comment"
+            v-model="result.comment"
             :class="condition.status === 'Bom' ? 'input-disabled' : 'input-field'"
             @input="emits('condition', condition)"
         />

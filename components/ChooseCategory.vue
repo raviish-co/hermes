@@ -5,24 +5,24 @@ import type { VariationValueModel } from "~/lib/frontend/models/variation_value"
 
 interface Props {
     category?: CategoryModel;
-    oldVariation?: VariationValueModel[];
+    oldVariations?: VariationValueModel[];
 }
 
 interface Emits {
     (e: "category", value: string): void;
     (e: "variation", value: any): void;
-}
-
-interface Variation {
-    variationId: string;
-    name: string;
-    value: string;
+    (e: "clear"): void;
 }
 
 const catalog = useCatalog();
 const variations = ref<VariationModel[]>([]);
-const selectedVariations = ref<Variation[]>([]);
+const selectedVariations = ref<VariationValueModel[]>([]);
 const viewOldVariation = ref<boolean>(true);
+
+const result = computed(() => {
+    if (props.oldVariations) return props.oldVariations;
+    return selectedVariations.value;
+});
 
 function chooseCategory(event: Event) {
     const value = (event.target as HTMLSelectElement).value;
@@ -30,11 +30,17 @@ function chooseCategory(event: Event) {
     selectedVariations.value = [];
 
     emits("category", value);
-    emits("variation", variations.value);
+    emits("variation", selectedVariations.value);
+    emits("clear");
+}
+
+function emit(i: number, value: any) {
+    selectedVariations.value[i] = value;
+    emits("variation", selectedVariations.value);
 }
 
 const emits = defineEmits<Emits>();
-defineProps<Props>();
+const props = defineProps<Props>();
 
 onMounted(() => {
     catalog.listVariations();
@@ -61,11 +67,11 @@ onMounted(() => {
     >
         <ChooseVariation
             v-for="(v, idx) in catalog.filterVariations(category?.variationsIds)"
+            :key="v.variationId"
+            :old-variation="result[idx]"
             :variation="v"
-            :old-variation="oldVariation"
             :view-old-variation="viewOldVariation"
-            :selectedVariations="selectedVariations"
-            @variation="selectedVariations[idx] = $event"
+            @variation="emit(idx, $event)"
         />
     </div>
 </template>

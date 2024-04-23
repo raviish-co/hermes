@@ -15,7 +15,8 @@ import type { InvalidLines } from "../domain/goods_receipt/invalid_lines_error";
 import type { MissingDependency } from "../domain/goods_receipt/missing_dependency_error";
 import type { CategoryAlreadyExists } from "../domain/catalog/categories/category_already_exists_error";
 import type { VariationNotFound } from "../domain/catalog/variations/variation_not_found_error";
-import type { SectionNotFound } from "../domain/catalog/sections/section_not_found_error";
+import type { CategoryNotFound } from "../domain/catalog/categories/category_not_found_error";
+import type { SectionNotFound } from "../domain/catalog/departments/section_not_found_error";
 
 export type GoodsIssueNoteError = InvalidPurpose | ItemNotFound | InvalidTotal | InsufficientStock;
 
@@ -36,4 +37,4 @@ export type GoodsReceiptError = InvalidEntryDate | InvalidLines | ItemNotFound |
 
 export type RegisterCategoryError = CategoryAlreadyExists | VariationNotFound;
 
-export type RegisterItemError = VariationNotFound | SectionNotFound;
+export type ItemError = VariationNotFound | SectionNotFound | CategoryNotFound;

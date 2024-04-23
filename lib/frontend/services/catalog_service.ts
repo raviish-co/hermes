@@ -56,8 +56,15 @@ export class CatalogService {
         return this.#toItemModel(item);
     }
 
-    async registerItem(data: RegisterItemDTO) {
+    async registerItem(data: ItemDTO) {
         return await $fetch("/api/items", { method: "post", body: data });
+    }
+
+    async updateItem(itemId: string, data: ItemDTO) {
+        return await $fetch(`/api/items/${itemId}`, {
+            method: "post",
+            body: data,
+        });
     }
 
     async registerCategory(name: string, variationsIds: string[], description?: string) {
@@ -80,7 +87,7 @@ export class CatalogService {
     }
 }
 
-interface RegisterItemDTO {
+interface ItemDTO {
     name: string;
     price: number;
     categoryId?: string;

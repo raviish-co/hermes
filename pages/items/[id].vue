@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ItemModel } from "~/lib/frontend/models/item";
+import { CatalogService } from "~/lib/frontend/services/catalog_service";
 
 const item = ref<ItemModel>({
     itemId: "",
@@ -9,40 +10,48 @@ const item = ref<ItemModel>({
     sectionId: "",
     categoryId: "",
     variationsValues: [],
+    tags: [],
 });
 
-const variations = ref<object[]>([]);
 const catalog = useCatalog();
 const route = useRoute();
+const itemId = route.params.id as string;
+const service = new CatalogService();
 
 const isDisabled = computed(() => {
-    if (item.value.name.length === 0) return true;
-
-    if (!item.value.price) return true;
+    if (!item.value.name || !item.value.price) return true;
 
     if (item.value.condition?.status !== "Bom" && item.value.condition!.comment!.length === 0)
         return true;
 
     const category = catalog.findCategory(item.value.categoryId!);
-    if (category && category.variationsIds.length > variations.value.length) return true;
+    if (category && item.value.variationsValues) {
+        if (category.variationsIds.length > item.value.variationsValues.length) return true;
+    }
 
     return false;
 });
 
 function save() {
-    alert("Artigo salvo com sucesso!");
-    navigateTo("/items");
+    service
+        .updateItem(itemId, {
+            ...item.value,
+            comment: item.value.condition?.comment,
+            variations: item.value.variationsValues,
+        })
+        .then(() => {
+            alert("Artigo salvo com sucesso!");
+            navigateTo("/items");
+        })
+        .catch((err) => alert(err.statusMessage));
 }
 
-let oldVariation: any[] = [];
 onBeforeMount(() => {
     catalog
-        .getItem(route.params.id as string)
-        .then((res) => {
-            item.value = res;
-            oldVariation = res.variationsValues ?? [];
-        })
-        .catch(() => {
+        .getItem(itemId)
+        .then((res) => (item.value = res))
+        .catch((err) => {
+            alert(err.statusMessage);
             navigateTo("/items");
         });
 
@@ -57,9 +66,10 @@ onBeforeMount(() => {
         <div class="space-y-4">
             <ChooseCategory
                 :category="catalog.findCategory(item.categoryId ?? '')"
-                :old-variation="oldVariation"
+                :old-variations="item.variationsValues"
                 @category="item.categoryId = $event"
                 @variation="item.variationsValues = $event"
+                @clear="() => (item.variationsValues = [])"
             />
 
             <ChooseSection :sectionId="item.sectionId" @section="item.sectionId = $event" />
@@ -70,7 +80,7 @@ onBeforeMount(() => {
 
             <ChooseCondition :condition="item?.condition" @condition="item.condition = $event" />
 
-            <InputTags :tags="item.tags ? item.tags : []" />
+            <InputTags :old-tags="item.tags" @tags="item.tags = $event" />
 
             <button class="btn bg-secondary-500" :disabled="isDisabled" @click="save()">
                 Salvar

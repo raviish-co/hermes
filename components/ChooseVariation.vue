@@ -3,25 +3,35 @@ import type { VariationModel } from "~/lib/frontend/models/variation";
 import type { VariationValueModel } from "~/lib/frontend/models/variation_value";
 
 interface Props {
-    variation?: VariationModel;
-    oldVariation?: VariationValueModel[];
-    viewOldVariation?: boolean;
-    selectedVariations?: Variation[];
+    variation: VariationModel;
+    oldVariation?: VariationValueModel;
 }
 
 interface Emits {
-    (e: "variation", value: Variation): void;
-}
-
-interface Variation {
-    variationId: string;
-    name: string;
-    value: string;
+    (e: "variation", value: VariationValueModel): void;
 }
 
 const catalog = useCatalog();
-const selectedVariation = ref<Variation>();
+const selectedVariation = ref<VariationValueModel>();
 const viewOptions = ref<boolean>(false);
+const emits = defineEmits<Emits>();
+const props = defineProps<Props>();
+
+const result = computed(() => {
+    if (!props.oldVariation && !selectedVariation.value) {
+        return props.variation.name;
+    }
+
+    if (props.oldVariation && !selectedVariation.value) return props.oldVariation.fulltext;
+
+    if (selectedVariation.value && !props.oldVariation) {
+        return selectedVariation.value.fulltext;
+    }
+
+    if (selectedVariation.value && props.oldVariation) return selectedVariation.value.fulltext;
+
+    return selectedVariation.value;
+});
 
 function toggle() {
     viewOptions.value = !viewOptions.value;
@@ -32,37 +42,18 @@ function chooseVariation(variationId: string, name: string, value: string) {
         variationId: variationId,
         name: name,
         value: value,
+        fulltext: `${name}: ${value}`,
     };
 
     emits("variation", selectedVariation.value);
 }
 
-defineProps<Props>();
-const emits = defineEmits<Emits>();
-
 onMounted(() => catalog.listVariations());
 </script>
 
 <template>
-    <div
-        v-if="variation"
-        class="relative input-field form-select cursor-pointer space-x-0"
-        @click="toggle()"
-    >
-        <div v-if="viewOldVariation">
-            {{ oldVariation?.find((o) => o.variationId === variation?.variationId)?.fulltext }}
-        </div>
-
-        <div v-else>
-            <span v-if="selectedVariations?.length === 0">{{ variation.name }}</span>
-            <span v-else>
-                {{
-                    selectedVariation
-                        ? `${selectedVariation.name}: ${selectedVariation.value}`
-                        : variation.name
-                }}
-            </span>
-        </div>
+    <div class="relative input-field form-select cursor-pointer space-x-0" @click="toggle()">
+        <div>{{ result }}</div>
 
         <div
             class="w-full h-48 mt-4 border bg-white absolute left-0 overflow-y-auto z-10 shadow-md"

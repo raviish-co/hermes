@@ -1,38 +1,47 @@
 <script setup lang="ts">
 interface Props {
-    tags: string[];
+    oldTags?: string[];
+}
+
+interface Emits {
+    (e: "tags", value: string[]): void;
 }
 
 const tag = ref<string>("");
+const newTags = ref<string[]>([]);
 
-function addTag() {
-    if (!tag.value) return;
+const result = computed(() => {
+    if (props.oldTags) newTags.value = [...props.oldTags];
+    return newTags.value;
+});
 
-    props.tags.push(tag.value);
+function add(value: string) {
+    if (!value) return;
+
+    emits("tags", newTags.value);
+
+    newTags.value.push(value);
+
     tag.value = "";
 }
 
-function removeTag(index: number) {
-    props.tags.splice(index, 1);
+function remove(index: number) {
+    newTags.value.splice(index, 1);
+
+    emits("tags", newTags.value);
 }
 
 const props = defineProps<Props>();
+const emits = defineEmits<Emits>();
 </script>
 
 <template>
     <div class="input-tags">
-        <div
-            class="flex flex-wrap gap-2"
-            :class="{
-                'p-0': tags.length === 0,
-                'p-2': tags.length > 0,
-            }"
-        >
+        <div class="flex flex-wrap gap-2 p-0" :class="{ 'p-2': result.length > 0 }">
             <span
-                v-if="tags"
-                v-for="(tag, idx) in tags"
+                v-for="(tag, idx) in result"
                 class="badge-light cursor-pointer"
-                @click="removeTag(idx)"
+                @click="remove(idx)"
             >
                 {{ tag }}
             </span>
@@ -41,7 +50,7 @@ const props = defineProps<Props>();
             class="w-full border-0 bg-transparent focus:ring-0 focus:border-primary"
             placeholder="Tags para o artigo"
             v-model="tag"
-            @keypress.enter="addTag()"
+            @keypress.enter="add(tag)"
         />
     </div>
 </template>

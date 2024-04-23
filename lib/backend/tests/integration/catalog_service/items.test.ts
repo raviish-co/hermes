@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { CategoryNotFound } from "../../../domain/catalog/categories/category_not_found_error";
 import { SectionNotFound } from "../../../domain/catalog/departments/section_not_found_error";
 import { Item, Status } from "../../../domain/catalog/items/item";
 import { ItemNotFound } from "../../../domain/catalog/items/item_not_found_error";
@@ -348,6 +349,22 @@ describe("CatalogService - Registrar artigo", () => {
         expect(item.categoryId!.toString()).toEqual(data.categoryId);
     });
 
+    it("Deve retornar **CategoryNotFound** se o ID da categoria não for encontrada no repositório", async () => {
+        const itemRepository = new ItemRepositoryStub();
+        const { service } = catalogService({ itemRepository });
+
+        const data = {
+            name: "Calça social de linho",
+            price: 10500,
+            categoryId: "2010",
+        };
+
+        const error = await service.registerItem(data);
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(CategoryNotFound);
+    });
+
     it("Deve registrar as variações do artigo", async () => {
         const variationRepository = new VariationRepositoryStub();
         const categoryRepository = new CategoryRepositoryStub();
@@ -445,6 +462,161 @@ describe("CatalogService - Registrar artigo", () => {
 
         expect(item.tags).toBeDefined();
         expect(item.tags).toEqual(data.tags);
+    });
+});
+
+describe("CatalogService - Actualizar dados do artigo", () => {
+    it("Deve actualizar nome e o preço do artigo no repositório", async () => {
+        const itemRepository = new ItemRepositoryStub();
+        const { service } = catalogService({ itemRepository });
+        const itemId = "1001";
+
+        const data = {
+            name: "T-shirt preta gola circular",
+            price: 15500,
+        };
+
+        await service.updateItem(itemId, data);
+
+        const itemOrErr = await itemRepository.getById(ID.fromString(itemId));
+        const item = <Item>itemOrErr.value;
+
+        expect(item.name).toEqual(data.name);
+        expect(item.price.value).toEqual(data.price);
+    });
+
+    it("Deve retornar **ItemNotFound** se o ID do artigo não for encontrado no repositório", async () => {
+        const { service } = catalogService();
+
+        const error = await service.updateItem("1000", { name: "T-shirt vermelha", price: 0 });
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(ItemNotFound);
+    });
+
+    it("Deve actualizar a secção do artigo no repositório", async () => {
+        const itemRepository = new ItemRepositoryStub();
+        const sectionRepository = new SectionRepositoryStub();
+        const { service } = catalogService({ itemRepository, sectionRepository });
+        const itemId = "1001";
+
+        const data = {
+            name: "Calça social de linho",
+            price: 10500,
+            sectionId: "2",
+        };
+
+        await service.updateItem(itemId, data);
+
+        const itemOrErr = await itemRepository.getById(ID.fromString(itemId));
+        const item = <Item>itemOrErr.value;
+
+        expect(item.sectionId).toBeDefined();
+        expect(item.sectionId?.toString()).toEqual(data.sectionId);
+    });
+
+    it("Deve retornar **SectionNotFound** se o ID da secção não for encontrada no repositório", async () => {
+        const itemRepository = new ItemRepositoryStub();
+        const { service } = catalogService({ itemRepository });
+        const itemId = "1001";
+
+        const data = {
+            name: "Calça social de linho",
+            price: 10500,
+            sectionId: "2010",
+        };
+
+        const error = await service.updateItem(itemId, data);
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(SectionNotFound);
+    });
+
+    it("Deve actualizar as tags do artigo no repositório", async () => {
+        const itemRepository = new ItemRepositoryStub();
+        const sectionRepository = new SectionRepositoryStub();
+        const { service } = catalogService({ itemRepository, sectionRepository });
+        const itemId = "1001";
+
+        const data = {
+            name: "Calça social de linho",
+            price: 10500,
+            sectionId: "1",
+            tags: ["Social", "Gala", "Executivo"],
+        };
+
+        await service.updateItem(itemId, data);
+
+        const itemOrErr = await itemRepository.getById(ID.fromString(itemId));
+        const item = <Item>itemOrErr.value;
+
+        expect(item.tags).toBeDefined();
+        expect(item.tags?.length).toBe(3);
+        expect(item.tags).toEqual(data.tags);
+    });
+
+    it("Deve actualizar a categoria do artigo no repositório", async () => {
+        const itemRepository = new ItemRepositoryStub();
+        const sectionRepository = new SectionRepositoryStub();
+        const categoryRepository = new CategoryRepositoryStub();
+        const { service } = catalogService({
+            itemRepository,
+            sectionRepository,
+            categoryRepository,
+        });
+        const itemId = "1002";
+
+        const data = {
+            name: "Calça social de linho",
+            price: 1500,
+            sectionId: "1",
+            tags: ["Social", "Gala"],
+            categoryId: "2",
+        };
+
+        await service.updateItem(itemId, data);
+
+        const itemOrErr = await itemRepository.getById(ID.fromString(itemId));
+        const item = <Item>itemOrErr.value;
+
+        expect(item.categoryId).toBeDefined();
+        expect(item.categoryId?.toString()).toEqual(data.categoryId);
+    });
+
+    it("Deve retornar **CategoryNotFound** se o ID da categoria não for encontrada no repositório", async () => {
+        const itemRepository = new ItemRepositoryStub();
+        const { service } = catalogService({ itemRepository });
+        const itemId = "1001";
+
+        const data = {
+            name: "Calça social de linho",
+            price: 10500,
+            categoryId: "2010",
+        };
+
+        const error = await service.updateItem(itemId, data);
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(CategoryNotFound);
+    });
+
+    it("Deve retornar erro **VariationNotFound** se uma variação não for encontrada no repositório", async () => {
+        const categoryRepository = new CategoryRepositoryStub();
+        const itemRepository = new ItemRepositoryStub();
+        const { service } = catalogService({ categoryRepository, itemRepository });
+        const itemId = "1001";
+
+        const data = {
+            name: "Artigo 1",
+            price: 100,
+            categoryId: "1",
+            variations: [{ variationId: "10", name: "Tamanho", value: "M" }],
+        };
+
+        const error = await service.updateItem(itemId, data);
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(VariationNotFound);
     });
 });
 

@@ -1,7 +1,8 @@
-import type { CategoryRepository } from "../../domain/catalog/categories/category_repository";
-import { CategoryNotFound } from "../../domain/catalog/categories/category_not_found_error";
-import { type Either, left, right } from "../../shared/either";
 import { Category } from "../../domain/catalog/categories/category";
+import { CategoryNotFound } from "../../domain/catalog/categories/category_not_found_error";
+import type { CategoryRepository } from "../../domain/catalog/categories/category_repository";
+import { type Either, left, right } from "../../shared/either";
+import type { ID } from "../../shared/id";
 
 export class InmemCategoryRepository implements CategoryRepository {
     #categories: Record<string, Category> = {};
@@ -13,6 +14,15 @@ export class InmemCategoryRepository implements CategoryRepository {
             this.#categories[category.categoryId.toString()] = category;
         });
     }
+
+    getById(categoryId: ID): Promise<Either<CategoryNotFound, Category>> {
+        const category = this.records.find((c) => c.categoryId.equals(categoryId));
+
+        if (!category) return Promise.resolve(left(new CategoryNotFound()));
+
+        return Promise.resolve(right(category));
+    }
+
     getAll(): Promise<Category[]> {
         return Promise.resolve(this.records);
     }

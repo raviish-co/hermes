@@ -20,6 +20,7 @@ const item = reactive({
 const condition = ref<ConditionModel>({ status: "Bom", comment: "" });
 const selectedVariations = ref<Variation[]>([]);
 const variationsIds = ref<string[]>([]);
+const tags = ref<string[]>([]);
 const catalog = useCatalog();
 const { categories } = catalog;
 
@@ -70,7 +71,7 @@ function register() {
         sectionId: item.sectionId,
         variations: selectedVariations.value,
         comment: condition.value.comment,
-        tags: item.tags,
+        tags: tags.value,
     };
 
     service
@@ -125,7 +126,7 @@ onMounted(() => {
 
             <ChooseCondition @condition="condition = $event" />
 
-            <InputTags :tags="item.tags" />
+            <InputTags @tags="tags = $event" />
 
             <button class="btn bg-secondary-500" :disabled="isDisabled" @click="register()">
                 Registrar

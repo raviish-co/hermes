@@ -1,20 +1,20 @@
-import { left, right, type Either } from "../shared/either";
-import { ID } from "../shared/id";
-import type { ItemRepository } from "../domain/catalog/items/item_repository";
-import type { Item } from "../domain/catalog/items/item";
+import type { Generator } from "../adapters/sequences/generator";
 import { Sequence } from "../adapters/sequences/sequence";
-import type { GoodsReceiptError } from "../shared/errors";
-import { InvalidLines } from "../domain/goods_receipt/invalid_lines_error";
-import { InvalidEntryDate } from "../domain/goods_receipt/invalid_entry_date_error";
-import type { GoodsReceiptNoteRepository } from "../domain/goods_receipt/goods_receipt_note_repository";
+import type { Item } from "../domain/catalog/items/item";
+import type { ItemRepository } from "../domain/catalog/items/item_repository";
 import { GoodsReceiptBuilder } from "../domain/goods_receipt/goods_receipt_builder";
 import { GoodsReceiptLine } from "../domain/goods_receipt/goods_receipt_line";
-import type { Generator } from "../adapters/sequences/generator";
+import type { GoodsReceiptNoteRepository } from "../domain/goods_receipt/goods_receipt_note_repository";
+import { InvalidEntryDate } from "../domain/goods_receipt/invalid_entry_date_error";
+import { InvalidLines } from "../domain/goods_receipt/invalid_lines_error";
+import { left, right, type Either } from "../shared/either";
+import type { GoodsReceiptError } from "../shared/errors";
+import { ID } from "../shared/id";
 
 export class GoodsReceiptService {
-    readonly #itemRepository: ItemRepository;
-    readonly #goodsReceiptNoteRepository: GoodsReceiptNoteRepository;
-    readonly #generator: Generator;
+    #itemRepository: ItemRepository;
+    #goodsReceiptNoteRepository: GoodsReceiptNoteRepository;
+    #generator: Generator;
 
     constructor(
         itemRepository: ItemRepository,

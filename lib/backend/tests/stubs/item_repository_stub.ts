@@ -33,7 +33,7 @@ const _itemData = [
         stock: 10,
         condition: { status: Status.Good },
         categoryId: "1",
-        sectionId: "1001",
+        sectionId: "1",
         variationsValues: { "1": "Cor: Branco", "2": "Marca: Nike" },
     },
     {
@@ -43,7 +43,7 @@ const _itemData = [
         stock: 10,
         condition: { status: Status.Good },
         categoryId: "4",
-        sectionId: "1002",
+        sectionId: "1",
         variationsValues: { "1": "Cor: Castanho", "2": "Marca: Gucci" },
     },
     {
@@ -53,7 +53,7 @@ const _itemData = [
         stock: 7,
         condition: { status: Status.Good },
         categoryId: "1",
-        sectionId: "1003",
+        sectionId: "1",
         variationsValues: { "1": "Cor: Verde", "2": "Marca: Adidas" },
     },
     {
@@ -63,7 +63,7 @@ const _itemData = [
         stock: 7,
         condition: { status: Status.Good },
         categoryId: "7",
-        sectionId: "1004",
+        sectionId: "1",
         variationsValues: { "1": "Cor: Verde", "2": "Marca: Adidas" },
         tags: ["Verão", "Desporto"],
     },
@@ -74,7 +74,7 @@ const _itemData = [
         stock: 8,
         condition: { status: Status.Good },
         categoryId: "3",
-        sectionId: "1005",
+        sectionId: "2",
         variationsValues: { "1": "Cor: Castanho", "2": "Marca: Polo", "5": "Tamanho: M" },
     },
     {
@@ -84,7 +84,7 @@ const _itemData = [
         stock: 8,
         condition: { status: Status.Good },
         categoryId: "1",
-        sectionId: "1006",
+        sectionId: "2",
         variationsValues: { "1": "Cor: Preta", "2": "Marca: Polo" },
     },
     {
@@ -94,7 +94,7 @@ const _itemData = [
         stock: 10,
         condition: { status: Status.Good },
         categoryId: "3",
-        sectionId: "1007",
+        sectionId: "2",
         variationsValues: { "1": "Cor: Castanho", "2": "Marca: Polo", "5": "Tamanho: L" },
     },
 ];
