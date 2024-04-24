@@ -4,7 +4,7 @@ interface Props {
 }
 
 interface Emits {
-    (e: "section", value: string): void;
+    (e: "sectionId", value: string): void;
 }
 
 const emits = defineEmits<Emits>();
@@ -12,7 +12,7 @@ const catalog = useCatalog();
 
 function chooseSection(event: Event) {
     const value = (event.target as HTMLSelectElement).value;
-    emits("section", value);
+    emits("sectionId", value);
 }
 
 defineProps<Props>();

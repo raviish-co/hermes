@@ -10,6 +10,7 @@ const item = ref<ItemModel>({
     sectionId: "",
     categoryId: "",
     variationsValues: [],
+    condition: { status: "Bom", comment: "" },
     tags: [],
 });
 
@@ -24,10 +25,15 @@ const isDisabled = computed(() => {
     if (item.value.condition?.status !== "Bom" && item.value.condition!.comment!.length === 0)
         return true;
 
-    const category = catalog.findCategory(item.value.categoryId!);
-    if (category && item.value.variationsValues) {
-        if (category.variationsIds.length > item.value.variationsValues.length) return true;
-    }
+    if (!item.value.categoryId) return false;
+
+    if (!item.value.variationsValues) return true;
+
+    const category = catalog.findCategory(item.value.categoryId)!;
+
+    if (!category) return false;
+
+    if (category.variationsIds.length > item.value.variationsValues.length) return true;
 
     return false;
 });
@@ -67,18 +73,23 @@ onBeforeMount(() => {
             <ChooseCategory
                 :category="catalog.findCategory(item.categoryId ?? '')"
                 :old-variations="item.variationsValues"
-                @category="item.categoryId = $event"
+                @item-name="item.name = $event"
+                @category-id="item.categoryId = $event"
                 @variation="item.variationsValues = $event"
                 @clear="() => (item.variationsValues = [])"
             />
 
-            <ChooseSection :sectionId="item.sectionId" @section="item.sectionId = $event" />
+            <ChooseSection :sectionId="item.sectionId" @section-id="item.sectionId = $event" />
 
             <input class="input-field" type="text" placeholder="Nome" v-model="item.name" />
 
             <input class="input-field" type="number" placeholder="Preço" v-model="item.price" />
 
-            <ChooseCondition :condition="item?.condition" @condition="item.condition = $event" />
+            <ChooseCondition
+                :condition="item?.condition"
+                @status="item.condition!.status = $event as any"
+                @comment="item.condition!.comment = $event"
+            />
 
             <InputTags :old-tags="item.tags" @tags="item.tags = $event" />
 

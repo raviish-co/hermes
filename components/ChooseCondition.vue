@@ -2,21 +2,22 @@
 import type { ConditionModel } from "~/lib/frontend/models/condition";
 
 interface Emits {
-    (e: "condition", value: ConditionModel): void;
+    (e: "status", value: string): void;
+    (e: "comment", value: string): void;
 }
 
 interface Props {
     condition?: ConditionModel;
 }
 
-const condition = reactive<ConditionModel>({ status: "Bom", comment: "" });
+const condition = reactive({ status: "Bom", comment: "" });
 const emits = defineEmits<Emits>();
 const props = defineProps<Props>();
 
 const result = computed(() => {
     if (props.condition) {
         condition.status = props.condition.status;
-        condition.comment = props.condition.comment;
+        condition.comment = props.condition.comment ?? "";
     }
 
     return condition;
@@ -28,12 +29,16 @@ function changeStatus(event: Event) {
     if (value === "Bom") {
         condition.status = "Bom";
         condition.comment = "";
+        emits("status", condition.status);
+        emits("comment", condition.comment);
         return;
     }
 
     condition.status = "Mau";
     condition.comment = "";
-    emits("condition", condition);
+
+    emits("status", condition.status);
+    emits("comment", condition.comment);
 }
 </script>
 
@@ -49,7 +54,7 @@ function changeStatus(event: Event) {
             placeholder="Escreva uma nota sobre o estado atual do artigo."
             v-model="result.comment"
             :class="condition.status === 'Bom' ? 'input-disabled' : 'input-field'"
-            @input="emits('condition', condition)"
+            @input="emits('comment', result.comment)"
         />
     </div>
 </template>

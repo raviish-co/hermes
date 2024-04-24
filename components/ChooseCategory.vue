@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { CategoryModel } from "~/lib/frontend/models/category";
-import type { VariationModel } from "~/lib/frontend/models/variation";
 import type { VariationValueModel } from "~/lib/frontend/models/variation_value";
 
 interface Props {
@@ -9,15 +8,16 @@ interface Props {
 }
 
 interface Emits {
-    (e: "category", value: string): void;
+    (e: "categoryId", value: string): void;
     (e: "variation", value: any): void;
     (e: "clear"): void;
+    (e: "itemName", value: string): void;
 }
 
 const catalog = useCatalog();
-const variations = ref<VariationModel[]>([]);
 const selectedVariations = ref<VariationValueModel[]>([]);
 const viewOldVariation = ref<boolean>(true);
+const itemName = ref<string>("");
 
 const result = computed(() => {
     if (props.oldVariations) return props.oldVariations;
@@ -29,14 +29,30 @@ function chooseCategory(event: Event) {
     viewOldVariation.value = false;
     selectedVariations.value = [];
 
-    emits("category", value);
+    const category = catalog.findCategory(value)!;
+    itemName.value = category.name;
+
+    buildItemName();
+
+    emits("itemName", itemName.value);
+    emits("categoryId", value);
     emits("variation", selectedVariations.value);
     emits("clear");
 }
 
-function emit(i: number, value: any) {
+function emitVariation(i: number, value: any) {
     selectedVariations.value[i] = value;
+
+    buildItemName();
+
     emits("variation", selectedVariations.value);
+    emits("itemName", itemName.value);
+}
+
+function buildItemName() {
+    const categoryName = itemName.value.split(" ")[0];
+    const varitions = selectedVariations.value.map((v) => v.value).join(" ");
+    itemName.value = `${categoryName} ${varitions}`;
 }
 
 const emits = defineEmits<Emits>();
@@ -63,7 +79,7 @@ onMounted(() => {
 
     <div
         class="grid grid-cols-1 gap-4 my-4 sm:grid-cols-4"
-        :class="{ hidden: category?.variationsIds.length === 0 }"
+        :class="{ hidden: category ? category.variationsIds.length === 0 : true }"
     >
         <ChooseVariation
             v-for="(v, idx) in catalog.filterVariations(category?.variationsIds)"
@@ -71,7 +87,7 @@ onMounted(() => {
             :old-variation="result[idx]"
             :variation="v"
             :view-old-variation="viewOldVariation"
-            @variation="emit(idx, $event)"
+            @variation="emitVariation(idx, $event)"
         />
     </div>
 </template>
