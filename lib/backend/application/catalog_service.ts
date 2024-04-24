@@ -154,6 +154,7 @@ export class CatalogService {
             .withSectionId(data.sectionId)
             .withCategoryId(data.categoryId)
             .withVariationsValues(variationsValues)
+            .withStock(itemOrErr.value.stock.quantity)
             .withCondition(data.comment)
             .withTags(data.tags)
             .build();

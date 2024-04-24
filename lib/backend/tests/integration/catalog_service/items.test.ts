@@ -494,6 +494,27 @@ describe("CatalogService - Actualizar dados do artigo", () => {
         expect(error.value).toBeInstanceOf(ItemNotFound);
     });
 
+    it("Deve ser o mesmo o valor em stock do artigo após a actualização", async () => {
+        const itemRepository = new ItemRepositoryStub();
+        const { service } = catalogService({ itemRepository });
+        const itemId = "1001";
+
+        const itemOrErr = await itemRepository.getById(ID.fromString(itemId));
+        const item = <Item>itemOrErr.value;
+
+        const data = {
+            name: "T-shirt preta gola circular",
+            price: 15500,
+        };
+
+        await service.updateItem(itemId, data);
+
+        const itemOrErr2 = await itemRepository.getById(ID.fromString(itemId));
+        const item2 = <Item>itemOrErr2.value;
+
+        expect(item2.stock.quantity).toEqual(item.stock.quantity);
+    });
+
     it("Deve actualizar a secção do artigo no repositório", async () => {
         const itemRepository = new ItemRepositoryStub();
         const sectionRepository = new SectionRepositoryStub();
