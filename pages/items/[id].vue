@@ -87,7 +87,7 @@ onBeforeMount(() => {
 
             <ChooseCondition
                 :condition="item?.condition"
-                @status="item.condition!.status = $event as any"
+                @status="item.condition!.status = $event"
                 @comment="item.condition!.comment = $event"
             />
 

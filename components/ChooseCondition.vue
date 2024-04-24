@@ -2,7 +2,7 @@
 import type { ConditionModel } from "~/lib/frontend/models/condition";
 
 interface Emits {
-    (e: "status", value: string): void;
+    (e: "status", value: "Bom" | "Mau"): void;
     (e: "comment", value: string): void;
 }
 
@@ -29,7 +29,7 @@ function changeStatus(event: Event) {
     if (value === "Bom") {
         condition.status = "Bom";
         condition.comment = "";
-        emits("status", condition.status);
+        emits("status", "Bom");
         emits("comment", condition.comment);
         return;
     }
@@ -37,24 +37,25 @@ function changeStatus(event: Event) {
     condition.status = "Mau";
     condition.comment = "";
 
-    emits("status", condition.status);
+    emits("status", "Mau");
     emits("comment", condition.comment);
 }
 </script>
 
 <template>
-    <div class="input-container">
+    <div class="space-y-4">
         <select class="input-field" v-model="result.status" @change="changeStatus">
             <option selected value="Bom">Bom</option>
             <option value="Mau">Mau</option>
         </select>
 
-        <input
-            type="text"
+        <textarea
+            v-model="condition.comment"
             placeholder="Escreva uma nota sobre o estado atual do artigo."
-            v-model="result.comment"
+            :rows="3"
             :class="condition.status === 'Bom' ? 'input-disabled' : 'input-field'"
-            @input="emits('comment', result.comment)"
+            class="input-field resize-none"
+            @input="emits('comment', condition.comment)"
         />
     </div>
 </template>

@@ -3,27 +3,37 @@ import type { ConditionModel } from "@frontend/models/condition";
 import type { VDialog } from "#build/components";
 import { Note } from "~/lib/frontend/domain/note";
 
-const BAD = "Mau";
+interface Emits {
+    (e: "update:condition", value: ConditionModel): void;
+}
 
-const itemId = ref<string>("");
-const condition = ref<ConditionModel>({ status: "Bom", comment: "" });
+const condition = reactive<ConditionModel>({ status: "Bom", comment: "" });
 const dialogRef = ref<typeof VDialog>();
-const props = defineProps<{ note: Note }>();
+const emits = defineEmits<Emits>();
+const itemId = ref<string>("");
 
-const isGoodState = computed(() => condition.value.status !== BAD);
-const isValidCondition = computed(() => condition.value.status === BAD && !condition.value.comment);
+const isDisabled = computed(() => {
+    if (condition.status === "Mau" && !condition.comment) return true;
+
+    if (condition.comment && condition.comment.length === 0) return false;
+
+    return false;
+});
 
 function initializeCondition(id: string, oldCondition: ConditionModel) {
     itemId.value = id;
-    condition.value = Object.assign({}, oldCondition);
+    condition.comment = "";
+    condition.status = "Bom";
+
+    if (oldCondition.comment) {
+        condition.comment = oldCondition.comment;
+        condition.status = "Mau";
+    }
 }
 
 function updateCondition() {
-    if (condition.value.status !== BAD) {
-        condition.value.comment = "";
-    }
+    props.note.updateCondition(itemId.value, condition);
 
-    props.note.updateCondition(itemId.value, condition.value);
     dialogRef.value?.close();
 }
 
@@ -32,24 +42,18 @@ function show() {
 }
 
 defineExpose({ show, initializeCondition });
+const props = defineProps<{ note: Note }>();
 </script>
 
 <template>
     <VDialog ref="dialogRef" title="Descrever estado do artigo" class="max-w-[30rem]">
-        <select class="input-field" v-model="condition.status">
-            <option value="Bom">Bom</option>
-            <option value="Mau">Mau</option>
-        </select>
-
-        <textarea
-            v-model="condition.comment"
-            placeholder="Escreva uma nota sobre o estado atual do artigo."
-            :rows="3"
-            :disabled="isGoodState"
-            class="input-field resize-none"
+        <ChooseCondition
+            :condition="condition"
+            @status="condition.status = $event"
+            @comment="condition.comment = $event"
         />
 
-        <button class="btn-secondary" :disabled="isValidCondition" @click="updateCondition">
+        <button class="btn-secondary" :disabled="isDisabled" @click="updateCondition()">
             Salvar
         </button>
     </VDialog>
