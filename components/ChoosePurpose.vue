@@ -65,6 +65,7 @@ onMounted(async () => {
         <div class="input-container">
             <select
                 class="input-field"
+                required
                 :value="purpose.description || 'Finalidade'"
                 @change="choosePurpose"
             >
@@ -75,6 +76,7 @@ onMounted(async () => {
             </select>
 
             <select
+                :required="!disableDetailsConstraint"
                 :value="purpose.details || 'Detalhes'"
                 :class="{
                     'input-field': !disableDetailsConstraint,
@@ -92,6 +94,7 @@ onMounted(async () => {
         <input
             v-model="purpose.notes"
             class="input-field"
+            :required="!isEmpty"
             :class="{ 'input-disabled': isEmpty }"
             :placeholder="notesType"
             @input="$emit('choosed', purpose as Purpose)"
