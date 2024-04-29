@@ -40,7 +40,7 @@ onMounted(async () => {
 
 <template>
     <div class="section-content">
-        <h1 class="page-title">Registrar categoria</h1>
+        <h1 class="page-title">Registar categoria</h1>
 
         <div class="space-y-4">
             <input class="input-field" type="text" placeholder="Categoria" v-model="name" />

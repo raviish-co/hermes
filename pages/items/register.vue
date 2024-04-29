@@ -54,7 +54,7 @@ onMounted(() => {
 </script>
 <template>
     <div class="section-content">
-        <h1 class="page-title">Registrar artigo</h1>
+        <h1 class="page-title">Registar artigo</h1>
 
         <div class="space-y-4">
             <ChooseCategory
