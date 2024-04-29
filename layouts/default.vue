@@ -47,16 +47,6 @@ function toggleMenu() {
             </div>
 
             <div class="flex flex-col w-full">
-                <NuxtLink to="/items" class="nuxt-link">
-                    <span class="material-symbols-outlined text-xl"> add_shopping_cart </span>
-                    <span>Artigos</span>
-                </NuxtLink>
-
-                <NuxtLink to="/categories" class="nuxt-link">
-                    <span class="material-symbols-outlined text-xl"> add_shopping_cart </span>
-                    <span>Categorias</span>
-                </NuxtLink>
-
                 <NuxtLink to="/goods-issues" class="nuxt-link">
                     <span class="material-symbols-outlined text-xl"> shopping_cart_checkout </span>
                     <span>Guias de saída</span>
@@ -69,7 +59,17 @@ function toggleMenu() {
 
                 <NuxtLink to="/items/upload" class="nuxt-link">
                     <span class="material-symbols-outlined text-xl"> upload </span>
-                    <span>Importar</span>
+                    <span>Importar artigos</span>
+                </NuxtLink>
+
+                <NuxtLink to="/items" class="nuxt-link">
+                    <span class="material-symbols-outlined text-xl"> add_box </span>
+                    <span>Artigos</span>
+                </NuxtLink>
+
+                <NuxtLink to="/categories" class="nuxt-link">
+                    <span class="material-symbols-outlined"> category </span>
+                    <span>Categorias</span>
                 </NuxtLink>
             </div>
         </div>
