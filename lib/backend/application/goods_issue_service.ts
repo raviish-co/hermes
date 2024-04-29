@@ -118,6 +118,7 @@ export class GoodsIssueService {
                 item.price,
                 item.fulltext,
                 quantity,
+                item.getCondition(),
                 item.variations
             );
 

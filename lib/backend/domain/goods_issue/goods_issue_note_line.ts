@@ -1,5 +1,6 @@
 import { ID } from "../../shared/id";
 import { Decimal } from "../../shared/decimal";
+import type { Condition } from "../catalog/items/item";
 
 export class GoodsIssueNoteLine {
     readonly issueLineId: ID;
@@ -7,8 +8,9 @@ export class GoodsIssueNoteLine {
     readonly name: string;
     readonly fulltext: string;
     readonly price: Decimal;
-    readonly #quantity: number;
     readonly variationsValues?: Record<string, string>;
+    readonly condition?: Condition;
+    readonly #quantity: number;
     quantityReturned: number;
     #netTotal: Decimal;
 
@@ -18,6 +20,7 @@ export class GoodsIssueNoteLine {
         price: Decimal,
         fulltext: string,
         quantity: number,
+        condition?: Condition,
         variations?: Record<string, string>,
         quantityReturned?: number
     ) {
@@ -28,8 +31,9 @@ export class GoodsIssueNoteLine {
         this.fulltext = fulltext;
         this.price = price;
         this.#quantity = quantity;
-        this.quantityReturned = quantityReturned || 0;
         this.#netTotal = new Decimal(0);
+        this.quantityReturned = quantityReturned || 0;
+        this.condition = condition;
 
         this.#calculateTotal();
     }

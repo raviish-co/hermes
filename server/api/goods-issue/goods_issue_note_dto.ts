@@ -17,6 +17,7 @@ interface GoodsIssueLineDTO {
     quantityToReturn: number;
     fulltext: string;
     variationValues: VariationValues[];
+    condition: any;
 }
 
 interface GoodsIssueNoteDTO {
@@ -39,6 +40,7 @@ function toGoodsIssueLineDTO(line: GoodsIssueNoteLine): GoodsIssueLineDTO {
         quantityToReturn: line.maxToReturn,
         fulltext: line.fulltext,
         variationValues: toVariationValuesDTO(line.variationsValues),
+        condition: line.condition,
     };
 }
 
