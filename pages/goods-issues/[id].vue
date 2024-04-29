@@ -94,7 +94,7 @@ function newGoodsReturn() {
                 >
                     Devolver
                 </button>
-                <button class="btn-light">Cancelar</button>
+                <NuxtLink class="btn-light" to="/goods-issues/">Cancelar</NuxtLink>
             </div>
 
             <div
