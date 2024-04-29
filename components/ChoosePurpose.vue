@@ -65,7 +65,7 @@ onMounted(async () => {
         <div class="input-container">
             <select
                 class="input-field"
-                required
+                :class="{ 'input-required': !purpose?.description }"
                 :value="purpose.description || 'Finalidade'"
                 @change="choosePurpose"
             >
@@ -76,11 +76,11 @@ onMounted(async () => {
             </select>
 
             <select
-                :required="!disableDetailsConstraint"
                 :value="purpose.details || 'Detalhes'"
                 :class="{
                     'input-field': !disableDetailsConstraint,
                     'input-disabled': disableDetailsConstraint,
+                    'input-required': purpose.details == '',
                 }"
                 @change="selectDetails"
             >
@@ -94,8 +94,10 @@ onMounted(async () => {
         <input
             v-model="purpose.notes"
             class="input-field"
-            :required="!isEmpty"
-            :class="{ 'input-disabled': isEmpty }"
+            :class="{
+                'input-disabled': isEmpty,
+                'input-required': purpose.notes == '',
+            }"
             :placeholder="notesType"
             @input="$emit('choosed', purpose as Purpose)"
         />

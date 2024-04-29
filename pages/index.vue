@@ -7,12 +7,15 @@ import type { ChoosePurpose } from "#build/components";
 const returnDate = getCurrentLocalDateTime();
 const service = new GoodsIssueService();
 const note = reactive(new GoodsIssueNote(returnDate));
+const wasSubmitted = ref<boolean>(false);
 
 function newGoodsIssue() {
     service
         .new(note as GoodsIssueNote)
         .then((res) => alert(res.message))
         .catch((err) => alert(err.statusMessage));
+
+    wasSubmitted.value = true;
 }
 </script>
 
@@ -35,7 +38,11 @@ function newGoodsIssue() {
     <section class="footer">
         <div class="footer-container">
             <div class="flex flex-wrap sm:flex-nowrap gap-4 w-full md:w-auto pb-4 md:pb-0">
-                <button class="btn-secondary" :disabled="!note.isValid()" @click="newGoodsIssue">
+                <button
+                    class="btn-secondary"
+                    :disabled="!note.isValid() || wasSubmitted"
+                    @click="newGoodsIssue"
+                >
                     Solicitar
                 </button>
                 <button class="btn-light" @click="note.clear()">Cancelar</button>

@@ -36,7 +36,10 @@ const isDisabled = computed(() => {
 
 function save() {
     service
-        .updateItem(itemId, item.value)
+        .updateItem(itemId, {
+            ...item.value,
+            variations: item.value.variationsValues,
+        })
         .then(() => {
             alert("Artigo salvo com sucesso!");
             navigateTo("/items");
