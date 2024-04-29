@@ -126,7 +126,7 @@ h1 {
 }
 
 .nuxt-link {
-    @apply flex gap-3 items-center p-2 hover:bg-black hover:text-white w-full;
+    @apply flex gap-3 items-center px-2 py-3 hover:bg-black hover:text-white w-full border-b;
 }
 
 ::-webkit-scrollbar {
