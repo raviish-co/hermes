@@ -133,6 +133,10 @@ h1 {
     @apply flex gap-3 items-center px-2 py-3 hover:bg-black hover:text-white w-full border-b;
 }
 
+.card {
+    @apply border px-3 py-5 border-light-500 space-y-3 bg-gray-200;
+}
+
 ::-webkit-scrollbar {
     background-color: transparent;
     width: 0.5rem;

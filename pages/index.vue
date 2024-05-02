@@ -1,70 +1,42 @@
-<script lang="ts" setup>
-import { getCurrentLocalDateTime } from "~/lib/frontend/helpers/current_local_date_time";
-import { GoodsIssueService } from "~/lib/frontend/services/goods_issue_service";
-import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
-import type { ChoosePurpose } from "#build/components";
-
-const returnDate = getCurrentLocalDateTime();
-const service = new GoodsIssueService();
-const note = reactive(new GoodsIssueNote(returnDate));
-const wasSubmitted = ref<boolean>(false);
-
-function newGoodsIssue() {
-    service
-        .new(note as GoodsIssueNote)
-        .then((res) => alert(res.message))
-        .catch((err) => alert(err.statusMessage));
-
-    wasSubmitted.value = true;
-}
-</script>
-
 <template>
-    <section class="section-content">
-        <h1 class="page-title">Guia de Saída de Artigos</h1>
-
-        <section class="space-y-4 mb-4">
-            <div class="input-container">
-                <div class="input-disabled">John Doe</div>
-                <input v-model="note.returnDate" type="datetime-local" class="input-field" />
+    <div class="section-content">
+        <h1 class="page-title">Dashboard</h1>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="card">
+                <span class="material-symbols-outlined text-3xl"> calendar_month </span>
+                <h1>10</h1>
+                <p class="text-sm text-gray-500">Guias de saída vencidas</p>
             </div>
 
-            <ChoosePurpose @choosed="note.setPurpose($event)" />
-        </section>
-
-        <IssueNote :note="note" />
-    </section>
-
-    <section class="footer">
-        <div class="footer-container">
-            <div class="flex flex-wrap sm:flex-nowrap gap-4 w-full md:w-auto pb-4 md:pb-0">
-                <button
-                    class="btn-secondary"
-                    :disabled="!note.isValid() || wasSubmitted"
-                    @click="newGoodsIssue"
-                >
-                    Solicitar
-                </button>
-                <button class="btn-light" @click="note.clear()">Cancelar</button>
+            <div class="card">
+                <span class="material-symbols-outlined text-3xl"> trending_down </span>
+                <h1>125</h1>
+                <p class="text-sm text-gray-500">Artigos com stock esgotado</p>
             </div>
 
-            <div
-                class="text-sm md:text-base flex flex-col sm:flex-row justify-center gap-2 w-full md:w-auto overflow-hidde"
-            >
-                <p
-                    class="text-center w-full md:w-auto md:text-right space-x-1 sm:max-w-80 truncate overflow-hidden"
-                >
-                    <span class="font-medium">Total Geral (Kz):</span>
-                    <span>{{ note.formattedGrossTotal }}</span>
-                </p>
+            <div class="card">
+                <span class="material-symbols-outlined text-3xl"> paid </span>
+                <h1>145.000,00 Kz</h1>
+                <p class="text-sm text-gray-500">Valor de mercadoria em stock</p>
+            </div>
 
-                <p
-                    class="text-center w-full md:w-auto md:text-right space-x-1 sm:max-w-80 truncate overflow-hidden"
-                >
-                    <span class="font-medium">Caução (Kz):</span>
-                    <span>{{ note.formattedSecurityDeposit }}</span>
-                </p>
+            <div class="card">
+                <span class="material-symbols-outlined text-3xl"> add_box </span>
+                <h1>258</h1>
+                <p class="text-sm text-gray-500">Artigos em stock</p>
+            </div>
+
+            <div class="card">
+                <span class="material-symbols-outlined text-3xl"> percent </span>
+                <h1>75</h1>
+                <p class="text-sm text-gray-500">Percentagem de artigos em bom estado</p>
+            </div>
+
+            <div class="card">
+                <span class="material-symbols-outlined text-3xl"> percent </span>
+                <h1>25</h1>
+                <p class="text-sm text-gray-500">Percentagem de artigos em mau estado</p>
             </div>
         </div>
-    </section>
+    </div>
 </template>

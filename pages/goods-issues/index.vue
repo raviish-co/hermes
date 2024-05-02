@@ -61,7 +61,7 @@ onMounted(async () => {
             </p>
         </div>
 
-        <NuxtLink :to="{ path: '/' }">
+        <NuxtLink to="/goods-issues/register">
             <button class="btn-circle mt-8 ml-auto block">
                 <span class="material-symbols-outlined">add</span>
             </button>

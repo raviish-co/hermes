@@ -47,6 +47,11 @@ function toggleMenu() {
             </div>
 
             <div class="flex flex-col w-full">
+                <NuxtLink to="/" class="nuxt-link">
+                    <span class="material-symbols-outlined text-xl"> dashboard </span>
+                    <span>Dashboard</span>
+                </NuxtLink>
+
                 <NuxtLink to="/goods-issues" class="nuxt-link">
                     <span class="material-symbols-outlined text-xl"> shopping_cart_checkout </span>
                     <span>Guias de saída</span>
