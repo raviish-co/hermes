@@ -1,10 +1,23 @@
+<script setup lang="ts">
+import type { DashboardModel } from "~/lib/frontend/models/dashboard_model";
+import { DashboardService } from "~/lib/frontend/services/dashboard_service";
+
+const statistics = ref<DashboardModel>({
+    totalExpiredGoodsIssueNotes: 0,
+});
+const service = new DashboardService();
+
+onMounted(async () => {
+    statistics.value = await service.getStatistics();
+});
+</script>
 <template>
     <div class="section-content">
         <h1 class="page-title">Dashboard</h1>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div class="card">
                 <span class="material-symbols-outlined text-3xl"> calendar_month </span>
-                <h1>10</h1>
+                <h1>{{ statistics.totalExpiredGoodsIssueNotes }}</h1>
                 <p class="text-sm text-gray-500">Guias de saída vencidas</p>
             </div>
 

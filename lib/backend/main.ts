@@ -14,6 +14,7 @@ import { CategoryRepositoryStub } from "./tests/stubs/categoria_repository_stub"
 import { GoodsReturnService } from "./application/goods_return_service";
 import { GoodsReceiptService } from "./application/goods_receipt_service";
 import { InmemGoodsReceiptNoteRepository } from "./persistense/inmem/inmem_goods_receipt_note_repository";
+import { DashboardService } from "./application/dashboard_service";
 
 const itemRepository = new ItemRepositoryStub();
 const goodsIssueRepository = new InmemGoodsIssueNoteRepository();
@@ -33,6 +34,7 @@ interface Services {
     purposeService: PurposeService;
     goodsReturnService: GoodsReturnService;
     goodsReceiptService: GoodsReceiptService;
+    dashboardService: DashboardService;
 }
 
 export const makeServices = (): Services => {
@@ -74,6 +76,8 @@ export const makeServices = (): Services => {
         sequenceGenerator
     );
 
+    const dashboardService = new DashboardService(goodsIssueRepository);
+
     return {
         goodsIssueService,
         catalogService,
@@ -81,5 +85,6 @@ export const makeServices = (): Services => {
         purposeService,
         goodsReturnService,
         goodsReceiptService,
+        dashboardService,
     };
 };

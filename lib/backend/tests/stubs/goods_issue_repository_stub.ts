@@ -90,6 +90,9 @@ const _item7 = new Item(
     { "1": "Cor: Preta" }
 );
 
+const today = new Date();
+const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+
 const _goodsIssueData = [
     {
         noteId: ID.fromString("GS - 1000"),
@@ -99,7 +102,7 @@ const _goodsIssueData = [
             notes: "Uso Pessoal",
         },
         userId: ID.fromString("1"),
-        returnDate: new Date(),
+        returnDate: tomorrow,
         lines: [
             new GoodsIssueNoteLine(
                 _item.itemId,
@@ -107,6 +110,7 @@ const _goodsIssueData = [
                 _item.price,
                 _item.fulltext,
                 15,
+                _item.getCondition(),
                 _item.variations!
             ),
             new GoodsIssueNoteLine(
@@ -115,6 +119,7 @@ const _goodsIssueData = [
                 _item2.price,
                 _item2.fulltext,
                 15,
+                _item2.getCondition(),
                 _item2.variations!
             ),
         ],
@@ -127,7 +132,7 @@ const _goodsIssueData = [
             notes: "Uso Pessoal",
         },
         userId: ID.fromString("1"),
-        returnDate: new Date(),
+        returnDate: tomorrow,
         lines: [
             new GoodsIssueNoteLine(
                 _item4.itemId,
@@ -135,6 +140,7 @@ const _goodsIssueData = [
                 _item4.price,
                 _item4.fulltext,
                 3,
+                _item4.getCondition(),
                 _item4.variations!
             ),
             new GoodsIssueNoteLine(
@@ -143,6 +149,7 @@ const _goodsIssueData = [
                 _item5.price,
                 _item5.fulltext,
                 2,
+                _item5.getCondition(),
                 _item5.variations!
             ),
         ],
@@ -155,7 +162,7 @@ const _goodsIssueData = [
             notes: "Uso Pessoal",
         },
         userId: ID.fromString("1"),
-        returnDate: new Date(),
+        returnDate: tomorrow,
         lines: [
             new GoodsIssueNoteLine(
                 _item6.itemId,
@@ -163,6 +170,7 @@ const _goodsIssueData = [
                 _item6.price,
                 _item6.fulltext,
                 2,
+                _item6.getCondition(),
                 _item6.variations!
             ),
         ],
@@ -183,6 +191,7 @@ const _goodsIssueData = [
                 _item7.price,
                 _item7.fulltext,
                 3,
+                _item7.getCondition(),
                 _item7.variations!
             ),
         ],

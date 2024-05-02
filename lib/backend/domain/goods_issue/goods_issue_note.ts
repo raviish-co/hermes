@@ -66,6 +66,11 @@ export class GoodsIssueNote {
         return this.status === GoodsIssueStatus.Returned;
     }
 
+    isExpired(): boolean {
+        const today = new Date();
+        return today.getTime() > new Date(this.returnDate).getTime();
+    }
+
     getSecurityDeposit(): Decimal {
         return this.securityDeposit;
     }
