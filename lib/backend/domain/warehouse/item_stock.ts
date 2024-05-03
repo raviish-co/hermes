@@ -7,12 +7,12 @@ export class ItemStock {
     #goodQuantities: number;
     #badQuantities: number;
 
-    constructor(itemId: ID, quantity: number, goodQuantities: number, badQuantities: number) {
+    constructor(itemId: ID, goodQuantities: number, badQuantities: number) {
         this.#itemStockId = ID.random();
         this.#itemId = itemId;
-        this.#total = quantity;
         this.#goodQuantities = goodQuantities;
         this.#badQuantities = badQuantities;
+        this.#total = goodQuantities + badQuantities;
     }
 
     isOutOfStock(): boolean {

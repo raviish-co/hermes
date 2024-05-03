@@ -220,10 +220,10 @@ const itemStockRepositoryMock = {
 };
 
 const items = [
-    new ItemStock(ID.random(), 0, 0, 0),
-    new ItemStock(ID.random(), 0, 0, 0),
-    new ItemStock(ID.random(), 0, 0, 0),
-    new ItemStock(ID.random(), 10, 8, 2),
-    new ItemStock(ID.random(), 20, 10, 10),
-    new ItemStock(ID.random(), 15, 10, 5),
+    new ItemStock(ID.random(), 0, 0),
+    new ItemStock(ID.random(), 0, 0),
+    new ItemStock(ID.random(), 0, 0),
+    new ItemStock(ID.random(), 8, 2),
+    new ItemStock(ID.random(), 10, 10),
+    new ItemStock(ID.random(), 10, 5),
 ];

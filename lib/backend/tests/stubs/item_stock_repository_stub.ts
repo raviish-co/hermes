@@ -7,12 +7,7 @@ export class ItemStockRepositoryStub implements ItemStockRepository {
 
     constructor() {
         _data.forEach((i) => {
-            const itemStock = new ItemStock(
-                i.itemId,
-                i.quantity,
-                i.goodQuantities,
-                i.badQuantities
-            );
+            const itemStock = new ItemStock(i.itemId, i.goodQuantities, i.badQuantities);
             this.#data[itemStock.itemStockId.toString()] = itemStock;
         });
     }
