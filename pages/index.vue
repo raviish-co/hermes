@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { formatCurrency } from "~/lib/frontend/helpers/format_currency";
 import type { DashboardModel } from "~/lib/frontend/models/dashboard_model";
 import { DashboardService } from "~/lib/frontend/services/dashboard_service";
 
@@ -6,6 +7,7 @@ const statistics = ref<DashboardModel>({
     totalExpiredGoodsIssueNotes: 0,
     totalOutOfStockItems: 0,
     totalInStockItems: 0,
+    totalInventoryValue: 0,
 });
 
 const service = new DashboardService();
@@ -32,7 +34,7 @@ onMounted(async () => {
 
             <div class="card">
                 <span class="material-symbols-outlined text-3xl"> paid </span>
-                <h1>145.000,00 Kz</h1>
+                <h1>{{ formatCurrency(statistics.totalInventoryValue) }} Kz</h1>
                 <p class="text-sm text-gray-500">Valor de mercadoria em stock</p>
             </div>
 

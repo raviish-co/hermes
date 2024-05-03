@@ -16,6 +16,10 @@ export class InmemItemRepository implements ItemRepository {
         });
     }
 
+    getAll(): Promise<Item[]> {
+        return Promise.resolve(this.records);
+    }
+
     getById(itemId: ID): Promise<Either<ItemNotFound, Item>> {
         const item = this.records.find((item) => item.itemId.equals(itemId));
         if (!item) return Promise.resolve(left(new ItemNotFound(itemId.toString())));

@@ -78,7 +78,11 @@ export const makeServices = (): Services => {
         sequenceGenerator
     );
 
-    const dashboardService = new DashboardService(goodsIssueRepository, itemStockRepository);
+    const dashboardService = new DashboardService(
+        goodsIssueRepository,
+        itemRepository,
+        itemStockRepository
+    );
 
     return {
         goodsIssueService,

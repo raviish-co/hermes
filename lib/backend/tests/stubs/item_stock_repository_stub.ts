@@ -1,13 +1,20 @@
 import { ItemStock } from "../../domain/warehouse/item_stock";
 import type { ItemStockRepository } from "../../domain/warehouse/item_stock_repository";
+import { ID } from "../../shared/id";
 
 export class ItemStockRepositoryStub implements ItemStockRepository {
     #data: Record<string, ItemStock> = {};
 
     constructor() {
-        itemStock.forEach((stock) => {
-            this.#data[stock.itemId] = new ItemStock(stock.quantity);
+        _data.forEach((i) => {
+            const itemStock = new ItemStock(i.itemId, i.quantity);
+            this.#data[itemStock.itemStockId.toString()] = itemStock;
         });
+    }
+
+    save(itemStock: ItemStock): Promise<void> {
+        this.#data[itemStock.itemStockId.toString()] = itemStock;
+        return Promise.resolve(undefined);
     }
 
     findAllInStock(): Promise<ItemStock[]> {
@@ -25,33 +32,33 @@ export class ItemStockRepositoryStub implements ItemStockRepository {
     }
 }
 
-const itemStock = [
+const _data = [
     {
-        itemId: "1",
+        itemId: ID.fromString("1001"),
         quantity: 10,
     },
     {
-        itemId: "2",
-        quantity: 20,
+        itemId: ID.fromString("1002"),
+        quantity: 10,
     },
     {
-        itemId: "3",
-        quantity: 30,
+        itemId: ID.fromString("1003"),
+        quantity: 7,
     },
     {
-        itemId: "4",
-        quantity: 0,
+        itemId: ID.fromString("1004"),
+        quantity: 7,
     },
     {
-        itemId: "5",
-        quantity: 0,
+        itemId: ID.fromString("1005"),
+        quantity: 8,
     },
     {
-        itemId: "6",
-        quantity: 0,
+        itemId: ID.fromString("1006"),
+        quantity: 8,
     },
     {
-        itemId: "7",
-        quantity: 180,
+        itemId: ID.fromString("1007"),
+        quantity: 10,
     },
 ];
