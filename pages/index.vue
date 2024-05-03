@@ -5,6 +5,7 @@ import { DashboardService } from "~/lib/frontend/services/dashboard_service";
 const statistics = ref<DashboardModel>({
     totalExpiredGoodsIssueNotes: 0,
     totalOutOfStockItems: 0,
+    totalInStockItems: 0,
 });
 
 const service = new DashboardService();
@@ -37,7 +38,7 @@ onMounted(async () => {
 
             <div class="card">
                 <span class="material-symbols-outlined text-3xl"> add_box </span>
-                <h1>258</h1>
+                <h1>{{ statistics.totalInStockItems }}</h1>
                 <p class="text-sm text-gray-500">Artigos em stock</p>
             </div>
 

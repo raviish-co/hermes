@@ -1,11 +1,15 @@
 export class ItemStock {
-    #quantity: number;
+    #total: number;
 
     constructor(quantity: number) {
-        this.#quantity = quantity;
+        this.#total = quantity;
     }
 
     isOutOfStock(): boolean {
-        return this.#quantity === 0;
+        return this.#total === 0;
+    }
+
+    get total(): number {
+        return this.#total;
     }
 }

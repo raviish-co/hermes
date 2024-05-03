@@ -31,9 +31,8 @@ describe("Dashboard Service - Total de guias de saída vencidas", async () => {
 describe("DashboardService - Artigos com estoque esgotado", async () => {
     it("Deve retornar 0 se não houver artigos com estoque esgotado", async () => {
         const goodsIssueRepository = new InmemGoodsIssueNoteRepository();
-        const itemStockRepository = { findAllOutOfStock: async () => [] };
 
-        const service = new DashboardService(goodsIssueRepository, itemStockRepository);
+        const service = new DashboardService(goodsIssueRepository, itemStockRepositoryMock);
 
         const result = await service.totalOutOfStockItems();
 
@@ -51,3 +50,31 @@ describe("DashboardService - Artigos com estoque esgotado", async () => {
         expect(result).toBe(3);
     });
 });
+
+describe("DashboardService - Artigos em armazem", async () => {
+    it("Deve retornar 0 se não houver artigos em armazem", async () => {
+        const goodsIssueRepository = new InmemGoodsIssueNoteRepository();
+
+        const service = new DashboardService(goodsIssueRepository, itemStockRepositoryMock);
+
+        const result = await service.totalInStockItems();
+
+        expect(result).toBe(0);
+    });
+
+    it("Deve retornar o total de artigos em armazem", async () => {
+        const goodsIssueRepository = new InmemGoodsIssueNoteRepository();
+        const itemStockRepository = new ItemStockRepositoryStub();
+
+        const service = new DashboardService(goodsIssueRepository, itemStockRepository);
+
+        const result = await service.totalInStockItems();
+
+        expect(result).toBe(240);
+    });
+});
+
+const itemStockRepositoryMock = {
+    findAllOutOfStock: async () => [],
+    findAllInStock: async () => [],
+};

@@ -23,11 +23,23 @@ export class DashboardService {
         return expiredNotes.length;
     }
 
-    async totalOutOfStockItems(): Promise<number> {
-        const itemsInStock = await this.#itemStockRepository.findAllOutOfStock();
+    async totalInStockItems(): Promise<number> {
+        const itemsInStock = await this.#itemStockRepository.findAllInStock();
 
         if (itemsInStock.length === 0) return 0;
 
-        return itemsInStock.length;
+        let total = 0;
+
+        itemsInStock.forEach((i) => (total += i.total));
+
+        return total;
+    }
+
+    async totalOutOfStockItems(): Promise<number> {
+        const result = await this.#itemStockRepository.findAllOutOfStock();
+
+        if (result.length === 0) return 0;
+
+        return result.length;
     }
 }

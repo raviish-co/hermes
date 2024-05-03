@@ -10,6 +10,11 @@ export class ItemStockRepositoryStub implements ItemStockRepository {
         });
     }
 
+    findAllInStock(): Promise<ItemStock[]> {
+        const result = this.records.filter((i) => !i.isOutOfStock());
+        return Promise.resolve(result);
+    }
+
     findAllOutOfStock(): Promise<ItemStock[]> {
         const result = this.records.filter((i) => i.isOutOfStock());
         return Promise.resolve(result);
@@ -44,5 +49,9 @@ const itemStock = [
     {
         itemId: "6",
         quantity: 0,
+    },
+    {
+        itemId: "7",
+        quantity: 180,
     },
 ];
