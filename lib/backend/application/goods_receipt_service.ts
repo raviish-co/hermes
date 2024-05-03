@@ -33,16 +33,16 @@ export class GoodsReceiptService {
 
         const itemsIds = this.#buildItemsIds(data.lines);
 
-        const itemsOrError = await this.#itemRepository.findAll(itemsIds);
-        if (itemsOrError.isLeft()) return left(itemsOrError.value);
+        const itemsOrErr = await this.#itemRepository.findAll(itemsIds);
+        if (itemsOrErr.isLeft()) return left(itemsOrErr.value);
 
-        this.#incrementItemsStock(itemsOrError.value, data.lines);
+        this.#incrementItemsStock(itemsOrErr.value, data.lines);
 
-        this.#updateItemsCondition(itemsOrError.value, data.lines);
+        this.#updateItemsCondition(itemsOrErr.value, data.lines);
 
-        this.#itemRepository.updateAll(itemsOrError.value);
+        this.#itemRepository.updateAll(itemsOrErr.value);
 
-        const lines = this.#buildLines(itemsIds, data.lines);
+        const lines = this.#buildLines(data.lines);
         const noteId = this.#generator.generate(Sequence.GoodsReceiptNote);
         const noteOrErr = new GoodsReceiptBuilder()
             .withGoodsReceiptNoteId(noteId)
@@ -69,8 +69,8 @@ export class GoodsReceiptService {
         items.forEach((item, idx) => item.incrementStock(lines[idx].quantity));
     }
 
-    #buildLines(itemsIds: ID[], lines: GoodsReceiptLineDTO[]): GoodsReceiptLine[] {
-        return lines.map((line, idx) => new GoodsReceiptLine(itemsIds[idx], line.quantity));
+    #buildLines(lines: GoodsReceiptLineDTO[]): GoodsReceiptLine[] {
+        return lines.map((line) => new GoodsReceiptLine(ID.fromString(line.itemId), line.quantity));
     }
 
     #updateItemsCondition(items: Item[], lines: GoodsReceiptLineDTO[]) {
@@ -82,13 +82,13 @@ export class GoodsReceiptService {
     }
 }
 
-export type GoodsReceiptDTO = {
+type GoodsReceiptDTO = {
     lines: GoodsReceiptLineDTO[];
     userId: string;
     entryDate: string;
 };
 
-export type GoodsReceiptLineDTO = {
+type GoodsReceiptLineDTO = {
     itemId: string;
     quantity: number;
     condition?: Condition;
