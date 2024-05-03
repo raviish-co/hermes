@@ -2,6 +2,7 @@ import type { DashboardModel } from "../models/dashboard_model";
 
 export class DashboardService {
     async getStatistics(): Promise<DashboardModel> {
-        return await $fetch("/api/dashboard", { method: "get" });
+        const result = await $fetch("/api/dashboard", { method: "get" });
+        return result;
     }
 }

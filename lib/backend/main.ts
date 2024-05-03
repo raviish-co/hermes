@@ -74,6 +74,7 @@ export const makeServices = (): Services => {
 
     const goodsReceiptService = new GoodsReceiptService(
         itemRepository,
+        itemStockRepository,
         goodsReceiptRepository,
         sequenceGenerator
     );

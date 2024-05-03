@@ -15,7 +15,7 @@ export class GoodsReceiptService {
     #toGoodsReceiptLineDTO(line: NoteLine): GoodsReceiptLineDTO {
         return {
             itemId: line.itemId,
-            quantity: line.quantity,
+            goodQuantities: line.quantity,
             condition: line.condition,
         };
     }
@@ -28,13 +28,14 @@ export class GoodsReceiptService {
     }
 }
 
-type GoodsReceiptDTO = {
+interface GoodsReceiptDTO {
     entryDate: string;
     lines: GoodsReceiptLineDTO[];
-};
+}
 
-type GoodsReceiptLineDTO = {
+interface GoodsReceiptLineDTO {
     itemId: string;
-    quantity: number;
+    goodQuantities: number;
+    badQuantities?: number;
     condition?: ConditionModel;
-};
+}

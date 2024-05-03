@@ -1,16 +1,16 @@
 import { ID } from "../../shared/id";
-import { GoodsReceiptLine } from "./goods_receipt_line";
+import { GoodsReceiptNoteLine } from "./goods_receipt_note_line";
 
 export class GoodsReceiptNote {
-    readonly goodsReceiptNoteId: ID;
+    readonly noteId: ID;
     readonly entryDate: Date;
     readonly userId: ID;
-    readonly goodsReceiptLines: GoodsReceiptLine[];
+    readonly lines: GoodsReceiptNoteLine[];
 
-    constructor(noteId: ID, entryDate: Date, userId: ID, goodsReceiptLines: GoodsReceiptLine[]) {
-        this.goodsReceiptNoteId = noteId;
+    constructor(noteId: ID, entryDate: Date, userId: ID, lines: GoodsReceiptNoteLine[]) {
+        this.noteId = noteId;
         this.entryDate = entryDate;
         this.userId = userId;
-        this.goodsReceiptLines = goodsReceiptLines;
+        this.lines = lines;
     }
 }

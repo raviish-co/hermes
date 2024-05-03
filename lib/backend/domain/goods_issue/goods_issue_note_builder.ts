@@ -1,11 +1,11 @@
 import { GoodsIssueNoteLine } from "./goods_issue_note_line";
 import { type Either, left, right } from "../../shared/either";
-import { Purpose } from "../../domain/goods_issue/purpose";
+import { Purpose } from "./purpose";
 import { GoodsIssueNote } from "./goods_issue_note";
 import { ID } from "../../shared/id";
 
 export class GoodsIssueNoteBuilder {
-    #goodsIssueNoteId?: ID;
+    #noteId?: ID;
     #purpose: Purpose = {} as Purpose;
     #lines: GoodsIssueNoteLine[] = [];
     #returnDate?: Date;
@@ -13,8 +13,8 @@ export class GoodsIssueNoteBuilder {
 
     constructor() {}
 
-    withGoodsIssueNoteId(noteId: string): GoodsIssueNoteBuilder {
-        this.#goodsIssueNoteId = ID.fromString(noteId);
+    withNoteId(noteId: string): GoodsIssueNoteBuilder {
+        this.#noteId = ID.fromString(noteId);
         return this;
     }
 
@@ -39,14 +39,14 @@ export class GoodsIssueNoteBuilder {
     }
 
     build(): Either<Error, GoodsIssueNote> {
-        if (!this.#goodsIssueNoteId) return left(new Error("goodsIssueId is required"));
+        if (!this.#noteId) return left(new Error("goodsIssueId is required"));
 
         if (!this.#returnDate) return left(new Error("returnDate is required"));
 
         if (!this.#userId) return left(new Error("userId is required"));
 
         const goodsIssue = new GoodsIssueNote(
-            this.#goodsIssueNoteId,
+            this.#noteId,
             this.#purpose,
             this.#userId,
             this.#returnDate,

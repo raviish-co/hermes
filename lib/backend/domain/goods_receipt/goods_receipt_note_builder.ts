@@ -1,17 +1,17 @@
 import { left, right, type Either } from "../../shared/either";
 import { ID } from "../../shared/id";
-import { GoodsReceiptLine } from "./goods_receipt_line";
+import { GoodsReceiptNoteLine } from "./goods_receipt_note_line";
 import { GoodsReceiptNote } from "./goods_receipt_note";
 import { MissingDependency } from "./missing_dependency_error";
 
-export class GoodsReceiptBuilder {
-    #goodsReceiptNoteId?: ID;
+export class GoodsReceiptNoteBuilder {
+    #noteId?: ID;
     #entryDate?: Date;
     #userId?: ID;
-    #lines: GoodsReceiptLine[] = [];
+    #lines: GoodsReceiptNoteLine[] = [];
 
-    withGoodsReceiptNoteId(noteId: string) {
-        this.#goodsReceiptNoteId = ID.fromString(noteId);
+    withNoteId(noteId: string) {
+        this.#noteId = ID.fromString(noteId);
         return this;
     }
 
@@ -25,20 +25,20 @@ export class GoodsReceiptBuilder {
         return this;
     }
 
-    withLines(lines: GoodsReceiptLine[]) {
+    withLines(lines: GoodsReceiptNoteLine[]) {
         this.#lines = lines;
         return this;
     }
 
     build(): Either<MissingDependency, GoodsReceiptNote> {
-        if (!this.#goodsReceiptNoteId) return left(new MissingDependency("goodsReceiptId"));
+        if (!this.#noteId) return left(new MissingDependency("goodsReceiptId"));
 
         if (!this.#entryDate) return left(new MissingDependency("entryDate"));
 
         if (!this.#userId) return left(new MissingDependency("userId"));
 
         const goodsReceipt = new GoodsReceiptNote(
-            this.#goodsReceiptNoteId,
+            this.#noteId,
             this.#entryDate,
             this.#userId,
             this.#lines

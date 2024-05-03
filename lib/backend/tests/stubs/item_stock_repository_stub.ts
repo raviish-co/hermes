@@ -17,6 +17,19 @@ export class ItemStockRepositoryStub implements ItemStockRepository {
         return Promise.resolve(undefined);
     }
 
+    updateAll(itemStocks: ItemStock[]): Promise<void> {
+        itemStocks.forEach((i) => {
+            this.#data[i.itemStockId.toString()] = i;
+        });
+        return Promise.resolve(undefined);
+    }
+
+    findAll(itemIds: ID[]): Promise<ItemStock[]> {
+        const ids = itemIds.map((i) => i.toString());
+        const result = this.records.filter((i) => ids.includes(i.itemId.toString()));
+        return Promise.resolve(result);
+    }
+
     findAllInStock(): Promise<ItemStock[]> {
         const result = this.records.filter((i) => !i.isOutOfStock());
         return Promise.resolve(result);

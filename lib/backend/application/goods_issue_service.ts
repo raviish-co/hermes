@@ -1,7 +1,7 @@
 import type { GoodsIssueNoteNotFound } from "../domain/goods_issue/goods_issue_note_not_found_error";
 import type { GoodsIssueNoteRepository } from "../domain/goods_issue/goods_issue_note_repository";
 import type { PurposeSpecification } from "../domain/goods_issue/purpose_specification";
-import { GoodsIssueNoteBuilder } from "../domain/goods_issue/goods_issue_builder";
+import { GoodsIssueNoteBuilder } from "../domain/goods_issue/goods_issue_note_builder";
 import { InsufficientStock } from "../domain/catalog/items/insufficient_stock_error";
 import { InvalidPurpose } from "../domain/goods_issue/invalid_purpose_error";
 import type { GoodsIssueNote } from "../domain/goods_issue/goods_issue_note";
@@ -51,7 +51,7 @@ export class GoodsIssueService {
         const lines = linesOrErr.value;
         const noteId = this.#buildNoteId();
         const noteOrErr = new GoodsIssueNoteBuilder()
-            .withGoodsIssueNoteId(noteId)
+            .withNoteId(noteId)
             .withPurpose(purpose)
             .withReturnDate(data.returnDate)
             .withUser(data.userId)

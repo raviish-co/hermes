@@ -5,7 +5,7 @@ export class InmemGoodsReceiptNoteRepository implements GoodsReceiptNoteReposito
     #goodsReceipts: Record<string, GoodsReceiptNote> = {};
 
     save(goodsReceipt: GoodsReceiptNote): Promise<void> {
-        this.#goodsReceipts[goodsReceipt.goodsReceiptNoteId.toString()] = goodsReceipt;
+        this.#goodsReceipts[goodsReceipt.noteId.toString()] = goodsReceipt;
         return Promise.resolve(undefined);
     }
 
