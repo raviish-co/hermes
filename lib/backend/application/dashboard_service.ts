@@ -29,15 +29,7 @@ export class DashboardService {
     }
 
     async totalInStockItems(): Promise<number> {
-        const itemsInStock = await this.#itemStockRepository.findAllInStock();
-
-        if (itemsInStock.length === 0) return 0;
-
-        let total = 0;
-
-        itemsInStock.forEach((i) => (total += i.total));
-
-        return total;
+        return await this.#calculateTotalItemsInStock();
     }
 
     async totalOutOfStockItems(): Promise<number> {
@@ -49,8 +41,11 @@ export class DashboardService {
     }
 
     async totalInventoryValue(): Promise<Decimal> {
-        const result = await this.#calculateInventoryValue();
-        return result;
+        return await this.#calculateInventoryValue();
+    }
+
+    async percentageOfItemsInStock(): Promise<ItemStockPercentage> {
+        return await this.#calculatePercentageOfItemsInStock();
     }
 
     async #calculateInventoryValue(): Promise<Decimal> {
@@ -74,4 +69,41 @@ export class DashboardService {
 
         return total;
     }
+
+    async #calculateTotalItemsInStock(): Promise<number> {
+        const itemStocks = await this.#itemStockRepository.findAllInStock();
+
+        if (itemStocks.length === 0) return 0;
+
+        let total = 0;
+
+        itemStocks.forEach((i) => (total += i.total));
+
+        return total;
+    }
+
+    async #calculatePercentageOfItemsInStock(): Promise<ItemStockPercentage> {
+        const result = await this.#calculateTotalItemsInStock();
+
+        if (result === 0) return { goodPercentage: 0, badPercentage: 0 };
+
+        let total = 0;
+
+        const itemStocks = await this.#itemStockRepository.findAllInStock();
+
+        itemStocks.forEach((i) => (total += i.goodQuantities));
+
+        const goodPercentage = (total / result) * PERCENT;
+
+        const badPercentage = PERCENT - goodPercentage;
+
+        return { goodPercentage, badPercentage };
+    }
 }
+
+const PERCENT = 100;
+
+type ItemStockPercentage = {
+    goodPercentage: number;
+    badPercentage: number;
+};

@@ -147,6 +147,72 @@ describe("DashboardService -  Valor de mercadorias em stock", () => {
     });
 });
 
+describe("DashboardService - Percentagem do estado das mercadorias em stock", async () => {
+    it("Deve retornar 0 se não exister mercadorias em bom estado em stock", async () => {
+        const goodsIssueRepository = new InmemGoodsIssueNoteRepository();
+        const itemRepository = new InmemItemRepository();
+        const service = new DashboardService(
+            goodsIssueRepository,
+            itemRepository,
+            itemStockRepositoryMock
+        );
+
+        const result = await service.percentageOfItemsInStock();
+
+        expect(result.goodPercentage).toBe(0);
+    });
+
+    it("Deve retornar a percentagem de mercadorias em bom estado em stock", async () => {
+        const goodsIssueRepository = new InmemGoodsIssueNoteRepository();
+        const itemRepository = new ItemRepositoryStub();
+        const itemStockRepository = new ItemStockRepositoryStub();
+        items.forEach((item) => itemStockRepository.save(item));
+
+        const service = new DashboardService(
+            goodsIssueRepository,
+            itemRepository,
+            itemStockRepository
+        );
+
+        const result = await service.percentageOfItemsInStock();
+
+        expect(result.goodPercentage).toBeDefined();
+        expect(result.goodPercentage).toBeGreaterThan(83);
+    });
+
+    it("Deve retornar 0 se não exister mercadorias em mau estado em stock", async () => {
+        const goodsIssueRepository = new InmemGoodsIssueNoteRepository();
+        const itemRepository = new InmemItemRepository();
+        const service = new DashboardService(
+            goodsIssueRepository,
+            itemRepository,
+            itemStockRepositoryMock
+        );
+
+        const result = await service.percentageOfItemsInStock();
+
+        expect(result.badPercentage).toBe(0);
+    });
+
+    it("Deve retornar a percentagem de mercadorias em mau estado em stock", async () => {
+        const goodsIssueRepository = new InmemGoodsIssueNoteRepository();
+        const itemRepository = new ItemRepositoryStub();
+        const itemStockRepository = new ItemStockRepositoryStub();
+        items.forEach((item) => itemStockRepository.save(item));
+
+        const service = new DashboardService(
+            goodsIssueRepository,
+            itemRepository,
+            itemStockRepository
+        );
+
+        const result = await service.percentageOfItemsInStock();
+
+        expect(result.badPercentage).toBeDefined();
+        expect(result.badPercentage).toBeLessThan(17);
+    });
+});
+
 const itemStockRepositoryMock = {
     findAllOutOfStock: async () => [],
     findAllInStock: async () => [],
@@ -154,7 +220,10 @@ const itemStockRepositoryMock = {
 };
 
 const items = [
-    new ItemStock(ID.random(), 0),
-    new ItemStock(ID.random(), 0),
-    new ItemStock(ID.random(), 0),
+    new ItemStock(ID.random(), 0, 0, 0),
+    new ItemStock(ID.random(), 0, 0, 0),
+    new ItemStock(ID.random(), 0, 0, 0),
+    new ItemStock(ID.random(), 10, 8, 2),
+    new ItemStock(ID.random(), 20, 10, 10),
+    new ItemStock(ID.random(), 15, 10, 5),
 ];

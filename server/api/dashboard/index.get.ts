@@ -7,6 +7,7 @@ export default defineEventHandler(async (event) => {
     const totalOutOfStockItems = await dashboardService.totalOutOfStockItems();
     const totalInStockItems = await dashboardService.totalInStockItems();
     const totalInventoryValue = await dashboardService.totalInventoryValue();
+    const percentageOfItemsInStock = await dashboardService.percentageOfItemsInStock();
 
     setResponseStatus(event, 200);
 
@@ -15,5 +16,6 @@ export default defineEventHandler(async (event) => {
         totalExpiredGoodsIssueNotes,
         totalOutOfStockItems,
         totalInventoryValue: totalInventoryValue.value,
+        percentageOfItemsInStock,
     };
 });

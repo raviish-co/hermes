@@ -7,7 +7,12 @@ export class ItemStockRepositoryStub implements ItemStockRepository {
 
     constructor() {
         _data.forEach((i) => {
-            const itemStock = new ItemStock(i.itemId, i.quantity);
+            const itemStock = new ItemStock(
+                i.itemId,
+                i.quantity,
+                i.goodQuantities,
+                i.badQuantities
+            );
             this.#data[itemStock.itemStockId.toString()] = itemStock;
         });
     }
@@ -36,29 +41,43 @@ const _data = [
     {
         itemId: ID.fromString("1001"),
         quantity: 10,
+        goodQuantities: 10,
+        badQuantities: 0,
     },
     {
         itemId: ID.fromString("1002"),
         quantity: 10,
+        goodQuantities: 10,
+        badQuantities: 0,
     },
     {
         itemId: ID.fromString("1003"),
         quantity: 7,
+        goodQuantities: 7,
+        badQuantities: 0,
     },
     {
         itemId: ID.fromString("1004"),
         quantity: 7,
+        goodQuantities: 7,
+        badQuantities: 0,
     },
     {
         itemId: ID.fromString("1005"),
         quantity: 8,
+        goodQuantities: 8,
+        badQuantities: 0,
     },
     {
         itemId: ID.fromString("1006"),
         quantity: 8,
+        goodQuantities: 8,
+        badQuantities: 0,
     },
     {
         itemId: ID.fromString("1007"),
         quantity: 10,
+        goodQuantities: 10,
+        badQuantities: 0,
     },
 ];

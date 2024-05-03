@@ -8,6 +8,10 @@ const statistics = ref<DashboardModel>({
     totalOutOfStockItems: 0,
     totalInStockItems: 0,
     totalInventoryValue: 0,
+    percentageOfItemsInStock: {
+        goodPercentage: 0,
+        badPercentage: 0,
+    },
 });
 
 const service = new DashboardService();
@@ -46,13 +50,13 @@ onMounted(async () => {
 
             <div class="card">
                 <span class="material-symbols-outlined text-3xl"> percent </span>
-                <h1>75</h1>
+                <h1>{{ statistics.percentageOfItemsInStock.goodPercentage }}</h1>
                 <p class="text-sm text-gray-500">Percentagem de artigos em bom estado</p>
             </div>
 
             <div class="card">
                 <span class="material-symbols-outlined text-3xl"> percent </span>
-                <h1>25</h1>
+                <h1>{{ statistics.percentageOfItemsInStock.badPercentage }}</h1>
                 <p class="text-sm text-gray-500">Percentagem de artigos em mau estado</p>
             </div>
         </div>

@@ -3,4 +3,8 @@ export interface DashboardModel {
     totalOutOfStockItems: number;
     totalInStockItems: number;
     totalInventoryValue: number;
+    percentageOfItemsInStock: {
+        goodPercentage: number;
+        badPercentage: number;
+    };
 }

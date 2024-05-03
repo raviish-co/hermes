@@ -4,11 +4,15 @@ export class ItemStock {
     #itemStockId: ID;
     #itemId: ID;
     #total: number;
+    #goodQuantities: number;
+    #badQuantities: number;
 
-    constructor(itemId: ID, quantity: number) {
+    constructor(itemId: ID, quantity: number, goodQuantities: number, badQuantities: number) {
         this.#itemStockId = ID.random();
         this.#itemId = itemId;
         this.#total = quantity;
+        this.#goodQuantities = goodQuantities;
+        this.#badQuantities = badQuantities;
     }
 
     isOutOfStock(): boolean {
@@ -25,5 +29,13 @@ export class ItemStock {
 
     get total(): number {
         return this.#total;
+    }
+
+    get goodQuantities(): number {
+        return this.#goodQuantities;
+    }
+
+    get badQuantities(): number {
+        return this.#badQuantities;
     }
 }
