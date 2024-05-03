@@ -15,6 +15,7 @@ import { GoodsReturnService } from "./application/goods_return_service";
 import { GoodsReceiptService } from "./application/goods_receipt_service";
 import { InmemGoodsReceiptNoteRepository } from "./persistense/inmem/inmem_goods_receipt_note_repository";
 import { DashboardService } from "./application/dashboard_service";
+import { ItemStockRepositoryStub } from "./tests/stubs/item_stock_repository_stub";
 
 const itemRepository = new ItemRepositoryStub();
 const goodsIssueRepository = new InmemGoodsIssueNoteRepository();
@@ -26,6 +27,7 @@ const sectionRepository = new SectionRepositoryStub();
 const purposeSpec = new DefaultPurposeSpecification();
 const goodsReturnRepository = new InmemGoodsReturnNoteRepository();
 const goodsReceiptRepository = new InmemGoodsReceiptNoteRepository();
+const itemStockRepository = new ItemStockRepositoryStub();
 
 interface Services {
     goodsIssueService: GoodsIssueService;
@@ -76,7 +78,7 @@ export const makeServices = (): Services => {
         sequenceGenerator
     );
 
-    const dashboardService = new DashboardService(goodsIssueRepository);
+    const dashboardService = new DashboardService(goodsIssueRepository, itemStockRepository);
 
     return {
         goodsIssueService,
