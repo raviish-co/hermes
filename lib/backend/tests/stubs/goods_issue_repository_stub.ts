@@ -90,6 +90,28 @@ const _item7 = new Item(
     { "1": "Cor: Preta" }
 );
 
+const _item9 = new Item(
+    ID.fromString("1009"),
+    "Item 1",
+    new Decimal(1000),
+    new ItemStock(10),
+    { status: Status.Good },
+    ID.random(),
+    ID.random(),
+    { "1": "Cor: Preta" }
+);
+
+const _item10 = new Item(
+    ID.fromString("1010"),
+    "Item 1",
+    new Decimal(1000),
+    new ItemStock(10),
+    { status: Status.Good },
+    ID.random(),
+    ID.random(),
+    { "1": "Cor: Preta" }
+);
+
 const today = new Date();
 const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
 
@@ -199,6 +221,39 @@ const _goodsIssueData = [
                 0,
                 _item7.getCondition(),
                 _item7.variations!
+            ),
+        ],
+    },
+
+    {
+        noteId: ID.fromString("GS - 1005"),
+        purpose: {
+            description: "Uso Pessoal",
+            details: "Uso Pessoal",
+            notes: "Uso Pessoal",
+        },
+        userId: ID.fromString("1"),
+        returnDate: new Date(),
+        lines: [
+            new GoodsIssueNoteLine(
+                _item9.itemId,
+                _item9.name,
+                _item9.price,
+                _item9.fulltext,
+                3,
+                0,
+                _item9.getCondition(),
+                _item9.variations!
+            ),
+            new GoodsIssueNoteLine(
+                _item10.itemId,
+                _item10.name,
+                _item10.price,
+                _item10.fulltext,
+                3,
+                0,
+                _item10.getCondition(),
+                _item10.variations!
             ),
         ],
     },

@@ -8,12 +8,12 @@ export class InmemGoodsReturnNoteRepository implements GoodsReturnNoteRepository
     #notes: Record<string, GoodsReturnNote> = {};
 
     save(note: GoodsReturnNote): Promise<void> {
-        this.#notes[note.goodsReturnNoteId.toString()] = note;
+        this.#notes[note.noteId.toString()] = note;
         return Promise.resolve(undefined);
     }
 
     getById(id: ID): Promise<Either<GoodsReturnNoteNotFound, GoodsReturnNote>> {
-        const note = this.records.find((note) => note.goodsReturnNoteId.equals(id));
+        const note = this.records.find((note) => note.noteId.equals(id));
 
         if (!note) return Promise.resolve(left(new GoodsReturnNoteNotFound()));
 

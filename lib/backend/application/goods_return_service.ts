@@ -14,22 +14,26 @@ import { left, right, type Either } from "../shared/either";
 import { Sequence } from "../adapters/sequences/sequence";
 import type { Item } from "../domain/catalog/items/item";
 import { ID } from "../shared/id";
+import type { ItemStockRepository } from "../domain/warehouse/item_stock_repository";
 
 export class GoodsReturnService {
     #goodsIssueRepository: GoodsIssueNoteRepository;
     #goodsReturnRepository: GoodsReturnNoteRepository;
     #itemRepository: ItemRepository;
+    #itemStockRepository: ItemStockRepository;
     #generator: Generator;
 
     constructor(
+        goodsReturnRepository: GoodsReturnNoteRepository,
         goodsIssueRepository: GoodsIssueNoteRepository,
         itemRepository: ItemRepository,
-        goodsReturnRepository: GoodsReturnNoteRepository,
+        itemStockRepository: ItemStockRepository,
         generator: Generator
     ) {
+        this.#goodsReturnRepository = goodsReturnRepository;
         this.#goodsIssueRepository = goodsIssueRepository;
         this.#itemRepository = itemRepository;
-        this.#goodsReturnRepository = goodsReturnRepository;
+        this.#itemStockRepository = itemStockRepository;
         this.#generator = generator;
     }
 
@@ -52,6 +56,15 @@ export class GoodsReturnService {
         const itemsIds = itemsData.map((item) => ID.fromString(item.itemId));
         const itemsOrErr = await this.#itemRepository.findAll(itemsIds);
         const items = <Item[]>itemsOrErr.value;
+
+        const itemsStock = await this.#itemStockRepository.findAll(itemsIds);
+
+        for (const stock of itemsStock) {
+            const data = itemsData.find((item) => stock.itemId.equals(ID.fromString(item.itemId)))!;
+            stock.increase(data.quantity);
+        }
+
+        await this.#itemStockRepository.updateAll(itemsStock);
 
         const returnNoteId = this.#buildReturnNoteId();
         const returnLines = this.#buildReturnLines(itemsData, items);
@@ -80,12 +93,8 @@ export class GoodsReturnService {
         return await this.#goodsReturnRepository.getAll();
     }
 
-    async get(
-        goodsReturnNoteId: string
-    ): Promise<Either<GoodsReturnNoteNotFound, GoodsReturnNote>> {
-        const noteId = ID.fromString(goodsReturnNoteId);
-
-        const noteOrErr = await this.#goodsReturnRepository.getById(noteId);
+    async get(noteId: string): Promise<Either<GoodsReturnNoteNotFound, GoodsReturnNote>> {
+        const noteOrErr = await this.#goodsReturnRepository.getById(ID.fromString(noteId));
         if (noteOrErr.isLeft()) return left(noteOrErr.value);
 
         return right(noteOrErr.value);
@@ -102,7 +111,7 @@ export class GoodsReturnService {
             const item = items.find((item) => item.itemId.equals(ID.fromString(itemData.itemId)))!;
 
             const line = new GoodsReturnNoteLine(
-                ID.fromString(itemData.itemId),
+                item.itemId,
                 item.name,
                 itemData.quantity,
                 item.variations,
@@ -132,9 +141,9 @@ export class GoodsReturnService {
 
             if (!line) return left(new GoodsIssueLineNotFound());
 
-            const isSameQuantity = line.checkQuantity(item.quantity);
-
-            if (!isSameQuantity) return left(new InvalidGoodsIssueLineQuantity());
+            if (!line.checkQuantity(item.quantity)) {
+                return left(new InvalidGoodsIssueLineQuantity());
+            }
         }
         return right(undefined);
     }

@@ -30,10 +30,10 @@ interface GoodsReturnNoteLineDTO {
 export function toGoodsReturnNoteDTO(note: GoodsReturnNote): GoodsReturnNoteDTO {
     return {
         goodsIssueNoteId: note.goodsIssueNoteId.toString(),
-        goodsReturnNoteId: note.goodsReturnNoteId.toString(),
+        goodsReturnNoteId: note.noteId.toString(),
         securityDepositWithHeld: note.securityDepositWithheld.value,
         issuedAt: note.issuedAt.toISOString(),
-        lines: note.goodsReturnLines.map(toGoodsReturnNoteLineDTO),
+        lines: note.lines.map(toGoodsReturnNoteLineDTO),
     };
 }
 

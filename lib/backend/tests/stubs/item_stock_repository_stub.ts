@@ -48,50 +48,52 @@ export class ItemStockRepositoryStub implements ItemStockRepository {
 const _data = [
     {
         itemId: ID.fromString("1001"),
-        quantity: 10,
         goodQuantities: 10,
         badQuantities: 0,
     },
     {
         itemId: ID.fromString("1002"),
-        quantity: 10,
         goodQuantities: 10,
         badQuantities: 0,
     },
     {
         itemId: ID.fromString("1003"),
-        quantity: 7,
         goodQuantities: 7,
         badQuantities: 0,
     },
     {
         itemId: ID.fromString("1004"),
-        quantity: 7,
         goodQuantities: 7,
         badQuantities: 0,
     },
     {
         itemId: ID.fromString("1005"),
-        quantity: 8,
         goodQuantities: 8,
         badQuantities: 0,
     },
     {
         itemId: ID.fromString("1006"),
-        quantity: 8,
         goodQuantities: 8,
         badQuantities: 0,
     },
     {
         itemId: ID.fromString("1007"),
-        quantity: 10,
         goodQuantities: 10,
         badQuantities: 0,
     },
     {
         itemId: ID.fromString("1008"),
-        quantity: 10,
         goodQuantities: 10,
         badQuantities: 5,
+    },
+    {
+        itemId: ID.fromString("1009"),
+        goodQuantities: 7,
+        badQuantities: 0,
+    },
+    {
+        itemId: ID.fromString("1010"),
+        goodQuantities: 7,
+        badQuantities: 0,
     },
 ];
