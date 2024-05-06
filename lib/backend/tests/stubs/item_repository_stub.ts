@@ -97,4 +97,14 @@ const _itemData = [
         sectionId: "2",
         variationsValues: { "1": "Cor: Castanho", "2": "Marca: Polo", "5": "Tamanho: L" },
     },
+    {
+        itemId: "1008",
+        name: "Jaqueta jeans casual",
+        price: 7500,
+        stock: 10,
+        condition: { status: Status.Good },
+        categoryId: "3",
+        sectionId: "2",
+        variationsValues: { "1": "Cor: Castanho", "2": "Marca: Polo", "5": "Tamanho: L" },
+    },
 ];

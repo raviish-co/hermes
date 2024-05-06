@@ -13,7 +13,7 @@ export class GoodsIssueNote {
     readonly goodsIssueNoteId: ID;
     readonly purpose: Purpose;
     readonly userId: ID;
-    readonly goodsIssueLines: GoodsIssueNoteLine[];
+    readonly lines: GoodsIssueNoteLine[];
     readonly returnDate: Date;
     readonly issuedAt: Date;
     status: GoodsIssueStatus;
@@ -35,7 +35,7 @@ export class GoodsIssueNote {
         this.issuedAt = new Date();
         this.returnDate = returnDate;
         this.total = new Decimal(0);
-        this.goodsIssueLines = [];
+        this.lines = [];
         this.securityDeposit = new Decimal(0);
         this.securityDepositWithheld = new Decimal(0);
 
@@ -91,7 +91,7 @@ export class GoodsIssueNote {
     }
 
     #addLine(line: GoodsIssueNoteLine): void {
-        this.goodsIssueLines.push(line);
+        this.lines.push(line);
         this.#calculateTotal(line.total);
     }
 
@@ -107,7 +107,7 @@ export class GoodsIssueNote {
     }
 
     #allGoodsIssueWasReturned(): boolean {
-        return this.goodsIssueLines.every((line) => line.isFullyReturned());
+        return this.lines.every((line) => line.isFullyReturned());
     }
 
     #calculateTotal(amount: Decimal): void {
@@ -120,6 +120,6 @@ export class GoodsIssueNote {
     }
 
     #findLineByItemId(itemId: ID): GoodsIssueNoteLine {
-        return this.goodsIssueLines.find((line) => line.itemId.equals(itemId))!;
+        return this.lines.find((line) => line.itemId.equals(itemId))!;
     }
 }

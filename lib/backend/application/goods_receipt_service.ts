@@ -74,9 +74,7 @@ export class GoodsReceiptService {
     }
 
     #incrementItemsStock(items: ItemStock[], lines: GoodsReceiptLineDTO[]) {
-        items.forEach((i, idx) =>
-            i.incrementStock(lines[idx].goodQuantities, lines[idx].badQuantities)
-        );
+        items.forEach((i, idx) => i.increase(lines[idx].goodQuantities, lines[idx].badQuantities));
     }
 
     #buildLines(lines: GoodsReceiptLineDTO[]): GoodsReceiptNoteLine[] {

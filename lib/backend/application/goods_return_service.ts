@@ -42,7 +42,7 @@ export class GoodsReturnService {
         if (noteOrErr.isLeft()) return left(noteOrErr.value);
 
         const note = noteOrErr.value;
-        const goodsIssueLines = note.goodsIssueLines;
+        const goodsIssueLines = note.lines;
 
         if (note.isReturned()) return left(new GoodsIssueNoteHasBeenReturned());
 

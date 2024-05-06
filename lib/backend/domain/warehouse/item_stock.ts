@@ -19,7 +19,7 @@ export class ItemStock {
         return this.#total === 0;
     }
 
-    incrementStock(goodQuantities: number, badQuantities?: number): void {
+    increase(goodQuantities: number, badQuantities?: number): void {
         this.#goodQuantities += goodQuantities;
 
         if (!badQuantities) return;
@@ -27,8 +27,20 @@ export class ItemStock {
         this.#badQuantities += badQuantities;
     }
 
-    reduce(quantity: number) {
-        this.#goodQuantities -= quantity;
+    reduce(goodQuantities: number, badQuantities?: number) {
+        this.#goodQuantities -= goodQuantities;
+
+        if (!badQuantities) return;
+
+        this.#badQuantities -= badQuantities;
+    }
+
+    canReduce(goodQuantities: number, badQuantities?: number): boolean {
+        const total = goodQuantities + (badQuantities ?? 0);
+
+        if (this.#total < total) return false;
+
+        return true;
     }
 
     get itemStockId(): ID {

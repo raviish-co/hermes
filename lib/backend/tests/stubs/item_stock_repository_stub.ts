@@ -88,4 +88,10 @@ const _data = [
         goodQuantities: 10,
         badQuantities: 0,
     },
+    {
+        itemId: ID.fromString("1008"),
+        quantity: 10,
+        goodQuantities: 10,
+        badQuantities: 5,
+    },
 ];

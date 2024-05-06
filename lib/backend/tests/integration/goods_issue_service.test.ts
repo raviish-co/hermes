@@ -43,7 +43,7 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
     });
 
     it("Deve retornar um erro **ItemNotFound** se o artigo não existir no repositório", async () => {
-        const lines = [{ itemId: "1008", quantity: 1 }];
+        const lines = [{ itemId: "1009", goodQuantities: 1 }];
         const { service } = makeService();
 
         const error = await service.new({
@@ -56,8 +56,8 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
     });
 
     it("Deve efectuar a guia de saída de mercadoria de um uníco artigo", async () => {
-        const lines = [{ itemId: "1001", quantity: 1 }];
-        const { service, goodsIssueRepository } = makeService();
+        const lines = [{ itemId: "1001", goodQuantities: 1 }];
+        const { service, noteRepository: goodsIssueRepository } = makeService();
 
         await service.new({
             ...goodsIssueData,
@@ -66,21 +66,21 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
         });
 
         const note = await goodsIssueRepository.last();
-        const noteLine = note.goodsIssueLines[0];
+        const noteLine = note.lines[0];
 
-        expect(note.goodsIssueLines.length).toBe(1);
+        expect(note.lines.length).toBe(1);
         expect(noteLine.itemId.toString()).toEqual("1001");
         expect(noteLine.total.value).toEqual(4500);
         expect(noteLine.quantityRequested).toEqual(1);
     });
 
-    it("Deve criar uma guida de saída de mercadoria de mais de um artigo", async () => {
+    it("Deve criar uma guida de saída de mercadoria de mais de um linha", async () => {
         const lines = [
-            { itemId: "1001", quantity: 1 },
-            { itemId: "1002", quantity: 1 },
+            { itemId: "1001", goodQuantities: 1 },
+            { itemId: "1002", goodQuantities: 1 },
         ];
         const total = 20000;
-        const { service, goodsIssueRepository } = makeService();
+        const { service, noteRepository: goodsIssueRepository } = makeService();
 
         await service.new({
             ...goodsIssueData,
@@ -89,8 +89,8 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
         });
 
         const note = await goodsIssueRepository.last();
-        expect(note.goodsIssueLines.length).toBe(2);
-        expect(note.getTotal().value).toEqual(total);
+
+        expect(note.lines.length).toBe(2);
     });
 
     it("Deve retornar **InvalidTotal** se o total enviado pelo solicitante for diferente do total calculado na guida de saída de mercadoria,", async () => {
@@ -107,7 +107,7 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
     });
 
     it("Deve registrar a data de devolução da guia de saída de mercadoria,", async () => {
-        const { service, goodsIssueRepository } = makeService();
+        const { service, noteRepository: goodsIssueRepository } = makeService();
 
         await service.new(goodsIssueData);
 
@@ -117,21 +117,31 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
         expect(goodsIssue.returnDate).toBeInstanceOf(Date);
     });
 
-    it("Deve solicitar vários artigos com diferentes quantidades", async () => {
-        const { service, goodsIssueRepository } = makeService();
+    it("Deve calcular o valor total da guia de saída de mercadorias", async () => {
+        const { service, noteRepository: goodsIssueRepository } = makeService();
 
         await service.new(goodsIssueData);
 
-        const goodsIssue = await goodsIssueRepository.last();
+        const note = await goodsIssueRepository.last();
 
-        expect(goodsIssue.goodsIssueLines.length).toBe(2);
-        expect(goodsIssue.getTotal().value).toEqual(55500);
+        expect(note.getTotal().value).toEqual(55500);
     });
 
-    it("Deve retornar **InsufficientStock** se a quantidade do artigo solicitado for maior que a sua quantidade em stock", async () => {
+    it("Deve solicitar vários artigos com diferentes quantidades", async () => {
+        const { service, noteRepository } = makeService();
+
+        await service.new(goodsIssueData);
+
+        const note = await noteRepository.last();
+
+        expect(note.lines[0].quantityRequested).toEqual(2);
+        expect(note.lines[1].quantityRequested).toEqual(3);
+    });
+
+    it("Deve retornar **InsufficientStock** se a quantidade de algum artigo solicitado for maior que o seu stock", async () => {
         const lines = [
-            { itemId: "1001", quantity: 10 },
-            { itemId: "1002", quantity: 15 },
+            { itemId: "1001", goodQuantities: 10 },
+            { itemId: "1002", goodQuantities: 15 },
         ];
 
         const { service } = makeService();
@@ -144,27 +154,53 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
         expect(error.value).toBeInstanceOf(InsufficientStock);
     });
 
-    it("Deve diminuir o stock dos artigos solicitados", async () => {
+    it("Deve reduzir o stock dos artigos solicitados", async () => {
         const { service, itemStockRepository } = makeService();
 
         await service.new(goodsIssueData);
 
-        const items = await itemStockRepository.findAll([
+        const itemsStock = await itemStockRepository.findAll([
             ID.fromString("1001"),
             ID.fromString("1002"),
         ]);
 
-        expect(items.length).toBe(2);
+        expect(itemsStock.length).toBe(2);
 
-        const item1 = items[0];
-        const item2 = items[1];
+        const stock1 = itemsStock[0];
+        const stock2 = itemsStock[1];
 
-        expect(item1.total).toEqual(8);
-        expect(item2.total).toEqual(7);
+        expect(stock1.total).toEqual(8);
+        expect(stock2.total).toEqual(7);
+    });
+
+    it("Deve reduzir o stock dos artigos em mau estado, se foi solicitado artigos em mau estado", async () => {
+        const data = {
+            ...goodsIssueData,
+            lines: [
+                {
+                    itemId: "1008",
+                    goodQuantities: 1,
+                    badQuantities: 1,
+                },
+            ],
+        };
+
+        const { service, itemStockRepository } = makeService();
+
+        await service.new(data);
+
+        const itemsStock = await itemStockRepository.findAll([ID.fromString("1008")]);
+
+        expect(itemsStock.length).toBe(1);
+
+        const stock = itemsStock[0];
+
+        expect(stock.badQuantities).toEqual(4);
+        expect(stock.goodQuantities).toEqual(9);
     });
 
     it("Deve criar a guia de saída de mercadoria com os detalhes da finalidade", async () => {
-        const { service, goodsIssueRepository } = makeService();
+        const { service, noteRepository: goodsIssueRepository } = makeService();
 
         await service.new(goodsIssueData);
 
@@ -184,7 +220,7 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
             },
         };
 
-        const { service, goodsIssueRepository } = makeService();
+        const { service, noteRepository: goodsIssueRepository } = makeService();
 
         await service.new(data);
 
@@ -194,11 +230,11 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
         expect(goodsIssue.purpose.notes).toEqual("John Doe");
     });
 
-    it("Deve retornar **InsufficientStock** se a quantidade solicitada de uma variação não tiver estoque suficiente", async () => {
+    it("Deve retornar **InsufficientStock** se não tiver quantidades suficiente em stock de algum artigo", async () => {
         const lines = [
-            { itemId: "1001", quantity: 2 },
-            { itemId: "1002", quantity: 3 },
-            { itemId: "1003", quantity: 14 },
+            { itemId: "1001", goodQuantities: 2 },
+            { itemId: "1002", goodQuantities: 3 },
+            { itemId: "1003", goodQuantities: 14 },
         ];
         const { service } = makeService();
 
@@ -212,32 +248,32 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
     });
 
     it("Deve gerar o ID da guia de saída de mercadoria,", async () => {
-        const { service, goodsIssueRepository } = makeService();
+        const { service, noteRepository } = makeService();
 
         await service.new(goodsIssueData);
 
-        const goodsIssueOrErr = await goodsIssueRepository.getById(ID.fromString("GS - 1000"));
-        const goodsIssue = <GoodsIssueNote>goodsIssueOrErr.value;
+        const noteOrErr = await noteRepository.getById(ID.fromString("GS - 1000"));
+        const note = <GoodsIssueNote>noteOrErr.value;
 
-        expect(goodsIssue.goodsIssueNoteId).toBeDefined();
-        expect(goodsIssue.goodsIssueNoteId).toBeInstanceOf(ID);
-        expect(goodsIssue.goodsIssueNoteId.toString()).toEqual("GS - 1000");
+        expect(note.goodsIssueNoteId).toBeDefined();
+        expect(note.goodsIssueNoteId).toBeInstanceOf(ID);
+        expect(note.goodsIssueNoteId.toString()).toEqual("GS - 1000");
     });
 
     it("Deve gerar 2 solicitações com IDs diferentes", async () => {
-        const { service, goodsIssueRepository } = makeService();
+        const { service, noteRepository } = makeService();
 
         await service.new(goodsIssueData);
         await service.new(goodsIssueData);
 
-        const goodsIssue1rErr = await goodsIssueRepository.getById(ID.fromString("GS - 1000"));
-        const goodsIssue2rErr = await goodsIssueRepository.getById(ID.fromString("GS - 1001"));
+        const note1OrErr = await noteRepository.getById(ID.fromString("GS - 1000"));
+        const note2OrErr = await noteRepository.getById(ID.fromString("GS - 1001"));
 
-        const goodsIssue1 = <GoodsIssueNote>goodsIssue1rErr.value;
-        const goodsIssue2 = <GoodsIssueNote>goodsIssue2rErr.value;
+        const note1 = <GoodsIssueNote>note1OrErr.value;
+        const note2 = <GoodsIssueNote>note2OrErr.value;
 
-        expect(goodsIssue1.goodsIssueNoteId.toString()).toEqual("GS - 1000");
-        expect(goodsIssue2.goodsIssueNoteId.toString()).toEqual("GS - 1001");
+        expect(note1.goodsIssueNoteId.toString()).toEqual("GS - 1000");
+        expect(note2.goodsIssueNoteId.toString()).toEqual("GS - 1001");
     });
 
     it("Deve receber o estado actual dos artigos solicitados", async () => {
@@ -314,12 +350,12 @@ const goodsIssueData = {
     lines: [
         {
             itemId: "1001",
-            quantity: 2,
+            goodQuantities: 2,
             condition: { status: "Bom" },
         },
         {
             itemId: "1002",
-            quantity: 3,
+            goodQuantities: 3,
             condition: { status: "Mau", comment: "T-shirt rasgada" },
         },
     ],
@@ -336,17 +372,23 @@ interface Dependencies {
 function makeService(deps?: Dependencies) {
     const purposeSource = new DefaultPurposeSpecification();
     const itemRepository = deps?.itemRepository ?? new ItemRepositoryStub();
-    const goodsIssueRepository = deps?.goodsIssueRepository ?? new InmemGoodsIssueNoteRepository();
+    const noteRepository = deps?.goodsIssueRepository ?? new InmemGoodsIssueNoteRepository();
     const storage = new InmemSequenceStorage();
     const generator = new SequenceGenerator(storage, 1000);
     const itemStockRepository = new ItemStockRepositoryStub();
     const service = new GoodsIssueService(
         itemRepository,
         itemStockRepository,
-        goodsIssueRepository,
+        noteRepository,
         generator,
         purposeSource
     );
 
-    return { goodsIssueRepository, service, itemRepository, purposeSource, itemStockRepository };
+    return {
+        noteRepository,
+        service,
+        itemRepository,
+        purposeSource,
+        itemStockRepository,
+    };
 }

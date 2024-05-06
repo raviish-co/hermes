@@ -49,7 +49,7 @@ export function toGoodsIssueNoteDTO(note: GoodsIssueNote): GoodsIssueNoteDTO {
         goodsIssueNoteId: note.goodsIssueNoteId.toString(),
         purpose: note.purpose,
         status: note.status,
-        lines: note.goodsIssueLines.map(toGoodsIssueLineDTO),
+        lines: note.lines.map(toGoodsIssueLineDTO),
         returnDate: note.returnDate.toISOString(),
         total: note.total.value,
         securityDeposit: note.securityDeposit.value,

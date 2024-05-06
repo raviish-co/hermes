@@ -48,7 +48,8 @@ export class GoodsIssueService {
         const itemsOrErr = await this.#itemRepository.findAll(itemsIds);
         if (itemsOrErr.isLeft()) return left(itemsOrErr.value);
 
-        await this.#reduceStock(itemsOrErr.value, data);
+        const voidOrErr = await this.#reduceStock(itemsOrErr.value, data);
+        if (voidOrErr.isLeft()) return left(voidOrErr.value);
 
         const linesOrErr = this.#buildGoodsIssueLines(itemsOrErr.value, data.lines);
         if (linesOrErr.isLeft()) return left(linesOrErr.value);
@@ -101,48 +102,56 @@ export class GoodsIssueService {
         items: Item[],
         lines: GoodIssueLineDTO[]
     ): Either<InsufficientStock, GoodsIssueNoteLine[]> {
-        const goodsIssueLines: GoodsIssueNoteLine[] = [];
+        const noteLines: GoodsIssueNoteLine[] = [];
 
         for (const idx in items) {
-            const { quantity, condition } = lines[idx];
+            const { goodQuantities, condition } = lines[idx];
             const item = items[idx];
-
-            if (!item.canBeReducedStock(quantity)) {
-                return left(new InsufficientStock(item.itemId.toString()));
-            }
 
             if (condition) {
                 item.updateCondition(condition.status, condition.comment);
             }
 
-            const goodsIssueLine = new GoodsIssueNoteLine(
+            const noteLine = new GoodsIssueNoteLine(
                 item.itemId,
                 item.name,
                 item.price,
                 item.fulltext,
-                quantity,
+                goodQuantities,
                 item.getCondition(),
                 item.variations
             );
 
-            goodsIssueLines.push(goodsIssueLine);
+            noteLines.push(noteLine);
         }
 
-        return right(goodsIssueLines);
+        return right(noteLines);
     }
 
-    async #reduceStock(items: Item[], data: GoodsIssueNoteDTO) {
+    async #reduceStock(
+        items: Item[],
+        data: GoodsIssueNoteDTO
+    ): Promise<Either<InsufficientStock, void>> {
         const itemsIds = this.#buildItemsIds(data.lines);
 
         const itemsInStock = await this.#itemStockRepository.findAll(itemsIds);
 
-        items.forEach((item, idx) => {
-            const stock = itemsInStock.find((stock) => stock.itemId.equals(item.itemId));
+        for (const idx in items) {
+            const item = items[idx];
             const line = data.lines[idx];
-            stock?.reduce(line.quantity);
-        });
+
+            const stock = itemsInStock.find((stock) => stock.itemId.equals(item.itemId))!;
+
+            if (!stock.canReduce(line.goodQuantities, line.badQuantities)) {
+                return left(new InsufficientStock(item.itemId.toString()));
+            }
+
+            stock.reduce(line.goodQuantities, line.badQuantities);
+        }
 
         await this.#itemStockRepository.updateAll(itemsInStock);
+
+        return right(undefined);
     }
 }
 
@@ -156,7 +165,8 @@ type GoodsIssueNoteDTO = {
 
 type GoodIssueLineDTO = {
     itemId: string;
-    quantity: number;
+    goodQuantities: number;
+    badQuantities?: number;
     condition?: Condition;
 };
 

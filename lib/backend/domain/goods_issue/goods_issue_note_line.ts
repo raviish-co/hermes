@@ -8,11 +8,11 @@ export class GoodsIssueNoteLine {
     readonly name: string;
     readonly fulltext: string;
     readonly price: Decimal;
-    readonly variationsValues?: Record<string, string>;
-    readonly condition?: Condition;
     readonly #quantity: number;
     quantityReturned: number;
     #netTotal: Decimal;
+    readonly variationsValues?: Record<string, string>;
+    readonly condition?: Condition;
 
     constructor(
         itemId: ID,
