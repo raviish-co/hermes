@@ -15,22 +15,26 @@ import { Sequence } from "../adapters/sequences/sequence";
 import { Purpose } from "../domain/goods_issue/purpose";
 import { Item } from "../domain/catalog/items/item";
 import { ID } from "../shared/id";
+import type { ItemStockRepository } from "../domain/warehouse/item_stock_repository";
 
 export class GoodsIssueService {
-    #goodsIssueNoteRepository: GoodsIssueNoteRepository;
-    #purposeSpecification: PurposeSpecification;
     #itemRepository: ItemRepository;
+    #itemStockRepository: ItemStockRepository;
+    #noteRepository: GoodsIssueNoteRepository;
+    #purposeSpecification: PurposeSpecification;
     #generator: Generator;
 
     constructor(
         itemRepository: ItemRepository,
-        goodsIssueNoteRepository: GoodsIssueNoteRepository,
+        itemStockRepository: ItemStockRepository,
+        noteRepository: GoodsIssueNoteRepository,
         generator: Generator,
         purposeSpecification: PurposeSpecification
     ) {
-        this.#goodsIssueNoteRepository = goodsIssueNoteRepository;
-        this.#purposeSpecification = purposeSpecification;
         this.#itemRepository = itemRepository;
+        this.#itemStockRepository = itemStockRepository;
+        this.#noteRepository = noteRepository;
+        this.#purposeSpecification = purposeSpecification;
         this.#generator = generator;
     }
 
@@ -44,8 +48,9 @@ export class GoodsIssueService {
         const itemsOrErr = await this.#itemRepository.findAll(itemsIds);
         if (itemsOrErr.isLeft()) return left(itemsOrErr.value);
 
-        const items = itemsOrErr.value;
-        const linesOrErr = this.#buildGoodsIssueLines(items, data.lines);
+        await this.#reduceStock(itemsOrErr.value, data);
+
+        const linesOrErr = this.#buildGoodsIssueLines(itemsOrErr.value, data.lines);
         if (linesOrErr.isLeft()) return left(linesOrErr.value);
 
         const lines = linesOrErr.value;
@@ -62,19 +67,19 @@ export class GoodsIssueService {
 
         if (!noteOrErr.value.isSameTotal(data.total)) return left(new InvalidTotal());
 
-        await this.#goodsIssueNoteRepository.save(noteOrErr.value);
+        await this.#noteRepository.save(noteOrErr.value);
 
-        await this.#itemRepository.updateAll(items);
+        await this.#itemRepository.updateAll(itemsOrErr.value);
 
         return right(undefined);
     }
 
     async list(): Promise<GoodsIssueNote[]> {
-        return await this.#goodsIssueNoteRepository.getAll();
+        return await this.#noteRepository.getAll();
     }
 
     async get(noteId: string): Promise<Either<GoodsIssueNoteNotFound, GoodsIssueNote>> {
-        const noteOrErr = await this.#goodsIssueNoteRepository.getById(ID.fromString(noteId));
+        const noteOrErr = await this.#noteRepository.getById(ID.fromString(noteId));
         if (noteOrErr.isLeft()) return left(noteOrErr.value);
 
         return right(noteOrErr.value);
@@ -110,8 +115,6 @@ export class GoodsIssueService {
                 item.updateCondition(condition.status, condition.comment);
             }
 
-            item.reduceStock(quantity);
-
             const goodsIssueLine = new GoodsIssueNoteLine(
                 item.itemId,
                 item.name,
@@ -126,6 +129,20 @@ export class GoodsIssueService {
         }
 
         return right(goodsIssueLines);
+    }
+
+    async #reduceStock(items: Item[], data: GoodsIssueNoteDTO) {
+        const itemsIds = this.#buildItemsIds(data.lines);
+
+        const itemsInStock = await this.#itemStockRepository.findAll(itemsIds);
+
+        items.forEach((item, idx) => {
+            const stock = itemsInStock.find((stock) => stock.itemId.equals(item.itemId));
+            const line = data.lines[idx];
+            stock?.reduce(line.quantity);
+        });
+
+        await this.#itemStockRepository.updateAll(itemsInStock);
     }
 }
 

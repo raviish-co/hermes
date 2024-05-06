@@ -27,6 +27,10 @@ export class ItemStock {
         this.#badQuantities += badQuantities;
     }
 
+    reduce(quantity: number) {
+        this.#goodQuantities -= quantity;
+    }
+
     get itemStockId(): ID {
         return this.#itemStockId;
     }
