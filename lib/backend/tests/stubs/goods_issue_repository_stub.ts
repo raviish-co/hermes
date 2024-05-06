@@ -110,6 +110,7 @@ const _goodsIssueData = [
                 _item.price,
                 _item.fulltext,
                 15,
+                0,
                 _item.getCondition(),
                 _item.variations!
             ),
@@ -119,6 +120,7 @@ const _goodsIssueData = [
                 _item2.price,
                 _item2.fulltext,
                 15,
+                0,
                 _item2.getCondition(),
                 _item2.variations!
             ),
@@ -140,6 +142,7 @@ const _goodsIssueData = [
                 _item4.price,
                 _item4.fulltext,
                 3,
+                0,
                 _item4.getCondition(),
                 _item4.variations!
             ),
@@ -149,6 +152,7 @@ const _goodsIssueData = [
                 _item5.price,
                 _item5.fulltext,
                 2,
+                0,
                 _item5.getCondition(),
                 _item5.variations!
             ),
@@ -170,6 +174,7 @@ const _goodsIssueData = [
                 _item6.price,
                 _item6.fulltext,
                 2,
+                0,
                 _item6.getCondition(),
                 _item6.variations!
             ),
@@ -191,6 +196,7 @@ const _goodsIssueData = [
                 _item7.price,
                 _item7.fulltext,
                 3,
+                0,
                 _item7.getCondition(),
                 _item7.variations!
             ),

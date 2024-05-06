@@ -50,13 +50,17 @@ onMounted(async () => {
 
             <div class="card">
                 <span class="material-symbols-outlined text-3xl"> percent </span>
-                <h1>{{ statistics.percentageOfItemsInStock.goodPercentage }}</h1>
+                <h1>
+                    {{ statistics.percentageOfItemsInStock.goodPercentage.toFixed(2) }}
+                </h1>
                 <p class="text-sm text-gray-500">Percentagem de artigos em bom estado</p>
             </div>
 
             <div class="card">
                 <span class="material-symbols-outlined text-3xl"> percent </span>
-                <h1>{{ statistics.percentageOfItemsInStock.badPercentage }}</h1>
+                <h1>
+                    {{ statistics.percentageOfItemsInStock.badPercentage.toFixed(2) }}
+                </h1>
                 <p class="text-sm text-gray-500">Percentagem de artigos em mau estado</p>
             </div>
         </div>

@@ -92,7 +92,7 @@ export class GoodsIssueNote {
 
     #addLine(line: GoodsIssueNoteLine): void {
         this.lines.push(line);
-        this.#calculateTotal(line.total);
+        this.#calculateTotal(line.netTotal);
     }
 
     #returnLines(lines: GoodsReturnNoteLine[]): void {

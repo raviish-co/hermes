@@ -42,6 +42,7 @@ interface Services {
 export const makeServices = (): Services => {
     const goodsIssueService = new GoodsIssueService(
         itemRepository,
+        itemStockRepository,
         goodsIssueRepository,
         sequenceGenerator,
         purposeSpec

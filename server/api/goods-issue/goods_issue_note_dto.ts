@@ -35,7 +35,7 @@ function toGoodsIssueLineDTO(line: GoodsIssueNoteLine): GoodsIssueLineDTO {
         itemId: line.itemId.toString(),
         name: line.name,
         price: line.price.value,
-        quantityRequested: line.quantityRequested,
+        quantityRequested: line.total,
         quantityReturned: line.quantityReturned,
         quantityToReturn: line.maxToReturn,
         fulltext: line.fulltext,
