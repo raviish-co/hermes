@@ -14,6 +14,8 @@ import type { ItemRepository } from "../domain/catalog/items/item_repository";
 import { Variation } from "../domain/catalog/variations/variation";
 import type { VariationNotFound } from "../domain/catalog/variations/variation_not_found_error";
 import type { VariationRepository } from "../domain/catalog/variations/variation_repository";
+import { ItemStock } from "../domain/warehouse/item_stock";
+import type { ItemStockRepository } from "../domain/warehouse/item_stock_repository";
 import { Decimal } from "../shared/decimal";
 import { left, right, type Either } from "../shared/either";
 import type { ItemError, RegisterCategoryError } from "../shared/errors";
@@ -22,6 +24,7 @@ import type { Pagination } from "../shared/pagination";
 
 export class CatalogService {
     #itemRepository: ItemRepository;
+    #itemStockRepository: ItemStockRepository;
     #categoryRepository: CategoryRepository;
     #variationRepository: VariationRepository;
     #sectionRepository: SectionRepository;
@@ -29,12 +32,14 @@ export class CatalogService {
 
     constructor(
         itemRepository: ItemRepository,
+        itemStockRepository: ItemStockRepository,
         variationRepository: VariationRepository,
         categoryRepository: CategoryRepository,
         sectionRepository: SectionRepository,
         generator: Generator
     ) {
         this.#itemRepository = itemRepository;
+        this.#itemStockRepository = itemStockRepository;
         this.#variationRepository = variationRepository;
         this.#categoryRepository = categoryRepository;
         this.#sectionRepository = sectionRepository;
@@ -99,7 +104,11 @@ export class CatalogService {
 
         const item = itemOrErr.value;
 
+        const stock = ItemStock.create(item.itemId);
+
         await this.#itemRepository.save(item);
+
+        await this.#itemStockRepository.save(stock);
 
         return right(undefined);
     }

@@ -226,8 +226,8 @@ describe("CatalogService - Pesquisar artigos", () => {
     });
 });
 
-describe("CatalogService - Registrar artigo", () => {
-    it("Deve registrar o artigo no repositório", async () => {
+describe("CatalogService - Registar artigo", () => {
+    it("Deve registar o artigo no repositório", async () => {
         const categoryRepository = new CategoryRepositoryStub();
         const { service, itemRepository } = catalogService({
             categoryRepository,
@@ -247,7 +247,7 @@ describe("CatalogService - Registrar artigo", () => {
         expect(item.name).toEqual(data.name);
     });
 
-    it("Deve registrar o artigo com o seu preço", async () => {
+    it("Deve registar o artigo com o seu preço", async () => {
         const categoryRepository = new CategoryRepositoryStub();
         const { service, itemRepository } = catalogService({
             categoryRepository,
@@ -283,7 +283,7 @@ describe("CatalogService - Registrar artigo", () => {
         expect(item.itemId.toString()).toEqual("RVS - 1000");
     });
 
-    it("Deve registrar o artigo com a categoria", async () => {
+    it("Deve registar o artigo com a categoria", async () => {
         const variationRepository = new VariationRepositoryStub();
         const categoryRepository = new CategoryRepositoryStub();
 
@@ -326,7 +326,7 @@ describe("CatalogService - Registrar artigo", () => {
         expect(error.value).toBeInstanceOf(CategoryNotFound);
     });
 
-    it("Deve registrar as variações do artigo", async () => {
+    it("Deve registar as variações do artigo", async () => {
         const variationRepository = new VariationRepositoryStub();
         const categoryRepository = new CategoryRepositoryStub();
         const { service, itemRepository } = catalogService({
@@ -371,7 +371,7 @@ describe("CatalogService - Registrar artigo", () => {
         expect(error.value).toBeInstanceOf(VariationNotFound);
     });
 
-    it("Deve registrar o artigo com a sua secção", async () => {
+    it("Deve registar o artigo com a sua secção", async () => {
         const categoryRepository = new CategoryRepositoryStub();
         const sectionRepository = new SectionRepositoryStub();
         const { service, itemRepository } = catalogService({
@@ -408,7 +408,7 @@ describe("CatalogService - Registrar artigo", () => {
         expect(error.value).toBeInstanceOf(SectionNotFound);
     });
 
-    it("Deve registrar o artigo com as suas tags", async () => {
+    it("Deve registar o artigo com as suas tags", async () => {
         const { service, itemRepository } = catalogService();
 
         const data = {
@@ -423,6 +423,24 @@ describe("CatalogService - Registrar artigo", () => {
 
         expect(item.tags).toBeDefined();
         expect(item.tags).toEqual(data.tags);
+    });
+
+    it("Deve criar o stock do artigo", async () => {
+        const data = {
+            name: "Artigo 1",
+            price: 100,
+        };
+
+        const { service, itemStockRepository, itemRepository } = catalogService();
+
+        await service.registerItem(data);
+
+        const item = await itemRepository.last();
+        const itemsStock = await itemStockRepository.findAll([item.itemId]);
+
+        expect(itemsStock[0].itemId).toBeDefined();
+        expect(itemsStock[0].total).toEqual(0);
+        expect(itemsStock[0].itemId.toString()).toEqual(item.itemId.toString());
     });
 });
 

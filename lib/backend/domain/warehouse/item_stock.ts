@@ -15,6 +15,10 @@ export class ItemStock {
         this.#total = goodQuantities + badQuantities;
     }
 
+    static create(itemId: ID): ItemStock {
+        return new ItemStock(itemId, 0, 0);
+    }
+
     isOutOfStock(): boolean {
         return this.#total === 0;
     }
@@ -27,7 +31,7 @@ export class ItemStock {
         this.#badQuantities += badQuantities;
     }
 
-    reduce(goodQuantities: number, badQuantities?: number) {
+    reduce(goodQuantities: number, badQuantities?: number): void {
         this.#goodQuantities -= goodQuantities;
 
         if (!badQuantities) return;
