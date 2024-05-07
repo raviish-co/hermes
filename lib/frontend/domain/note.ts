@@ -8,7 +8,6 @@ export type LineOptions = {
     price: number;
     variationsValues?: VariationValueModel[];
     condition?: ConditionModel;
-    stock?: number;
     quantityRequested?: number;
     quantityReturned?: number;
     quantityToReturn?: number;
@@ -21,12 +20,12 @@ export class Note {
         this.lines = [];
     }
 
-    addLine(options: LineOptions, quantity: number) {
+    addLine(options: LineOptions, quantity: number, stock: number) {
         if (!quantity) return;
 
         if (this.isSameLine(options.itemId)) return;
 
-        const line = this.createLine(options, quantity);
+        const line = this.createLine(options, quantity, stock);
 
         this.lines.push(line);
     }
@@ -65,7 +64,7 @@ export class Note {
         return this.lines.some((line) => line.quantity !== 0);
     }
 
-    createLine(options: LineOptions, quantity: number) {
+    createLine(options: LineOptions, quantity: number, stock: number) {
         const line = new NoteLine(
             options.itemId,
             options.name,
@@ -74,6 +73,8 @@ export class Note {
         );
 
         line.changeQuantity(quantity);
+
+        line.changeStock(stock);
 
         return line;
     }

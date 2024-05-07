@@ -5,7 +5,6 @@ import { NoteLine } from "./note_line";
 
 export class GoodsIssueNoteLine extends NoteLine {
     price: number;
-    stock: number;
     total: number;
 
     constructor(
@@ -14,7 +13,6 @@ export class GoodsIssueNoteLine extends NoteLine {
         price: number,
         variationsValues?: VariationValueModel[],
         condition?: ConditionModel,
-        stock?: number,
         quantityRequested?: number,
         quantityReturned?: number,
         quantityToReturn?: number
@@ -27,21 +25,10 @@ export class GoodsIssueNoteLine extends NoteLine {
         this.quantityRequested = quantityRequested ?? 0;
         this.quantityReturned = quantityReturned ?? 0;
         this.quantity = quantityToReturn ?? 0;
-
-        this.stock = stock ?? 0;
     }
 
     calculate() {
-        if (!this.isAvaliableQuantity()) {
-            this.total = 0;
-            return;
-        }
-
         this.total = this.price * this.quantity;
-    }
-
-    isAvaliableQuantity() {
-        return this.quantity <= this.stock;
     }
 
     totalIsZero() {

@@ -51,14 +51,14 @@ export class GoodsIssueNote extends Note {
         return note;
     }
 
-    addLine(options: LineOptions, quantity: number) {
+    addLine(options: LineOptions, quantity: number, stock: number) {
         if (this.isSameLine(options.itemId)) return;
 
-        const line = this.createLine(options, quantity);
+        if (quantity > stock) return;
+
+        const line = this.createLine(options, quantity, stock);
 
         line.calculate();
-
-        if (line.totalIsZero()) return;
 
         this.lines.push(line);
 
@@ -73,7 +73,10 @@ export class GoodsIssueNote extends Note {
 
     changeQuantity(itemId: string, quantity: number) {
         const line = this.findLine(itemId);
+
         if (!line) return;
+
+        if (quantity > line.stock) return;
 
         line.changeQuantity(quantity);
 
@@ -109,17 +112,18 @@ export class GoodsIssueNote extends Note {
         return this.lines.find((line) => line.itemId === itemId);
     }
 
-    createLine(options: LineOptions, quantity: number) {
+    createLine(options: LineOptions, quantity: number, stock: number) {
         const line = new GoodsIssueNoteLine(
             options.itemId,
             options.name,
             options.price,
             options.variationsValues,
-            options.condition,
-            options.stock
+            options.condition
         );
 
         line.changeQuantity(quantity);
+
+        line.changeStock(stock);
 
         return line;
     }

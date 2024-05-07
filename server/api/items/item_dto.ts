@@ -15,11 +15,6 @@ export interface ItemDTO {
     categoryId?: string;
     variationsValues?: VariationValues[];
     tags?: string[];
-    stock: number;
-    condition: {
-        status: "Bom" | "Mau";
-        comment?: string;
-    };
 }
 
 export function toItemDTO(item: Item): ItemDTO {
@@ -30,12 +25,7 @@ export function toItemDTO(item: Item): ItemDTO {
         sectionId: item.sectionId?.toString(),
         categoryId: item.categoryId?.toString(),
         variationsValues: toVariationValuesDTO(item.variations),
-        stock: item.stock.quantity,
         tags: item.tags,
-        condition: {
-            status: item.getCondition().status,
-            comment: item.getCondition()?.comment,
-        },
     };
 }
 

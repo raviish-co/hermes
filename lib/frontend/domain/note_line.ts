@@ -8,6 +8,7 @@ export class NoteLine {
     quantity: number = 0;
     quantityReturned: number = 0;
     quantityRequested: number = 0;
+    stock: number = 0;
     variationsValues?: VariationValueModel[];
     condition?: ConditionModel;
 
@@ -29,6 +30,10 @@ export class NoteLine {
 
     changeQuantity(quantity: number) {
         this.quantity = quantity;
+    }
+
+    changeStock(stock: number) {
+        this.stock = stock;
     }
 
     updateCondition(status: "Bom" | "Mau", comment?: string) {

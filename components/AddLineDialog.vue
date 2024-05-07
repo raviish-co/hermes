@@ -5,6 +5,8 @@ import { CatalogService } from "@frontend/services/catalog_service";
 import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_values";
 import { initializeQuantities } from "@frontend/helpers/initialize_quantities";
 import type { Note } from "~/lib/frontend/domain/note";
+import { WarehouseService } from "~/lib/frontend/services/warehouse_service";
+import type { ItemStockModel } from "~/lib/frontend/models/item_stock";
 
 interface Props {
     note: Note;
@@ -15,8 +17,10 @@ const dialogRef = ref<typeof VDialog>();
 const searchText = ref<string>("");
 const quantities = ref<number[]>([]);
 const items = ref<ItemModel[]>([]);
+const itemsStock = ref<ItemStockModel[]>([]);
 const pages = ref<number>(1);
 const catalogService = new CatalogService();
+const warehouseService = new WarehouseService();
 
 withDefaults(defineProps<Props>(), {
     hasLimit: true,
@@ -59,7 +63,15 @@ function changePageToken(pageToken: number) {
     listItems(pageToken);
 }
 
+function findItemStock(itemId: string) {
+    return itemsStock.value.find((i) => i.itemId === itemId)!;
+}
+
 defineExpose({ show });
+
+onMounted(async () => {
+    itemsStock.value = await warehouseService.listItemStock();
+});
 </script>
 
 <template>
@@ -89,7 +101,16 @@ defineExpose({ show });
                         :class="{ hidden: note.isSameLine(item.itemId) }"
                         class="hover:bg-gray-50"
                     >
-                        <td class="cursor-pointer" @click="note.addLine(item, quantities[idx])">
+                        <td
+                            class="cursor-pointer"
+                            @click="
+                                note.addLine(
+                                    item,
+                                    quantities[idx],
+                                    findItemStock(item.itemId).total
+                                )
+                            "
+                        >
                             <span>{{ item.name }}</span>
                             <br />
                             <span class="text-light-600 text-xs sm:text-sm">
@@ -98,8 +119,14 @@ defineExpose({ show });
                         </td>
 
                         <td class="text-center">
-                            <span :class="{ 'badge-danger': item.stock === 0 }">
-                                {{ item.stock === 0 ? "Esgotado" : item.stock }}
+                            <span
+                                :class="{ 'badge-danger': findItemStock(item.itemId).total === 0 }"
+                            >
+                                {{
+                                    findItemStock(item.itemId).total === 0
+                                        ? "Esgotado"
+                                        : findItemStock(item.itemId).total
+                                }}
                             </span>
                         </td>
 
@@ -110,13 +137,24 @@ defineExpose({ show });
                                 placeholder="QTD"
                                 min="0"
                                 class="input-number text-center"
-                                :max="hasLimit ? item.stock : undefined"
-                                @keypress.enter="note.addLine(item, quantities[idx])"
-                                @keydown.tab="note.addLine(item, quantities[idx])"
+                                :max="hasLimit ? findItemStock(item.itemId).total : undefined"
+                                @keypress.enter="
+                                    note.addLine(
+                                        item,
+                                        quantities[idx],
+                                        findItemStock(item.itemId).total
+                                    )
+                                "
+                                @keydown.tab="
+                                    note.addLine(
+                                        item,
+                                        quantities[idx],
+                                        findItemStock(item.itemId).total
+                                    )
+                                "
                             />
                         </td>
                     </tr>
-
                     <tr v-if="items.length === 0">
                         <td colspan="3">Nenhum artigo encontrado</td>
                     </tr>
