@@ -1,21 +1,22 @@
 import { DefaultPurposeSpecification } from "./adapters/default_purpose_specification";
-import { InmemGoodsIssueNoteRepository } from "./persistense/inmem/inmem_goods_issue_note_repository";
-import { VariationRepositoryStub } from "./tests/stubs/variation_repository_stub";
-import { InmemSequenceStorage } from "./persistense/inmem/inmem_sequence_storage";
 import { SequenceGenerator } from "./adapters/sequences/sequence_generator";
-import { ItemRepositoryStub } from "./tests/stubs/item_repository_stub";
-import { GoodsIssueService } from "./application/goods_issue_service";
 import { CatalogService } from "./application/catalog_service";
+import { DashboardService } from "./application/dashboard_service";
+import { GoodsIssueService } from "./application/goods_issue_service";
+import { GoodsReceiptService } from "./application/goods_receipt_service";
+import { GoodsReturnService } from "./application/goods_return_service";
 import { ImportService } from "./application/import_service";
 import { PurposeService } from "./application/purpose_service";
-import { SectionRepositoryStub } from "./tests/stubs/section_repository_stub";
-import { InmemGoodsReturnNoteRepository } from "./persistense/inmem/inmem_goods_return_note_repository";
-import { CategoryRepositoryStub } from "./tests/stubs/category_repository_stub";
-import { GoodsReturnService } from "./application/goods_return_service";
-import { GoodsReceiptService } from "./application/goods_receipt_service";
+import { WarehouseService } from "./application/warehouse_service";
+import { InmemGoodsIssueNoteRepository } from "./persistense/inmem/inmem_goods_issue_note_repository";
 import { InmemGoodsReceiptNoteRepository } from "./persistense/inmem/inmem_goods_receipt_note_repository";
-import { DashboardService } from "./application/dashboard_service";
+import { InmemGoodsReturnNoteRepository } from "./persistense/inmem/inmem_goods_return_note_repository";
+import { InmemSequenceStorage } from "./persistense/inmem/inmem_sequence_storage";
+import { CategoryRepositoryStub } from "./tests/stubs/category_repository_stub";
+import { ItemRepositoryStub } from "./tests/stubs/item_repository_stub";
 import { ItemStockRepositoryStub } from "./tests/stubs/item_stock_repository_stub";
+import { SectionRepositoryStub } from "./tests/stubs/section_repository_stub";
+import { VariationRepositoryStub } from "./tests/stubs/variation_repository_stub";
 
 const itemRepository = new ItemRepositoryStub();
 const goodsIssueRepository = new InmemGoodsIssueNoteRepository();
@@ -37,6 +38,7 @@ interface Services {
     goodsReturnService: GoodsReturnService;
     goodsReceiptService: GoodsReceiptService;
     dashboardService: DashboardService;
+    warehouseService: WarehouseService;
 }
 
 export const makeServices = (): Services => {
@@ -50,6 +52,7 @@ export const makeServices = (): Services => {
 
     const catalogService = new CatalogService(
         itemRepository,
+        itemStockRepository,
         variationRepository,
         categoryRepository,
         sectionRepository,
@@ -87,6 +90,8 @@ export const makeServices = (): Services => {
         itemStockRepository
     );
 
+    const warehouseService = new WarehouseService(itemStockRepository);
+
     return {
         goodsIssueService,
         catalogService,
@@ -95,5 +100,6 @@ export const makeServices = (): Services => {
         goodsReturnService,
         goodsReceiptService,
         dashboardService,
+        warehouseService,
     };
 };

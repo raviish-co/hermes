@@ -12,6 +12,10 @@ export class ItemStockRepositoryStub implements ItemStockRepository {
         });
     }
 
+    getAll(): Promise<ItemStock[]> {
+        return Promise.resolve(this.records);
+    }
+
     save(itemStock: ItemStock): Promise<void> {
         this.#data[itemStock.itemStockId.toString()] = itemStock;
         return Promise.resolve(undefined);
