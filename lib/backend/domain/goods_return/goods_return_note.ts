@@ -1,4 +1,4 @@
-import type { GoodsReturnNoteLine } from "./goods_return_note_line";
+import { GoodsReturnNoteLine } from "./goods_return_note_line";
 import { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
 

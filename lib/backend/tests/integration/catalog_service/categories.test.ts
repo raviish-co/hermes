@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { CategoryAlreadyExists } from "../../../domain/catalog/categories/category_already_exists_error";
 import { VariationNotFound } from "../../../domain/catalog/variations/variation_not_found_error";
-import { CategoryRepositoryStub } from "../../stubs/categoria_repository_stub";
+import { CategoryRepositoryStub } from "../../stubs/category_repository_stub";
 import { VariationRepositoryStub } from "../../stubs/variation_repository_stub";
 import { ItemRepositoryStub } from "../../stubs/item_repository_stub";
 import { catalogService } from "./service";

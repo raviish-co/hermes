@@ -1,13 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { CategoryNotFound } from "../../../domain/catalog/categories/category_not_found_error";
 import { SectionNotFound } from "../../../domain/catalog/departments/section_not_found_error";
-import { Item, Status } from "../../../domain/catalog/items/item";
+import { Item } from "../../../domain/catalog/items/item";
 import { ItemNotFound } from "../../../domain/catalog/items/item_not_found_error";
-import { ItemStock } from "../../../domain/catalog/items/item_stock";
 import { VariationNotFound } from "../../../domain/catalog/variations/variation_not_found_error";
 import { Decimal } from "../../../shared/decimal";
 import { ID } from "../../../shared/id";
-import { CategoryRepositoryStub } from "../../stubs/categoria_repository_stub";
+import { CategoryRepositoryStub } from "../../stubs/category_repository_stub";
 import { ItemRepositoryStub } from "../../stubs/item_repository_stub";
 import { SectionRepositoryStub } from "../../stubs/section_repository_stub";
 import { VariationRepositoryStub } from "../../stubs/variation_repository_stub";
@@ -266,44 +265,6 @@ describe("CatalogService - Registrar artigo", () => {
         expect(item.price.value).toEqual(data.price);
     });
 
-    it("Deve registrar a condição do artigo", async () => {
-        const categoryRepository = new CategoryRepositoryStub();
-        const { service, itemRepository } = catalogService({
-            categoryRepository,
-        });
-
-        const data = {
-            name: "Artigo 1",
-            price: 100,
-        };
-
-        await service.registerItem(data);
-
-        const item = await itemRepository.last();
-
-        expect(item.getCondition().status).toEqual("Bom");
-    });
-
-    it("Deve modificar o estado do artigo para **Mau** quando tem uma nota a descrever os danos", async () => {
-        const categoryRepository = new CategoryRepositoryStub();
-        const { service, itemRepository } = catalogService({
-            categoryRepository,
-        });
-
-        const data = {
-            name: "Artigo 1",
-            price: 100,
-            comment: "Danificado",
-        };
-
-        await service.registerItem(data);
-
-        const item = await itemRepository.last();
-
-        expect(item.getCondition().status).toEqual("Mau");
-        expect(item.getCondition().comment).toEqual("Danificado");
-    });
-
     it("Deve gerar o identificador do artigo", async () => {
         const categoryRepository = new CategoryRepositoryStub();
         const { service, itemRepository } = catalogService({
@@ -494,27 +455,6 @@ describe("CatalogService - Actualizar dados do artigo", () => {
         expect(error.value).toBeInstanceOf(ItemNotFound);
     });
 
-    it("Deve ser o mesmo o valor em stock do artigo após a actualização", async () => {
-        const itemRepository = new ItemRepositoryStub();
-        const { service } = catalogService({ itemRepository });
-        const itemId = "1001";
-
-        const itemOrErr = await itemRepository.getById(ID.fromString(itemId));
-        const item = <Item>itemOrErr.value;
-
-        const data = {
-            name: "T-shirt preta gola circular",
-            price: 15500,
-        };
-
-        await service.updateItem(itemId, data);
-
-        const itemOrErr2 = await itemRepository.getById(ID.fromString(itemId));
-        const item2 = <Item>itemOrErr2.value;
-
-        expect(item2.stock.quantity).toEqual(item.stock.quantity);
-    });
-
     it("Deve actualizar a secção do artigo no repositório", async () => {
         const itemRepository = new ItemRepositoryStub();
         const sectionRepository = new SectionRepositoryStub();
@@ -666,7 +606,5 @@ describe("CatalogService - Recuperar artigo pelo ID", () => {
 const item = new Item(
     ID.fromString("RVS - 10001"),
     "T-shirt desportiva gola redonda",
-    new Decimal(100),
-    new ItemStock(10),
-    { status: Status.Good }
+    new Decimal(100)
 );

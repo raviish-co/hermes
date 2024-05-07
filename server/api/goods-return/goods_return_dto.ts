@@ -41,7 +41,7 @@ function toGoodsReturnNoteLineDTO(line: GoodsReturnNoteLine): GoodsReturnNoteLin
     return {
         returnLineId: line.returnLineId.toString(),
         itemId: line.itemId.toString(),
-        quantity: line.quantityReturned.toString(),
+        quantity: line.total.toString(),
         name: line.name,
         variationValues: toVariationValuesDTO(line.variationsValues),
         condition: line.condition,

@@ -1,13 +1,11 @@
-import { Item, Status } from "../../domain/catalog/items/item";
-import { ItemStock } from "../../domain/catalog/items/item_stock";
-import { GoodsIssueNoteLine } from "../../domain/goods_issue/goods_issue_note_line";
+import { Item } from "../../domain/catalog/items/item";
 import { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
+import { GoodsIssueNoteLine } from "../../domain/goods_issue/goods_issue_note_line";
 import { InmemGoodsIssueNoteRepository } from "../../persistense/inmem/inmem_goods_issue_note_repository";
 import { Decimal } from "../../shared/decimal";
-
 import { ID } from "../../shared/id";
 
-export class GoodsIssueRepositoryStub extends InmemGoodsIssueNoteRepository {
+export class GoodsIssueNoteRepositoryStub extends InmemGoodsIssueNoteRepository {
     constructor() {
         super(
             _goodsIssueData.map(
@@ -28,8 +26,6 @@ const _item = new Item(
     ID.fromString("1001"),
     "Item 1",
     new Decimal(1000),
-    new ItemStock(1),
-    { status: Status.Good },
     ID.random(),
     ID.random(),
     { "1": "Cor: Preta" }
@@ -39,8 +35,6 @@ const _item2 = new Item(
     ID.fromString("1002"),
     "Item 1",
     new Decimal(1000),
-    new ItemStock(1),
-    { status: Status.Good },
     ID.random(),
     ID.random(),
     { "1": "Cor: Preta" }
@@ -50,8 +44,6 @@ const _item4 = new Item(
     ID.fromString("1004"),
     "Item 1",
     new Decimal(1000),
-    new ItemStock(7),
-    { status: Status.Good },
     ID.random(),
     ID.random(),
     { "1": "Cor: Preta" }
@@ -61,8 +53,6 @@ const _item5 = new Item(
     ID.fromString("1005"),
     "Item 1",
     new Decimal(1000),
-    new ItemStock(8),
-    { status: Status.Good },
     ID.random(),
     ID.random(),
     { "1": "Cor: Preta" }
@@ -72,8 +62,6 @@ const _item6 = new Item(
     ID.fromString("1006"),
     "Item 1",
     new Decimal(1000),
-    new ItemStock(8),
-    { status: Status.Good },
     ID.random(),
     ID.random(),
     { "1": "Cor: Preta" }
@@ -83,8 +71,6 @@ const _item7 = new Item(
     ID.fromString("1007"),
     "Item 1",
     new Decimal(1000),
-    new ItemStock(10),
-    { status: Status.Good },
     ID.random(),
     ID.random(),
     { "1": "Cor: Preta" }
@@ -94,8 +80,6 @@ const _item9 = new Item(
     ID.fromString("1009"),
     "Item 1",
     new Decimal(1000),
-    new ItemStock(10),
-    { status: Status.Good },
     ID.random(),
     ID.random(),
     { "1": "Cor: Preta" }
@@ -105,8 +89,24 @@ const _item10 = new Item(
     ID.fromString("1010"),
     "Item 1",
     new Decimal(1000),
-    new ItemStock(10),
-    { status: Status.Good },
+    ID.random(),
+    ID.random(),
+    { "1": "Cor: Preta" }
+);
+
+const _item11 = new Item(
+    ID.fromString("1011"),
+    "Item 1",
+    new Decimal(1000),
+    ID.random(),
+    ID.random(),
+    { "1": "Cor: Preta" }
+);
+
+const _item12 = new Item(
+    ID.fromString("1012"),
+    "Item 1",
+    new Decimal(1000),
     ID.random(),
     ID.random(),
     { "1": "Cor: Preta" }
@@ -133,7 +133,6 @@ const _goodsIssueData = [
                 _item.fulltext,
                 15,
                 0,
-                _item.getCondition(),
                 _item.variations!
             ),
             new GoodsIssueNoteLine(
@@ -143,7 +142,7 @@ const _goodsIssueData = [
                 _item2.fulltext,
                 15,
                 0,
-                _item2.getCondition(),
+
                 _item2.variations!
             ),
         ],
@@ -165,7 +164,7 @@ const _goodsIssueData = [
                 _item4.fulltext,
                 3,
                 0,
-                _item4.getCondition(),
+
                 _item4.variations!
             ),
             new GoodsIssueNoteLine(
@@ -175,7 +174,7 @@ const _goodsIssueData = [
                 _item5.fulltext,
                 2,
                 0,
-                _item5.getCondition(),
+
                 _item5.variations!
             ),
         ],
@@ -197,7 +196,7 @@ const _goodsIssueData = [
                 _item6.fulltext,
                 2,
                 0,
-                _item6.getCondition(),
+
                 _item6.variations!
             ),
         ],
@@ -219,7 +218,7 @@ const _goodsIssueData = [
                 _item7.fulltext,
                 3,
                 0,
-                _item7.getCondition(),
+
                 _item7.variations!
             ),
         ],
@@ -242,7 +241,7 @@ const _goodsIssueData = [
                 _item9.fulltext,
                 3,
                 0,
-                _item9.getCondition(),
+
                 _item9.variations!
             ),
             new GoodsIssueNoteLine(
@@ -252,8 +251,40 @@ const _goodsIssueData = [
                 _item10.fulltext,
                 3,
                 0,
-                _item10.getCondition(),
+
                 _item10.variations!
+            ),
+        ],
+    },
+    {
+        noteId: ID.fromString("GS - 1006"),
+        purpose: {
+            description: "Uso Pessoal",
+            details: "Uso Pessoal",
+            notes: "Uso Pessoal",
+        },
+        userId: ID.fromString("1"),
+        returnDate: new Date(),
+        lines: [
+            new GoodsIssueNoteLine(
+                _item11.itemId,
+                _item11.name,
+                _item11.price,
+                _item11.fulltext,
+                10,
+                10,
+
+                _item11.variations!
+            ),
+            new GoodsIssueNoteLine(
+                _item12.itemId,
+                _item12.name,
+                _item12.price,
+                _item12.fulltext,
+                10,
+                10,
+
+                _item12.variations!
             ),
         ],
     },

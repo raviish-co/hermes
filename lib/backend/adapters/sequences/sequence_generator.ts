@@ -1,5 +1,5 @@
-import type { SequenceStorage } from "./sequence_storage";
 import { type Generator } from "./generator";
+import type { SequenceStorage } from "./sequence_storage";
 
 export class SequenceGenerator implements Generator {
     readonly storage: SequenceStorage;

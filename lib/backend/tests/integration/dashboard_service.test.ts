@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { GoodsIssueRepositoryStub } from "../stubs/goods_issue_repository_stub";
+import { GoodsIssueNoteRepositoryStub } from "../stubs/goods_issue_note_repository_stub";
 import { InmemGoodsIssueNoteRepository } from "../../persistense/inmem/inmem_goods_issue_note_repository";
 import { DashboardService } from "../../application/dashboard_service";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
@@ -27,7 +27,7 @@ describe("Dashboard Service - Total de guias de saída vencidas", async () => {
     });
 
     it("Deve retornar o total de guias de saída vencida", async () => {
-        const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsIssueRepository = new GoodsIssueNoteRepositoryStub();
         const itemStockRepository = new ItemStockRepositoryStub();
 
         const itemRepository = new ItemRepositoryStub();

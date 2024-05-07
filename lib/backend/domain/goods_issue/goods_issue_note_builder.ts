@@ -1,8 +1,8 @@
-import { GoodsIssueNoteLine } from "./goods_issue_note_line";
 import { type Either, left, right } from "../../shared/either";
-import { Purpose } from "./purpose";
-import { GoodsIssueNote } from "./goods_issue_note";
 import { ID } from "../../shared/id";
+import { GoodsIssueNote } from "./goods_issue_note";
+import { GoodsIssueNoteLine } from "./goods_issue_note_line";
+import { Purpose } from "./purpose";
 
 export class GoodsIssueNoteBuilder {
     #noteId?: ID;

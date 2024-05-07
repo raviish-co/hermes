@@ -1,20 +1,20 @@
-import { InvalidVariationFormat } from "../domain/catalog/variations/invalid_variation_format_error";
-import type { VariationRepository } from "../domain/catalog/variations/variation_repository";
-import type { CategoryRepository } from "../domain/catalog/categories/category_repository";
-import { InvalidFileHeader } from "../adapters/readers/invalid_file_header_error";
-import { FileNotSupported } from "../adapters/readers/file_not_supported_error";
-import type { SectionRepository } from "../domain/catalog/departments/section_repository";
 import { CsvReader, VALID_CSV_HEADER } from "../adapters/readers/csv_reader";
-import type { ItemRepository } from "../domain/catalog/items/item_repository";
 import { FileEmpty } from "../adapters/readers/file_empty_error";
+import { FileNotSupported } from "../adapters/readers/file_not_supported_error";
+import { InvalidFileHeader } from "../adapters/readers/invalid_file_header_error";
 import type { Generator } from "../adapters/sequences/generator";
-import type { Variation } from "../domain/catalog/variations/variation";
-import { ItemBuilder } from "../domain/catalog/items/item_builder";
-import { left, right, type Either } from "../shared/either";
 import { Sequence } from "../adapters/sequences/sequence";
-import type { FileError } from "../shared/errors";
+import type { CategoryRepository } from "../domain/catalog/categories/category_repository";
+import type { SectionRepository } from "../domain/catalog/departments/section_repository";
 import { Item } from "../domain/catalog/items/item";
+import { ItemBuilder } from "../domain/catalog/items/item_builder";
+import type { ItemRepository } from "../domain/catalog/items/item_repository";
+import { InvalidVariationFormat } from "../domain/catalog/variations/invalid_variation_format_error";
+import type { Variation } from "../domain/catalog/variations/variation";
+import type { VariationRepository } from "../domain/catalog/variations/variation_repository";
 import { Decimal } from "../shared/decimal";
+import { left, right, type Either } from "../shared/either";
+import type { FileError } from "../shared/errors";
 
 export class ImportService {
     #itemRepository: ItemRepository;
@@ -67,22 +67,20 @@ export class ImportService {
     }
 
     async #parseLine(line: string): Promise<Either<Error, Item>> {
-        const [name, price, quantity, comment, categoryName, sectionName, variationsTokens] =
-            line.split(",");
+        const [name, price, comment, categoryName, sectionName, variationsTokens] = line.split(",");
 
         const resultOrErr = this.#extractVariations(variationsTokens);
         if (resultOrErr.isLeft()) return left(resultOrErr.value);
 
         const categoryOrErr = await this.#categoryRepository.findByName(categoryName);
+        if (categoryOrErr.isLeft()) return left(categoryOrErr.value);
+
         const sectionOrErr = await this.#sectionRepository.findByName(sectionName);
+        if (sectionOrErr.isLeft()) return left(sectionOrErr.value);
+
         const variationsOrErr = await this.#variationRepository.findByNames(
             resultOrErr.value.names
         );
-
-        if (categoryOrErr.isLeft()) return left(categoryOrErr.value);
-
-        if (sectionOrErr.isLeft()) return left(sectionOrErr.value);
-
         if (variationsOrErr.isLeft()) return left(variationsOrErr.value);
 
         const variations = this.#makeItemVariationsValues(
@@ -96,8 +94,6 @@ export class ImportService {
             .withName(name)
             .withPrice(new Decimal(Number(price)))
             .withCategoryId(categoryId)
-            .withCondition(comment)
-            .withStock(Number(quantity))
             .withSectionId(sectionOrErr.value.sectionId.toString())
             .withVariationsValues(variations)
             .build();

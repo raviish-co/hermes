@@ -26,18 +26,15 @@ export class ItemStockRepositoryStub implements ItemStockRepository {
 
     findAll(itemIds: ID[]): Promise<ItemStock[]> {
         const ids = itemIds.map((i) => i.toString());
-        const result = this.records.filter((i) => ids.includes(i.itemId.toString()));
-        return Promise.resolve(result);
+        return Promise.resolve(this.records.filter((i) => ids.includes(i.itemId.toString())));
     }
 
     findAllInStock(): Promise<ItemStock[]> {
-        const result = this.records.filter((i) => !i.isOutOfStock());
-        return Promise.resolve(result);
+        return Promise.resolve(this.records.filter((i) => !i.isOutOfStock()));
     }
 
     findAllOutOfStock(): Promise<ItemStock[]> {
-        const result = this.records.filter((i) => i.isOutOfStock());
-        return Promise.resolve(result);
+        return Promise.resolve(this.records.filter((i) => i.isOutOfStock()));
     }
 
     get records(): ItemStock[] {
@@ -95,5 +92,15 @@ const _data = [
         itemId: ID.fromString("1010"),
         goodQuantities: 7,
         badQuantities: 0,
+    },
+    {
+        itemId: ID.fromString("1011"),
+        goodQuantities: 3,
+        badQuantities: 3,
+    },
+    {
+        itemId: ID.fromString("1012"),
+        goodQuantities: 3,
+        badQuantities: 4,
     },
 ];

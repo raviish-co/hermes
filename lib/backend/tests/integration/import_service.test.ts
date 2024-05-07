@@ -1,26 +1,25 @@
-import { InmemCategoryRepository } from "../../persistense/inmem/inmem_category_repository";
-import { InmemSectionRepository } from "../../persistense/inmem/inmem_section_repository";
-import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
-import { InmemItemRepository } from "../../persistense/inmem/inmem_item_repository";
-import { InvalidFileHeader } from "../../adapters/readers/invalid_file_header_error";
-import { CategoryNotFound } from "../../domain/catalog/categories/category_not_found_error";
-import { FileNotSupported } from "../../adapters/readers/file_not_supported_error";
-import { SectionNotFound } from "../../domain/catalog/departments/section_not_found_error";
-import { SequenceGenerator } from "../../adapters/sequences/sequence_generator";
-import { VariationRepositoryStub } from "../stubs/variation_repository_stub";
-import { VariationNotFound } from "../../domain/catalog/variations/variation_not_found_error";
-import { InmemVariationRepository } from "../../persistense/inmem/inmem_variation_repository";
-import { InvalidVariationFormat } from "../../domain/catalog/variations/invalid_variation_format_error";
-import type { CategoryRepository } from "../../domain/catalog/categories/category_repository";
-import type { SectionRepository } from "../../domain/catalog/departments/section_repository";
-import type { VariationRepository } from "../../domain/catalog/variations/variation_repository";
+import { describe, expect, it } from "vitest";
 import { FileEmpty } from "../../adapters/readers/file_empty_error";
+import { FileNotSupported } from "../../adapters/readers/file_not_supported_error";
+import { InvalidFileHeader } from "../../adapters/readers/invalid_file_header_error";
+import { SequenceGenerator } from "../../adapters/sequences/sequence_generator";
 import { ImportService } from "../../application/import_service";
 import { Category } from "../../domain/catalog/categories/category";
+import { CategoryNotFound } from "../../domain/catalog/categories/category_not_found_error";
+import type { CategoryRepository } from "../../domain/catalog/categories/category_repository";
 import { Section } from "../../domain/catalog/departments/section";
-import { Status } from "../../domain/catalog/items/item";
-import { describe, it, expect } from "vitest";
+import { SectionNotFound } from "../../domain/catalog/departments/section_not_found_error";
+import type { SectionRepository } from "../../domain/catalog/departments/section_repository";
+import { InvalidVariationFormat } from "../../domain/catalog/variations/invalid_variation_format_error";
+import { VariationNotFound } from "../../domain/catalog/variations/variation_not_found_error";
+import type { VariationRepository } from "../../domain/catalog/variations/variation_repository";
+import { InmemCategoryRepository } from "../../persistense/inmem/inmem_category_repository";
+import { InmemItemRepository } from "../../persistense/inmem/inmem_item_repository";
+import { InmemSectionRepository } from "../../persistense/inmem/inmem_section_repository";
+import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
+import { InmemVariationRepository } from "../../persistense/inmem/inmem_variation_repository";
 import { ID } from "../../shared/id";
+import { VariationRepositoryStub } from "../stubs/variation_repository_stub";
 
 describe("Test Upload Items", async () => {
     it("Deve retornar **FileNotSupported** caso o ficheiro não seja .csv", async () => {
@@ -175,34 +174,19 @@ describe("Test Upload Items", async () => {
         expect(items[3].itemId.toString()).toEqual("RVS - 0004");
         expect(items[4].itemId.toString()).toEqual("RVS - 0005");
     });
-
-    it("Deve adicionar o comentario ao estado do item caso seja definido", async () => {
-        const { service, itemRepository, categoryRepository, sectionRepository } = makeService();
-        await categoryRepository.save(category);
-        await sectionRepository.save(section);
-
-        await service.uploadItems(file);
-
-        const { result: items } = await itemRepository.list(1, 12);
-
-        expect(items[0].getCondition().status).toEqual(Status.Bad);
-        expect(items[0].getCondition().comment).toEqual("some-comment");
-        expect(items[1].getCondition().status).toEqual(Status.Bad);
-        expect(items[1].getCondition().comment).toEqual("some-comment");
-    });
 });
 
 const category = new Category(ID.random(), "Categoria 1");
 const section = new Section(ID.random(), "Secao 1", ID.random());
 
-const csvData = `nome,preco,quantidade,estado,categoria,seccao,variacoes
-Produto 1,100.00,1,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Nike
-Produto 2,200.00,2,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Rebock
-Produto 3,300.00,3,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Adidas
-Produto 4,400.00,4,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Nike
-Produto 5,500.00,5,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Rebock`;
+const csvData = `nome,preco,estado,categoria,seccao,variacoes
+Produto 1,100.00,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Nike
+Produto 2,200.00,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Rebock
+Produto 3,300.00,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Adidas
+Produto 4,400.00,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Nike
+Produto 5,500.00,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Rebock`;
 
-const variationFormatData = `nome,preco,quantidade,estado,categoria,seccao,variacoes
+const variationFormatData = `nome,preco,estado,categoria,seccao,variacoes
 Produto 1,100.00,1,some-comment,Categoria 1,Secao 1,Cor-Preto`;
 
 const file = new File([csvData], "filename.csv", { type: "text/csv" });
@@ -211,13 +195,9 @@ const fileHeader = new File(["nome,invali_field"], "filename.csv", {
     type: "text/csv",
 });
 const fileTxt = new File([], "filename.txt", { type: "text/plain" });
-const emptyFile = new File(
-    ["nome,preco,quantidade,estado,categoria,seccao,variacoes"],
-    "filename.csv",
-    {
-        type: "text/csv",
-    }
-);
+const emptyFile = new File(["nome,preco,estado,categoria,seccao,variacoes"], "filename.csv", {
+    type: "text/csv",
+});
 
 interface Dependencies {
     categoryRepository?: CategoryRepository;

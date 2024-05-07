@@ -1,6 +1,5 @@
 import type { Generator } from "../adapters/sequences/generator";
 import { Sequence } from "../adapters/sequences/sequence";
-import type { Item } from "../domain/catalog/items/item";
 import type { ItemRepository } from "../domain/catalog/items/item_repository";
 import { GoodsReceiptNoteBuilder } from "../domain/goods_receipt/goods_receipt_note_builder";
 import { GoodsReceiptNoteLine } from "../domain/goods_receipt/goods_receipt_note_line";
@@ -9,6 +8,7 @@ import { InvalidEntryDate } from "../domain/goods_receipt/invalid_entry_date_err
 import { InvalidLines } from "../domain/goods_receipt/invalid_lines_error";
 import type { ItemStock } from "../domain/warehouse/item_stock";
 import type { ItemStockRepository } from "../domain/warehouse/item_stock_repository";
+import { convertToIds } from "../shared/convert_to_ids";
 import { left, right, type Either } from "../shared/either";
 import type { GoodsReceiptError } from "../shared/errors";
 import { ID } from "../shared/id";
@@ -31,19 +31,17 @@ export class GoodsReceiptService {
         this.#generator = generator;
     }
 
-    async new(data: GoodsReceiptDTO): Promise<Either<GoodsReceiptError, void>> {
+    async new(data: NoteDTO): Promise<Either<GoodsReceiptError, void>> {
         if (!data.entryDate) return left(new InvalidEntryDate(data.entryDate));
         if (this.#isValidLines(data)) return left(new InvalidLines());
 
-        const itemsIds = this.#buildItemsIds(data.lines);
+        const itemsIds = convertToIds(data.lines.map((line) => line.itemId));
         const itemsOrErr = await this.#itemRepository.findAll(itemsIds);
         if (itemsOrErr.isLeft()) return left(itemsOrErr.value);
 
         const itemStocks = await this.#itemStockRepository.findAll(itemsIds);
 
         this.#incrementItemsStock(itemStocks, data.lines);
-
-        this.#updateItemsCondition(itemsOrErr.value, data.lines);
 
         const lines = this.#buildLines(data.lines);
         const noteId = this.#generator.generate(Sequence.GoodsReceiptNote);
@@ -65,52 +63,37 @@ export class GoodsReceiptService {
         return right(undefined);
     }
 
-    #isValidLines(data: GoodsReceiptDTO) {
+    #isValidLines(data: NoteDTO) {
         return !data.lines || data.lines.length === 0;
     }
 
-    #buildItemsIds(linesDTO: GoodsReceiptLineDTO[]): ID[] {
-        return linesDTO.map((line) => ID.fromString(line.itemId));
-    }
-
-    #incrementItemsStock(items: ItemStock[], lines: GoodsReceiptLineDTO[]) {
+    #incrementItemsStock(items: ItemStock[], lines: NoteLineDTO[]) {
         items.forEach((i, idx) => i.increase(lines[idx].goodQuantities, lines[idx].badQuantities));
     }
 
-    #buildLines(lines: GoodsReceiptLineDTO[]): GoodsReceiptNoteLine[] {
-        return lines.map(
-            (line) =>
-                new GoodsReceiptNoteLine(
-                    ID.fromString(line.itemId),
-                    line.goodQuantities,
-                    line.badQuantities
-                )
-        );
+    #buildLines(lines: NoteLineDTO[]): GoodsReceiptNoteLine[] {
+        return lines.map(this.#buildLine);
     }
 
-    #updateItemsCondition(items: Item[], lines: GoodsReceiptLineDTO[]) {
-        lines.forEach((line, idx) => {
-            if (!line.condition) return;
-
-            items[idx].updateCondition(line.condition.status, line.condition.comment);
-        });
+    #buildLine(line: NoteLineDTO): GoodsReceiptNoteLine {
+        return new GoodsReceiptNoteLine(
+            ID.fromString(line.itemId),
+            line.goodQuantities,
+            line.badQuantities,
+            line.comment
+        );
     }
 }
 
-type GoodsReceiptDTO = {
-    lines: GoodsReceiptLineDTO[];
-    userId: string;
+type NoteDTO = {
     entryDate: string;
+    userId: string;
+    lines: NoteLineDTO[];
 };
 
-type GoodsReceiptLineDTO = {
+type NoteLineDTO = {
     itemId: string;
     goodQuantities: number;
     badQuantities?: number;
-    condition?: Condition;
-};
-
-type Condition = {
-    status: string;
     comment?: string;
 };

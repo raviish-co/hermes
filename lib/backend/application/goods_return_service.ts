@@ -12,6 +12,7 @@ import { GoodsReturnNoteLine } from "../domain/goods_return/goods_return_note_li
 import type { GoodsReturnNoteNotFound } from "../domain/goods_return/goods_return_note_not_found_error";
 import type { GoodsReturnNoteRepository } from "../domain/goods_return/goods_return_note_repository";
 import type { ItemStockRepository } from "../domain/warehouse/item_stock_repository";
+import { convertToIds } from "../shared/convert_to_ids";
 import { left, right, type Either } from "../shared/either";
 import type { GoodsReturnNoteError } from "../shared/errors";
 import { ID } from "../shared/id";
@@ -45,35 +46,30 @@ export class GoodsReturnService {
         const noteOrErr = await this.#goodsIssueRepository.getById(ID.fromString(noteId));
         if (noteOrErr.isLeft()) return left(noteOrErr.value);
 
-        const note = noteOrErr.value;
-        if (note.isReturned()) return left(new GoodsIssueNoteHasBeenReturned());
+        if (noteOrErr.value.isReturned()) return left(new GoodsIssueNoteHasBeenReturned());
 
-        const voidOrErr = this.#verifyQuantities(itemsData, note.lines);
+        const voidOrErr = this.#verifyQuantities(itemsData, noteOrErr.value.lines);
         if (voidOrErr.isLeft()) return left(voidOrErr.value);
 
-        const itemsIds = itemsData.map((item) => ID.fromString(item.itemId));
+        const itemsIds = convertToIds(itemsData.map((item) => item.itemId));
         const itemsOrErr = await this.#itemRepository.findAll(itemsIds);
         if (itemsOrErr.isLeft()) return left(itemsOrErr.value);
 
         await this.#increaseStock(itemsIds, itemsData);
 
-        const returnNoteId = this.#buildReturnNoteId();
         const returnLines = this.#buildReturnLines(itemsData, itemsOrErr.value);
-
         const returnNote = new GoodsReturnNote(
-            returnNoteId,
-            note.goodsIssueNoteId,
+            this.#buildReturnNoteId(),
+            noteOrErr.value.goodsIssueNoteId,
             returnLines,
             securityDepositWithheld
         );
 
-        note.returnTheGoods(returnLines);
+        noteOrErr.value.returnTheGoods(returnLines);
 
-        await this.#goodsIssueRepository.update(note);
+        await this.#goodsIssueRepository.update(noteOrErr.value);
 
         await this.#goodsReturnRepository.save(returnNote);
-
-        this.#restoreItems(itemsData, itemsOrErr.value);
 
         await this.#itemRepository.updateAll(itemsOrErr.value);
 
@@ -92,26 +88,27 @@ export class GoodsReturnService {
     }
 
     #buildReturnNoteId(): ID {
-        const noteId = this.#generator.generate(Sequence.GoodsReturnNote);
-        return ID.fromString(noteId);
+        return ID.fromString(this.#generator.generate(Sequence.GoodsReturnNote));
     }
 
     #buildReturnLines(itemsData: ItemData[], items: Item[]): GoodsReturnNoteLine[] {
         const lines = [];
         for (const itemData of itemsData) {
             const item = items.find((item) => item.itemId.equals(ID.fromString(itemData.itemId)))!;
-
-            const line = new GoodsReturnNoteLine(
-                item.itemId,
-                item.name,
-                itemData.quantity,
-                item.variations,
-                itemData.comment
-            );
-
-            lines.push(line);
+            lines.push(this.#buidReturnLine(item, itemData));
         }
         return lines;
+    }
+
+    #buidReturnLine(item: Item, itemData: ItemData) {
+        return new GoodsReturnNoteLine(
+            item.itemId,
+            item.name,
+            itemData.goodQuantities,
+            itemData.badQuantities,
+            item.variations,
+            itemData.comment
+        );
     }
 
     async #increaseStock(itemsIds: ID[], itemsData: ItemData[]) {
@@ -119,21 +116,10 @@ export class GoodsReturnService {
 
         for (const stock of itemsStock) {
             const data = itemsData.find((item) => stock.itemId.equals(ID.fromString(item.itemId)))!;
-            stock.increase(data.quantity);
+            stock.increase(data.goodQuantities, data.badQuantities);
         }
 
         this.#itemStockRepository.updateAll(itemsStock);
-    }
-
-    // Apagar isso quando a condição for adicionada a linha de devolução
-    #restoreItems(itemsData: ItemData[], items: Item[]): void {
-        itemsData.forEach((data) => {
-            const item = items.find((item) => item.itemId.equals(ID.fromString(data.itemId)))!;
-
-            if (!data.comment) return;
-
-            item.updateBadCondition(data.comment);
-        });
     }
 
     #verifyQuantities(items: ItemData[], lines: GoodsIssueNoteLine[]): Either<Error, void> {
@@ -142,7 +128,7 @@ export class GoodsReturnService {
 
             if (!line) return left(new GoodsIssueLineNotFound());
 
-            if (!line.checkQuantity(item.quantity)) {
+            if (!line.checkQuantity(item.goodQuantities)) {
                 return left(new InvalidGoodsIssueLineQuantity());
             }
         }
@@ -156,6 +142,7 @@ export class GoodsReturnService {
 
 type ItemData = {
     itemId: string;
-    quantity: number;
+    goodQuantities: number;
+    badQuantities?: number;
     comment?: string;
 };

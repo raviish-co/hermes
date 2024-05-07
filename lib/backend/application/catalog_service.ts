@@ -89,11 +89,9 @@ export class CatalogService {
             .withItemId(itemId)
             .withName(data.name)
             .withPrice(new Decimal(data.price))
-            .withStock(0)
             .withCategoryId(data.categoryId)
             .withSectionId(data.sectionId)
             .withVariationsValues(variationsValues)
-            .withCondition(data.comment)
             .withTags(data.tags)
             .build();
 
@@ -154,8 +152,6 @@ export class CatalogService {
             .withSectionId(data.sectionId)
             .withCategoryId(data.categoryId)
             .withVariationsValues(variationsValues)
-            .withStock(itemOrErr.value.stock.quantity)
-            .withCondition(data.comment)
             .withTags(data.tags)
             .build();
 

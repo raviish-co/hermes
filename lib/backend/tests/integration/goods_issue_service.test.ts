@@ -13,7 +13,7 @@ import { InvalidTotal } from "../../domain/goods_issue/invalid_total_error";
 import { InmemGoodsIssueNoteRepository } from "../../persistense/inmem/inmem_goods_issue_note_repository";
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
 import { ID } from "../../shared/id";
-import { GoodsIssueRepositoryStub } from "../stubs/goods_issue_repository_stub";
+import { GoodsIssueNoteRepositoryStub } from "../stubs/goods_issue_note_repository_stub";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
 
@@ -123,7 +123,7 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
 
         const note = await noteRepository.last();
 
-        expect(note.getTotal().value).toEqual(55500);
+        expect(note.total.value).toEqual(55500);
     });
 
     it("Deve criar guia com artigos de diferentes quantidades", async () => {
@@ -309,7 +309,7 @@ describe("GoodsIssueService - Recuperar as guias de saída de mercadorias", () =
     });
 
     it("Deve recuperar as guias de saídas presentes no repositório", async () => {
-        const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsIssueRepository = new GoodsIssueNoteRepositoryStub();
         const { service } = makeService({ goodsIssueRepository });
 
         const notes = await service.list();
@@ -335,7 +335,7 @@ describe("GoodsIssueService - Recuperar guia de saída de mercadoria ", () => {
     });
 
     it("Deve retornar a guia de saída de mercadoria", async () => {
-        const goodsIssueRepository = new GoodsIssueRepositoryStub();
+        const goodsIssueRepository = new GoodsIssueNoteRepositoryStub();
         const { service } = makeService({ goodsIssueRepository });
 
         const noteOrErr = await service.get("GS - 1000");
@@ -356,12 +356,10 @@ const goodsIssueData = {
         {
             itemId: "1001",
             goodQuantities: 2,
-            condition: { status: "Bom" },
         },
         {
             itemId: "1002",
             goodQuantities: 3,
-            condition: { status: "Mau", comment: "T-shirt rasgada" },
         },
     ],
     total: 55500,

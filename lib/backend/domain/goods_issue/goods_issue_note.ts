@@ -4,7 +4,7 @@ import { Decimal } from "../../shared/decimal";
 import { Purpose } from "./purpose";
 import { ID } from "../../shared/id";
 
-export enum GoodsIssueStatus {
+enum Status {
     Pending = "Por Devolver",
     Returned = "Devolvido",
 }
@@ -16,10 +16,10 @@ export class GoodsIssueNote {
     readonly lines: GoodsIssueNoteLine[];
     readonly returnDate: Date;
     readonly issuedAt: Date;
-    status: GoodsIssueStatus;
-    total: Decimal;
-    securityDeposit: Decimal;
-    securityDepositWithheld: Decimal;
+    #status: Status;
+    #total: Decimal;
+    #securityDeposit: Decimal;
+    #securityDepositWithheld: Decimal;
 
     constructor(
         noteId: ID,
@@ -31,13 +31,13 @@ export class GoodsIssueNote {
         this.goodsIssueNoteId = noteId;
         this.purpose = purpose;
         this.userId = user;
-        this.status = GoodsIssueStatus.Pending;
         this.issuedAt = new Date();
         this.returnDate = returnDate;
-        this.total = new Decimal(0);
         this.lines = [];
-        this.securityDeposit = new Decimal(0);
-        this.securityDepositWithheld = new Decimal(0);
+        this.#status = Status.Pending;
+        this.#total = new Decimal(0);
+        this.#securityDeposit = new Decimal(0);
+        this.#securityDepositWithheld = new Decimal(0);
 
         this.#addLines(lines);
     }
@@ -51,42 +51,43 @@ export class GoodsIssueNote {
 
         if (!this.#allGoodsIssueWasReturned()) return;
 
-        this.status = GoodsIssueStatus.Returned;
+        this.#status = Status.Returned;
     }
 
     isSameTotal(total: number): boolean {
-        return this.total.value === total;
+        return this.#total.value === total;
     }
 
     isSameSecurityDeposit(securityDeposit: number): boolean {
-        return this.securityDeposit.value === securityDeposit;
+        return this.#securityDeposit.value === securityDeposit;
     }
 
     isReturned(): boolean {
-        return this.status === GoodsIssueStatus.Returned;
+        return this.#status === Status.Returned;
     }
 
     isExpired(): boolean {
-        const today = new Date();
-        return today.getTime() > new Date(this.returnDate).getTime();
+        return new Date().getTime() > new Date(this.returnDate).getTime();
     }
 
-    getSecurityDeposit(): Decimal {
-        return this.securityDeposit;
+    get securityDeposit(): Decimal {
+        return this.#securityDeposit;
     }
 
-    getStatus(): string {
-        return this.status;
+    get securityDepositWithheld(): Decimal {
+        return this.#securityDepositWithheld;
     }
 
-    getTotal(): Decimal {
-        return this.total;
+    get status(): string {
+        return this.#status;
+    }
+
+    get total(): Decimal {
+        return this.#total;
     }
 
     #addLines(lines: GoodsIssueNoteLine[]): void {
-        for (const line of lines) {
-            this.#addLine(line);
-        }
+        lines.forEach((line) => this.#addLine(line));
         this.#calculateSecurityDeposit();
     }
 
@@ -97,7 +98,7 @@ export class GoodsIssueNote {
 
     #returnLines(lines: GoodsReturnNoteLine[]): void {
         for (const line of lines) {
-            this.#returnLine(line.itemId, line.quantityReturned);
+            this.#returnLine(line.itemId, line.total);
         }
     }
 
@@ -111,12 +112,11 @@ export class GoodsIssueNote {
     }
 
     #calculateTotal(amount: Decimal): void {
-        this.total = this.total.add(amount);
+        this.#total = this.#total.add(amount);
     }
 
     #calculateSecurityDeposit(): void {
-        const factor = new Decimal(2);
-        this.securityDeposit = this.total.multiply(factor);
+        this.#securityDeposit = this.#total.multiply(new Decimal(2));
     }
 
     #findLineByItemId(itemId: ID): GoodsIssueNoteLine {

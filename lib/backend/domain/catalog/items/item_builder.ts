@@ -1,9 +1,7 @@
-import { left, right, type Either } from "../../../shared/either";
-import { type Condition, Status, Item } from "./item";
 import { Decimal } from "../../../shared/decimal";
-
-import { ItemStock } from "./item_stock";
+import { left, right, type Either } from "../../../shared/either";
 import { ID } from "../../../shared/id";
+import { Item } from "./item";
 
 export class ItemBuilder {
     #itemId: ID;
@@ -12,14 +10,10 @@ export class ItemBuilder {
     #sectionId?: ID;
     #price?: Decimal;
     #variationsValues: Record<string, string>;
-    #stock: ItemStock;
-    #condition: Condition;
     #tags?: string[];
 
     constructor() {
         this.#itemId = ID.random();
-        this.#condition = { status: Status.Good };
-        this.#stock = new ItemStock(0);
         this.#variationsValues = {};
     }
 
@@ -65,30 +59,6 @@ export class ItemBuilder {
         return this;
     }
 
-    withStock(quantity: number): ItemBuilder {
-        this.#stock = new ItemStock(quantity);
-        return this;
-    }
-
-    withCondition(comment?: string): ItemBuilder {
-        this.withGoodCondition();
-
-        if (!comment) return this;
-
-        this.withBadCondition(comment);
-        return this;
-    }
-
-    withGoodCondition(): ItemBuilder {
-        this.#condition = { status: Status.Good };
-        return this;
-    }
-
-    withBadCondition(comment: string): ItemBuilder {
-        this.#condition = { status: Status.Bad, comment };
-        return this;
-    }
-
     withTags(tags?: string[]): ItemBuilder {
         this.#tags = tags;
         return this;
@@ -112,8 +82,6 @@ export class ItemBuilder {
                 this.#itemId,
                 this.#name,
                 this.#price,
-                this.#stock,
-                this.#condition,
                 this.#categoryId,
                 this.#sectionId,
                 this.#variationsValues,

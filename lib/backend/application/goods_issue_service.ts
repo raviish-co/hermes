@@ -38,7 +38,7 @@ export class GoodsIssueService {
         this.#generator = generator;
     }
 
-    async new(data: GoodsIssueNoteDTO): Promise<Either<GoodsIssueNoteError, void>> {
+    async new(data: NoteDTO): Promise<Either<GoodsIssueNoteError, void>> {
         const purpose = this.#buildPurpose(data.purpose);
         if (!this.#purposeSpecification.isSatisfiedBy(purpose)) {
             return left(new InvalidPurpose(data.purpose.description));
@@ -94,13 +94,13 @@ export class GoodsIssueService {
         return new Purpose(data.description, data.notes, data.details);
     }
 
-    #buildItemsIds(lines: GoodIssueLineDTO[]): ID[] {
+    #buildItemsIds(lines: NoteLineDTO[]): ID[] {
         return lines.map((line) => ID.fromString(line.itemId));
     }
 
     #buildNoteLines(
         items: Item[],
-        lines: GoodIssueLineDTO[]
+        lines: NoteLineDTO[]
     ): Either<InsufficientStock, GoodsIssueNoteLine[]> {
         const result: GoodsIssueNoteLine[] = [];
         for (const idx in items) {
@@ -111,7 +111,7 @@ export class GoodsIssueService {
         return right(result);
     }
 
-    #buildLine(item: Item, line: GoodIssueLineDTO) {
+    #buildLine(item: Item, line: NoteLineDTO) {
         return new GoodsIssueNoteLine(
             item.itemId,
             item.name,
@@ -119,15 +119,12 @@ export class GoodsIssueService {
             item.fulltext,
             line.goodQuantities,
             line.badQuantities,
-            item.getCondition(),
-            item.variations
+            item.variations,
+            line.comment
         );
     }
 
-    async #reduceStock(
-        items: Item[],
-        data: GoodsIssueNoteDTO
-    ): Promise<Either<InsufficientStock, void>> {
+    async #reduceStock(items: Item[], data: NoteDTO): Promise<Either<InsufficientStock, void>> {
         const itemsIds = this.#buildItemsIds(data.lines);
 
         const itemsInStock = await this.#itemStockRepository.findAll(itemsIds);
@@ -151,28 +148,23 @@ export class GoodsIssueService {
     }
 }
 
-type GoodsIssueNoteDTO = {
+type NoteDTO = {
     purpose: PurposeDTO;
-    lines: GoodIssueLineDTO[];
+    lines: NoteLineDTO[];
     userId: string;
     total: number;
     returnDate: string;
 };
 
-type GoodIssueLineDTO = {
+type NoteLineDTO = {
     itemId: string;
     goodQuantities: number;
     badQuantities?: number;
-    condition?: Condition;
+    comment?: string;
 };
 
 type PurposeDTO = {
     description: string;
     details?: string;
     notes: string;
-};
-
-type Condition = {
-    status: string;
-    comment?: string;
 };

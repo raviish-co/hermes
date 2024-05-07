@@ -1,6 +1,6 @@
-import { ID } from "../../shared/id";
+import { Condition } from "../../shared/condition";
 import { Decimal } from "../../shared/decimal";
-import type { Condition } from "../catalog/items/item";
+import { ID } from "../../shared/id";
 
 export class GoodsIssueNoteLine {
     readonly lineId: ID;
@@ -22,9 +22,8 @@ export class GoodsIssueNoteLine {
         fulltext: string,
         goodQuantities: number,
         badQuantities?: number,
-        condition?: Condition,
         variations?: Record<string, string>,
-        quantityReturned?: number
+        comment?: string
     ) {
         this.lineId = ID.random();
         this.itemId = itemId;
@@ -32,11 +31,11 @@ export class GoodsIssueNoteLine {
         this.variationsValues = variations;
         this.fulltext = fulltext;
         this.price = price;
+        this.condition = new Condition(comment);
         this.#goodQuantities = goodQuantities;
-        this.#netTotal = new Decimal(0);
         this.#badQuantities = badQuantities ?? 0;
-        this.#quantityReturned = quantityReturned ?? 0;
-        this.condition = condition;
+        this.#quantityReturned = 0;
+        this.#netTotal = new Decimal(0);
 
         this.#calculateTotal();
     }
@@ -51,7 +50,7 @@ export class GoodsIssueNoteLine {
     }
 
     isFullyReturned(): boolean {
-        return this.#quantityReturned === this.#goodQuantities;
+        return this.#quantityReturned === this.total;
     }
 
     #calculateTotal(): void {

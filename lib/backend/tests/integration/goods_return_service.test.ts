@@ -11,7 +11,7 @@ import { GoodsReturnNoteNotFound } from "../../domain/goods_return/goods_return_
 import { InmemGoodsReturnNoteRepository } from "../../persistense/inmem/inmem_goods_return_note_repository";
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
 import { ID } from "../../shared/id";
-import { GoodsIssueRepositoryStub } from "../stubs/goods_issue_repository_stub";
+import { GoodsIssueNoteRepositoryStub } from "../stubs/goods_issue_note_repository_stub";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
 
@@ -19,8 +19,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve efetuar a devolução de um conjunto de artigos", async () => {
         const goodsIssueNoteId = "GS - 1000";
         const itemsData = [
-            { itemId: "1001", quantity: 1, comment: "Riscado" },
-            { itemId: "1002", quantity: 1 },
+            { itemId: "1001", goodQuantities: 1, comment: "Riscado" },
+            { itemId: "1002", goodQuantities: 1 },
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
@@ -35,8 +35,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve devolver as quantidades exactas dos artigos solicitados na guia de saída de mercadoria", async () => {
         const goodsIssueNoteId = "GS - 1000";
         const itemsData = [
-            { itemId: "1001", quantity: 1, comment: "Riscado" },
-            { itemId: "1002", quantity: 1 },
+            { itemId: "1001", goodQuantities: 1, comment: "Riscado" },
+            { itemId: "1002", goodQuantities: 1 },
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
@@ -45,15 +45,15 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         const noteOrErr = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
         const note = <GoodsReturnNote>noteOrErr.value;
 
-        expect(note.lines[0].quantityReturned).toBe(1);
-        expect(note.lines[1].quantityReturned).toBe(1);
+        expect(note.lines[0].total).toBe(1);
+        expect(note.lines[1].total).toBe(1);
     });
 
     it("Deve armazenar os IDs dos artigos devolvidos nas devolução", async () => {
         const goodsIssueNoteId = "GS - 1000";
         const itemsData = [
-            { itemId: "1001", quantity: 1, comment: "Riscado" },
-            { itemId: "1002", quantity: 1 },
+            { itemId: "1001", goodQuantities: 1, comment: "Riscado" },
+            { itemId: "1002", goodQuantities: 1 },
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
@@ -83,8 +83,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve registrar o valor da calção retida na guia de devolução", async () => {
         const goodsIssueNoteId = "GS - 1000";
         const itemsData = [
-            { itemId: "1001", quantity: 1, comment: "Riscado" },
-            { itemId: "1002", quantity: 1 },
+            { itemId: "1001", goodQuantities: 1, comment: "Riscado" },
+            { itemId: "1002", goodQuantities: 1 },
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
@@ -99,8 +99,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve actualizar o stock dos artigos devolvidos", async () => {
         const goodsIssueNoteId = "GS - 1005";
         const itemsData = [
-            { itemId: "1009", quantity: 1, comment: "Riscado" },
-            { itemId: "1010", quantity: 1 },
+            { itemId: "1009", goodQuantities: 1, comment: "Riscado" },
+            { itemId: "1010", goodQuantities: 1 },
         ];
         const { service, itemStockRepository } = makeService();
 
@@ -117,11 +117,50 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         expect(itemsStock[1].total).toBe(8);
     });
 
+    it("Se for devolvido artigos em mau estado, as suas quantidades devem ser actualizadas no stock", async () => {
+        const data = [
+            { itemId: "1011", goodQuantities: 3, badQuantities: 2 },
+            { itemId: "1012", goodQuantities: 3, badQuantities: 2 },
+        ];
+
+        const { service, itemStockRepository } = makeService();
+
+        await service.returningGoods("GS - 1006", securityDepositWithHeld, data);
+
+        const itemsStock = await itemStockRepository.findAll([
+            ID.fromString("1011"),
+            ID.fromString("1012"),
+        ]);
+
+        expect(itemsStock.length).toBe(2);
+        expect(itemsStock[0].goodQuantities).toBe(6);
+        expect(itemsStock[0].badQuantities).toBe(5);
+
+        expect(itemsStock[1].goodQuantities).toBe(6);
+        expect(itemsStock[1].badQuantities).toBe(6);
+    });
+
+    it("Deve registar as quantidades em mau estado na linha de devolução", async () => {
+        const { service, goodsReturnNoteRepository } = makeService();
+        const data = [
+            { itemId: "1011", goodQuantities: 3, badQuantities: 2 },
+            { itemId: "1012", goodQuantities: 3, badQuantities: 2 },
+        ];
+
+        await service.returningGoods("GS - 1006", securityDepositWithHeld, data);
+
+        const noteOrErr = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+        const note = <GoodsReturnNote>noteOrErr.value;
+
+        expect(note.lines[0].badQuantities).toBe(2);
+        expect(note.lines[1].badQuantities).toBe(2);
+    });
+
     it("Deve definir a guida de saída de artigos como devolvida", async () => {
         const goodsIssueNoteId = "GS - 1002";
         const itemsData = [
-            { itemId: "1004", quantity: 3, comment: "Riscado" },
-            { itemId: "1005", quantity: 2 },
+            { itemId: "1004", goodQuantities: 3, comment: "Riscado" },
+            { itemId: "1005", goodQuantities: 2 },
         ];
         const { service, goodsIssueRepository } = makeService();
 
@@ -137,8 +176,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve retornar **InvalidQuantity** se a quantidade devolvida do item for diferente da quantidade na guida de saída", async () => {
         const goodsIssueNoteId = "GS - 1000";
         const itemsData = [
-            { itemId: "1001", quantity: 100 },
-            { itemId: "1002", quantity: 3 },
+            { itemId: "1001", goodQuantities: 100 },
+            { itemId: "1002", goodQuantities: 3 },
         ];
         const { service } = makeService();
 
@@ -153,28 +192,11 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         expect(error.value).toBeInstanceOf(InvalidGoodsIssueLineQuantity);
     });
 
-    it("Deve actualizar a condição dos artigos devolvidos", async () => {
-        const goodsIssueNoteId = "GS - 1000";
-        const itemsData = [
-            { itemId: "1001", quantity: 1, comment: "Riscado" },
-            { itemId: "1002", quantity: 1 },
-        ];
-        const { service, itemRepository } = makeService();
-
-        await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
-
-        const itemOrErr = await itemRepository.getById(ID.fromString("1001"));
-
-        const item = <Item>itemOrErr.value;
-
-        expect(item.getCondition().comment).toBe("Riscado");
-    });
-
     it("Deve retornar o erro **GoodsIssueLineNotFound** se a linha com base no ID do artigo não for encontrada", async () => {
         const goodsIssueNoteId = "GS - 1000";
         const itemsData = [
-            { itemId: "1007", quantity: 3 },
-            { itemId: "1002", quantity: 3 },
+            { itemId: "1007", goodQuantities: 3 },
+            { itemId: "1002", goodQuantities: 3 },
         ];
         const { service } = makeService();
 
@@ -190,7 +212,7 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
     it("Deve fechar a guida de saída de mercadoria se todos os artigos foram devolvidos", async () => {
         const goodsIssueNoteId = "GS - 1003";
-        const itemsData = [{ itemId: "1006", quantity: 2, comment: "Rasgado" }];
+        const itemsData = [{ itemId: "1006", goodQuantities: 2, comment: "Rasgado" }];
         const { service, goodsIssueRepository } = makeService();
 
         await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
@@ -205,8 +227,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve registrar a devolução dos artigos no repositório", async () => {
         const goodsIssueNoteId = "GS - 1000";
         const itemsData = [
-            { itemId: "1001", quantity: 1, comment: "Riscado" },
-            { itemId: "1002", quantity: 1 },
+            { itemId: "1001", goodQuantities: 1, comment: "Riscado" },
+            { itemId: "1002", goodQuantities: 1 },
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
@@ -221,8 +243,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve referenciar a guida de saída de mercadoria no documento de devolução", async () => {
         const goodsIssueNoteId = "GS - 1000";
         const itemsData = [
-            { itemId: "1001", quantity: 1, comment: "Riscado" },
-            { itemId: "1002", quantity: 1 },
+            { itemId: "1001", goodQuantities: 1, comment: "Riscado" },
+            { itemId: "1002", goodQuantities: 1 },
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
@@ -237,8 +259,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve adicionar as linhas de devolução no documento de devolução", async () => {
         const goodsIssueNoteId = "GS - 1000";
         const itemsData = [
-            { itemId: "1001", quantity: 1, comment: "Riscado" },
-            { itemId: "1002", quantity: 1 },
+            { itemId: "1001", goodQuantities: 1, comment: "Riscado" },
+            { itemId: "1002", goodQuantities: 1 },
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
@@ -253,8 +275,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve registrar o memento em que a devolução foi efectuada", async () => {
         const goodsIssueNoteId = "GS - 1000";
         const itemsData = [
-            { itemId: "1001", quantity: 1, comment: "Riscado" },
-            { itemId: "1002", quantity: 1 },
+            { itemId: "1001", goodQuantities: 1, comment: "Riscado" },
+            { itemId: "1002", goodQuantities: 1 },
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
@@ -269,8 +291,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve registrar o identificador do documento de devolução", async () => {
         const goodsIssueNoteId = "GS - 1000";
         const itemsData = [
-            { itemId: "1001", quantity: 1, comment: "Riscado" },
-            { itemId: "1002", quantity: 1 },
+            { itemId: "1001", goodQuantities: 1, comment: "Riscado" },
+            { itemId: "1002", goodQuantities: 1 },
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
@@ -284,7 +306,7 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
     it("Deve retornar o erro **GoodsIssueNoteHasBenReturned** se a guia de saída de mercadoria já foi devolvida por completo", async () => {
         const goodsIssueNoteId = "GS - 1003";
-        const itemsData = [{ itemId: "1006", quantity: 2, comment: "Riscado" }];
+        const itemsData = [{ itemId: "1006", goodQuantities: 2, comment: "Riscado" }];
 
         const { service } = makeService();
 
@@ -302,8 +324,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve armazenar no repositório os dados da condição dos artigos devolvidos", async () => {
         const goodsIssueNoteId = "GS - 1000";
         const itemsData = [
-            { itemId: "1001", quantity: 1, comment: "Riscado" },
-            { itemId: "1002", quantity: 1 },
+            { itemId: "1001", goodQuantities: 1, comment: "Riscado" },
+            { itemId: "1002", goodQuantities: 1 },
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
@@ -318,8 +340,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve armazernar no repositório os nomes dos artigos devolvidos", async () => {
         const goodsIssueNoteId = "GS - 1000";
         const itemsData = [
-            { itemId: "1001", quantity: 1, comment: "Riscado" },
-            { itemId: "1002", quantity: 1 },
+            { itemId: "1001", goodQuantities: 1, comment: "Riscado" },
+            { itemId: "1002", goodQuantities: 1 },
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
@@ -335,8 +357,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve armazenar a variação dos artigos devolvidos no repositório", async () => {
         const goodsIssueNoteId = "GS - 1000";
         const itemsData = [
-            { itemId: "1001", quantity: 1, comment: "Riscado" },
-            { itemId: "1002", quantity: 1 },
+            { itemId: "1001", goodQuantities: 1, comment: "Riscado" },
+            { itemId: "1002", goodQuantities: 1 },
         ];
         const { service, goodsReturnNoteRepository } = makeService();
 
@@ -357,8 +379,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
     it("Deve verificar se as quantidades devolvidas estão no intervalo das quantidades solicitas e as quantidades devolvidas", async () => {
         const goodsIssueNoteId = "GS - 1004";
-        const itemsData = [{ itemId: "1007", quantity: 1 }];
-        const itemsData1 = [{ itemId: "1007", quantity: 3 }];
+        const itemsData = [{ itemId: "1007", goodQuantities: 1 }];
+        const itemsData1 = [{ itemId: "1007", goodQuantities: 3 }];
 
         const { service } = makeService();
 
@@ -387,8 +409,8 @@ describe("GoodsReturnService - Recuperar guias de devoluções", () => {
     it("Deve retornar a lista de guias de devolução de artigos", async () => {
         const { service } = makeService();
         const itemsData = [
-            { itemId: "1001", quantity: 1, comment: "Riscado" },
-            { itemId: "1002", quantity: 1 },
+            { itemId: "1001", goodQuantities: 1, comment: "Riscado" },
+            { itemId: "1002", goodQuantities: 1 },
         ];
 
         await service.returningGoods("GS - 1000", securityDepositWithHeld, itemsData);
@@ -402,8 +424,8 @@ describe("GoodsReturnService - Recuperar guias de devoluções", () => {
 describe("GoodsReturnService - Recuperar guia de devolução", () => {
     it("Deve retornar a guia de devolução de artigos com base no ID", async () => {
         const itemsData = [
-            { itemId: "1001", quantity: 1, comment: "Riscado" },
-            { itemId: "1002", quantity: 1 },
+            { itemId: "1001", goodQuantities: 1, comment: "Riscado" },
+            { itemId: "1002", goodQuantities: 1 },
         ];
         const goodsIssueNoteId = "GS - 1000";
         const { service } = makeService();
@@ -431,15 +453,15 @@ describe("GoodsReturnService - Recuperar guia de devolução", () => {
 const securityDepositWithHeld = 100;
 
 const itemsData = [
-    { itemId: "1001", quantity: 3, comment: "Riscado" },
-    { itemId: "1002", quantity: 2 },
+    { itemId: "1001", goodQuantities: 3, comment: "Riscado" },
+    { itemId: "1002", goodQuantities: 2 },
 ];
 
 function makeService() {
     const storage = new InmemSequenceStorage();
     const generator = new SequenceGenerator(storage, 1001);
     const itemRepository = new ItemRepositoryStub();
-    const goodsIssueRepository = new GoodsIssueRepositoryStub();
+    const goodsIssueRepository = new GoodsIssueNoteRepositoryStub();
     const goodsReturnNoteRepository = new InmemGoodsReturnNoteRepository();
     const itemStockRepository = new ItemStockRepositoryStub();
 
