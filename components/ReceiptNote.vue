@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import type { AddLineDialog, DescribeCondition } from "#build/components";
-import type { ConditionModel } from "~/lib/frontend/models/condition";
 import type { GoodsReceiptNote } from "~/lib/frontend/domain/goods_receipt_note";
+import type { NoteLine } from "~/lib/frontend/domain/note_line";
 
 const describeConditionRef = ref<typeof DescribeCondition>();
 const addLineDialogRef = ref<typeof AddLineDialog>();
 
-function showDecribeCondition(itemId: string, condition?: ConditionModel) {
-    describeConditionRef.value?.initializeCondition(itemId, condition);
+function showDecribeCondition(line: NoteLine) {
+    describeConditionRef.value?.initializeCondition(line.itemId, line.condition);
+    describeConditionRef.value?.initializeQuantities(line.quantity, line.badQuantities);
     describeConditionRef.value?.show();
 }
 
@@ -33,7 +34,7 @@ defineProps<{ note: GoodsReceiptNote }>();
                 <tbody>
                     <tr v-for="(line, idx) in note.lines" :key="idx" class="cursor-pointer">
                         <td>{{ line.itemId }}</td>
-                        <td @click="showDecribeCondition(line.itemId, line.condition)">
+                        <td @click="showDecribeCondition(line)">
                             {{ line.name }}
 
                             <br />
@@ -46,7 +47,7 @@ defineProps<{ note: GoodsReceiptNote }>();
                         <td>
                             <ChooseQuantity
                                 :initital="1"
-                                :model-value="line.goodQuantities"
+                                :model-value="line.quantity"
                                 @update-quantity="note.changeQuantity(line.itemId, $event)"
                             />
                         </td>

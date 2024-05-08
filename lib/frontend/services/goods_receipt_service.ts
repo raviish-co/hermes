@@ -16,6 +16,7 @@ export class GoodsReceiptService {
         return {
             itemId: line.itemId,
             goodQuantities: line.goodQuantities,
+            badQuantities: line.badQuantities,
             condition: line.condition,
         };
     }
