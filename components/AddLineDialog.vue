@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
+import { initializeQuantities } from "@frontend/helpers/initialize_quantities";
 import type { ItemModel } from "@frontend/models/item";
 import { CatalogService } from "@frontend/services/catalog_service";
-import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_values";
-import { initializeQuantities } from "@frontend/helpers/initialize_quantities";
 import type { Note } from "~/lib/frontend/domain/note";
-import { WarehouseService } from "~/lib/frontend/services/warehouse_service";
+import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_values";
 import type { ItemStockModel } from "~/lib/frontend/models/item_stock";
+import { WarehouseService } from "~/lib/frontend/services/warehouse_service";
 
 interface Props {
     note: Note;

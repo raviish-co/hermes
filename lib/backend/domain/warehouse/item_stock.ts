@@ -20,7 +20,7 @@ export class ItemStock {
     }
 
     isOutOfStock(): boolean {
-        return this.#total === 0;
+        return this.total === 0;
     }
 
     increase(goodQuantities: number, badQuantities?: number): void {

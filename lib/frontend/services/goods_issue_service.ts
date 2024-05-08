@@ -1,7 +1,6 @@
 import type { GoodsIssueNoteModel } from "../models/goods_issue_note";
 import type { GoodsIssueNoteLine } from "../domain/goods_issue_note_line";
 import type { GoodsIssueNote } from "../domain/goods_issue_note";
-import type { ConditionModel } from "../models/condition";
 
 export class GoodsIssueService {
     async new(note: GoodsIssueNote) {
@@ -26,18 +25,15 @@ export class GoodsIssueService {
         return notes.map(this.#toGoodsIssueNoteModel);
     }
 
-    #toGoodsIssueLine(line: GoodsIssueNoteLine): GoodsIssueLineDTO {
+    #toGoodsIssueLine(line: GoodsIssueNoteLine): LineDTO {
         return {
             itemId: line.itemId,
-            quantity: line.quantity,
-            condition: {
-                comment: line?.condition?.comment,
-                status: line.condition?.status!,
-            },
+            goodQuantities: line.quantity,
+            comment: line.condition?.comment,
         };
     }
 
-    #toGoodsIssueDTO(note: GoodsIssueNote): GoodsIssueDTO {
+    #toGoodsIssueDTO(note: GoodsIssueNote): NoteDTO {
         return {
             total: note.grossTotal,
             returnDate: note.returnDate,
@@ -63,16 +59,17 @@ export class GoodsIssueService {
     }
 }
 
-interface GoodsIssueLineDTO {
+interface LineDTO {
     itemId: string;
-    quantity: number;
-    condition?: ConditionModel;
+    goodQuantities: number;
+    badQuantities?: number;
+    comment?: string;
 }
 
-interface GoodsIssueDTO {
+interface NoteDTO {
     total: number;
     returnDate: string;
-    lines: GoodsIssueLineDTO[];
+    lines: LineDTO[];
     purpose: {
         description: string;
         details?: string;

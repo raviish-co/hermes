@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import type { AddLineDialog, DescribeCondition } from "#build/components";
-import type { ConditionModel } from "~/lib/frontend/models/condition";
-
 const describeConditionRef = ref<typeof DescribeCondition>();
 const addLineDialogRef = ref<typeof AddLineDialog>();
 
-function showDecribeCondition(itemId: string, condition?: ConditionModel) {
-    describeConditionRef.value?.initializeCondition(itemId, condition);
+function showDecribeCondition(itemId: string) {
+    describeConditionRef.value?.initializeCondition(itemId);
     describeConditionRef.value?.show();
 }
 
@@ -34,7 +32,7 @@ defineProps(["note"]);
                 <tbody>
                     <tr v-for="(line, idx) in note.lines" :key="idx" class="cursor-pointer">
                         <td>{{ line.itemId }}</td>
-                        <td @click="showDecribeCondition(line.itemId, line.condition)">
+                        <td @click="showDecribeCondition(line.itemId)">
                             {{ line.name }}
 
                             <br />

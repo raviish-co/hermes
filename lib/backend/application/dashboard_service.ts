@@ -34,9 +34,6 @@ export class DashboardService {
 
     async totalOutOfStockItems(): Promise<number> {
         const result = await this.#itemStockRepository.findAllOutOfStock();
-
-        if (result.length === 0) return 0;
-
         return result.length;
     }
 

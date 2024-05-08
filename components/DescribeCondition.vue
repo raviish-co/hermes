@@ -25,10 +25,10 @@ function initializeCondition(id: string, oldCondition: ConditionModel) {
     condition.comment = "";
     condition.status = "Bom";
 
-    if (oldCondition.comment) {
-        condition.comment = oldCondition.comment;
-        condition.status = "Mau";
-    }
+    if (!oldCondition) return;
+
+    condition.comment = oldCondition.comment;
+    condition.status = "Mau";
 }
 
 function updateCondition() {
