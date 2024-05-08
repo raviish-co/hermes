@@ -56,12 +56,20 @@ export class Note {
         line.changeQuantity(quantity);
     }
 
+    updateBadQuantities(itemId: string, goodQuantities: number, badQuantities: number) {
+        const line = this.findLine(itemId);
+
+        if (!line) return;
+
+        line.changeBadQuantities(goodQuantities, badQuantities);
+    }
+
     clearLines() {
         this.lines = [];
     }
 
     isValid(): boolean {
-        return this.lines.some((line) => line.quantity !== 0);
+        return this.lines.some((line) => line.goodQuantities !== 0);
     }
 
     createLine(options: LineOptions, quantity: number, stock: number) {

@@ -15,6 +15,8 @@ interface GoodsIssueLineDTO {
     quantityRequested: number;
     quantityReturned: number;
     quantityToReturn: number;
+    goodQuantities: number;
+    badQuantities: number;
     fulltext: string;
     variationValues: VariationValues[];
     condition: any;
@@ -38,6 +40,8 @@ function toGoodsIssueLineDTO(line: GoodsIssueNoteLine): GoodsIssueLineDTO {
         quantityRequested: line.total,
         quantityReturned: line.quantityReturned,
         quantityToReturn: line.maxToReturn,
+        goodQuantities: line.goodQuantities,
+        badQuantities: line.badQuantities,
         fulltext: line.fulltext,
         variationValues: toVariationValuesDTO(line.variationsValues),
         condition: line.condition,

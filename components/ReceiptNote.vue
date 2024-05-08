@@ -46,7 +46,7 @@ defineProps<{ note: GoodsReceiptNote }>();
                         <td>
                             <ChooseQuantity
                                 :initital="1"
-                                :model-value="line.quantity"
+                                :model-value="line.goodQuantities"
                                 @update-quantity="note.changeQuantity(line.itemId, $event)"
                             />
                         </td>

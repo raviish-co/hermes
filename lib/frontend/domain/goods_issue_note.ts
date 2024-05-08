@@ -37,7 +37,7 @@ export class GoodsIssueNote extends Note {
                 line.condition
             );
 
-            noteLine.quantity = line.quantityToReturn;
+            noteLine.goodQuantities = line.quantityToReturn;
             noteLine.quantityRequested = line.quantityRequested;
             noteLine.quantityReturned = line.quantityReturned;
 

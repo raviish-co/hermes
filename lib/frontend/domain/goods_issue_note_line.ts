@@ -24,11 +24,11 @@ export class GoodsIssueNoteLine extends NoteLine {
 
         this.quantityRequested = quantityRequested ?? 0;
         this.quantityReturned = quantityReturned ?? 0;
-        this.quantity = quantityToReturn ?? 0;
+        this.goodQuantities = quantityToReturn ?? 0;
     }
 
     calculate() {
-        this.total = this.price * this.quantity;
+        this.total = this.price * this.goodQuantities;
     }
 
     totalIsZero() {

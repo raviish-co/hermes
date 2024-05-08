@@ -15,7 +15,7 @@ export class GoodsReceiptService {
     #toGoodsReceiptLineDTO(line: NoteLine): GoodsReceiptLineDTO {
         return {
             itemId: line.itemId,
-            goodQuantities: line.quantity,
+            goodQuantities: line.goodQuantities,
             condition: line.condition,
         };
     }

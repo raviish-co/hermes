@@ -43,7 +43,7 @@ export class GoodsReturnService {
     #toItemDTO(line: NoteLine): ItemDTO {
         return {
             itemId: line.itemId,
-            quantity: line.quantity,
+            quantity: line.goodQuantities,
             comment: line.condition?.comment,
         };
     }

@@ -5,7 +5,8 @@ import type { ConditionModel } from "../models/condition";
 export class NoteLine {
     itemId: string;
     name: string;
-    quantity: number = 0;
+    goodQuantities: number = 0;
+    badQuantities: number = 0;
     quantityReturned: number = 0;
     quantityRequested: number = 0;
     stock: number = 0;
@@ -29,7 +30,13 @@ export class NoteLine {
     }
 
     changeQuantity(quantity: number) {
-        this.quantity = quantity;
+        this.goodQuantities = quantity;
+        this.badQuantities = 0;
+    }
+
+    changeBadQuantities(good: number, quantity: number) {
+        this.badQuantities = quantity;
+        this.goodQuantities = good - quantity;
     }
 
     changeStock(stock: number) {
@@ -42,6 +49,10 @@ export class NoteLine {
 
     isFullyReturned() {
         return this.quantityRequested === this.quantityReturned;
+    }
+
+    get quantity() {
+        return this.goodQuantities + this.badQuantities;
     }
 
     get maxToReturn(): number {

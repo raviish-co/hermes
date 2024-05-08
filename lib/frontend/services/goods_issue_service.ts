@@ -4,7 +4,7 @@ import type { GoodsIssueNote } from "../domain/goods_issue_note";
 
 export class GoodsIssueService {
     async new(note: GoodsIssueNote) {
-        const data = this.#toGoodsIssueDTO(note);
+        const data = this.#toNoteDTO(note);
 
         return await $fetch("/api/goods-issue", {
             method: "post",
@@ -25,20 +25,21 @@ export class GoodsIssueService {
         return notes.map(this.#toGoodsIssueNoteModel);
     }
 
-    #toGoodsIssueLine(line: GoodsIssueNoteLine): LineDTO {
+    #toNoteLine(line: GoodsIssueNoteLine): LineDTO {
         return {
             itemId: line.itemId,
-            goodQuantities: line.quantity,
+            goodQuantities: line.goodQuantities,
+            badQuantities: line.badQuantities,
             comment: line.condition?.comment,
         };
     }
 
-    #toGoodsIssueDTO(note: GoodsIssueNote): NoteDTO {
+    #toNoteDTO(note: GoodsIssueNote): NoteDTO {
         return {
             total: note.grossTotal,
             returnDate: note.returnDate,
             purpose: note.purpose,
-            lines: note.lines.map(this.#toGoodsIssueLine),
+            lines: note.lines.map(this.#toNoteLine),
         };
     }
 

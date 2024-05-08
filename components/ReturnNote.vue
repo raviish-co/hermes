@@ -92,9 +92,9 @@ function showRequestedLines() {
 
                         <td class="text-center">
                             <ChooseQuantity
-                                :initital="line.quantity"
+                                :initital="line.goodQuantities"
                                 :limit="line.maxToReturn"
-                                :model-value="line.quantity"
+                                :model-value="line.goodQuantities"
                                 :class="{ 'input-disabled border-none': line.isFullyReturned() }"
                                 @update-quantity="changeQuantity(line, $event)"
                             />

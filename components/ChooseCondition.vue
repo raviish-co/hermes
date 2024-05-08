@@ -4,15 +4,19 @@ import type { ConditionModel } from "~/lib/frontend/models/condition";
 interface Emits {
     (e: "status", value: "Bom" | "Mau"): void;
     (e: "comment", value: string): void;
+    (e: "badQuantities", value: number): void;
 }
 
 interface Props {
     condition?: ConditionModel;
+    quantities: number;
 }
 
-const condition = reactive({ status: "Bom", comment: "" });
 const emits = defineEmits<Emits>();
+const condition = reactive({ status: "Bom", comment: "" });
 const props = defineProps<Props>();
+const badQuantitites = ref<number>(0);
+const total = ref<number>(0);
 
 const result = computed(() => {
     if (props.condition) {
@@ -25,6 +29,8 @@ const result = computed(() => {
 
 function changeStatus(event: Event) {
     const value = (event.target as HTMLSelectElement).value;
+
+    reset(props.quantities);
 
     if (value === "Bom") {
         condition.status = "Bom";
@@ -40,6 +46,34 @@ function changeStatus(event: Event) {
     emits("status", "Mau");
     emits("comment", condition.comment);
 }
+
+function calculate() {
+    if (total.value === 0) {
+        total.value = props.quantities;
+    }
+
+    total.value = props.quantities - badQuantitites.value;
+
+    if (total.value < 0) {
+        total.value = props.quantities;
+        emits("badQuantities", 0);
+        return;
+    }
+
+    emits("badQuantities", badQuantitites.value);
+}
+
+function initialize(good: number, bad: number) {
+    total.value = good - bad;
+    badQuantitites.value = bad;
+}
+
+function reset(value: number) {
+    total.value = value;
+    badQuantitites.value = 0;
+}
+
+defineExpose({ reset, initialize });
 </script>
 
 <template>
@@ -48,6 +82,23 @@ function changeStatus(event: Event) {
             <option selected value="Bom">Bom</option>
             <option value="Mau">Mau</option>
         </select>
+
+        <input class="input-disabled" :value="total" />
+
+        <input
+            class="input-field"
+            placeholder="0"
+            v-model="badQuantitites"
+            type="number"
+            :class="{
+                'input-disabled': condition.status === 'Bom',
+                invalid:
+                    badQuantitites > quantities ||
+                    badQuantitites < 0 ||
+                    (!badQuantitites && condition.status === 'Mau'),
+            }"
+            @input="calculate()"
+        />
 
         <textarea
             v-model="condition.comment"
