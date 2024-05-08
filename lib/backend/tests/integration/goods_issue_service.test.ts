@@ -269,6 +269,26 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
         expect(error.value).toBeInstanceOf(InsufficientStock);
     });
 
+    it("Deve retornar **InsufficientStock** se não tiver quantidades suficiente em stock de algum artigo em mau estado", async () => {
+        const data = {
+            ...goodsIssueData,
+            lines: [
+                {
+                    itemId: "1001",
+                    goodQuantities: 4,
+                    badQuantities: 5,
+                },
+            ],
+        };
+
+        const { service } = makeService();
+
+        const error = await service.new(data);
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(InsufficientStock);
+    });
+
     it("Deve gerar o ID da guia de saída de mercadoria,", async () => {
         const { service, noteRepository } = makeService();
 

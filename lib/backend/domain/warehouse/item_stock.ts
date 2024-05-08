@@ -40,9 +40,11 @@ export class ItemStock {
     }
 
     canReduce(goodQuantities: number, badQuantities?: number): boolean {
-        const total = goodQuantities + (badQuantities ?? 0);
+        if (goodQuantities > this.#goodQuantities) return false;
 
-        if (this.#total < total) return false;
+        if (!badQuantities) return true;
+
+        if (badQuantities > this.#badQuantities) return false;
 
         return true;
     }

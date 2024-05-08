@@ -51,10 +51,7 @@ export class GoodsIssueService {
         const voidOrErr = await this.#reduceStock(itemsOrErr.value, data);
         if (voidOrErr.isLeft()) return left(voidOrErr.value);
 
-        const linesOrErr = this.#buildNoteLines(itemsOrErr.value, data.lines);
-        if (linesOrErr.isLeft()) return left(linesOrErr.value);
-
-        const lines = linesOrErr.value;
+        const lines = this.#buildNoteLines(itemsOrErr.value, data.lines);
         const noteId = this.#buildNoteId();
         const noteOrErr = new GoodsIssueNoteBuilder()
             .withNoteId(noteId)
@@ -98,17 +95,14 @@ export class GoodsIssueService {
         return lines.map((line) => ID.fromString(line.itemId));
     }
 
-    #buildNoteLines(
-        items: Item[],
-        lines: NoteLineDTO[]
-    ): Either<InsufficientStock, GoodsIssueNoteLine[]> {
+    #buildNoteLines(items: Item[], lines: NoteLineDTO[]): GoodsIssueNoteLine[] {
         const result: GoodsIssueNoteLine[] = [];
         for (const idx in items) {
             const noteLine = this.#buildLine(items[idx], lines[idx]);
             result.push(noteLine);
         }
 
-        return right(result);
+        return result;
     }
 
     #buildLine(item: Item, line: NoteLineDTO) {
