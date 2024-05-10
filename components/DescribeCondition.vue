@@ -7,12 +7,10 @@ interface Emits {
     (e: "update:condition", value: ConditionModel): void;
 }
 
-const condition = reactive<ConditionModel>({ status: "Bom", comment: "" });
 const emits = defineEmits<Emits>();
-
+const condition = reactive<ConditionModel>({ status: "Bom", comment: "" });
 const goodQuantities = ref<number>(0);
 const badQuantitites = ref<number>(0);
-
 const dialogRef = ref<typeof VDialog>();
 const chooseConditionRef = ref<typeof ChooseCondition>();
 const itemId = ref<string>("");
@@ -39,7 +37,7 @@ function initializeCondition(id: string, oldCondition?: ConditionModel) {
 }
 
 function initializeQuantities(good: number, bad: number) {
-    goodQuantities.value = good;
+    goodQuantities.value = good - bad;
     chooseConditionRef.value?.initialize(good, bad);
 }
 

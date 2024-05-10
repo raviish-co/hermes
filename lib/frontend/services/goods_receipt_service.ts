@@ -12,7 +12,7 @@ export class GoodsReceiptService {
         });
     }
 
-    #toGoodsReceiptLineDTO(line: NoteLine): GoodsReceiptLineDTO {
+    #toGoodsReceiptLineDTO(line: NoteLine): NoteLineDTO {
         return {
             itemId: line.itemId,
             goodQuantities: line.goodQuantities,
@@ -21,7 +21,7 @@ export class GoodsReceiptService {
         };
     }
 
-    #toGoodsReceiptDTO(note: GoodsReceiptNote): GoodsReceiptDTO {
+    #toGoodsReceiptDTO(note: GoodsReceiptNote): NoteDTO {
         return {
             entryDate: note.entryDate,
             lines: note.lines.map(this.#toGoodsReceiptLineDTO),
@@ -29,12 +29,12 @@ export class GoodsReceiptService {
     }
 }
 
-interface GoodsReceiptDTO {
+interface NoteDTO {
     entryDate: string;
-    lines: GoodsReceiptLineDTO[];
+    lines: NoteLineDTO[];
 }
 
-interface GoodsReceiptLineDTO {
+interface NoteLineDTO {
     itemId: string;
     goodQuantities: number;
     badQuantities?: number;

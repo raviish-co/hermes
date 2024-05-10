@@ -19,7 +19,9 @@ interface GoodsReturnNoteLineDTO {
     returnLineId: string;
     itemId: string;
     name: string;
-    quantity: string;
+    goodQuantities: number;
+    badQuantities: number;
+    total: number;
     variationValues: VariationValues[];
     condition: {
         status: string;
@@ -41,7 +43,9 @@ function toGoodsReturnNoteLineDTO(line: GoodsReturnNoteLine): GoodsReturnNoteLin
     return {
         returnLineId: line.returnLineId.toString(),
         itemId: line.itemId.toString(),
-        quantity: line.total.toString(),
+        goodQuantities: line.goodQuantities,
+        badQuantities: line.badQuantities,
+        total: line.total,
         name: line.name,
         variationValues: toVariationValuesDTO(line.variationsValues),
         condition: line.condition,

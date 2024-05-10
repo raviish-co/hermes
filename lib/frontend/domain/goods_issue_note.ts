@@ -37,14 +37,12 @@ export class GoodsIssueNote extends Note {
                 line.condition
             );
 
-            noteLine.goodQuantities = line.quantityToReturn;
+            noteLine.goodQuantities = line.goodQuantities;
+            noteLine.badQuantities = line.badQuantities;
             noteLine.quantityRequested = line.quantityRequested;
             noteLine.quantityReturned = line.quantityReturned;
-
-            if (line.quantityReturned === 0) {
-                noteLine.changeQuantity(line.quantityRequested);
-            }
-
+            noteLine.goodQuantitiesReturned = line.goodQuantitiesReturned;
+            noteLine.badQuantitiesReturned = line.badQuantitiesReturned;
             note.lines.push(noteLine);
         }
 

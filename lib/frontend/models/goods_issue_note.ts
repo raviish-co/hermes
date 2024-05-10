@@ -6,6 +6,10 @@ export interface GoodsIssueNoteLineModel {
     itemId: string;
     name: string;
     price: number;
+    goodQuantities: number;
+    badQuantities: number;
+    goodQuantitiesReturned: number;
+    badQuantitiesReturned: number;
     quantityRequested: number;
     quantityReturned: number;
     quantityToReturn: number;

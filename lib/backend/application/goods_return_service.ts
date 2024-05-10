@@ -55,8 +55,6 @@ export class GoodsReturnService {
         const itemsOrErr = await this.#itemRepository.findAll(itemsIds);
         if (itemsOrErr.isLeft()) return left(itemsOrErr.value);
 
-        await this.#increaseStock(itemsIds, itemsData);
-
         const returnLines = this.#buildReturnLines(itemsData, itemsOrErr.value);
         const returnNote = new GoodsReturnNote(
             this.#buildReturnNoteId(),
@@ -72,6 +70,8 @@ export class GoodsReturnService {
         await this.#goodsReturnRepository.save(returnNote);
 
         await this.#itemRepository.updateAll(itemsOrErr.value);
+
+        await this.#increaseStock(itemsIds, itemsData);
 
         return right(undefined);
     }
@@ -128,7 +128,7 @@ export class GoodsReturnService {
 
             if (!line) return left(new GoodsIssueLineNotFound());
 
-            if (!line.checkQuantity(item.goodQuantities)) {
+            if (!line.checkQuantity(item.goodQuantities, item.badQuantities)) {
                 return left(new InvalidGoodsIssueLineQuantity());
             }
         }

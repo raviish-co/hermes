@@ -7,6 +7,8 @@ export class NoteLine {
     name: string;
     goodQuantities: number = 0;
     badQuantities: number = 0;
+    goodQuantitiesReturned: number = 0;
+    badQuantitiesReturned: number = 0;
     quantityReturned: number = 0;
     quantityRequested: number = 0;
     stock: number = 0;
@@ -47,6 +49,11 @@ export class NoteLine {
         this.condition = { status, comment };
     }
 
+    updateQuantitiesToReturn(good: number, bad: number) {
+        this.goodQuantitiesReturned = good;
+        this.badQuantitiesReturned = bad;
+    }
+
     isFullyReturned() {
         return this.quantityRequested === this.quantityReturned;
     }
@@ -55,8 +62,12 @@ export class NoteLine {
         return this.goodQuantities + this.badQuantities;
     }
 
-    get maxToReturn(): number {
+    get totalToReturn() {
         return this.quantityRequested - this.quantityReturned;
+    }
+
+    get maxToReturn(): number {
+        return this.goodQuantitiesReturned + this.badQuantitiesReturned;
     }
 
     get formattedVariationsValues() {

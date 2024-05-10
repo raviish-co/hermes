@@ -98,13 +98,13 @@ export class GoodsIssueNote {
 
     #returnLines(lines: GoodsReturnNoteLine[]): void {
         for (const line of lines) {
-            this.#returnLine(line.itemId, line.total);
+            this.#returnLine(line.itemId, line.goodQuantities, line.badQuantities);
         }
     }
 
-    #returnLine(itemId: ID, quantityReturned: number): void {
+    #returnLine(itemId: ID, goodQuantities: number, badQuantities: number): void {
         const line = this.#findLineByItemId(itemId);
-        line.returnLine(quantityReturned);
+        line.returnLine(goodQuantities, badQuantities);
     }
 
     #allGoodsIssueWasReturned(): boolean {

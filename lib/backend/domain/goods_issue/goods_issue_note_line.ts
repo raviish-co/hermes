@@ -12,7 +12,8 @@ export class GoodsIssueNoteLine {
     readonly condition?: Condition;
     #goodQuantities: number;
     #badQuantities: number;
-    #quantityReturned: number;
+    #goodQuantitiesReturned: number;
+    #badQuantitiesReturned: number;
     #netTotal: Decimal;
 
     constructor(
@@ -34,23 +35,31 @@ export class GoodsIssueNoteLine {
         this.condition = new Condition(comment);
         this.#goodQuantities = goodQuantities;
         this.#badQuantities = badQuantities ?? 0;
-        this.#quantityReturned = 0;
+        this.#goodQuantitiesReturned = 0;
+        this.#badQuantitiesReturned = 0;
         this.#netTotal = new Decimal(0);
 
         this.#calculateTotal();
     }
 
-    returnLine(quantity: number) {
+    returnLine(goodQuantities: number, badQuantities: number = 0): void {
         if (this.isFullyReturned()) return;
-        this.#quantityReturned += quantity;
+        this.#goodQuantitiesReturned += goodQuantities;
+        this.#badQuantitiesReturned += badQuantities;
     }
 
-    checkQuantity(quantity: number): boolean {
-        return quantity >= 1 && quantity <= this.#range();
+    checkQuantity(goodQuantities: number, badQuantities: number = 0): boolean {
+        const goodTotal = this.goodQuantities - this.goodQuantitiesReturned;
+        if (this.badQuantities === 0) return goodTotal >= goodQuantities;
+        const badTotal = this.badQuantities - this.badQuantitiesReturned;
+        return goodTotal >= goodQuantities && badTotal >= badQuantities;
     }
 
     isFullyReturned(): boolean {
-        return this.#quantityReturned === this.total;
+        return (
+            this.#goodQuantities === this.#goodQuantitiesReturned &&
+            this.#badQuantities === this.#badQuantitiesReturned
+        );
     }
 
     #calculateTotal(): void {
@@ -59,7 +68,7 @@ export class GoodsIssueNoteLine {
     }
 
     #range() {
-        return this.total - this.#quantityReturned;
+        return this.total - this.quantityReturned;
     }
 
     get netTotal(): Decimal {
@@ -79,10 +88,18 @@ export class GoodsIssueNoteLine {
     }
 
     get quantityReturned(): number {
-        return this.#quantityReturned;
+        return this.#goodQuantitiesReturned + this.#badQuantitiesReturned;
     }
 
     get maxToReturn(): number {
         return this.#range();
+    }
+
+    get goodQuantitiesReturned(): number {
+        return this.#goodQuantitiesReturned;
+    }
+
+    get badQuantitiesReturned(): number {
+        return this.#badQuantitiesReturned;
     }
 }

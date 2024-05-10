@@ -64,6 +64,14 @@ export class Note {
         line.changeBadQuantities(goodQuantities, badQuantities);
     }
 
+    updateQuantitiesToReturn(itemId: string, goodQuantities: number, badQuantities: number) {
+        const line = this.findLine(itemId);
+
+        if (!line) return;
+
+        line.updateQuantitiesToReturn(goodQuantities, badQuantities);
+    }
+
     clearLines() {
         this.lines = [];
     }

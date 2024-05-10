@@ -17,6 +17,8 @@ interface GoodsIssueLineDTO {
     quantityToReturn: number;
     goodQuantities: number;
     badQuantities: number;
+    goodQuantitiesReturned: number;
+    badQuantitiesReturned: number;
     fulltext: string;
     variationValues: VariationValues[];
     condition: any;
@@ -37,11 +39,13 @@ function toGoodsIssueLineDTO(line: GoodsIssueNoteLine): GoodsIssueLineDTO {
         itemId: line.itemId.toString(),
         name: line.name,
         price: line.price.value,
+        goodQuantities: line.goodQuantities,
+        badQuantities: line.badQuantities,
+        goodQuantitiesReturned: line.goodQuantitiesReturned,
+        badQuantitiesReturned: line.badQuantitiesReturned,
         quantityRequested: line.total,
         quantityReturned: line.quantityReturned,
         quantityToReturn: line.maxToReturn,
-        goodQuantities: line.goodQuantities,
-        badQuantities: line.badQuantities,
         fulltext: line.fulltext,
         variationValues: toVariationValuesDTO(line.variationsValues),
         condition: line.condition,

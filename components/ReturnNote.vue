@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ChooseNoteLine, DescribeCondition } from "#build/components";
+import type { ChooseNoteLine, DescribeReturnCondition } from "#build/components";
 import type { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
 import type { GoodsIssueNoteLine } from "~/lib/frontend/domain/goods_issue_note_line";
 import type { GoodsReturnNote } from "~/lib/frontend/domain/goods_return_note";
@@ -17,14 +17,13 @@ interface Props {
 
 const emits = defineEmits<Emits>();
 const props = defineProps<Props>();
-const describeConditionRef = ref<typeof DescribeCondition>();
+const describeConditionRef = ref<typeof DescribeReturnCondition>();
 const chooseNoteLineRef = ref<typeof ChooseNoteLine>();
 
 function showDecribeCondition(line: NoteLine) {
     if (line.isFullyReturned()) return;
 
-    describeConditionRef.value?.initializeCondition(line.itemId, line.condition);
-    describeConditionRef.value?.show();
+    describeConditionRef.value?.show(line.itemId, line.totalToReturn);
 }
 
 function changeQuantity(line: NoteLine, quantity: number) {
@@ -32,7 +31,7 @@ function changeQuantity(line: NoteLine, quantity: number) {
 
     if (quantity > 0) emits("invalid-line", false);
 
-    line.changeQuantity(quantity);
+    line.updateQuantitiesToReturn(quantity, 0);
 }
 
 function addLine(line: GoodsIssueNoteLine, quantity: number) {
@@ -92,9 +91,9 @@ function showRequestedLines() {
 
                         <td class="text-center">
                             <ChooseQuantity
-                                :initital="line.goodQuantities"
-                                :limit="line.maxToReturn"
-                                :model-value="line.goodQuantities"
+                                :initital="1"
+                                :limit="line.totalToReturn"
+                                :model-value="line.totalToReturn"
                                 :class="{ 'input-disabled border-none': line.isFullyReturned() }"
                                 @update-quantity="changeQuantity(line, $event)"
                             />
@@ -117,7 +116,8 @@ function showRequestedLines() {
         </div>
     </VNote>
 
-    <DescribeCondition ref="describeConditionRef" :note="goodsReturnNote" />
+    <DescribeReturnCondition ref="describeConditionRef" :note="goodsReturnNote" />
+
     <ChooseNoteLine
         ref="chooseNoteLineRef"
         :note="goodsReturnNote"

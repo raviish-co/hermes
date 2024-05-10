@@ -43,7 +43,8 @@ export class GoodsReturnService {
     #toItemDTO(line: NoteLine): ItemDTO {
         return {
             itemId: line.itemId,
-            quantity: line.goodQuantities,
+            goodQuantities: line.goodQuantitiesReturned,
+            badQuantities: line.badQuantitiesReturned,
             comment: line.condition?.comment,
         };
     }
@@ -51,7 +52,8 @@ export class GoodsReturnService {
 
 interface ItemDTO {
     itemId: string;
-    quantity: number;
+    goodQuantities: number;
+    badQuantities?: number;
     comment?: string;
 }
 

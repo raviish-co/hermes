@@ -17,6 +17,11 @@ function newGoodsIssue() {
 
     wasSubmitted.value = true;
 }
+
+function clear() {
+    note.clear();
+    wasSubmitted.value = false;
+}
 </script>
 
 <template>
@@ -45,7 +50,7 @@ function newGoodsIssue() {
                 >
                     Solicitar
                 </button>
-                <button class="btn-light" @click="note.clear()">Cancelar</button>
+                <button class="btn-light" @click="clear()">Cancelar</button>
             </div>
 
             <div
