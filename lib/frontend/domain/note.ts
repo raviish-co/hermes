@@ -20,8 +20,8 @@ export class Note {
         this.lines = [];
     }
 
-    addLine(options: LineOptions, quantity: number, stock: number) {
-        if (!quantity) return;
+    addLine(options: LineOptions, quantity: number, stock?: number) {
+        if (!quantity || !stock) return;
 
         if (this.isSameLine(options.itemId)) return;
 

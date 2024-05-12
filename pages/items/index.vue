@@ -50,7 +50,20 @@ onMounted(() => {
                             </span>
                         </td>
                         <td class="text-gray-500">{{ formatCurrency(item.price) }}</td>
-                        <td>{{ warehouse.findItemStock(item.itemId)?.total }}</td>
+                        <td class="text-center">
+                            <span v-if="!warehouse.findItemStock(item.itemId)" class="badge-danger">
+                                Esgotado
+                            </span>
+
+                            <span
+                                v-else-if="warehouse.findItemStock(item.itemId)?.total === 0"
+                                class="badge-danger"
+                            >
+                                Esgotado
+                            </span>
+
+                            <span v-else>{{ warehouse.findItemStock(item.itemId)?.total }}</span>
+                        </td>
                         <td>
                             <NuxtLink :to="`/items/${item.itemId}/`">
                                 <span class="material-symbols-outlined"> edit </span>

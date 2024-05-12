@@ -49,7 +49,9 @@ export class GoodsIssueNote extends Note {
         return note;
     }
 
-    addLine(options: LineOptions, quantity: number, stock: number) {
+    addLine(options: LineOptions, quantity: number, stock?: number) {
+        if (!quantity || !stock) return;
+
         if (this.isSameLine(options.itemId)) return;
 
         if (quantity > stock) return;

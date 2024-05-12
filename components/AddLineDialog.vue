@@ -99,7 +99,7 @@ onMounted(() => warehouse.listItemsStock());
                                 note.addLine(
                                     item,
                                     quantities[idx],
-                                    warehouse.findItemStock(item.itemId)!.total
+                                    warehouse.findItemStock(item.itemId)?.total
                                 )
                             "
                         >
@@ -111,15 +111,18 @@ onMounted(() => warehouse.listItemsStock());
                         </td>
 
                         <td class="text-center">
-                            <span
-                                :class="{ 'badge-danger': warehouse.findItemStock(item.itemId)!.total === 0 }"
-                            >
-                                {{
-                                    warehouse.findItemStock(item.itemId)!.total === 0
-                                        ? "Esgotado"
-                                        : warehouse.findItemStock(item.itemId)!.total
-                                }}
+                            <span v-if="!warehouse.findItemStock(item.itemId)" class="badge-danger">
+                                Esgotado
                             </span>
+
+                            <span
+                                v-else-if="warehouse.findItemStock(item.itemId)?.total === 0"
+                                class="badge-danger"
+                            >
+                                Esgotado
+                            </span>
+
+                            <span v-else>{{ warehouse.findItemStock(item.itemId)?.total }}</span>
                         </td>
 
                         <td class="text-xs">
@@ -129,19 +132,23 @@ onMounted(() => warehouse.listItemsStock());
                                 placeholder="QTD"
                                 min="0"
                                 class="input-number text-center"
-                                :max="hasLimit ? warehouse.findItemStock(item.itemId)!.total : undefined"
+                                :max="
+                                    hasLimit
+                                        ? warehouse.findItemStock(item.itemId)?.total
+                                        : undefined
+                                "
                                 @keypress.enter="
                                     note.addLine(
                                         item,
                                         quantities[idx],
-                                        warehouse.findItemStock(item.itemId)!.total
+                                        warehouse.findItemStock(item.itemId)?.total
                                     )
                                 "
                                 @keydown.tab="
                                     note.addLine(
                                         item,
                                         quantities[idx],
-                                        warehouse.findItemStock(item.itemId)!.total
+                                        warehouse.findItemStock(item.itemId)?.total
                                     )
                                 "
                             />
