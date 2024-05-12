@@ -5,8 +5,6 @@ import type { ItemModel } from "@frontend/models/item";
 import { CatalogService } from "@frontend/services/catalog_service";
 import type { Note } from "~/lib/frontend/domain/note";
 import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_values";
-import type { ItemStockModel } from "~/lib/frontend/models/item_stock";
-import { WarehouseService } from "~/lib/frontend/services/warehouse_service";
 
 interface Props {
     note: Note;
@@ -17,10 +15,9 @@ const dialogRef = ref<typeof VDialog>();
 const searchText = ref<string>("");
 const quantities = ref<number[]>([]);
 const items = ref<ItemModel[]>([]);
-const itemsStock = ref<ItemStockModel[]>([]);
 const pages = ref<number>(1);
 const catalogService = new CatalogService();
-const warehouseService = new WarehouseService();
+const warehouse = useWarehouse();
 
 withDefaults(defineProps<Props>(), {
     hasLimit: true,
@@ -28,6 +25,7 @@ withDefaults(defineProps<Props>(), {
 
 function show() {
     listItems();
+    warehouse.listItemsStock();
     dialogRef.value?.show();
 }
 
@@ -63,15 +61,9 @@ function changePageToken(pageToken: number) {
     listItems(pageToken);
 }
 
-function findItemStock(itemId: string) {
-    return itemsStock.value.find((i) => i.itemId === itemId)!;
-}
-
 defineExpose({ show });
 
-onMounted(async () => {
-    itemsStock.value = await warehouseService.listItemStock();
-});
+onMounted(() => warehouse.listItemsStock());
 </script>
 
 <template>
@@ -107,7 +99,7 @@ onMounted(async () => {
                                 note.addLine(
                                     item,
                                     quantities[idx],
-                                    findItemStock(item.itemId).total
+                                    warehouse.findItemStock(item.itemId)!.total
                                 )
                             "
                         >
@@ -120,12 +112,12 @@ onMounted(async () => {
 
                         <td class="text-center">
                             <span
-                                :class="{ 'badge-danger': findItemStock(item.itemId).total === 0 }"
+                                :class="{ 'badge-danger': warehouse.findItemStock(item.itemId)!.total === 0 }"
                             >
                                 {{
-                                    findItemStock(item.itemId).total === 0
+                                    warehouse.findItemStock(item.itemId)!.total === 0
                                         ? "Esgotado"
-                                        : findItemStock(item.itemId).total
+                                        : warehouse.findItemStock(item.itemId)!.total
                                 }}
                             </span>
                         </td>
@@ -137,19 +129,19 @@ onMounted(async () => {
                                 placeholder="QTD"
                                 min="0"
                                 class="input-number text-center"
-                                :max="hasLimit ? findItemStock(item.itemId).total : undefined"
+                                :max="hasLimit ? warehouse.findItemStock(item.itemId)!.total : undefined"
                                 @keypress.enter="
                                     note.addLine(
                                         item,
                                         quantities[idx],
-                                        findItemStock(item.itemId).total
+                                        warehouse.findItemStock(item.itemId)!.total
                                     )
                                 "
                                 @keydown.tab="
                                     note.addLine(
                                         item,
                                         quantities[idx],
-                                        findItemStock(item.itemId).total
+                                        warehouse.findItemStock(item.itemId)!.total
                                     )
                                 "
                             />

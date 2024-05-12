@@ -4,8 +4,12 @@ import { formatCurrency } from "~/lib/frontend/helpers/format_currency";
 
 const criteria = ref<string>("");
 const catalog = useCatalog();
+const warehouse = useWarehouse();
 
-onMounted(() => catalog.listItems());
+onMounted(() => {
+    catalog.listItems();
+    warehouse.listItemsStock();
+});
 </script>
 
 <template>
@@ -26,10 +30,9 @@ onMounted(() => catalog.listItems());
                 <thead>
                     <tr>
                         <th class="min-w-20 w-20">ID</th>
-                        <th class="min-w-60 w-60 text-left">Descrição</th>
+                        <th class="min-w-80 w-80 text-left">Descrição</th>
                         <th class="min-w-40 w-40">Preço Kz</th>
                         <th class="min-w-40 w-40">Stock</th>
-                        <th class="min-w-40 w-40">Estado</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -47,9 +50,7 @@ onMounted(() => catalog.listItems());
                             </span>
                         </td>
                         <td class="text-gray-500">{{ formatCurrency(item.price) }}</td>
-                        <td>{{ item.stock }}</td>
-                        <td>{{ item.condition?.status }}</td>
-
+                        <td>{{ warehouse.findItemStock(item.itemId)?.total }}</td>
                         <td>
                             <NuxtLink :to="`/items/${item.itemId}/`">
                                 <span class="material-symbols-outlined"> edit </span>
