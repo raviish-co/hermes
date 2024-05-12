@@ -11,7 +11,6 @@ export function useCatalog() {
     const variations = ref<VariationModel[]>([]);
     const categories = ref<CategoryModel[]>([]);
     const sections = ref<SectionModel[]>([]);
-
     const pages = ref<number>(1);
 
     const changePage = (page: number) => {

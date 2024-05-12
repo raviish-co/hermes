@@ -7,7 +7,6 @@ const item = reactive({
     sectionId: "",
     categoryId: "",
     variationsValues: [],
-    condition: { status: "Bom", comment: "" },
 });
 
 const catalog = useCatalog();
@@ -18,11 +17,9 @@ const service = new CatalogService();
 const isDisabled = computed(() => {
     if (!item.name || !item.price) return true;
 
-    const category = catalog.findCategory(item.categoryId)!;
+    const category = catalog.findCategory(item.categoryId);
 
-    if (category.variationsIds.length > item.variationsValues.length) return true;
-
-    if (item.condition.status === "Mau" && item.condition.comment!.length === 0) return true;
+    if (category && category.variationsIds.length > item.variationsValues.length) return true;
 
     return false;
 });
@@ -34,7 +31,6 @@ function register() {
         categoryId: item.categoryId,
         sectionId: item.sectionId,
         variations: item.variationsValues,
-        comment: item.condition.comment,
         tags: tags.value,
     };
 
@@ -70,11 +66,6 @@ onMounted(() => {
             <input class="input-field" type="text" placeholder="Nome" v-model="item.name" />
 
             <input class="input-field" type="number" placeholder="Preço" v-model="item.price" />
-
-            <ChooseCondition
-                @status="item.condition.status = $event"
-                @comment="item.condition.comment = $event"
-            />
 
             <InputTags @tags="tags = $event" />
 
