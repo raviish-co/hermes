@@ -1,4 +1,5 @@
 import { DefaultPurposeSpecification } from "./adapters/default_purpose_specification";
+import { CsvReader } from "./adapters/readers/csv_reader";
 import { SequenceGenerator } from "./adapters/sequences/sequence_generator";
 import { CatalogService } from "./application/catalog_service";
 import { DashboardService } from "./application/dashboard_service";
@@ -23,6 +24,7 @@ const goodsIssueRepository = new InmemGoodsIssueNoteRepository();
 const sequenceStorage = new InmemSequenceStorage();
 const sequenceGenerator = new SequenceGenerator(sequenceStorage);
 const categoryRepository = new CategoryRepositoryStub();
+const csvReader = new CsvReader();
 const variationRepository = new VariationRepositoryStub();
 const sectionRepository = new SectionRepositoryStub();
 const purposeSpec = new DefaultPurposeSpecification();
@@ -61,10 +63,12 @@ export const makeServices = (): Services => {
 
     const importService = new ImportService(
         itemRepository,
+        itemStockRepository,
         categoryRepository,
         sectionRepository,
         variationRepository,
-        sequenceGenerator
+        sequenceGenerator,
+        csvReader
     );
 
     const purposeService = new PurposeService();

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { CsvReader } from "../../adapters/readers/csv_reader";
 import { FileEmpty } from "../../adapters/readers/file_empty_error";
 import { FileNotSupported } from "../../adapters/readers/file_not_supported_error";
 import { InvalidFileHeader } from "../../adapters/readers/invalid_file_header_error";
@@ -19,6 +20,7 @@ import { InmemSectionRepository } from "../../persistense/inmem/inmem_section_re
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
 import { InmemVariationRepository } from "../../persistense/inmem/inmem_variation_repository";
 import { ID } from "../../shared/id";
+import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
 import { VariationRepositoryStub } from "../stubs/variation_repository_stub";
 
 describe("Test Upload Items", async () => {
@@ -176,6 +178,74 @@ describe("Test Upload Items", async () => {
     });
 });
 
+describe("Import Service - Upload Items in Stock", async () => {
+    it("Deve actualizar as quantidades em stock dos artigos a partir do ficheiro .csv", async () => {
+        const { service, itemStockRepository } = makeService();
+        const file = new File([itemsStockData], "filename.csv", { type: "text/csv" });
+
+        await service.uploadItemsInStock(file);
+
+        const itemsStock = await itemStockRepository.findAll([
+            ID.fromString("1001"),
+            ID.fromString("1002"),
+            ID.fromString("1003"),
+        ]);
+
+        expect(itemsStock.length).toBe(3);
+        expect(itemsStock[0].goodQuantities).toBe(20);
+        expect(itemsStock[1].goodQuantities).toBe(18);
+        expect(itemsStock[2].goodQuantities).toBe(12);
+    });
+
+    it("Deve actualizar as quantidades em mau estado dos artigos em stock a partir do ficheiro .csv", async () => {
+        const { service, itemStockRepository } = makeService();
+        const file = new File([itemsStockData], "filename.csv", { type: "text/csv" });
+
+        await service.uploadItemsInStock(file);
+
+        const itemsStock = await itemStockRepository.findAll([
+            ID.fromString("1001"),
+            ID.fromString("1002"),
+            ID.fromString("1003"),
+        ]);
+
+        expect(itemsStock.length).toBe(3);
+
+        expect(itemsStock[0].badQuantities).toBe(5);
+        expect(itemsStock[1].badQuantities).toBe(5);
+        expect(itemsStock[2].badQuantities).toBe(10);
+    });
+    it("Deve retornar **FileNotSupported** caso o ficheiro não seja .csv", async () => {
+        const { service } = makeService();
+
+        const error = await service.uploadItemsInStock(fileTxt);
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(FileNotSupported);
+    });
+
+    it("Deve retornar **EmptyFile** caso o ficheiro seja válido e esteja vazio", async () => {
+        const { service } = makeService();
+
+        const error = await service.uploadItemsInStock(emptyFile);
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(FileEmpty);
+    });
+
+    it("Deve retornar **InvalidFileHeader** caso o cabeçalho não esteja completo", async () => {
+        const { service } = makeService();
+        const data = `id,nome,description
+        1001,10,5`;
+        const file = new File([data], "filename.csv", { type: "text/csv" });
+
+        const error = await service.uploadItemsInStock(file);
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(InvalidFileHeader);
+    });
+});
+
 const category = new Category(ID.random(), "Categoria 1");
 const section = new Section(ID.random(), "Secao 1", ID.random());
 
@@ -199,6 +269,11 @@ const emptyFile = new File(["nome,preco,estado,categoria,seccao,variacoes"], "fi
     type: "text/csv",
 });
 
+const itemsStockData = `id,boas,com_defeito 
+1001,10,5
+1002,8,5
+1003,5,10`;
+
 interface Dependencies {
     categoryRepository?: CategoryRepository;
     sectionRepository?: SectionRepository;
@@ -212,13 +287,17 @@ function makeService(deps?: Dependencies) {
     const categoryRepository = deps?.categoryRepository ?? new InmemCategoryRepository();
     const sectionRepository = deps?.sectionRepository ?? new InmemSectionRepository();
     const variationRepository = deps?.variationRepository ?? new VariationRepositoryStub();
+    const itemStockRepository = new ItemStockRepositoryStub();
+    const csvReader = new CsvReader();
 
     const service = new ImportService(
         itemRepository,
+        itemStockRepository,
         categoryRepository,
         sectionRepository,
         variationRepository,
-        sequenceGenerator
+        sequenceGenerator,
+        csvReader
     );
 
     return {
@@ -227,5 +306,6 @@ function makeService(deps?: Dependencies) {
         categoryRepository,
         sectionRepository,
         variationRepository,
+        itemStockRepository,
     };
 }
