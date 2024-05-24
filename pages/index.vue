@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { formatCurrency } from "~/lib/frontend/helpers/format_currency";
-import type { DashboardModel } from "~/lib/frontend/models/dashboard_model";
+import type { DashboardModel } from "~/lib/frontend/models/dashboard";
 import { DashboardService } from "~/lib/frontend/services/dashboard_service";
 
 const statistics = ref<DashboardModel>({

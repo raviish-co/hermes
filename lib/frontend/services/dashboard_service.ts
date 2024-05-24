@@ -1,4 +1,4 @@
-import type { DashboardModel } from "../models/dashboard_model";
+import type { DashboardModel } from "../models/dashboard";
 
 export class DashboardService {
     async getStatistics(): Promise<DashboardModel> {

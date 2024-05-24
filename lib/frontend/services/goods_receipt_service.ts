@@ -1,6 +1,7 @@
 import type { GoodsReceiptNote } from "../domain/goods_receipt_note";
-import type { ConditionModel } from "../models/condition";
 import type { NoteLine } from "../domain/note_line";
+import type { ConditionModel } from "../models/condition";
+import type { GoodsReceiptNoteModel } from "../models/goods_receipt_note";
 
 export class GoodsReceiptService {
     async new(note: GoodsReceiptNote) {
@@ -10,6 +11,19 @@ export class GoodsReceiptService {
             method: "post",
             body: { data },
         });
+    }
+
+    async getAll(): Promise<GoodsReceiptNoteModel[]> {
+        const notes = await $fetch("/api/goods-receipt");
+        return notes.map(this.#toGoodsReceiptModel);
+    }
+
+    #toGoodsReceiptModel(data: any) {
+        return {
+            noteId: data.noteId,
+            entryDate: data.entryDate,
+            lines: data.lines,
+        };
     }
 
     #toGoodsReceiptLineDTO(line: NoteLine): NoteLineDTO {
