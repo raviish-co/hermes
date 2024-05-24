@@ -1,6 +1,7 @@
 import type { Generator } from "../adapters/sequences/generator";
 import { Sequence } from "../adapters/sequences/sequence";
 import type { ItemRepository } from "../domain/catalog/items/item_repository";
+import type { GoodsReceiptNote } from "../domain/goods_receipt/goods_receipt_note";
 import { GoodsReceiptNoteBuilder } from "../domain/goods_receipt/goods_receipt_note_builder";
 import { GoodsReceiptNoteLine } from "../domain/goods_receipt/goods_receipt_note_line";
 import type { GoodsReceiptNoteRepository } from "../domain/goods_receipt/goods_receipt_note_repository";
@@ -61,6 +62,10 @@ export class GoodsReceiptService {
         this.#itemRepository.updateAll(itemsOrErr.value);
 
         return right(undefined);
+    }
+
+    async list(): Promise<GoodsReceiptNote[]> {
+        return this.#noteRepository.getAll();
     }
 
     #isValidLines(data: NoteDTO) {

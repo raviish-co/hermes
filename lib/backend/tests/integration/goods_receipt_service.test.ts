@@ -231,6 +231,33 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
     });
 });
 
+describe("GoodsReceiptService - Listar guias de entrada de mercadoria", () => {
+    it("Deve listar todas as guias de entrada de mercadoria", async () => {
+        const { service } = makeService();
+        const data = {
+            lines: [
+                { itemId: "1001", goodQuantities: 2 },
+                { itemId: "1002", goodQuantities: 2 },
+            ],
+            entryDate: "2024-03-01T16:40:00",
+            userId: "1001",
+        };
+
+        await service.new(data);
+
+        const notes = await service.list();
+
+        expect(notes.length).toBe(1);
+    });
+
+    it("Deve retornar uma lista vazia se não houver guias de entrada de mercadoria", async () => {
+        const { service } = makeService();
+
+        const notes = await service.list();
+
+        expect(notes.length).toBe(0);
+    });
+});
 interface Options {
     generator?: Generator;
     itemStockRepository?: ItemStockRepository;
