@@ -5,7 +5,7 @@ const service = new ImportService();
 
 function importFile(formData: FormData) {
     service
-        .importItems(formData)
+        .importItemsStock(formData)
         .then((res) => alert(res.message))
         .catch((err) => alert(err.statusMessage));
 }
