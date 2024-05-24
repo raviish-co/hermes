@@ -83,6 +83,10 @@ export class GoodsIssueService {
         return right(noteOrErr.value);
     }
 
+    async search(query: string): Promise<GoodsIssueNote[]> {
+        return await this.#noteRepository.search(query);
+    }
+
     #buildNoteId() {
         return this.#generator.generate(Sequence.GoodIssueNote);
     }

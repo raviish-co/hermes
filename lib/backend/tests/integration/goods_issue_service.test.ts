@@ -297,9 +297,9 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
         const noteOrErr = await noteRepository.getById(ID.fromString("GS - 1000"));
         const note = <GoodsIssueNote>noteOrErr.value;
 
-        expect(note.goodsIssueNoteId).toBeDefined();
-        expect(note.goodsIssueNoteId).toBeInstanceOf(ID);
-        expect(note.goodsIssueNoteId.toString()).toEqual("GS - 1000");
+        expect(note.noteId).toBeDefined();
+        expect(note.noteId).toBeInstanceOf(ID);
+        expect(note.noteId.toString()).toEqual("GS - 1000");
     });
 
     it("Deve gerar 2 solicitações com IDs diferentes", async () => {
@@ -314,8 +314,8 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
         const note1 = <GoodsIssueNote>note1OrErr.value;
         const note2 = <GoodsIssueNote>note2OrErr.value;
 
-        expect(note1.goodsIssueNoteId.toString()).toEqual("GS - 1000");
-        expect(note2.goodsIssueNoteId.toString()).toEqual("GS - 1001");
+        expect(note1.noteId.toString()).toEqual("GS - 1000");
+        expect(note2.noteId.toString()).toEqual("GS - 1001");
     });
 });
 
@@ -338,7 +338,7 @@ describe("GoodsIssueService - Recuperar as guias de saída de mercadorias", () =
 
         const note = notes[0];
 
-        expect(note.goodsIssueNoteId.toString()).toEqual("GS - 1000");
+        expect(note.noteId.toString()).toEqual("GS - 1000");
     });
 });
 
@@ -362,7 +362,54 @@ describe("GoodsIssueService - Recuperar guia de saída de mercadoria ", () => {
         const note = <GoodsIssueNote>noteOrErr.value;
 
         expect(noteOrErr.isRight()).toBeTruthy();
-        expect(note.goodsIssueNoteId.toString()).toEqual("GS - 1000");
+        expect(note.noteId.toString()).toEqual("GS - 1000");
+    });
+});
+
+describe("GoodsIssueService - Pesquisar guia de saída de mercadoria", () => {
+    it("Deve recuperar as guias com a mesma sequência de caracteres no ID", async () => {
+        const goodsIssueRepository = new GoodsIssueNoteRepositoryStub();
+        const { service } = makeService({ goodsIssueRepository });
+
+        const notes = await service.search("GS - 1");
+
+        expect(notes.length).toBeGreaterThanOrEqual(6);
+    });
+
+    it("Deve recuperar as guias com a mesma sequência de caracteres na finalidade", async () => {
+        const goodsIssueRepository = new GoodsIssueNoteRepositoryStub();
+        const { service } = makeService({ goodsIssueRepository });
+
+        const notes = await service.search("Uso Pessoal");
+
+        expect(notes.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("Deve recuperar as guias com a mesma sequência de caracteres no detalhe da finalidade", async () => {
+        const goodsIssueRepository = new GoodsIssueNoteRepositoryStub();
+        const { service } = makeService({ goodsIssueRepository });
+
+        const notes = await service.search("John Doe");
+
+        expect(notes.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("Deve recuperar as guias com a mesma sequência de caracteres nas notas da finalidade", async () => {
+        const goodsIssueRepository = new GoodsIssueNoteRepositoryStub();
+        const { service } = makeService({ goodsIssueRepository });
+
+        const notes = await service.search("Deadpool");
+
+        expect(notes.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("Deve pesquisar as guias por letras minúsculas", async () => {
+        const goodsIssueRepository = new GoodsIssueNoteRepositoryStub();
+        const { service } = makeService({ goodsIssueRepository });
+
+        const notes = await service.search("Uso PessoaL");
+
+        expect(notes.length).toBeGreaterThanOrEqual(1);
     });
 });
 

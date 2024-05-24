@@ -120,8 +120,8 @@ const _goodsIssueData = [
         noteId: ID.fromString("GS - 1000"),
         purpose: {
             description: "Uso Pessoal",
-            details: "Uso Pessoal",
-            notes: "Uso Pessoal",
+            details: "John Doe",
+            notes: "",
         },
         userId: ID.fromString("1"),
         returnDate: tomorrow,
@@ -151,8 +151,8 @@ const _goodsIssueData = [
         noteId: ID.fromString("GS - 1002"),
         purpose: {
             description: "Uso Pessoal",
-            details: "Uso Pessoal",
-            notes: "Uso Pessoal",
+            details: "John Doe",
+            notes: "",
         },
         userId: ID.fromString("1"),
         returnDate: tomorrow,
@@ -259,9 +259,9 @@ const _goodsIssueData = [
     {
         noteId: ID.fromString("GS - 1006"),
         purpose: {
-            description: "Uso Pessoal",
-            details: "Uso Pessoal",
-            notes: "Uso Pessoal",
+            description: "Gravação",
+            details: "Filme",
+            notes: "Deadpool",
         },
         userId: ID.fromString("1"),
         returnDate: new Date(),

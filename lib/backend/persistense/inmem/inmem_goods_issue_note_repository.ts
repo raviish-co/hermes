@@ -5,17 +5,17 @@ import { left, right, type Either } from "../../shared/either";
 import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
 
 export class InmemGoodsIssueNoteRepository implements GoodsIssueNoteRepository {
-    #goodsIssues: Record<string, GoodsIssueNote> = {};
+    #notes: Record<string, GoodsIssueNote> = {};
 
     constructor(notes?: GoodsIssueNote[]) {
         if (notes) {
-            notes.forEach((note) => (this.#goodsIssues[note.goodsIssueNoteId.toString()] = note));
+            notes.forEach((note) => (this.#notes[note.noteId.toString()] = note));
         }
     }
 
     getById(goodsIssueId: ID): Promise<Either<GoodsIssueNoteNotFound, GoodsIssueNote>> {
         const goodsIssueNote = this.records.find(
-            (g) => g.goodsIssueNoteId.toString() === goodsIssueId.toString()
+            (g) => g.noteId.toString() === goodsIssueId.toString()
         );
         if (!goodsIssueNote) return Promise.resolve(left(new GoodsIssueNoteNotFound()));
         return Promise.resolve(right(goodsIssueNote));
@@ -25,13 +25,22 @@ export class InmemGoodsIssueNoteRepository implements GoodsIssueNoteRepository {
         return Promise.resolve(this.records);
     }
 
+    search(query: string): Promise<GoodsIssueNote[]> {
+        const notes = this.records.filter(
+            (note) =>
+                note.noteId.toString().includes(query) ||
+                note.fulltext.includes(query.toLowerCase())
+        );
+        return Promise.resolve(notes);
+    }
+
     save(goodIssueNote: GoodsIssueNote): Promise<void> {
-        this.#goodsIssues[goodIssueNote.goodsIssueNoteId.toString()] = goodIssueNote;
+        this.#notes[goodIssueNote.noteId.toString()] = goodIssueNote;
         return Promise.resolve(undefined);
     }
 
     update(goodsIssue: GoodsIssueNote): Promise<void> {
-        this.#goodsIssues[goodsIssue.goodsIssueNoteId.toString()] = goodsIssue;
+        this.#notes[goodsIssue.noteId.toString()] = goodsIssue;
         return Promise.resolve(undefined);
     }
 
@@ -40,6 +49,6 @@ export class InmemGoodsIssueNoteRepository implements GoodsIssueNoteRepository {
     }
 
     get records(): GoodsIssueNote[] {
-        return Object.values(this.#goodsIssues);
+        return Object.values(this.#notes);
     }
 }

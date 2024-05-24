@@ -7,6 +7,7 @@ export interface GoodsIssueNoteRepository {
     getById(goodsIssueId: ID): Promise<Either<GoodsIssueNoteNotFound, GoodsIssueNote>>;
     getAll(): Promise<GoodsIssueNote[]>;
     save(goodsIssue: GoodsIssueNote): Promise<void>;
+    search(query: string): Promise<GoodsIssueNote[]>;
     update(goodsIssue: GoodsIssueNote): Promise<void>;
     last(): Promise<GoodsIssueNote>;
 }

@@ -58,7 +58,7 @@ export class GoodsReturnService {
         const returnLines = this.#buildReturnLines(itemsData, itemsOrErr.value);
         const returnNote = new GoodsReturnNote(
             this.#buildReturnNoteId(),
-            noteOrErr.value.goodsIssueNoteId,
+            noteOrErr.value.noteId,
             returnLines,
             securityDepositWithheld
         );

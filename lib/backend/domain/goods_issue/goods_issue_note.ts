@@ -10,12 +10,13 @@ enum Status {
 }
 
 export class GoodsIssueNote {
-    readonly goodsIssueNoteId: ID;
+    readonly noteId: ID;
     readonly purpose: Purpose;
     readonly userId: ID;
     readonly lines: GoodsIssueNoteLine[];
     readonly returnDate: Date;
     readonly issuedAt: Date;
+    readonly fulltext: string;
     #status: Status;
     #total: Decimal;
     #securityDeposit: Decimal;
@@ -28,7 +29,7 @@ export class GoodsIssueNote {
         returnDate: Date,
         lines: GoodsIssueNoteLine[]
     ) {
-        this.goodsIssueNoteId = noteId;
+        this.noteId = noteId;
         this.purpose = purpose;
         this.userId = user;
         this.issuedAt = new Date();
@@ -38,6 +39,8 @@ export class GoodsIssueNote {
         this.#total = new Decimal(0);
         this.#securityDeposit = new Decimal(0);
         this.#securityDepositWithheld = new Decimal(0);
+
+        this.fulltext = this.#buildFulltext();
 
         this.#addLines(lines);
     }
@@ -121,5 +124,11 @@ export class GoodsIssueNote {
 
     #findLineByItemId(itemId: ID): GoodsIssueNoteLine {
         return this.lines.find((line) => line.itemId.equals(itemId))!;
+    }
+
+    #buildFulltext(): string {
+        return Object.values(this.purpose)
+            .map((v) => v.toLowerCase())
+            .join(" ");
     }
 }

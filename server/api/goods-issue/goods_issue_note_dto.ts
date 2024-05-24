@@ -54,7 +54,7 @@ function toGoodsIssueLineDTO(line: GoodsIssueNoteLine): GoodsIssueLineDTO {
 
 export function toGoodsIssueNoteDTO(note: GoodsIssueNote): GoodsIssueNoteDTO {
     return {
-        goodsIssueNoteId: note.goodsIssueNoteId.toString(),
+        goodsIssueNoteId: note.noteId.toString(),
         purpose: note.purpose,
         status: note.status,
         lines: note.lines.map(toGoodsIssueLineDTO),
