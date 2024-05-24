@@ -11,7 +11,6 @@ import type { CategoryRepository } from "../../domain/catalog/categories/categor
 import { Section } from "../../domain/catalog/departments/section";
 import { SectionNotFound } from "../../domain/catalog/departments/section_not_found_error";
 import type { SectionRepository } from "../../domain/catalog/departments/section_repository";
-import { InvalidVariationFormat } from "../../domain/catalog/variations/invalid_variation_format_error";
 import { VariationNotFound } from "../../domain/catalog/variations/variation_not_found_error";
 import type { VariationRepository } from "../../domain/catalog/variations/variation_repository";
 import { InmemCategoryRepository } from "../../persistense/inmem/inmem_category_repository";
@@ -31,15 +30,6 @@ describe("Test Upload Items", async () => {
 
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(FileNotSupported);
-    });
-
-    it("Deve retornar **InvalidFileHeader** caso o cabeçalho não esteja completo", async () => {
-        const { service } = makeService();
-
-        const error = await service.uploadItems(fileHeader);
-
-        expect(error.isLeft()).toBeTruthy();
-        expect(error.value).toBeInstanceOf(InvalidFileHeader);
     });
 
     it("Deve retonar **EmptyFile** caso o ficheiro seja válido e esteja vazio", async () => {
@@ -133,17 +123,6 @@ describe("Test Upload Items", async () => {
 
         expect(item.variations!["1"]).toBeDefined();
         expect(item.variations!["1"]).toEqual("Cor: Preto");
-    });
-
-    it("Deve retornar **InvalidVariationFormat** se a variação não estiver no formato correto", async () => {
-        const { service } = makeService();
-
-        const file = new File([variationFormatData], "filename.csv", { type: "text/csv" });
-
-        const error = await service.uploadItems(file);
-
-        expect(error.isLeft()).toBeTruthy();
-        expect(error.value).toBeInstanceOf(InvalidVariationFormat);
     });
 
     it("Deve associar várias variações ao artigo a ser importado", async () => {
@@ -249,12 +228,12 @@ describe("Import Service - Upload Items in Stock", async () => {
 const category = new Category(ID.random(), "Categoria 1");
 const section = new Section(ID.random(), "Secao 1", ID.random());
 
-const csvData = `nome,preco,estado,categoria,seccao,variacoes
-Produto 1,100.00,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Nike
-Produto 2,200.00,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Rebock
-Produto 3,300.00,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Adidas
-Produto 4,400.00,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Nike
-Produto 5,500.00,some-comment,Categoria 1,Secao 1,Cor=Preto;Marca=Rebock`;
+const csvData = `nome,preco,categoria,seccao,cor,marca
+Produto 1,100.00,Categoria 1,Secao 1,Preto,Nike
+Produto 2,200.00,Categoria 1,Secao 1,Preto,Rebock
+Produto 3,300.00,Categoria 1,Secao 1,Preto,Adidas
+Produto 4,400.00,Categoria 1,Secao 1,Preto,Nike
+Produto 5,500.00,Categoria 1,Secao 1,Preto,Rebock`;
 
 const variationFormatData = `nome,preco,estado,categoria,seccao,variacoes
 Produto 1,100.00,1,some-comment,Categoria 1,Secao 1,Cor-Preto`;

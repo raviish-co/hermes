@@ -1,5 +1,4 @@
 import type { InsufficientStock } from "../domain/catalog/items/insufficient_stock_error";
-import type { InvalidVariationFormat } from "../domain/catalog/variations/invalid_variation_format_error";
 import type { ItemNotFound } from "../domain/catalog/items/item_not_found_error";
 import type { InvalidTotal } from "../domain/goods_issue/invalid_total_error";
 import type { InvalidPurpose } from "../domain/goods_issue/invalid_purpose_error";
@@ -12,7 +11,6 @@ import type { GoodsIssueLineNotFound } from "../domain/goods_issue/goods_lssue_l
 import { GoodsIssueNoteHasBeenReturned } from "../domain/goods_issue/goods_issue_note_has_been_returned_error";
 import type { InvalidEntryDate } from "../domain/goods_receipt/invalid_entry_date_error";
 import type { InvalidLines } from "../domain/goods_receipt/invalid_lines_error";
-import type { MissingDependency } from "../domain/goods_receipt/missing_dependency_error";
 import type { CategoryAlreadyExists } from "../domain/catalog/categories/category_already_exists_error";
 import type { VariationNotFound } from "../domain/catalog/variations/variation_not_found_error";
 import type { CategoryNotFound } from "../domain/catalog/categories/category_not_found_error";
@@ -26,14 +24,9 @@ export type GoodsReturnNoteError =
     | GoodsIssueLineNotFound
     | GoodsIssueNoteHasBeenReturned;
 
-export type FileError =
-    | InvalidFileHeader
-    | FileEmpty
-    | FileNotSupported
-    | InvalidVariationFormat
-    | Error;
+export type FileError = InvalidFileHeader | FileEmpty | FileNotSupported | Error;
 
-export type GoodsReceiptError = InvalidEntryDate | InvalidLines | ItemNotFound | MissingDependency;
+export type GoodsReceiptError = InvalidEntryDate | InvalidLines | ItemNotFound;
 
 export type RegisterCategoryError = CategoryAlreadyExists | VariationNotFound;
 
