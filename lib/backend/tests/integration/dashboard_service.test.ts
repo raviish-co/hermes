@@ -214,6 +214,7 @@ describe("DashboardService - Percentagem do estado das mercadorias em stock", as
 });
 
 const itemStockRepositoryMock = {
+    getAll: async () => [],
     findAllOutOfStock: async () => [],
     findAllInStock: async () => [],
     save: async (itemStock: ItemStock) => undefined,
