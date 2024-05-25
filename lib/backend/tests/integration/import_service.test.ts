@@ -21,6 +21,7 @@ import { InmemVariationRepository } from "../../persistense/inmem/inmem_variatio
 import { ID } from "../../shared/id";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
 import { VariationRepositoryStub } from "../stubs/variation_repository_stub";
+import { InmemGoodsReceiptNoteRepository } from "../../persistense/inmem/inmem_goods_receipt_note_repository";
 
 describe("Test Upload Items", async () => {
     it("Deve retornar **FileNotSupported** caso o ficheiro não seja .csv", async () => {
@@ -194,6 +195,19 @@ describe("Import Service - Upload Items in Stock", async () => {
         expect(itemsStock[1].badQuantities).toBe(5);
         expect(itemsStock[2].badQuantities).toBe(10);
     });
+
+    it("Deve criar a guia de entrada de mercadorias em stock", async () => {
+        const { service, goodsReceiptNoteRepository } = makeService();
+        const file = new File([itemsStockData], "filename.csv", { type: "text/csv" });
+
+        await service.uploadItemsInStock(file);
+
+        const note = await goodsReceiptNoteRepository.last();
+
+        expect(note.noteId.toString()).toBe("GE - 0001");
+        expect(note.lines.length).toBe(3);
+    });
+
     it("Deve retornar **FileNotSupported** caso o ficheiro não seja .csv", async () => {
         const { service } = makeService();
 
@@ -267,6 +281,7 @@ function makeService(deps?: Dependencies) {
     const sectionRepository = deps?.sectionRepository ?? new InmemSectionRepository();
     const variationRepository = deps?.variationRepository ?? new VariationRepositoryStub();
     const itemStockRepository = new ItemStockRepositoryStub();
+    const goodsReceiptNoteRepository = new InmemGoodsReceiptNoteRepository();
     const csvReader = new CsvReader();
 
     const service = new ImportService(
@@ -275,6 +290,7 @@ function makeService(deps?: Dependencies) {
         categoryRepository,
         sectionRepository,
         variationRepository,
+        goodsReceiptNoteRepository,
         sequenceGenerator,
         csvReader
     );
@@ -286,5 +302,6 @@ function makeService(deps?: Dependencies) {
         sectionRepository,
         variationRepository,
         itemStockRepository,
+        goodsReceiptNoteRepository,
     };
 }

@@ -67,6 +67,7 @@ export const makeServices = (): Services => {
         categoryRepository,
         sectionRepository,
         variationRepository,
+        goodsReceiptRepository,
         sequenceGenerator,
         csvReader
     );

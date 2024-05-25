@@ -12,6 +12,9 @@ import { ItemBuilder } from "../domain/catalog/items/item_builder";
 import type { ItemRepository } from "../domain/catalog/items/item_repository";
 import type { Variation } from "../domain/catalog/variations/variation";
 import type { VariationRepository } from "../domain/catalog/variations/variation_repository";
+import { GoodsReceiptNoteBuilder } from "../domain/goods_receipt/goods_receipt_note_builder";
+import { GoodsReceiptNoteLine } from "../domain/goods_receipt/goods_receipt_note_line";
+import type { GoodsReceiptNoteRepository } from "../domain/goods_receipt/goods_receipt_note_repository";
 import type { ItemStock } from "../domain/warehouse/item_stock";
 import type { ItemStockRepository } from "../domain/warehouse/item_stock_repository";
 import { Decimal } from "../shared/decimal";
@@ -25,6 +28,7 @@ export class ImportService {
     #categoryRepository: CategoryRepository;
     #sectionRepository: SectionRepository;
     #variationRepository: VariationRepository;
+    #goodsReceiptNoteRepository: GoodsReceiptNoteRepository;
     #generator: Generator;
     #reader: Reader;
 
@@ -34,6 +38,7 @@ export class ImportService {
         categoryRepository: CategoryRepository,
         sectionRepository: SectionRepository,
         variationRepository: VariationRepository,
+        goodsReceiptNoteRepository: GoodsReceiptNoteRepository,
         generator: Generator,
         reader: Reader
     ) {
@@ -42,6 +47,7 @@ export class ImportService {
         this.#categoryRepository = categoryRepository;
         this.#sectionRepository = sectionRepository;
         this.#variationRepository = variationRepository;
+        this.#goodsReceiptNoteRepository = goodsReceiptNoteRepository;
         this.#generator = generator;
         this.#reader = reader;
     }
@@ -73,9 +79,21 @@ export class ImportService {
         const itemsIds = this.#buildItemsIds(lines);
 
         const itemsStock = await this.#itemStockRepository.findAll(itemsIds);
+        const noteLines = this.buildNoteLines(itemsStock);
+
+        const noteId = this.#generator.generate(Sequence.GoodsReceiptNote);
+        const entryDate = new Date();
+        const noteOrErr = new GoodsReceiptNoteBuilder()
+            .withNoteId(noteId)
+            .withLines(noteLines)
+            .withEntryDate(entryDate.toISOString())
+            .build();
+
+        if (noteOrErr.isLeft()) return left(noteOrErr.value);
+
+        await this.#goodsReceiptNoteRepository.save(noteOrErr.value);
 
         this.#increaseItemsStock(itemsStock, lines);
-
         this.#itemStockRepository.updateAll(itemsStock);
 
         return right(undefined);
@@ -103,6 +121,21 @@ export class ImportService {
         });
 
         return itemsIds;
+    }
+
+    buildNoteLines(itemsStock: ItemStock[]) {
+        const lines: GoodsReceiptNoteLine[] = [];
+
+        for (const itemStock of itemsStock) {
+            const line = new GoodsReceiptNoteLine(
+                itemStock.itemId,
+                itemStock.goodQuantities,
+                itemStock.badQuantities
+            );
+            lines.push(line);
+        }
+
+        return lines;
     }
 
     async #buildLine(line: string, headers: string[]): Promise<Either<Error, Item>> {
