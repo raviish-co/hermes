@@ -1,6 +1,6 @@
+import type { ItemModel } from "@frontend/models/item";
 import type { VariationModel } from "@frontend/models/variation";
 import type { CategoryModel } from "../models/category";
-import type { ItemModel } from "@frontend/models/item";
 import type { SectionModel } from "../models/section";
 
 export class CatalogService {
@@ -77,8 +77,6 @@ export class CatalogService {
             itemId: data.itemId,
             name: data.name,
             price: data.price,
-            stock: data.stock,
-            condition: data.condition,
             categoryId: data.categoryId,
             sectionId: data.sectionId,
             variationsValues: data.variationsValues,

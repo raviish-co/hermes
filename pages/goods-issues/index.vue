@@ -1,15 +1,27 @@
 <script setup lang="ts">
-import type { GoodsIssueNoteModel } from "~/lib/frontend/models/goods_issue_note";
-import { GoodsIssueService } from "~/lib/frontend/services/goods_issue_service";
-import type { PurposeModel } from "~/lib/frontend/models/purpose";
 import { formatDate } from "@frontend/helpers/format_date";
+import type { GoodsIssueNoteModel } from "~/lib/frontend/models/goods_issue_note";
+import type { PurposeModel } from "~/lib/frontend/models/purpose";
+import { GoodsIssueService } from "~/lib/frontend/services/goods_issue_service";
 
+const criteria = ref<string>("");
 const notes = ref<GoodsIssueNoteModel[]>([]);
 const service = new GoodsIssueService();
 
 function formatPurpose(purpose: PurposeModel) {
-    const details = purpose.details ? " | " + purpose.details : "";
-    return `${purpose.description} ${details} | ${purpose.notes}`;
+    return Object.values(purpose)
+        .filter((value) => value)
+        .join(" | ");
+}
+
+async function search() {
+    if (!criteria.value) {
+        notes.value = await service.list();
+        return;
+    }
+
+    if (criteria.value.length < 3) return;
+    notes.value = await service.search(criteria.value);
 }
 
 onMounted(async () => {
@@ -20,9 +32,18 @@ onMounted(async () => {
 <template>
     <div class="section-content">
         <h1 class="page-title">Guias de Saída</h1>
+        <div class="mb-6">
+            <input
+                type="text"
+                placeholder="Pesquisar guias..."
+                class="input-field"
+                v-model="criteria"
+                @input="search"
+            />
+        </div>
 
         <div class="table-container">
-            <div v-if="notes.length > 0" class="overflow-y-auto">
+            <div class="overflow-y-auto">
                 <p class="p-2">Filtro:</p>
                 <table class="table text-center">
                     <thead>
@@ -56,8 +77,8 @@ onMounted(async () => {
                     </tbody>
                 </table>
             </div>
-            <p v-else class="text-gray-500 text-center">
-                Não existem guias de saída no momento. Crie uma nova
+            <p v-if="notes.length === 0" class="text-gray-500 text-center">
+                Não foram encontradas guias de saída.
             </p>
         </div>
 

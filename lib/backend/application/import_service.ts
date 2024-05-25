@@ -85,7 +85,7 @@ export class ImportService {
         const items: Item[] = [];
 
         for (const line of lines.slice(1)) {
-            const itemOrErr = await this.#parseLine(line, lines);
+            const itemOrErr = await this.#buildLine(line, lines);
             if (itemOrErr.isLeft()) return left(itemOrErr.value);
 
             items.push(itemOrErr.value);
@@ -105,7 +105,7 @@ export class ImportService {
         return itemsIds;
     }
 
-    async #parseLine(line: string, headers: string[]): Promise<Either<Error, Item>> {
+    async #buildLine(line: string, headers: string[]): Promise<Either<Error, Item>> {
         const csvRow = processLine(line, headers);
         const variationsNames = Object.keys(csvRow.variations).map(
             (v) => v.charAt(0).toUpperCase() + v.slice(1)

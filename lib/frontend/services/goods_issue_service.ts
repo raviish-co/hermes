@@ -1,6 +1,6 @@
-import type { GoodsIssueNoteModel } from "../models/goods_issue_note";
-import type { GoodsIssueNoteLine } from "../domain/goods_issue_note_line";
 import type { GoodsIssueNote } from "../domain/goods_issue_note";
+import type { GoodsIssueNoteLine } from "../domain/goods_issue_note_line";
+import type { GoodsIssueNoteModel } from "../models/goods_issue_note";
 
 export class GoodsIssueService {
     async new(note: GoodsIssueNote) {
@@ -22,6 +22,11 @@ export class GoodsIssueService {
 
     async list(): Promise<GoodsIssueNoteModel[]> {
         const notes = await $fetch("/api/goods-issue/", { method: "get" });
+        return notes.map(this.#toGoodsIssueNoteModel);
+    }
+
+    async search(query: string): Promise<GoodsIssueNoteModel[]> {
+        const notes = await $fetch("/api/goods-issue/search/", { method: "get", query: { query } });
         return notes.map(this.#toGoodsIssueNoteModel);
     }
 
