@@ -1,4 +1,4 @@
-# Raviish - Solicitação de Artigos
+# Hermes
 
 Aplicação responsável pelo controle da entrada e saída de artigos.
 
@@ -18,13 +18,13 @@ Aplicação responsável pelo controle da entrada e saída de artigos.
 - Clone o repositório do projecto
 
 ```bash
-git clone git@github.com:zafir-co-ao/raviish-app.git
+git clone git@github.com:raviish-co/hermes.git
 ```
 
 - Mude para o diretório da aplicação
 
 ```bash
-cd raviish-app
+cd hermes
 ```
 
 ## Ambiente de Produção
@@ -34,18 +34,18 @@ Para executar a aplicação atráves da sua imagem em Docker siga os seguintes p
 - Construção da Imagem
 
 ```bash
-docker build -f .build/Dockerfile -t app-name .
+docker build -f .build/Dockerfile -t hermes .
 ```
 
-> NOTA: Substitua `app-name` pelo nome real da sua imagem docker
+> NOTA: Substitua `hermes` pelo nome real da sua imagem docker
 
 - Execução do Container
 
 ```bash
-docker run -d -p 3000:8080 --name="container-name" app-name
+docker run -d -p 3000:8080 hermes
 ```
 
-> NOTA: `app-name` é o nome que deu a imagem no passo acima, opionalmente, também pode definir do nome do container na flag --name="container-name"
+> NOTA: `hermes` é o nome que deu a imagem no passo acima, opcionalmente, também pode definir do nome do container na flag --name="container-name"
 
 Depois de executar o comando acima a aplicação estará disponível no seguinte endereço: <http://localhost:3000>
 
