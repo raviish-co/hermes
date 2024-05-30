@@ -140,8 +140,8 @@ export class ImportService {
 
     async #buildLine(line: string, headers: string[]): Promise<Either<Error, Item>> {
         const csvRow = processLine(line, headers);
-        const variationsNames = Object.keys(csvRow.variations).map(
-            (v) => v.charAt(0).toUpperCase() + v.slice(1)
+        const variationsNames = Object.keys(csvRow.variations).map((v) =>
+            (v.charAt(0).toUpperCase() + v.slice(1)).trim()
         );
 
         const categoryOrErr = await this.#categoryRepository.findByName(csvRow.category);
