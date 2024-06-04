@@ -1,6 +1,6 @@
-import type { VariationRepository } from "../../domain/catalog/variations/variation_repository";
-import { VariationNotFound } from "../../domain/catalog/variations/variation_not_found_error";
 import { Variation } from "../../domain/catalog/variations/variation";
+import { VariationNotFound } from "../../domain/catalog/variations/variation_not_found_error";
+import type { VariationRepository } from "../../domain/catalog/variations/variation_repository";
 import { left, right, type Either } from "../../shared/either";
 import type { ID } from "../../shared/id";
 
@@ -31,6 +31,20 @@ export class InmemVariationRepository implements VariationRepository {
             if (!variation)
                 return Promise.resolve(left(new VariationNotFound(variationId.toString())));
         }
+        return Promise.resolve(right(undefined));
+    }
+
+    verifyValues(values: string[]): Promise<Either<VariationNotFound, void>> {
+        const variations = this.records;
+        const variationValues = variations.map((v) => v.values).flat();
+        for (const value of values) {
+            if (!variationValues.includes(value)) {
+                return Promise.resolve(
+                    left(new VariationNotFound("Valor da variação não encontrado"))
+                );
+            }
+        }
+
         return Promise.resolve(right(undefined));
     }
 

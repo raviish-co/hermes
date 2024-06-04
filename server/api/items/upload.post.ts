@@ -1,8 +1,10 @@
-import { InvalidFileHeader } from "~/lib/backend/adapters/readers/invalid_file_header_error";
-import { FileNotSupported } from "~/lib/backend/adapters/readers/file_not_supported_error";
 import { FileEmpty } from "~/lib/backend/adapters/readers/file_empty_error";
-import { HttpStatus } from "~/server/api/http_status";
+import { EmptyLine } from "~/lib/backend/adapters/readers/file_empty_line_error";
+import { FileNotSupported } from "~/lib/backend/adapters/readers/file_not_supported_error";
+import { InvalidFileHeader } from "~/lib/backend/adapters/readers/invalid_file_header_error";
+import { VariationNotFound } from "~/lib/backend/domain/catalog/variations/variation_not_found_error";
 import { makeServices } from "~/lib/backend/main";
+import { HttpStatus } from "~/server/api/http_status";
 
 const { importService } = makeServices();
 
@@ -31,6 +33,20 @@ export default defineEventHandler(async (event) => {
         throw createError({
             statusCode: HttpStatus.BadRequest,
             statusMessage: "Tipo de arquivo nao suportado.",
+        });
+    }
+
+    if (voidOrErr.value instanceof EmptyLine) {
+        throw createError({
+            statusCode: HttpStatus.BadRequest,
+            statusMessage: "Arquivo contem linhas vazias.",
+        });
+    }
+
+    if (voidOrErr.value instanceof VariationNotFound) {
+        throw createError({
+            statusCode: HttpStatus.ServerError,
+            statusMessage: "Variacao nao encontrada.",
         });
     }
 

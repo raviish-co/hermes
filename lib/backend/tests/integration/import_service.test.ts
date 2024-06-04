@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { CsvReader } from "../../adapters/readers/csv_reader";
 import { FileEmpty } from "../../adapters/readers/file_empty_error";
+import { EmptyLine } from "../../adapters/readers/file_empty_line_error";
 import { FileNotSupported } from "../../adapters/readers/file_not_supported_error";
 import { InvalidFileHeader } from "../../adapters/readers/invalid_file_header_error";
 import { SequenceGenerator } from "../../adapters/sequences/sequence_generator";
@@ -14,6 +15,7 @@ import type { SectionRepository } from "../../domain/catalog/departments/section
 import { VariationNotFound } from "../../domain/catalog/variations/variation_not_found_error";
 import type { VariationRepository } from "../../domain/catalog/variations/variation_repository";
 import { InmemCategoryRepository } from "../../persistense/inmem/inmem_category_repository";
+import { InmemGoodsReceiptNoteRepository } from "../../persistense/inmem/inmem_goods_receipt_note_repository";
 import { InmemItemRepository } from "../../persistense/inmem/inmem_item_repository";
 import { InmemSectionRepository } from "../../persistense/inmem/inmem_section_repository";
 import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
@@ -21,7 +23,6 @@ import { InmemVariationRepository } from "../../persistense/inmem/inmem_variatio
 import { ID } from "../../shared/id";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
 import { VariationRepositoryStub } from "../stubs/variation_repository_stub";
-import { InmemGoodsReceiptNoteRepository } from "../../persistense/inmem/inmem_goods_receipt_note_repository";
 
 describe("Test Upload Items", async () => {
     it("Deve retornar **FileNotSupported** caso o ficheiro não seja .csv", async () => {
@@ -156,6 +157,41 @@ describe("Test Upload Items", async () => {
         expect(items[3].itemId.toString()).toEqual("RVS - 0004");
         expect(items[4].itemId.toString()).toEqual("RVS - 0005");
     });
+
+    it("Deve retornar **VariationNotFound** caso os valores da variação não sejam encontrada no repositório", async () => {
+        const { service, categoryRepository, sectionRepository } = makeService();
+        await categoryRepository.save(category);
+        await sectionRepository.save(section);
+
+        const file = new File([csvData1], "filename.csv", { type: "text/csv" });
+
+        await service.uploadItems(file);
+
+        const error = await service.uploadItems(file);
+
+        expect(error.isLeft()).toBeTruthy();
+
+        expect(error.value).toBeInstanceOf(VariationNotFound);
+    });
+
+    it("Deve retornar **EmptyLine** caso alguma linha do ficheiro seja vazia", async () => {
+        const { service, categoryRepository, sectionRepository } = makeService();
+        await categoryRepository.save(category);
+        await sectionRepository.save(section);
+
+        const data = `nome,preco,categoria,seccao,cor,marca
+        Produto 1,100.00,Categoria 1,Secao 1,Preto,Nike
+        Produto 2,200.00,Categoria 1,Secao 1,Preto,Rebock
+        ,300.00,Categoria 1,Secao 1,Preto,Adidas
+        Produto 4,400.00,Categoria 1,Secao 1,Preto,Nike`;
+
+        const file = new File([data], "filename.csv", { type: "text/csv" });
+
+        const error = await service.uploadItems(file);
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(EmptyLine);
+    });
 });
 
 describe("Import Service - Upload Items in Stock", async () => {
@@ -248,6 +284,12 @@ Produto 2,200.00,Categoria 1,Secao 1,Preto,Rebock
 Produto 3,300.00,Categoria 1,Secao 1,Preto,Adidas
 Produto 4,400.00,Categoria 1,Secao 1,Preto,Nike
 Produto 5,500.00,Categoria 1,Secao 1,Preto,Rebock`;
+
+const csvData1 = `nome,preco,categoria,seccao,cor,marca
+Produto 1,100.00,Categoria 1,Secao 1,Preto,Nike
+Produto 2,200.00,Categoria 1,Secao 1,Preto,Zara
+Produto 3,300.00,Categoria 1,Secao 1,Preto,Adidas
+Produto 4,400.00,Categoria 1,Secao 1,Preto,Nike`;
 
 const variationFormatData = `nome,preco,estado,categoria,seccao,variacoes
 Produto 1,100.00,1,some-comment,Categoria 1,Secao 1,Cor-Preto`;

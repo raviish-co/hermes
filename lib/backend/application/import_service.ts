@@ -1,5 +1,6 @@
 import { processLine, VALID_ITEM_STOCK_CSV_HEADER } from "../adapters/readers/csv_reader";
 import { FileEmpty } from "../adapters/readers/file_empty_error";
+import { EmptyLine } from "../adapters/readers/file_empty_line_error";
 import { FileNotSupported } from "../adapters/readers/file_not_supported_error";
 import { InvalidFileHeader } from "../adapters/readers/invalid_file_header_error";
 import type { Reader } from "../adapters/readers/reader";
@@ -105,7 +106,6 @@ export class ImportService {
         for (const line of lines.slice(1)) {
             const itemOrErr = await this.#buildLine(line, lines);
             if (itemOrErr.isLeft()) return left(itemOrErr.value);
-
             items.push(itemOrErr.value);
         }
 
@@ -139,8 +139,14 @@ export class ImportService {
     }
 
     async #buildLine(line: string, headers: string[]): Promise<Either<Error, Item>> {
+        const values = line.split(",").map((v) => v.trim());
+        if (values.includes("")) return left(new EmptyLine());
+
         const csvRow = processLine(line, headers);
         const variationsNames = Object.keys(csvRow.variations).map((v) =>
+            (v.charAt(0).toUpperCase() + v.slice(1)).trim()
+        );
+        const variationsValues = Object.values(csvRow.variations).map((v) =>
             (v.charAt(0).toUpperCase() + v.slice(1)).trim()
         );
 
@@ -152,6 +158,9 @@ export class ImportService {
 
         const variationsOrErr = await this.#variationRepository.findByNames(variationsNames);
         if (variationsOrErr.isLeft()) return left(variationsOrErr.value);
+
+        const voidOrErr = await this.#variationRepository.verifyValues(variationsValues);
+        if (voidOrErr.isLeft()) return left(voidOrErr.value);
 
         const variations = this.#makeItemVariationsValues(
             variationsOrErr.value,
