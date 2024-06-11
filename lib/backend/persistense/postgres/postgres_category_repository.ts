@@ -39,7 +39,11 @@ export class PostgresCategoryRepository implements CategoryRepository {
         const categoriesData = await this.#prisma.category.findMany();
         const categories: Category[] = [];
         for (const categoryData of categoriesData) {
-            categories.push(categoryFactory(categoryData, []));
+            const variationsData = await this.#prisma.variation.findMany({
+                where: { variation_id: { in: categoryData?.variations?.split(",") } },
+            });
+
+            categories.push(categoryFactory(categoryData, variationsData));
         }
 
         return categories;
