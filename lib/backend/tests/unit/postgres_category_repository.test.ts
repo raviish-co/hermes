@@ -81,4 +81,46 @@ describe("PostgresCategoryRepostory - findByName", () => {
     });
 });
 
+describe("PostgresCategoryRepostory - save", () => {
+    it("Deve salvar uma categoria com a sua descrição", async () => {
+        const categoryId = ID.random();
+        const categoryRepository = new PostgresCategoryRepository(prisma);
+
+        await categoryRepository.save(
+            new Category(categoryId, "Sapatilhas", [], "Calçados para caminhada")
+        );
+
+        const categoryOrErr = await categoryRepository.getById(categoryId);
+
+        const category = <Category>categoryOrErr.value;
+        expect(category.categoryId.equals(categoryId)).toBeTruthy();
+        expect(category.name).toBe("Sapatilhas");
+        expect(category.description).toBe("Calçados para caminhada");
+    });
+
+    it("Deve salvar uma categoria com variações", async () => {
+        const categoryId = ID.random();
+        const variationId1 = ID.random();
+        const variationId2 = ID.random();
+        const variation1 = new Variation(variationId1, "Cor", []);
+        const variation2 = new Variation(variationId2, "Tamanho", []);
+        const variationRepository = new PostgresVariationRepository(prisma);
+        const categoryRepository = new PostgresCategoryRepository(prisma);
+        await variationRepository.save(variation1);
+        await variationRepository.save(variation2);
+
+        await categoryRepository.save(
+            new Category(categoryId, "Sapatilhas", [variationId1, variationId2])
+        );
+
+        const categoryOrErr = await categoryRepository.getById(categoryId);
+
+        const category = <Category>categoryOrErr.value;
+        expect(category.categoryId.equals(categoryId)).toBeTruthy();
+        expect(category.name).toBe("Sapatilhas");
+        expect(category.variationsIds).toEqual([variationId1, variationId2]);
+        expect(category.variationsIds.length).toEqual(2);
+    });
+});
+
 const prisma = new PrismaClient();
