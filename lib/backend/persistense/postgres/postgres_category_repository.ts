@@ -32,8 +32,19 @@ export class PostgresCategoryRepository implements CategoryRepository {
         );
     }
 
-    getAll(): Promise<Category[]> {
-        throw new Error("Method not implemented.");
+    async getAll(): Promise<Category[]> {
+        const rows = await this.#prisma.category.findMany();
+        const categories: Category[] = [];
+        for (const row of rows) {
+            const category = new Category(
+                ID.fromString(row.category_id),
+                row.name,
+                row.variations?.split(",").map((v) => ID.fromString(v))
+            );
+            categories.push(category);
+        }
+
+        return categories;
     }
 
     findByName(name: string): Promise<Either<CategoryNotFound, Category>> {
