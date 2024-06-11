@@ -131,4 +131,24 @@ describe("PostgresCategoryRepostory - save", () => {
     });
 });
 
+describe("PostgresCategoryRepostory - exists", () => {
+    it("Deve retornar true se a categoria existe", async () => {
+        const name = "Roupas";
+        const categoryRepository = new PostgresCategoryRepository(prisma);
+
+        const exists = await categoryRepository.exists(name);
+
+        expect(exists).toBeTruthy();
+    });
+
+    it("Deve retornar false se a categoria não existe", async () => {
+        const name = "Calças";
+        const categoryRepository = new PostgresCategoryRepository(prisma);
+
+        const exists = await categoryRepository.exists(name);
+
+        expect(exists).toBeFalsy();
+    });
+});
+
 const prisma = new PrismaClient();
