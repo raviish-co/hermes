@@ -5,6 +5,15 @@ import type { CategoryRepository } from "../../domain/catalog/categories/categor
 import { type Either, left, right } from "../../shared/either";
 import { ID } from "../../shared/id";
 
+function categoryFactory(categoryData: any, variationsData: any[]): Category {
+    return new Category(
+        ID.fromString(categoryData?.category_id!),
+        categoryData?.name!,
+        variationsData.map((v) => ID.fromString(v.variation_id)),
+        categoryData?.description ?? undefined
+    );
+}
+
 export class PostgresCategoryRepository implements CategoryRepository {
     #prisma: PrismaClient;
 
@@ -23,25 +32,14 @@ export class PostgresCategoryRepository implements CategoryRepository {
             where: { variation_id: { in: categoryData?.variations?.split(",") } },
         });
 
-        return right(
-            new Category(
-                ID.fromString(categoryData?.category_id!),
-                categoryData?.name!,
-                variationsData.map((v) => ID.fromString(v.variation_id))
-            )
-        );
+        return right(categoryFactory(categoryData, variationsData));
     }
 
     async getAll(): Promise<Category[]> {
         const categoriesData = await this.#prisma.category.findMany();
         const categories: Category[] = [];
         for (const categoryData of categoriesData) {
-            const category = new Category(
-                ID.fromString(categoryData.category_id),
-                categoryData.name,
-                categoryData.variations?.split(",").map((v) => ID.fromString(v))
-            );
-            categories.push(category);
+            categories.push(categoryFactory(categoryData, []));
         }
 
         return categories;
@@ -58,13 +56,7 @@ export class PostgresCategoryRepository implements CategoryRepository {
             where: { variation_id: { in: categoryData?.variations?.split(",") } },
         });
 
-        return right(
-            new Category(
-                ID.fromString(categoryData?.category_id!),
-                categoryData?.name!,
-                variationsData.map((v) => ID.fromString(v.variation_id))
-            )
-        );
+        return right(categoryFactory(categoryData, variationsData));
     }
 
     async save(category: Category): Promise<void> {
@@ -72,6 +64,7 @@ export class PostgresCategoryRepository implements CategoryRepository {
             data: {
                 category_id: category.categoryId.toString(),
                 name: category.name,
+                description: category.description,
                 variations: category.variationsIds.map((v) => v.toString()).join(","),
             },
         });
