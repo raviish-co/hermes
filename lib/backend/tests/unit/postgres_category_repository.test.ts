@@ -48,4 +48,15 @@ describe("Postgres Category - getById", () => {
     });
 });
 
+describe("Postgres Category - getAll", () => {
+    it("Deve recuperar todas as categorias do repsitório", async () => {
+        const categoryRepository = new PostgresCategoryRepository(prisma);
+
+        const categories = await categoryRepository.getAll();
+
+        expect(categories.length).toBeGreaterThanOrEqual(0);
+        expect(categories[0].name).toBe("Roupas");
+    });
+});
+
 const prisma = new PrismaClient();
