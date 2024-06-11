@@ -57,6 +57,14 @@ describe("PostgresCategoryRepostory - getAll", () => {
         expect(categories.length).toBeGreaterThanOrEqual(0);
         expect(categories[0].name).toBe("Roupas");
     });
+
+    it("Deve recuperar as categorias com as suas variações", async () => {
+        const categoryRepository = new PostgresCategoryRepository(prisma);
+
+        const categories = await categoryRepository.getAll();
+        const categoriesWithVariations = categories.filter((c) => c.variationsIds.length > 0);
+        expect(categoriesWithVariations.length).toBeGreaterThan(1);
+    });
 });
 
 describe("PostgresCategoryRepostory - findByName", () => {
