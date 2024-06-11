@@ -33,13 +33,13 @@ export class PostgresCategoryRepository implements CategoryRepository {
     }
 
     async getAll(): Promise<Category[]> {
-        const rows = await this.#prisma.category.findMany();
+        const categoriesData = await this.#prisma.category.findMany();
         const categories: Category[] = [];
-        for (const row of rows) {
+        for (const categoryData of categoriesData) {
             const category = new Category(
-                ID.fromString(row.category_id),
-                row.name,
-                row.variations?.split(",").map((v) => ID.fromString(v))
+                ID.fromString(categoryData.category_id),
+                categoryData.name,
+                categoryData.variations?.split(",").map((v) => ID.fromString(v))
             );
             categories.push(category);
         }
@@ -47,8 +47,24 @@ export class PostgresCategoryRepository implements CategoryRepository {
         return categories;
     }
 
-    findByName(name: string): Promise<Either<CategoryNotFound, Category>> {
-        throw new Error("Method not implemented.");
+    async findByName(name: string): Promise<Either<CategoryNotFound, Category>> {
+        const categoryData = await this.#prisma.category.findFirst({
+            where: { name: name },
+        });
+
+        if (!categoryData) return left(new CategoryNotFound());
+
+        const variationsData = await this.#prisma.variation.findMany({
+            where: { variation_id: { in: categoryData?.variations?.split(",") } },
+        });
+
+        return right(
+            new Category(
+                ID.fromString(categoryData?.category_id!),
+                categoryData?.name!,
+                variationsData.map((v) => ID.fromString(v.variation_id))
+            )
+        );
     }
 
     async save(category: Category): Promise<void> {
