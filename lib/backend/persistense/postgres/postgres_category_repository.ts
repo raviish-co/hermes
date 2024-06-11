@@ -74,8 +74,12 @@ export class PostgresCategoryRepository implements CategoryRepository {
         });
     }
 
-    exists(name: string): Promise<boolean> {
-        throw new Error("Method not implemented.");
+    async exists(name: string): Promise<boolean> {
+        const categoryData = await this.#prisma.category.findFirst({ where: { name: name } });
+
+        if (!categoryData) return false;
+
+        return true;
     }
 
     last(): Promise<Category> {
