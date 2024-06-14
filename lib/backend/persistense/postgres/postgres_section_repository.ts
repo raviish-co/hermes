@@ -6,7 +6,7 @@ import { type Either, left, right } from "../../shared/either";
 import { ID } from "../../shared/id";
 
 function sectionFactory(sectionData: any): Section {
-    return new Section(ID.fromString(sectionData.section_id), sectionData.name, ID.random());
+    return new Section(ID.fromString(sectionData.sectionId), sectionData.name, ID.random());
 }
 
 export class PostgresSectionRepository implements SectionRepository {
@@ -32,7 +32,7 @@ export class PostgresSectionRepository implements SectionRepository {
 
     async findById(sectionId: ID): Promise<Either<SectionNotFound, void>> {
         const sectionData = await this.prisma.section.findUnique({
-            where: { section_id: sectionId.toString() },
+            where: { sectionId: sectionId.toString() },
         });
 
         if (!sectionData) return left(new SectionNotFound(sectionId.toString()));
@@ -43,7 +43,7 @@ export class PostgresSectionRepository implements SectionRepository {
     async save(section: Section): Promise<void> {
         await this.prisma.section.create({
             data: {
-                section_id: section.sectionId.toString(),
+                sectionId: section.sectionId.toString(),
                 name: section.name,
             },
         });
