@@ -10,7 +10,7 @@ describe("PostgresSectionRepository", () => {
         const prisma = {
             section: {
                 create: async (_args: object) => {
-                    return { section_id: "1", name: "T-shirts" };
+                    return { sectionId: "1", name: "T-shirts" };
                 },
             },
         };
@@ -25,7 +25,7 @@ describe("PostgresSectionRepository", () => {
         expect(spy).toHaveBeenCalledTimes(1);
         expect(spy).toHaveBeenCalledWith({
             data: {
-                section_id: section.sectionId.toString(),
+                sectionId: section.sectionId.toString(),
                 name: section.name,
             },
         });
@@ -47,7 +47,7 @@ describe("PostgresSectionRepository", () => {
         const prisma = {
             section: {
                 findMany: async () => {
-                    return [{ section_id: "1", name: "T-shirts" }];
+                    return [{ sectionId: "1", name: "T-shirts" }];
                 },
             },
         };
@@ -65,7 +65,7 @@ describe("PostgresSectionRepository", () => {
         const prisma = {
             section: {
                 findFirst: async () => {
-                    return { section_id: "1", name: "T-shirts" };
+                    return { sectionId: "1", name: "T-shirts" };
                 },
             },
         };
@@ -85,7 +85,7 @@ describe("PostgresSectionRepository", () => {
         const prisma = {
             section: {
                 findFirst: async () => {
-                    return { section_id: "1", name: "T-shirts" };
+                    return { sectionId: "1", name: "T-shirts" };
                 },
             },
         };
@@ -122,7 +122,7 @@ describe("PostgresSectionRepository", () => {
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledTimes(1);
         expect(spy).toHaveBeenCalledWith({
-            where: { section_id: "1" },
+            where: { sectionId: "1" },
         });
     });
 
