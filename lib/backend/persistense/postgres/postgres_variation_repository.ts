@@ -27,7 +27,7 @@ export class PostgresVariationRepository implements VariationRepository {
     async save(variation: Variation): Promise<void> {
         await this.#prisma.variation.create({
             data: {
-                variation_id: variation.variationId.toString(),
+                variationId: variation.variationId.toString(),
                 name: variation.name,
             },
         });
