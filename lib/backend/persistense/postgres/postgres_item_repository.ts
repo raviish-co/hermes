@@ -49,6 +49,8 @@ export class PostgresItemRepository implements ItemRepository {
                 price: item.price.value,
                 categoryId: item.categoryId?.toString(),
                 sectionId: item.sectionId?.toString(),
+                tags: item.tags?.join(","),
+                fulltext: item.fulltext,
             },
         });
 
