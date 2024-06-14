@@ -2,8 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { Section } from "../../domain/catalog/departments/section";
 import { SectionNotFound } from "../../domain/catalog/departments/section_not_found_error";
+import { PostgresSectionRepository } from "../../persistense/postgres/postgres_section_repository";
 import { ID } from "../../shared/id";
-import { PostgresSectionRepository } from "./postgres_section_repository";
 
 describe("PostgresSectionRepository", () => {
     it("Deve salva uma secção no repositório", async () => {
