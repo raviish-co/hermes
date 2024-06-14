@@ -5,7 +5,7 @@ import type { ID } from "~/lib/backend/shared/id";
 
 export interface SectionRepository {
     getAll(): Promise<Section[]>;
-    findByName(name: string): Promise<Either<SectionNotFound, Section>>;
     findById(sectionId: ID): Promise<Either<SectionNotFound, void>>;
+    findByName(name: string): Promise<Either<SectionNotFound, Section>>;
     save(section: Section): Promise<void>;
 }
