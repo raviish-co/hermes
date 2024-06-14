@@ -5,13 +5,20 @@ import type { CategoryRepository } from "../../domain/catalog/categories/categor
 import { type Either, left, right } from "../../shared/either";
 import { ID } from "../../shared/id";
 
-function categoryFactory(categoryData: any, variationsData: any[]): Category {
-    return new Category(
-        ID.fromString(categoryData?.category_id!),
-        categoryData?.name!,
-        variationsData.map((v) => ID.fromString(v.variation_id)),
-        categoryData?.description ?? undefined
-    );
+function categoryFactory(categoryData: any): Category {
+    const category = new Category(ID.fromString(categoryData.categoryId), categoryData.name);
+
+    if (!categoryData.variations) {
+        category.description = categoryData.description;
+        return category;
+    }
+
+    category.variationsIds = categoryData.variations
+        .split(",")
+        .map((v: string) => ID.fromString(v));
+    category.description = categoryData.description;
+
+    return category;
 }
 
 export class PostgresCategoryRepository implements CategoryRepository {
@@ -23,30 +30,17 @@ export class PostgresCategoryRepository implements CategoryRepository {
 
     async getById(categoryId: ID): Promise<Either<CategoryNotFound, Category>> {
         const categoryData = await this.#prisma.category.findUnique({
-            where: { category_id: categoryId.toString() },
+            where: { categoryId: categoryId.toString() },
         });
 
         if (!categoryData) return left(new CategoryNotFound());
 
-        const variationsData = await this.#prisma.variation.findMany({
-            where: { variation_id: { in: categoryData?.variations?.split(",") } },
-        });
-
-        return right(categoryFactory(categoryData, variationsData));
+        return right(categoryFactory(categoryData));
     }
 
     async getAll(): Promise<Category[]> {
         const categoriesData = await this.#prisma.category.findMany();
-        const categories: Category[] = [];
-        for (const categoryData of categoriesData) {
-            const variationsData = await this.#prisma.variation.findMany({
-                where: { variation_id: { in: categoryData?.variations?.split(",") } },
-            });
-
-            categories.push(categoryFactory(categoryData, variationsData));
-        }
-
-        return categories;
+        return categoriesData.map(categoryFactory);
     }
 
     async findByName(name: string): Promise<Either<CategoryNotFound, Category>> {
@@ -56,17 +50,13 @@ export class PostgresCategoryRepository implements CategoryRepository {
 
         if (!categoryData) return left(new CategoryNotFound());
 
-        const variationsData = await this.#prisma.variation.findMany({
-            where: { variation_id: { in: categoryData?.variations?.split(",") } },
-        });
-
-        return right(categoryFactory(categoryData, variationsData));
+        return right(categoryFactory(categoryData));
     }
 
     async save(category: Category): Promise<void> {
         await this.#prisma.category.create({
             data: {
-                category_id: category.categoryId.toString(),
+                categoryId: category.categoryId.toString(),
                 name: category.name,
                 description: category.description,
                 variations: category.variationsIds.map((v) => v.toString()).join(","),
