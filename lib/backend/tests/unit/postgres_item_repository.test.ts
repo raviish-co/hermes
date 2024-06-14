@@ -184,7 +184,48 @@ describe("PostgresItemRepository - save", () => {
     });
 });
 
+describe("PostgresItemRepository - getAll", () => {
+    it("Deve retornar todos os artigos", async () => {
+        const prisma = { product: { findMany: async (_args: object) => _products } };
+        const itemRepository = new PostgresItemRepository(prisma as PrismaClient);
+        const spy = vi.spyOn(prisma.product, "findMany");
+
+        const items = await itemRepository.getAll();
+
+        expect(spy).toBeCalled();
+        expect(spy).toBeCalledTimes(1);
+        expect(spy).toBeCalledWith({
+            include: { variations: true },
+        });
+
+        expect(items.length).toEqual(2);
+        expect(items[0].itemId.toString()).toEqual("1");
+        expect(items[0].name).toEqual("Artigo 1");
+        expect(items[0].price.value).toEqual(10);
+
+        expect(items[1].categoryId?.toString()).toEqual("1");
+        expect(items[1].sectionId?.toString()).toEqual("1");
+        expect(items[1].tags).toEqual(["tag1", "tag2"]);
+    });
+});
+
 const prisma = {
     product: { create: async (_args: object) => ({}) },
     productVariations: { createMany: async (_args: object) => ({}) },
 };
+
+const _products = [
+    {
+        productId: "1",
+        name: "Artigo 1",
+        price: 10,
+    },
+    {
+        productId: "2",
+        name: "Artigo 2",
+        price: 20,
+        categoryId: "1",
+        sectionId: "1",
+        tags: "tag1,tag2",
+    },
+];

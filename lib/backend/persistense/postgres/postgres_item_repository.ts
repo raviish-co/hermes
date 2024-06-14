@@ -5,6 +5,19 @@ import type { ItemRepository } from "../../domain/catalog/items/item_repository"
 import type { Either } from "../../shared/either";
 import { ID } from "../../shared/id";
 import type { Pagination } from "../../shared/pagination";
+import { Decimal } from "../../shared/decimal";
+
+function itemFactory(itemData: any): Item {
+    return new Item(
+        ID.fromString(itemData.productId),
+        itemData.name,
+        new Decimal(itemData.price),
+        itemData.categoryId ? ID.fromString(itemData.categoryId) : undefined,
+        itemData.sectionId ? ID.fromString(itemData.sectionId) : undefined,
+        {},
+        itemData.tags ? itemData.tags.split(",") : undefined
+    );
+}
 
 export class PostgresItemRepository implements ItemRepository {
     #prisma: PrismaClient;
@@ -13,8 +26,9 @@ export class PostgresItemRepository implements ItemRepository {
         this.#prisma = prisma;
     }
 
-    getAll(): Promise<Item[]> {
-        throw new Error("Method not implemented.");
+    async getAll(): Promise<Item[]> {
+        const itemsData = await this.#prisma.product.findMany({ include: { variations: true } });
+        return itemsData.map(itemFactory);
     }
 
     findAll(itemsIds: ID[]): Promise<Either<ItemNotFound, Item[]>> {
