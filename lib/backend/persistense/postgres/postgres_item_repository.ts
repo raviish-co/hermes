@@ -14,9 +14,20 @@ function itemFactory(itemData: any): Item {
         new Decimal(itemData.price),
         itemData.categoryId ? ID.fromString(itemData.categoryId) : undefined,
         itemData.sectionId ? ID.fromString(itemData.sectionId) : undefined,
-        {},
+        extractVariationValues(itemData),
         itemData.tags ? itemData.tags.split(",") : undefined
     );
+}
+
+function extractVariationValues(itemData: any) {
+    let variationsValues: Record<string, string> = {};
+
+    if (itemData.variations) {
+        for (const v of itemData.variations) {
+            variationsValues[v.variationId] = v.value;
+        }
+    }
+    return variationsValues;
 }
 
 export class PostgresItemRepository implements ItemRepository {
@@ -71,9 +82,9 @@ export class PostgresItemRepository implements ItemRepository {
         if (!item.variations) return;
 
         await this.#prisma.productVariations.createMany({
-            data: Object.entries(item.variations).map(([name, value]) => ({
+            data: Object.entries(item.variations).map(([variationId, value]) => ({
                 productId: item.itemId.toString(),
-                name,
+                variationId,
                 value,
             })),
         });

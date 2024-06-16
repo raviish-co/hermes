@@ -8,7 +8,7 @@ import { ID } from "../../shared/id";
 describe("PostgresItemRepository - save", () => {
     it("Deve salvar um artigo no repositorio", async () => {
         const item = new Item(ID.random(), "Artigo 2", new Decimal(10));
-        const itemRepository = new PostgresItemRepository(prisma as PrismaClient);
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
         const spy = vi.spyOn(prisma.product, "create");
 
         await itemRepository.save(item);
@@ -26,7 +26,7 @@ describe("PostgresItemRepository - save", () => {
     });
 
     it("Deve salvar um artigo com a sua categoria", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as PrismaClient);
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
         const item = new Item(ID.random(), "Artigo 1", new Decimal(10), ID.fromString("1"));
         const spy = vi.spyOn(prisma.product, "create");
 
@@ -46,7 +46,7 @@ describe("PostgresItemRepository - save", () => {
     });
 
     it("Deve salvar um artigo com a sua secção", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as PrismaClient);
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
         const item = new Item(
             ID.random(),
             "Artigo 1",
@@ -72,7 +72,7 @@ describe("PostgresItemRepository - save", () => {
     });
 
     it("Deve salvar um artigo com a sua categoria e secção", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as PrismaClient);
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
         const item = new Item(
             ID.random(),
             "Artigo 1",
@@ -100,14 +100,14 @@ describe("PostgresItemRepository - save", () => {
 
     it("Deve salvar um artigo com as suas variações", async () => {
         const spy = vi.spyOn(prisma.productVariations, "createMany");
-        const itemRepository = new PostgresItemRepository(prisma as PrismaClient);
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
         const item = new Item(
             ID.fromString("1"),
             "Artigo 1",
             new Decimal(10),
             ID.random(),
             ID.random(),
-            { Cor: "Azul" }
+            { "1": "Cor: Azul" }
         );
 
         await itemRepository.save(item);
@@ -115,8 +115,8 @@ describe("PostgresItemRepository - save", () => {
         expect(spy).toBeCalled();
         expect(spy).toBeCalledTimes(1);
         expect(spy).toBeCalledWith({
-            data: Object.entries(item.variations ?? {}).map(([name, value]) => ({
-                name,
+            data: Object.entries(item.variations ?? {}).map(([variationId, value]) => ({
+                variationId,
                 value,
                 productId: item.itemId.toString(),
             })),
@@ -134,7 +134,7 @@ describe("PostgresItemRepository - save", () => {
             ["tag1", "tag2"]
         );
         const spy = vi.spyOn(prisma.product, "create");
-        const itemRepository = new PostgresItemRepository(prisma as PrismaClient);
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
 
         await itemRepository.save(item);
 
@@ -164,7 +164,7 @@ describe("PostgresItemRepository - save", () => {
             ["tag1", "tag2"]
         );
         const spy = vi.spyOn(prisma.product, "create");
-        const itemRepository = new PostgresItemRepository(prisma as PrismaClient);
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
 
         await itemRepository.save(item);
 
@@ -185,18 +185,23 @@ describe("PostgresItemRepository - save", () => {
 });
 
 describe("PostgresItemRepository - getAll", () => {
-    it("Deve retornar todos os artigos", async () => {
-        const prisma = { product: { findMany: async (_args: object) => _products } };
-        const itemRepository = new PostgresItemRepository(prisma as PrismaClient);
+    it("Deve recuperar os artigos no repositório", async () => {
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
         const spy = vi.spyOn(prisma.product, "findMany");
 
-        const items = await itemRepository.getAll();
+        await itemRepository.getAll();
 
         expect(spy).toBeCalled();
         expect(spy).toBeCalledTimes(1);
         expect(spy).toBeCalledWith({
             include: { variations: true },
         });
+    });
+
+    it("Deve retornar os artigos encontrados no repositório", async () => {
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+
+        const items = await itemRepository.getAll();
 
         expect(items.length).toEqual(2);
         expect(items[0].itemId.toString()).toEqual("1");
@@ -207,11 +212,25 @@ describe("PostgresItemRepository - getAll", () => {
         expect(items[1].sectionId?.toString()).toEqual("1");
         expect(items[1].tags).toEqual(["tag1", "tag2"]);
     });
+
+    it("Deve retornar os artigos com as suas variações", async () => {
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+
+        const items = await itemRepository.getAll();
+
+        expect(items[0].variations).toEqual({});
+        expect(items[1].variations).toEqual({ "1": "Cor: Azul", "2": "Tamanho: M" });
+    });
 });
 
 const prisma = {
-    product: { create: async (_args: object) => ({}) },
-    productVariations: { createMany: async (_args: object) => ({}) },
+    product: {
+        create: async (_args: object) => ({}),
+        findMany: async (_args: object) => _products,
+    },
+    productVariations: {
+        createMany: async (_args: object) => ({}),
+    },
 };
 
 const _products = [
@@ -227,5 +246,17 @@ const _products = [
         categoryId: "1",
         sectionId: "1",
         tags: "tag1,tag2",
+        variations: [
+            {
+                productId: "2",
+                variationId: "1",
+                value: "Cor: Azul",
+            },
+            {
+                productId: "2",
+                variationId: "2",
+                value: "Tamanho: M",
+            },
+        ],
     },
 ];

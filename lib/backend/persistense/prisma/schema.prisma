@@ -50,7 +50,7 @@ model Product {
 
 model ProductVariations {
   id Int @id @default(autoincrement())
-  name String
+  variationId String @map("variation_id")
   value String
   product Product @relation(fields: [productId], references: [productId])
   productId String @map("product_id")
