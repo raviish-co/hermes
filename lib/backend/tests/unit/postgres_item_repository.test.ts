@@ -4,6 +4,7 @@ import { Item } from "../../domain/catalog/items/item";
 import { PostgresItemRepository } from "../../persistense/postgres/postgres_item_repository";
 import { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
+import { ItemNotFound } from "../../domain/catalog/items/item_not_found_error";
 
 describe("PostgresItemRepository - save", () => {
     it("Deve salvar um artigo no repositorio", async () => {
@@ -220,6 +221,48 @@ describe("PostgresItemRepository - getAll", () => {
 
         expect(items[0].variations).toEqual({});
         expect(items[1].variations).toEqual({ "1": "Cor: Azul", "2": "Tamanho: M" });
+    });
+});
+
+describe("PostgresItemRepository - findAll", () => {
+    it("Deve encontrar os artigos no repositório", async () => {
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const spy = vi.spyOn(prisma.product, "findMany");
+
+        await itemRepository.findAll([ID.fromString("1"), ID.fromString("2")]);
+
+        expect(spy).toBeCalled();
+        expect(spy).toBeCalledTimes(1);
+        expect(spy).toBeCalledWith({
+            where: {
+                productId: { in: ["1", "2"] },
+            },
+            include: { variations: true },
+        });
+    });
+
+    it("Deve recuperar os artigos no repositório", async () => {
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+
+        const itemsOrErr = await itemRepository.findAll([ID.fromString("1"), ID.fromString("2")]);
+
+        const items = <Item[]>itemsOrErr.value;
+
+        expect(itemsOrErr.isRight()).toBe(true);
+        expect(items.length).toEqual(2);
+    });
+
+    it("Deve retornar **ItemNotFound** se não encontrar algum artigo", async () => {
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+
+        const itemsOrErr = await itemRepository.findAll([
+            ID.fromString("1"),
+            ID.fromString("2"),
+            ID.fromString("3"),
+        ]);
+
+        expect(itemsOrErr.isLeft()).toBe(true);
+        expect(itemsOrErr.value).toBeInstanceOf(ItemNotFound);
     });
 });
 
