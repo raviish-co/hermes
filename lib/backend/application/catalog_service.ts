@@ -47,7 +47,7 @@ export class CatalogService {
     }
 
     async listItems(pageToken: number = 1, perPage: number = 12): Promise<Pagination<Item>> {
-        return await this.#itemRepository.list(pageToken, perPage);
+        return await this.#itemRepository.getAll({ pageToken, perPage });
     }
 
     async listCategories(): Promise<Category[]> {

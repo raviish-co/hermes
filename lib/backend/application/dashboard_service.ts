@@ -48,7 +48,7 @@ export class DashboardService {
     async #calculateInventoryValue(): Promise<Decimal> {
         let total = new Decimal(0);
 
-        const items = await this.#itemRepository.getAll();
+        const { result: items } = await this.#itemRepository.getAll();
 
         if (items.length === 0) return total;
 

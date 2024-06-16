@@ -4,3 +4,8 @@ export type Pagination<T> = {
     pageToken: number;
     total: number;
 };
+
+export type PaginatorOptions = {
+    pageToken: number;
+    perPage: number;
+};

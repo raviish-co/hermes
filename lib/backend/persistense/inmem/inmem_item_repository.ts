@@ -1,9 +1,9 @@
-import type { ItemRepository as ItemRepository } from "../../domain/catalog/items/item_repository";
-import { ItemNotFound } from "../../domain/catalog/items/item_not_found_error";
-import { type Either, left, right } from "../../shared/either";
-import type { Pagination } from "../../shared/pagination";
 import { Item } from "../../domain/catalog/items/item";
+import { ItemNotFound } from "../../domain/catalog/items/item_not_found_error";
+import type { ItemRepository } from "../../domain/catalog/items/item_repository";
+import { type Either, left, right } from "../../shared/either";
 import { ID } from "../../shared/id";
+import type { Pagination, PaginatorOptions } from "../../shared/pagination";
 
 export class InmemItemRepository implements ItemRepository {
     #items: Record<string, Item> = {};
@@ -16,8 +16,30 @@ export class InmemItemRepository implements ItemRepository {
         });
     }
 
-    async getAll(): Promise<Item[]> {
-        return this.records;
+    async getAll(opts?: PaginatorOptions): Promise<Pagination<Item>> {
+        if (!opts) {
+            return {
+                result: this.records,
+                perPage: 0,
+                pageToken: 0,
+                total: 0,
+            };
+        }
+
+        const startIndex = (opts.pageToken - 1) * opts.perPage;
+
+        const endIndex = startIndex + opts.perPage;
+
+        const result = this.records.slice(startIndex, endIndex);
+
+        const total = Math.ceil(this.records.length / opts.perPage);
+
+        return {
+            pageToken: opts.pageToken,
+            perPage: opts.perPage,
+            total,
+            result,
+        };
     }
 
     async getById(itemId: ID): Promise<Either<ItemNotFound, Item>> {
@@ -39,23 +61,6 @@ export class InmemItemRepository implements ItemRepository {
             items.push(filtered);
         }
         return right(items);
-    }
-
-    async list(pageToken: number, perPage: number): Promise<Pagination<Item>> {
-        const startIndex = (pageToken - 1) * perPage;
-
-        const endIndex = startIndex + perPage;
-
-        const result = this.records.slice(startIndex, endIndex);
-
-        const total = Math.ceil(this.records.length / perPage);
-
-        return {
-            pageToken,
-            perPage,
-            total,
-            result,
-        };
     }
 
     async search(query: string, pageToken: number, perPage: number): Promise<Pagination<Item>> {

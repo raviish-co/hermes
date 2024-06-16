@@ -85,7 +85,10 @@ describe("Test Upload Items", async () => {
 
         await service.uploadItems(file);
 
-        const { result: items } = await itemRepository.list(1, 12);
+        const { result: items } = await itemRepository.getAll({
+            pageToken: 1,
+            perPage: 12,
+        });
 
         expect(items.length).toBe(5);
     });
@@ -149,7 +152,10 @@ describe("Test Upload Items", async () => {
 
         await service.uploadItems(file);
 
-        const { result: items } = await itemRepository.list(1, 12);
+        const { result: items } = await itemRepository.getAll({
+            pageToken: 1,
+            perPage: 12,
+        });
 
         expect(items[0].itemId.toString()).toEqual("RVS - 0001");
         expect(items[1].itemId.toString()).toEqual("RVS - 0002");
