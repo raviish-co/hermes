@@ -1,5 +1,5 @@
 export class ItemNotFound extends Error {
-    constructor(itemId: string) {
-        super(`Item ${itemId} not found`);
+    constructor() {
+        super("Item not found");
     }
 }
