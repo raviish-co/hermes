@@ -55,8 +55,15 @@ export class PostgresItemRepository implements ItemRepository {
         return right(items);
     }
 
-    getById(itemId: ID): Promise<Either<ItemNotFound, Item>> {
-        throw new Error("Method not implemented.");
+    async getById(itemId: ID): Promise<Either<ItemNotFound, Item>> {
+        const itemData = await this.#prisma.product.findUnique({
+            where: { productId: itemId.toString() },
+            include: { variations: true },
+        });
+
+        if (!itemData) return left(new ItemNotFound());
+
+        return right(itemFactory(itemData));
     }
 
     list(pageToken: number, perPage: number): Promise<Pagination<Item>> {
