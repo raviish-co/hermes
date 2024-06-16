@@ -1,10 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { Item } from "../../domain/catalog/items/item";
+import { ItemNotFound } from "../../domain/catalog/items/item_not_found_error";
 import { PostgresItemRepository } from "../../persistense/postgres/postgres_item_repository";
 import { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
-import { ItemNotFound } from "../../domain/catalog/items/item_not_found_error";
 
 describe("PostgresItemRepository - save", () => {
     it("Deve salvar um artigo no repositorio", async () => {
