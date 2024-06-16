@@ -2,10 +2,10 @@ import type { PrismaClient } from "@prisma/client";
 import { Item } from "../../domain/catalog/items/item";
 import { ItemNotFound } from "../../domain/catalog/items/item_not_found_error";
 import type { ItemRepository } from "../../domain/catalog/items/item_repository";
-import type { Either } from "../../shared/either";
+import { Decimal } from "../../shared/decimal";
+import { left, right, type Either } from "../../shared/either";
 import { ID } from "../../shared/id";
 import type { Pagination } from "../../shared/pagination";
-import { Decimal } from "../../shared/decimal";
 
 function itemFactory(itemData: any): Item {
     return new Item(
@@ -42,8 +42,17 @@ export class PostgresItemRepository implements ItemRepository {
         return itemsData.map(itemFactory);
     }
 
-    findAll(itemsIds: ID[]): Promise<Either<ItemNotFound, Item[]>> {
-        throw new Error("Method not implemented.");
+    async findAll(itemsIds: ID[]): Promise<Either<ItemNotFound, Item[]>> {
+        const itemData = await this.#prisma.product.findMany({
+            include: { variations: true },
+            where: { productId: { in: itemsIds.map((i) => i.toString()) } },
+        });
+
+        const items = itemData.map(itemFactory);
+
+        if (items.length !== itemsIds.length) return left(new ItemNotFound());
+
+        return right(items);
     }
 
     getById(itemId: ID): Promise<Either<ItemNotFound, Item>> {
