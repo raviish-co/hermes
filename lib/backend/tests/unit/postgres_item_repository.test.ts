@@ -266,10 +266,56 @@ describe("PostgresItemRepository - findAll", () => {
     });
 });
 
+describe("PostgresItemRepository - getById", () => {
+    it("Deve encontrar o artigo pelo seu ID", async () => {
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const spy = vi.spyOn(prisma.product, "findUnique");
+
+        await itemRepository.getById(ID.fromString("1"));
+
+        expect(spy).toBeCalled();
+        expect(spy).toBeCalledTimes(1);
+        expect(spy).toBeCalledWith({
+            where: {
+                productId: "1",
+            },
+            include: { variations: true },
+        });
+    });
+
+    it("Deve retornar o artigo encontrado", async () => {
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+
+        const itemOrErr = await itemRepository.getById(ID.fromString("1"));
+
+        const item = <Item>itemOrErr.value;
+
+        expect(itemOrErr.isRight()).toBe(true);
+        expect(item.itemId.toString()).toEqual("1");
+        expect(item.name).toEqual("Artigo 1");
+        expect(item.price.value).toEqual(10);
+    });
+
+    it("Deve retornar **ItemNotFound** se não encontrar o artigo", async () => {
+        const prisma = {
+            product: {
+                findUnique: async (_args: object) => null,
+            },
+        };
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+
+        const itemOrErr = await itemRepository.getById(ID.fromString("3"));
+
+        expect(itemOrErr.isLeft()).toBe(true);
+        expect(itemOrErr.value).toBeInstanceOf(ItemNotFound);
+    });
+});
+
 const prisma = {
     product: {
         create: async (_args: object) => ({}),
         findMany: async (_args: object) => _products,
+        findUnique: async (_args: object) => _products[0],
     },
     productVariations: {
         createMany: async (_args: object) => ({}),
