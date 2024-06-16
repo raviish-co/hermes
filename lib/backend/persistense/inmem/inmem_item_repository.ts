@@ -11,9 +11,7 @@ export class InmemItemRepository implements ItemRepository {
     constructor(items?: Item[]) {
         if (!items) return;
 
-        items.forEach((item) => {
-            this.#items[item.itemId.toString()] = item;
-        });
+        items.forEach(this.save.bind(this));
     }
 
     async getAll(opts?: PaginatorOptions): Promise<Pagination<Item>> {
@@ -63,7 +61,7 @@ export class InmemItemRepository implements ItemRepository {
         return right(items);
     }
 
-    async search(query: string, pageToken: number, perPage: number): Promise<Pagination<Item>> {
+    async search(query: string, opts: PaginatorOptions): Promise<Pagination<Item>> {
         const items = this.records.filter((i) => {
             return (
                 i.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -72,17 +70,17 @@ export class InmemItemRepository implements ItemRepository {
             );
         });
 
-        const startIndex = (pageToken - 1) * perPage;
+        const startIndex = (opts.pageToken - 1) * opts.perPage;
 
-        const endIndex = startIndex + perPage;
+        const endIndex = startIndex + opts.perPage;
 
         const result = items.slice(startIndex, endIndex);
 
-        const total = Math.ceil(items.length / perPage);
+        const total = Math.ceil(items.length / opts.perPage);
 
         return {
-            pageToken,
-            perPage,
+            pageToken: opts.pageToken,
+            perPage: opts.perPage,
             total,
             result,
         };

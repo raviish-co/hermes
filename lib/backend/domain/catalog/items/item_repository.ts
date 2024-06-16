@@ -8,7 +8,7 @@ export interface ItemRepository {
     getAll(opts?: PaginatorOptions): Promise<Pagination<Item>>;
     findAll(itemsIds: ID[]): Promise<Either<ItemNotFound, Item[]>>;
     getById(itemId: ID): Promise<Either<ItemNotFound, Item>>;
-    search(query: string, pageToken: number, perPage: number): Promise<Pagination<Item>>;
+    search(query: string, opts: PaginatorOptions): Promise<Pagination<Item>>;
     updateAll(items: Item[]): Promise<void>;
     update(item: Item): Promise<void>;
     save(item: Item): Promise<void>;

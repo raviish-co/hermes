@@ -5,7 +5,7 @@ import type { ItemRepository } from "../../domain/catalog/items/item_repository"
 import { Decimal } from "../../shared/decimal";
 import { left, right, type Either } from "../../shared/either";
 import { ID } from "../../shared/id";
-import type { Pagination } from "../../shared/pagination";
+import type { Pagination, PaginatorOptions } from "../../shared/pagination";
 
 function itemFactory(itemData: any): Item {
     return new Item(
@@ -37,9 +37,14 @@ export class PostgresItemRepository implements ItemRepository {
         this.#prisma = prisma;
     }
 
-    async getAll(): Promise<Item[]> {
+    async getAll(opts?: PaginatorOptions): Promise<Pagination<Item>> {
         const itemsData = await this.#prisma.product.findMany({ include: { variations: true } });
-        return itemsData.map(itemFactory);
+        return {
+            result: itemsData.map(itemFactory),
+            pageToken: 0,
+            perPage: 0,
+            total: 0,
+        };
     }
 
     async findAll(itemsIds: ID[]): Promise<Either<ItemNotFound, Item[]>> {
@@ -66,12 +71,29 @@ export class PostgresItemRepository implements ItemRepository {
         return right(itemFactory(itemData));
     }
 
-    list(pageToken: number, perPage: number): Promise<Pagination<Item>> {
-        throw new Error("Method not implemented.");
-    }
+    async search(query: string, opts: PaginatorOptions): Promise<Pagination<Item>> {
+        const skip = (opts.pageToken - 1) * opts.perPage;
+        const itemsData = await this.#prisma.product.findMany({
+            include: { variations: true },
+            where: {
+                OR: [
+                    { productId: { contains: query } },
+                    { name: { contains: query } },
+                    { fulltext: { contains: query } },
+                ],
+            },
+            skip,
+            take: opts.perPage,
+        });
 
-    search(query: string, pageToken: number, perPage: number): Promise<Pagination<Item>> {
-        throw new Error("Method not implemented.");
+        const items = itemsData.map(itemFactory);
+
+        return {
+            result: items,
+            pageToken: opts.pageToken,
+            perPage: opts.perPage,
+            total: items.length,
+        };
     }
 
     updateAll(items: Item[]): Promise<void> {

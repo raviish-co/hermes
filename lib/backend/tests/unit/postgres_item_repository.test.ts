@@ -202,7 +202,7 @@ describe("PostgresItemRepository - getAll", () => {
     it("Deve retornar os artigos encontrados no repositório", async () => {
         const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
 
-        const items = await itemRepository.getAll();
+        const { result: items } = await itemRepository.getAll();
 
         expect(items.length).toEqual(2);
         expect(items[0].itemId.toString()).toEqual("1");
@@ -217,7 +217,7 @@ describe("PostgresItemRepository - getAll", () => {
     it("Deve retornar os artigos com as suas variações", async () => {
         const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
 
-        const items = await itemRepository.getAll();
+        const { result: items } = await itemRepository.getAll();
 
         expect(items[0].variations).toEqual({});
         expect(items[1].variations).toEqual({ "1": "Cor: Azul", "2": "Tamanho: M" });
@@ -308,6 +308,66 @@ describe("PostgresItemRepository - getById", () => {
 
         expect(itemOrErr.isLeft()).toBe(true);
         expect(itemOrErr.value).toBeInstanceOf(ItemNotFound);
+    });
+});
+
+describe("PostgresItemRepository - search", () => {
+    it("Deve pesquisar os artigos pelo nome, id ou pelo fulltext no repositório", async () => {
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const spy = vi.spyOn(prisma.product, "findMany");
+
+        await itemRepository.search("Artigo 1", { pageToken: 1, perPage: 10 });
+
+        expect(spy).toBeCalled();
+        expect(spy).toBeCalledTimes(1);
+        expect(spy).toBeCalledWith({
+            where: {
+                OR: [
+                    { productId: { contains: "Artigo 1" } },
+                    { name: { contains: "Artigo 1" } },
+                    { fulltext: { contains: "Artigo 1" } },
+                ],
+            },
+            include: { variations: true },
+            skip: 0,
+            take: 10,
+        });
+    });
+
+    it("Deve pesquisar os artigos pelo nome, id ou pelo fulltext em minúsculas", async () => {
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const spy = vi.spyOn(prisma.product, "findMany");
+
+        await itemRepository.search("artigo 1", { pageToken: 1, perPage: 10 });
+
+        expect(spy).toBeCalled();
+        expect(spy).toBeCalledTimes(1);
+        expect(spy).toBeCalledWith({
+            where: {
+                OR: [
+                    { productId: { contains: "artigo 1" } },
+                    { name: { contains: "artigo 1" } },
+                    { fulltext: { contains: "artigo 1" } },
+                ],
+            },
+            include: { variations: true },
+            skip: 0,
+            take: 10,
+        });
+    });
+
+    it("Deve retornar o resultado da pesquisa no repositório páginado", async () => {
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+
+        const {
+            result: items,
+            pageToken,
+            perPage,
+        } = await itemRepository.search("Artigo 1", { pageToken: 1, perPage: 10 });
+
+        expect(items.length).toEqual(2);
+        expect(pageToken).toEqual(1);
+        expect(perPage).toEqual(10);
     });
 });
 

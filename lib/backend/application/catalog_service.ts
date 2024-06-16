@@ -67,7 +67,7 @@ export class CatalogService {
         pageToken: number = 1,
         perPage: number = 12
     ): Promise<Pagination<Item>> {
-        return await this.#itemRepository.search(query, pageToken, perPage);
+        return await this.#itemRepository.search(query, { pageToken, perPage });
     }
 
     async getItem(itemId: string): Promise<Either<ItemNotFound, Item>> {
