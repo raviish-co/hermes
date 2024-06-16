@@ -16,17 +16,17 @@ export class InmemItemRepository implements ItemRepository {
         });
     }
 
-    getAll(): Promise<Item[]> {
-        return Promise.resolve(this.records);
+    async getAll(): Promise<Item[]> {
+        return this.records;
     }
 
-    getById(itemId: ID): Promise<Either<ItemNotFound, Item>> {
+    async getById(itemId: ID): Promise<Either<ItemNotFound, Item>> {
         const item = this.records.find((item) => item.itemId.equals(itemId));
-        if (!item) return Promise.resolve(left(new ItemNotFound(itemId.toString())));
-        return Promise.resolve(right(item));
+        if (!item) return left(new ItemNotFound());
+        return right(item);
     }
 
-    findAll(queries: ID[]): Promise<Either<ItemNotFound, Item[]>> {
+    async findAll(queries: ID[]): Promise<Either<ItemNotFound, Item[]>> {
         const items: Item[] = [];
 
         for (const query of queries) {
@@ -34,14 +34,14 @@ export class InmemItemRepository implements ItemRepository {
                 (item) => item.itemId.toString() === query.toString()
             );
 
-            if (!filtered) return Promise.resolve(left(new ItemNotFound(query.toString())));
+            if (!filtered) return left(new ItemNotFound());
 
             items.push(filtered);
         }
-        return Promise.resolve(right(items));
+        return right(items);
     }
 
-    list(pageToken: number, perPage: number): Promise<Pagination<Item>> {
+    async list(pageToken: number, perPage: number): Promise<Pagination<Item>> {
         const startIndex = (pageToken - 1) * perPage;
 
         const endIndex = startIndex + perPage;
@@ -50,15 +50,15 @@ export class InmemItemRepository implements ItemRepository {
 
         const total = Math.ceil(this.records.length / perPage);
 
-        return Promise.resolve({
+        return {
             pageToken,
             perPage,
             total,
             result,
-        });
+        };
     }
 
-    search(query: string, pageToken: number, perPage: number): Promise<Pagination<Item>> {
+    async search(query: string, pageToken: number, perPage: number): Promise<Pagination<Item>> {
         const items = this.records.filter((i) => {
             return (
                 i.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -75,40 +75,36 @@ export class InmemItemRepository implements ItemRepository {
 
         const total = Math.ceil(items.length / perPage);
 
-        return Promise.resolve({
+        return {
             pageToken,
             perPage,
             total,
             result,
-        });
+        };
     }
 
-    save(item: Item): Promise<void> {
+    async save(item: Item): Promise<void> {
         this.#items[item.itemId.toString()] = item;
-        return Promise.resolve(undefined);
     }
 
-    updateAll(items: Item[]): Promise<void> {
+    async updateAll(items: Item[]): Promise<void> {
         for (const item of items) {
             this.#items[item.itemId.toString()] = item;
         }
-        return Promise.resolve(undefined);
     }
 
-    update(item: Item): Promise<void> {
+    async update(item: Item): Promise<void> {
         this.#items[item.itemId.toString()] = item;
-        return Promise.resolve(undefined);
     }
 
-    saveAll(items: Item[]): Promise<void> {
+    async saveAll(items: Item[]): Promise<void> {
         for (const item of items) {
             this.#items[item.itemId.toString()] = item;
         }
-        return Promise.resolve(undefined);
     }
 
-    last(): Promise<Item> {
-        return Promise.resolve(this.records[this.records.length - 1]);
+    async last(): Promise<Item> {
+        return this.records[this.records.length - 1];
     }
 
     get records(): Item[] {
