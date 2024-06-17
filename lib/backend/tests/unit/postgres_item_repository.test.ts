@@ -371,14 +371,105 @@ describe("PostgresItemRepository - search", () => {
     });
 });
 
+describe("PostgresItemRepository - update", () => {
+    it("Deve actualizar o artigo no repositório", async () => {
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const spy = vi.spyOn(prisma.product, "update");
+
+        await itemRepository.update(_items[0]);
+
+        expect(spy).toBeCalled();
+        expect(spy).toBeCalledTimes(1);
+        expect(spy).toBeCalledWith({
+            where: { productId: _items[0].itemId.toString() },
+            data: {
+                name: _items[0].name,
+                price: _items[0].price.value,
+                fulltext: _items[0].fulltext,
+            },
+        });
+    });
+
+    it("Deve actualizar o artigo com categoria e secção", async () => {
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const spy = vi.spyOn(prisma.product, "update");
+
+        await itemRepository.update(_items[1]);
+
+        expect(spy).toBeCalled();
+        expect(spy).toBeCalledTimes(1);
+        expect(spy).toBeCalledWith({
+            where: { productId: _items[1].itemId.toString() },
+            data: {
+                name: _items[1].name,
+                price: _items[1].price.value,
+                categoryId: _items[1].categoryId?.toString(),
+                sectionId: _items[1].sectionId?.toString(),
+                fulltext: _items[1].fulltext,
+            },
+        });
+    });
+
+    it("Deve actualizar os artigos com as suas tags", async () => {
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const spy = vi.spyOn(prisma.product, "update");
+
+        await itemRepository.update(_items[2]);
+
+        expect(spy).toBeCalled();
+        expect(spy).toBeCalledTimes(1);
+        expect(spy).toBeCalledWith({
+            where: { productId: _items[2].itemId.toString() },
+            data: {
+                name: _items[2].name,
+                price: _items[2].price.value,
+                categoryId: _items[2].categoryId?.toString(),
+                sectionId: _items[2].sectionId?.toString(),
+                tags: _items[2].tags?.join(","),
+                fulltext: _items[2].fulltext,
+            },
+        });
+    });
+
+    it("Deve actualizar os artigos com as suas variações", async () => {
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const spy = vi.spyOn(prisma.productVariations, "updateMany");
+
+        await itemRepository.update(_items[3]);
+
+        expect(spy).toBeCalled();
+        expect(spy).toBeCalledTimes(1);
+        expect(spy).toBeCalledWith({
+            where: { productId: _items[3].itemId.toString() },
+            data: [
+                {
+                    variationId: "1",
+                    value: "Cor: Azul",
+                },
+            ],
+        });
+    });
+
+    it("Não deve actualizar as variações se não existirem", async () => {
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const spy = vi.spyOn(prisma.productVariations, "updateMany");
+
+        await itemRepository.update(_items[0]);
+
+        expect(spy).not.toBeCalled();
+    });
+});
+
 const prisma = {
     product: {
         create: async (_args: object) => ({}),
         findMany: async (_args: object) => _products,
         findUnique: async (_args: object) => _products[0],
+        update: async (_args: object) => ({}),
     },
     productVariations: {
         createMany: async (_args: object) => ({}),
+        updateMany: async (_args: object) => ({}),
     },
 };
 
@@ -408,4 +499,33 @@ const _products = [
             },
         ],
     },
+];
+
+const _items = [
+    new Item(ID.fromString("1"), "Artigo 1", new Decimal(10), undefined, undefined, {}),
+    new Item(
+        ID.fromString("2"),
+        "Artigo 2",
+        new Decimal(30),
+        ID.fromString("1"),
+        ID.fromString("1")
+    ),
+    new Item(
+        ID.fromString("3"),
+        "Artigo 3",
+        new Decimal(10),
+        ID.fromString("1"),
+        ID.fromString("1"),
+        undefined,
+        ["tag1", "tag2"]
+    ),
+    new Item(
+        ID.fromString("4"),
+        "Artigo 4",
+        new Decimal(10),
+        ID.fromString("1"),
+        ID.fromString("1"),
+        { "1": "Cor: Azul" },
+        ["tag1", "tag2"]
+    ),
 ];
