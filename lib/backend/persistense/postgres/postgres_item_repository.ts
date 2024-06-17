@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@prisma/client";
+import type { PrismaClient, Product } from "@prisma/client";
 import { Item } from "../../domain/catalog/items/item";
 import { ItemNotFound } from "../../domain/catalog/items/item_not_found_error";
 import type { ItemRepository } from "../../domain/catalog/items/item_repository";
@@ -7,7 +7,7 @@ import { left, right, type Either } from "../../shared/either";
 import { ID } from "../../shared/id";
 import type { Pagination, PaginatorOptions } from "../../shared/pagination";
 
-function itemFactory(itemData: any): Item {
+function itemFactory(itemData: Product): Item {
     return new Item(
         ID.fromString(itemData.productId),
         itemData.name,
@@ -38,12 +38,19 @@ export class PostgresItemRepository implements ItemRepository {
     }
 
     async getAll(opts?: PaginatorOptions): Promise<Pagination<Item>> {
-        const itemsData = await this.#prisma.product.findMany({ include: { variations: true } });
+        const itemsData = await this.#prisma.product.findMany({
+            include: { variations: true },
+            skip: opts ? (opts.pageToken - 1) * opts.perPage : 0,
+            take: opts ? opts.perPage : 0,
+        });
+
+        const items = itemsData.map(itemFactory);
+
         return {
-            result: itemsData.map(itemFactory),
-            pageToken: 0,
-            perPage: 0,
-            total: 0,
+            result: items,
+            pageToken: opts ? opts.pageToken : 0,
+            perPage: opts ? opts.perPage : 0,
+            total: items.length,
         };
     }
 
@@ -136,16 +143,28 @@ export class PostgresItemRepository implements ItemRepository {
         if (this.#isEmptyVariations(item)) return;
 
         await this.#prisma.productVariations.createMany({
-            data: Object.entries(item.variations!).map(([variationId, value]) => ({
-                productId: item.itemId.toString(),
-                variationId,
-                value,
-            })),
+            data: this.#createProductVariations(item),
         });
     }
 
     async saveAll(items: Item[]): Promise<void> {
-        throw new Error("Method not implemented.");
+        await this.#prisma.product.createMany({
+            data: items.map((item) => ({
+                productId: item.itemId.toString(),
+                name: item.name,
+                price: item.price.value,
+                categoryId: item.categoryId?.toString(),
+                sectionId: item.sectionId?.toString(),
+                tags: item.tags?.join(","),
+                fulltext: item.fulltext,
+            })),
+        });
+
+        const variations = items
+            .filter((item) => !this.#isEmptyVariations(item))
+            .flatMap(this.#createProductVariations);
+
+        await this.#prisma.productVariations.createMany({ data: variations });
     }
 
     last(): Promise<Item> {
@@ -154,5 +173,13 @@ export class PostgresItemRepository implements ItemRepository {
 
     #isEmptyVariations(item: Item) {
         return !item.variations || Object.values(item.variations).length === 0;
+    }
+
+    #createProductVariations(item: Item) {
+        return Object.entries(item.variations!).map(([variationId, value]) => ({
+            productId: item.itemId.toString(),
+            variationId,
+            value,
+        }));
     }
 }
