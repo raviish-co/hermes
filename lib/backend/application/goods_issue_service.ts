@@ -67,8 +67,6 @@ export class GoodsIssueService {
 
         await this.#noteRepository.save(noteOrErr.value);
 
-        await this.#itemRepository.updateAll(itemsOrErr.value);
-
         return right(undefined);
     }
 

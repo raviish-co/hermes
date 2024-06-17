@@ -69,8 +69,6 @@ export class GoodsReturnService {
 
         await this.#goodsReturnRepository.save(returnNote);
 
-        await this.#itemRepository.updateAll(itemsOrErr.value);
-
         await this.#increaseStock(itemsIds, itemsData);
 
         return right(undefined);

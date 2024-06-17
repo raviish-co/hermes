@@ -59,8 +59,6 @@ export class GoodsReceiptService {
 
         this.#itemStockRepository.updateAll(itemStocks);
 
-        this.#itemRepository.updateAll(itemsOrErr.value);
-
         return right(undefined);
     }
 
