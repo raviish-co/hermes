@@ -96,12 +96,28 @@ export class PostgresItemRepository implements ItemRepository {
         };
     }
 
-    updateAll(items: Item[]): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
+    async update(item: Item): Promise<void> {
+        await this.#prisma.product.update({
+            where: { productId: item.itemId.toString() },
+            data: {
+                name: item.name,
+                price: item.price.value,
+                fulltext: item.fulltext,
+                categoryId: item.categoryId?.toString(),
+                sectionId: item.sectionId?.toString(),
+                tags: item.tags?.join(","),
+            },
+        });
 
-    update(item: Item): Promise<void> {
-        throw new Error("Method not implemented.");
+        if (this.#isEmptyVariations(item)) return;
+
+        await this.#prisma.productVariations.updateMany({
+            where: { productId: item.itemId.toString() },
+            data: Object.entries(item.variations!).map(([variationId, value]) => ({
+                variationId,
+                value,
+            })),
+        });
     }
 
     async save(item: Item): Promise<void> {
@@ -117,10 +133,10 @@ export class PostgresItemRepository implements ItemRepository {
             },
         });
 
-        if (!item.variations) return;
+        if (this.#isEmptyVariations(item)) return;
 
         await this.#prisma.productVariations.createMany({
-            data: Object.entries(item.variations).map(([variationId, value]) => ({
+            data: Object.entries(item.variations!).map(([variationId, value]) => ({
                 productId: item.itemId.toString(),
                 variationId,
                 value,
@@ -128,11 +144,15 @@ export class PostgresItemRepository implements ItemRepository {
         });
     }
 
-    saveAll(items: Item[]): Promise<void> {
+    async saveAll(items: Item[]): Promise<void> {
         throw new Error("Method not implemented.");
     }
 
     last(): Promise<Item> {
         throw new Error("Method not implemented.");
+    }
+
+    #isEmptyVariations(item: Item) {
+        return !item.variations || Object.values(item.variations).length === 0;
     }
 }
