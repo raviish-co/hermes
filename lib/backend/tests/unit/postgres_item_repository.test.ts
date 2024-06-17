@@ -196,6 +196,8 @@ describe("PostgresItemRepository - getAll", () => {
         expect(spy).toBeCalledTimes(1);
         expect(spy).toBeCalledWith({
             include: { variations: true },
+            skip: 0,
+            take: 0,
         });
     });
 
@@ -221,6 +223,20 @@ describe("PostgresItemRepository - getAll", () => {
 
         expect(items[0].variations).toEqual({});
         expect(items[1].variations).toEqual({ "1": "Cor: Azul", "2": "Tamanho: M" });
+    });
+
+    it("Deve recuperar os artigos páginados", async () => {
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+
+        const {
+            result: items,
+            pageToken,
+            perPage,
+        } = await itemRepository.getAll({ pageToken: 1, perPage: 10 });
+
+        expect(items.length).toEqual(2);
+        expect(pageToken).toEqual(1);
+        expect(perPage).toEqual(10);
     });
 });
 
@@ -460,9 +476,52 @@ describe("PostgresItemRepository - update", () => {
     });
 });
 
+describe("PostgresItemRepository - saveAll", () => {
+    it("Deve salvar um conjunto de artigos no repositório", async () => {
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const spy = vi.spyOn(prisma.product, "createMany");
+
+        await itemRepository.saveAll(_items);
+
+        expect(spy).toBeCalled();
+        expect(spy).toBeCalledTimes(1);
+        expect(spy).toBeCalledWith({
+            data: _items.map((item) => ({
+                productId: item.itemId.toString(),
+                name: item.name,
+                price: item.price.value,
+                categoryId: item.categoryId?.toString(),
+                sectionId: item.sectionId?.toString(),
+                tags: item.tags?.join(","),
+                fulltext: item.fulltext,
+            })),
+        });
+    });
+
+    it("Deve salvar o conjunto de artigos com as suas variações", async () => {
+        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const spy = vi.spyOn(prisma.productVariations, "createMany");
+
+        await itemRepository.saveAll(_items);
+
+        expect(spy).toBeCalled();
+        expect(spy).toBeCalledTimes(1);
+        expect(spy).toBeCalledWith({
+            data: [
+                {
+                    productId: "4",
+                    variationId: "1",
+                    value: "Cor: Azul",
+                },
+            ],
+        });
+    });
+});
+
 const prisma = {
     product: {
         create: async (_args: object) => ({}),
+        createMany: async (_args: object) => ({}),
         findMany: async (_args: object) => _products,
         findUnique: async (_args: object) => _products[0],
         update: async (_args: object) => ({}),
