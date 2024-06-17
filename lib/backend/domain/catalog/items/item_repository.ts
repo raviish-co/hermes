@@ -9,7 +9,6 @@ export interface ItemRepository {
     findAll(itemsIds: ID[]): Promise<Either<ItemNotFound, Item[]>>;
     getById(itemId: ID): Promise<Either<ItemNotFound, Item>>;
     search(query: string, opts: PaginatorOptions): Promise<Pagination<Item>>;
-    updateAll(items: Item[]): Promise<void>;
     update(item: Item): Promise<void>;
     save(item: Item): Promise<void>;
     saveAll(items: Item[]): Promise<void>;
