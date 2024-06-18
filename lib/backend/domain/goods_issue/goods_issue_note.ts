@@ -21,7 +21,6 @@ export class GoodsIssueNote {
     #status: Status;
     #total: Decimal;
     #securityDeposit: Decimal;
-    #securityDepositWithheld: Decimal;
 
     constructor(
         noteId: ID,
@@ -39,7 +38,6 @@ export class GoodsIssueNote {
         this.#status = Status.Pending;
         this.#total = new Decimal(0);
         this.#securityDeposit = new Decimal(0);
-        this.#securityDepositWithheld = new Decimal(0);
 
         this.fulltext = this.#buildFulltext();
 
@@ -65,7 +63,6 @@ export class GoodsIssueNote {
         note.#issuedAt = data.issuedAt;
         note.#total = new Decimal(data.total);
         note.#securityDeposit = new Decimal(data.securityDeposit);
-        note.#securityDepositWithheld = new Decimal(data.securityDepositWithheld);
 
         return note;
     }
@@ -100,10 +97,6 @@ export class GoodsIssueNote {
 
     get securityDeposit(): Decimal {
         return this.#securityDeposit;
-    }
-
-    get securityDepositWithheld(): Decimal {
-        return this.#securityDepositWithheld;
     }
 
     get status(): string {
