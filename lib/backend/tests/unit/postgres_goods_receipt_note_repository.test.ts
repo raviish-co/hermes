@@ -18,10 +18,10 @@ describe("PostgresGoodsReceiptNoteRepository - save", () => {
             data: {
                 noteId: note.noteId.toString(),
                 entryDate: note.entryDate,
-                receiptNoteLines: {
+                lines: {
                     createMany: {
                         data: noteLines.map((line) => ({
-                            receiptLineId: line.receiptLineId.toString(),
+                            lineId: line.lineId.toString(),
                             productId: line.itemId.toString(),
                             goodQuantities: line.goodQuantities,
                             badQuantities: line.badQuantities,
@@ -43,10 +43,10 @@ describe("PostgresGoodsReceiptNoteRepository - save", () => {
             data: {
                 noteId: note.noteId.toString(),
                 entryDate: note.entryDate,
-                receiptNoteLines: {
+                lines: {
                     createMany: {
                         data: noteLines.map((line) => ({
-                            receiptLineId: line.receiptLineId.toString(),
+                            lineId: line.lineId.toString(),
                             productId: line.itemId.toString(),
                             goodQuantities: line.goodQuantities,
                             badQuantities: line.badQuantities,
@@ -68,10 +68,10 @@ describe("PostgresGoodsReceiptNoteRepository - save", () => {
             data: {
                 noteId: note.noteId.toString(),
                 entryDate: note.entryDate,
-                receiptNoteLines: {
+                lines: {
                     createMany: {
                         data: noteLines.map((line) => ({
-                            receiptLineId: line.receiptLineId.toString(),
+                            lineId: line.lineId.toString(),
                             productId: line.itemId.toString(),
                             goodQuantities: line.goodQuantities,
                             badQuantities: line.badQuantities,
@@ -93,10 +93,10 @@ describe("PostgresGoodsReceiptNoteRepository - save", () => {
             data: {
                 noteId: note.noteId.toString(),
                 entryDate: note.entryDate,
-                receiptNoteLines: {
+                lines: {
                     createMany: {
                         data: noteLines.map((line) => ({
-                            receiptLineId: line.receiptLineId.toString(),
+                            lineId: line.lineId.toString(),
                             productId: line.itemId.toString(),
                             goodQuantities: line.goodQuantities,
                             badQuantities: line.badQuantities,
@@ -120,7 +120,7 @@ describe("PostgresGoodsReceiptNoteRepository - getAll", () => {
         expect(spy).toBeCalledTimes(1);
         expect(spy).toBeCalledWith({
             include: {
-                receiptNoteLines: true,
+                lines: true,
             },
         });
     });
@@ -144,9 +144,9 @@ const _notes = [
     {
         noteId: "1",
         entryDate: "2021-09-01T00:00:00.000Z",
-        receiptNoteLines: [
+        lines: [
             {
-                receiptLineId: "1",
+                lineId: "1",
                 productId: "1",
                 goodQuantities: 1,
                 badQuantities: 0,
@@ -157,9 +157,9 @@ const _notes = [
     {
         noteId: "2",
         entryDate: "2021-09-02T00:00:00.000Z",
-        receiptNoteLines: [
+        lines: [
             {
-                receiptLineId: "2",
+                lineId: "2",
                 productId: "1",
                 goodQuantities: 18,
                 badQuantities: 5,
