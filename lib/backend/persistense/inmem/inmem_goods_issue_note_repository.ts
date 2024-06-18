@@ -13,39 +13,35 @@ export class InmemGoodsIssueNoteRepository implements GoodsIssueNoteRepository {
         }
     }
 
-    getById(goodsIssueId: ID): Promise<Either<GoodsIssueNoteNotFound, GoodsIssueNote>> {
-        const goodsIssueNote = this.records.find(
-            (g) => g.noteId.toString() === goodsIssueId.toString()
-        );
-        if (!goodsIssueNote) return Promise.resolve(left(new GoodsIssueNoteNotFound()));
-        return Promise.resolve(right(goodsIssueNote));
+    async getById(noteId: ID): Promise<Either<GoodsIssueNoteNotFound, GoodsIssueNote>> {
+        const note = this.records.find((g) => g.noteId.toString() === noteId.toString());
+        if (!note) return left(new GoodsIssueNoteNotFound());
+        return right(note);
     }
 
-    getAll(): Promise<GoodsIssueNote[]> {
-        return Promise.resolve(this.records);
+    async getAll(): Promise<GoodsIssueNote[]> {
+        return this.records;
     }
 
-    search(query: string): Promise<GoodsIssueNote[]> {
+    async search(query: string): Promise<GoodsIssueNote[]> {
         const notes = this.records.filter(
             (note) =>
                 note.noteId.toString().includes(query) ||
                 note.fulltext.includes(query.toLowerCase())
         );
-        return Promise.resolve(notes);
+        return notes;
     }
 
-    save(goodIssueNote: GoodsIssueNote): Promise<void> {
+    async save(goodIssueNote: GoodsIssueNote): Promise<void> {
         this.#notes[goodIssueNote.noteId.toString()] = goodIssueNote;
-        return Promise.resolve(undefined);
     }
 
-    update(goodsIssue: GoodsIssueNote): Promise<void> {
+    async update(goodsIssue: GoodsIssueNote): Promise<void> {
         this.#notes[goodsIssue.noteId.toString()] = goodsIssue;
-        return Promise.resolve(undefined);
     }
 
-    last(): Promise<GoodsIssueNote> {
-        return Promise.resolve(this.records[this.records.length - 1]);
+    async last(): Promise<GoodsIssueNote> {
+        return this.records[this.records.length - 1];
     }
 
     get records(): GoodsIssueNote[] {
