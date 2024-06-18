@@ -21,7 +21,7 @@ export class PostgresGoodsIssueNoteRepository implements GoodsIssueNoteRepositor
 
         if (!noteData) return left(new GoodsIssueNoteNotFound());
 
-        return right(GoodsIssueNote.restore(noteData as unknown as NoteOptions));
+        return right(GoodsIssueNote.restore(noteData as NoteOptions));
     }
 
     async getAll(): Promise<GoodsIssueNote[]> {
@@ -29,11 +29,46 @@ export class PostgresGoodsIssueNoteRepository implements GoodsIssueNoteRepositor
             include: { purpose: true, lines: true },
         });
 
-        return notesData.map((note) => GoodsIssueNote.restore(note as unknown as NoteOptions));
+        return notesData.map((note) => GoodsIssueNote.restore(note as NoteOptions));
     }
 
-    save(note: GoodsIssueNote): Promise<void> {
-        throw new Error("Method not implemented.");
+    async save(note: GoodsIssueNote): Promise<void> {
+        await this.#prisma.goodsIssueNote.create({
+            data: {
+                noteId: note.noteId.toString(),
+                purpose: {
+                    create: {
+                        description: note.purpose.description,
+                        notes: note.purpose.notes,
+                        details: note.purpose.details,
+                    },
+                },
+                issuedAt: note.issuedAt,
+                returnDate: note.returnDate,
+                securityDeposit: note.securityDeposit.value,
+                securityDepositWithheld: note.securityDepositWithheld.value,
+                status: note.status,
+                total: note.total.value,
+                fulltext: note.fulltext,
+                lines: {
+                    createMany: {
+                        data: note.lines.map((line) => ({
+                            lineId: line.lineId.toString(),
+                            productId: line.itemId.toString(),
+                            name: line.name,
+                            price: line.price.value,
+                            netTotal: line.netTotal.value,
+                            goodQuantities: line.goodQuantities,
+                            badQuantities: line.badQuantities,
+                            comments: line.condition?.comment,
+                            goodQuantitiesReturned: line.goodQuantitiesReturned,
+                            badQuantitiesReturned: line.badQuantitiesReturned,
+                            variations: JSON.stringify(line.variationsValues ?? {}),
+                        })),
+                    },
+                },
+            },
+        });
     }
 
     search(query: string): Promise<GoodsIssueNote[]> {
