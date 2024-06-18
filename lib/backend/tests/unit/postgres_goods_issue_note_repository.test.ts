@@ -122,6 +122,40 @@ describe("PostgresGoodsIssueNoteRepository - save", () => {
     });
 });
 
+describe("PostgresGoodsIssueNoteRepository - search", () => {
+    it("Deve pesquisar as guias de saída pelo ID", async () => {
+        const noteRepository = new PostgresGoodsIssueNoteRepository(prisma);
+        const spy = vi.spyOn(prisma.goodsIssueNote, "findMany");
+
+        await noteRepository.search("1");
+
+        expect(spy).toBeCalled();
+        expect(spy).toBeCalledTimes(1);
+        expect(spy).toBeCalledWith({
+            where: {
+                OR: [{ noteId: { contains: "1" } }, { fulltext: { contains: "1" } }],
+            },
+            include: { purpose: true, lines: true },
+        });
+    });
+
+    it("Deve pesquisar as guias de saída pelo ID e pelo fulltext", async () => {
+        const noteRepository = new PostgresGoodsIssueNoteRepository(prisma);
+        const spy = vi.spyOn(prisma.goodsIssueNote, "findMany");
+
+        await noteRepository.search("dummy");
+
+        expect(spy).toBeCalled();
+        expect(spy).toBeCalledTimes(1);
+        expect(spy).toBeCalledWith({
+            where: {
+                OR: [{ noteId: { contains: "dummy" } }, { fulltext: { contains: "dummy" } }],
+            },
+            include: { purpose: true, lines: true },
+        });
+    });
+});
+
 const prisma = {
     goodsIssueNote: {
         findUnique: async (_args: object) => _notes[0],
