@@ -14,15 +14,15 @@ export type NoteOptions = {
     lines: LineOptions[];
 };
 
-type LineOptions = {
+export type LineOptions = {
     lineId: string;
-    itemId: string;
+    productId: string;
     name: string;
     price: number;
     goodQuantities: number;
     badQuantities: number;
     goodQuantitiesReturned: number;
     badQuantitiesReturned: number;
-    variations?: Record<string, string>;
+    variations?: string;
     comments?: string;
 };

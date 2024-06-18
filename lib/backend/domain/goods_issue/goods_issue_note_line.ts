@@ -1,14 +1,15 @@
 import { Condition } from "../../shared/condition";
 import { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
+import type { LineOptions } from "./goods_issue_note_options";
 
 export class GoodsIssueNoteLine {
-    readonly lineId: ID;
     readonly itemId: ID;
     readonly name: string;
     readonly price: Decimal;
     readonly variationsValues?: Record<string, string>;
     readonly condition?: Condition;
+    #lineId: ID;
     #goodQuantities: number;
     #badQuantities: number;
     #goodQuantitiesReturned: number;
@@ -24,12 +25,12 @@ export class GoodsIssueNoteLine {
         variations?: Record<string, string>,
         comment?: string
     ) {
-        this.lineId = ID.random();
         this.itemId = itemId;
         this.name = name;
         this.variationsValues = variations;
         this.price = price;
         this.condition = new Condition(comment);
+        this.#lineId = ID.random();
         this.#goodQuantities = goodQuantities;
         this.#badQuantities = badQuantities ?? 0;
         this.#goodQuantitiesReturned = 0;
@@ -39,17 +40,18 @@ export class GoodsIssueNoteLine {
         this.#calculateTotal();
     }
 
-    static restore(data: any): GoodsIssueNoteLine {
+    static restore(data: LineOptions): GoodsIssueNoteLine {
         const line = new GoodsIssueNoteLine(
-            ID.fromString(data.itemId),
+            ID.fromString(data.productId),
             data.name,
             new Decimal(data.price),
             data.goodQuantities,
             data.badQuantities,
-            data.variations,
+            JSON.parse(data.variations ?? "{}"),
             data.comments
         );
 
+        line.#lineId = ID.fromString(data.lineId);
         line.#goodQuantitiesReturned = data.goodQuantitiesReturned;
         line.#badQuantitiesReturned = data.badQuantitiesReturned;
 
@@ -103,6 +105,10 @@ export class GoodsIssueNoteLine {
 
     get quantityReturned(): number {
         return this.#goodQuantitiesReturned + this.#badQuantitiesReturned;
+    }
+
+    get lineId(): ID {
+        return this.#lineId;
     }
 
     get maxToReturn(): number {
