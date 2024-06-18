@@ -67,8 +67,33 @@ describe("PostgresGoodsIssueNoteRepository - geById", () => {
     });
 });
 
+describe("PostgresGoodsIssueNoteRepository - getAll", () => {
+    it("Deve encontrar as guias de saída", async () => {
+        const noteRepository = new PostgresGoodsIssueNoteRepository(prisma);
+        const spy = vi.spyOn(prisma.goodsIssueNote, "findMany");
+
+        const notes = await noteRepository.getAll();
+
+        expect(spy).toBeCalled();
+        expect(spy).toBeCalledTimes(1);
+        expect(spy).toBeCalledWith({ include: { purpose: true, lines: true } });
+    });
+
+    it("Deve recuperar as linhas das guias de saída", async () => {
+        const noteRepository = new PostgresGoodsIssueNoteRepository(prisma);
+
+        const notes = await noteRepository.getAll();
+
+        expect(notes.length).toEqual(1);
+        expect(notes[0].lines.length).toEqual(1);
+    });
+});
+
 const prisma = {
-    goodsIssueNote: { findUnique: async (_args: object) => _notes[0] },
+    goodsIssueNote: {
+        findUnique: async (_args: object) => _notes[0],
+        findMany: async (_args: object) => _notes,
+    },
 } as unknown as PrismaClient;
 
 const _notes = [
