@@ -10,7 +10,6 @@ export type NoteOptions = {
     status: string;
     total: number;
     securityDeposit: number;
-    securityDepositWithheld: number;
     lines: LineOptions[];
 };
 
