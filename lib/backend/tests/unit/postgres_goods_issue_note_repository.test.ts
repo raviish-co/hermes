@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
-import type { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
+import { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { PostgresGoodsIssueNoteRepository } from "../../persistense/postgres/postgres_goods_issue_note_repository";
 import { ID } from "../../shared/id";
 import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
@@ -89,10 +89,44 @@ describe("PostgresGoodsIssueNoteRepository - getAll", () => {
     });
 });
 
+describe("PostgresGoodsIssueNoteRepository - save", () => {
+    it("Deve salvar a guia de saída", async () => {
+        const noteRepository = new PostgresGoodsIssueNoteRepository(prisma);
+        const note = GoodsIssueNote.restore(_notes[0]);
+        const spy = vi.spyOn(prisma.goodsIssueNote, "create");
+
+        await noteRepository.save(note);
+
+        expect(spy).toBeCalled();
+        expect(spy).toBeCalledTimes(1);
+        expect(spy).toBeCalledWith({
+            data: {
+                ..._notes[0],
+                purpose: {
+                    create: {
+                        ..._notes[0].purpose,
+                    },
+                },
+                lines: {
+                    createMany: {
+                        data: [
+                            {
+                                ..._notes[0].lines[0],
+                                lineId: "1",
+                            },
+                        ],
+                    },
+                },
+            },
+        });
+    });
+});
+
 const prisma = {
     goodsIssueNote: {
         findUnique: async (_args: object) => _notes[0],
         findMany: async (_args: object) => _notes,
+        create: async (_args: object) => ({}),
     },
 } as unknown as PrismaClient;
 
@@ -104,25 +138,26 @@ const _notes = [
             notes: "dummy",
             details: "dummy",
         },
-        returnData: "01-01-2021T00:00:00",
-        issuedAt: "01-01-2021T00:00:00",
+        returnDate: new Date("01-01-2021T00:00:00"),
+        issuedAt: new Date("01-01-2021T00:00:00"),
         status: "Por Devolver",
+        fulltext: "dummy dummy dummy",
         total: 0,
         securityDeposit: 0,
         securityDepositWithheld: 0,
         lines: [
             {
-                lineId: ID.random().toString(),
-                itemId: "1",
+                lineId: "1",
+                productId: "1",
                 name: "dummy",
                 price: 0,
-                fulltext: "dummy",
                 goodQuantities: 1,
                 badQuantities: 0,
                 goodQuantitiesReturned: 0,
                 badQuantitiesReturned: 0,
+                netTotal: 0,
                 comments: "dummy",
-                variations: { "1": "Cor: Azul", "2": "Tamanho: L" },
+                variations: JSON.stringify({ "1": "Cor: Azul", "2": "Tamanho: L" }),
             },
         ],
     },
