@@ -8,9 +8,6 @@ import { ID } from "../../shared/id";
 describe("PostgresCategoryRepostory - getById", () => {
     it("Deve pesquisar a categoria pelo id", async () => {
         const categoryId = ID.random();
-        const prisma = {
-            category: { findUnique: async (_args: object) => ({}) },
-        };
         const categoryRepository = new PostgresCategoryRepository(prisma as PrismaClient);
         const spy = vi.spyOn(prisma.category, "findUnique");
 
@@ -24,44 +21,26 @@ describe("PostgresCategoryRepostory - getById", () => {
     });
 
     it("Deve recuperar a categoria pelo id", async () => {
-        const categoryId = ID.random();
-        const prisma = {
-            category: {
-                findUnique: async (_args: object) => ({
-                    categoryId: categoryId.toString(),
-                    name: "Roupas",
-                    variations: "1",
-                }),
-            },
-        };
         const categoryRepository = new PostgresCategoryRepository(prisma as PrismaClient);
 
-        const categoryOrErr = await categoryRepository.getById(categoryId);
+        const categoryOrErr = await categoryRepository.getById(ID.fromString("1"));
 
         const category = <Category>categoryOrErr.value;
-        expect(category.categoryId.equals(categoryId)).toBeTruthy();
+        expect(category.categoryId.toString()).toBe("1");
         expect(category.name).toBe("Roupas");
     });
 
     it("Deve recuperar a categoria e as suas variações", async () => {
-        const categoryId = ID.random();
-        const variationId = ID.random();
-        const prisma = {
-            category: {
-                findUnique: async (_args: object) => ({
-                    categoryId: categoryId.toString(),
-                    name: "Roupas",
-                    variations: "1",
-                }),
-            },
-        };
+        const categoryId = ID.fromString("1");
+
         const categoryRepository = new PostgresCategoryRepository(prisma as PrismaClient);
         const categoryOrErr = await categoryRepository.getById(categoryId);
 
         const category = <Category>categoryOrErr.value;
 
-        expect(category.categoryId.equals(categoryId)).toBeTruthy();
-        expect(category.variationsIds).toEqual([variationId]);
+        const variations = category.variationsIds.map((v) => v.toString());
+        expect(category.categoryId.toString()).toEqual("1");
+        expect(variations).toEqual(["1"]);
     });
 
     it("Deve retornar CategoryNotFound quando a categoria não existe", async () => {
@@ -78,15 +57,6 @@ describe("PostgresCategoryRepostory - getById", () => {
 
 describe("PostgresCategoryRepostory - getAll", () => {
     it("Deve recuperar todas as categorias do repsitório", async () => {
-        const prisma = {
-            category: {
-                findMany: async () => [
-                    { categoryId: "1", name: "Roupas", variations: "1" },
-                    { categoryId: "2", name: "Calçados", variations: "1,2" },
-                ],
-            },
-        };
-
         const categoryRepository = new PostgresCategoryRepository(prisma as PrismaClient);
 
         const categories = await categoryRepository.getAll();
@@ -99,15 +69,6 @@ describe("PostgresCategoryRepostory - getAll", () => {
 describe("PostgresCategoryRepostory - findByName", () => {
     it("Deve recuperar a categoria pelo nome", async () => {
         const name = "Roupas";
-        const prisma = {
-            category: {
-                findFirst: async (_args: object) => ({
-                    categoryId: "1",
-                    name,
-                    variations: "1",
-                }),
-            },
-        };
         const categoryRepository = new PostgresCategoryRepository(prisma as PrismaClient);
 
         const categoryOrErr = await categoryRepository.findByName(name);
@@ -130,9 +91,6 @@ describe("PostgresCategoryRepostory - findByName", () => {
 
 describe("PostgresCategoryRepostory - save", () => {
     it("Deve salvar uma categoria", async () => {
-        const prisma = {
-            category: { create: async (_args: object) => ({}) },
-        };
         const categoryId = ID.random();
         const categoryRepository = new PostgresCategoryRepository(prisma as PrismaClient);
         const category = new Category(
@@ -161,9 +119,6 @@ describe("PostgresCategoryRepostory - save", () => {
 describe("PostgresCategoryRepostory - exists", () => {
     it("Deve retornar true se a categoria existe", async () => {
         const name = "Roupas";
-        const prisma = {
-            category: { findFirst: async (_args: object) => ({ categoryId: "1", name }) },
-        };
         const categoryRepository = new PostgresCategoryRepository(prisma as PrismaClient);
 
         const exists = await categoryRepository.exists(name);
@@ -181,3 +136,17 @@ describe("PostgresCategoryRepostory - exists", () => {
         expect(exists).toBeFalsy();
     });
 });
+
+const prisma = {
+    category: {
+        findUnique: async (_args: object) => _categories[0],
+        findMany: async () => _categories,
+        findFirst: async (_args: object) => _categories[0],
+        create: async (_args: object) => ({}),
+    },
+};
+
+const _categories = [
+    { categoryId: "1", name: "Roupas", variations: "1" },
+    { categoryId: "2", name: "Calçados", variations: "1,2" },
+];
