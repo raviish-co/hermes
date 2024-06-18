@@ -46,7 +46,6 @@ export class PostgresGoodsIssueNoteRepository implements GoodsIssueNoteRepositor
                 issuedAt: note.issuedAt,
                 returnDate: note.returnDate,
                 securityDeposit: note.securityDeposit.value,
-                securityDepositWithheld: note.securityDepositWithheld.value,
                 status: note.status,
                 total: note.total.value,
                 fulltext: note.fulltext,
@@ -85,8 +84,25 @@ export class PostgresGoodsIssueNoteRepository implements GoodsIssueNoteRepositor
         return notesData.map((note) => GoodsIssueNote.restore(note as NoteOptions));
     }
 
-    update(note: GoodsIssueNote): Promise<void> {
-        throw new Error("Method not implemented.");
+    async update(note: GoodsIssueNote): Promise<void> {
+        await this.#prisma.goodsIssueNote.update({
+            where: { noteId: note.noteId.toString() },
+            data: {
+                status: note.status,
+                lines: {
+                    updateMany: {
+                        where: { noteId: note.noteId.toString() },
+                        data: note.lines.map((line) => ({
+                            where: { lineId: line.lineId.toString() },
+                            data: {
+                                goodQuantitiesReturned: line.goodQuantitiesReturned,
+                                badQuantitiesReturned: line.badQuantitiesReturned,
+                            },
+                        })),
+                    },
+                },
+            },
+        });
     }
 
     last(): Promise<GoodsIssueNote> {
