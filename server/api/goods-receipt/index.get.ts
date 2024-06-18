@@ -20,7 +20,7 @@ interface GoodsReceiptNoteDTO {
 
 function toGoodsReceiptNoteLineDTO(line: GoodsReceiptNoteLine): GoodsReceiptNoteLineDTO {
     return {
-        lineId: line.receiptLineId.toString(),
+        lineId: line.lineId.toString(),
         itemId: line.itemId.toString(),
         goodQuantities: line.goodQuantities,
         badQuantities: line.badQuantities,

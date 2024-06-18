@@ -41,7 +41,7 @@ export function toGoodsReturnNoteDTO(note: GoodsReturnNote): GoodsReturnNoteDTO 
 
 function toGoodsReturnNoteLineDTO(line: GoodsReturnNoteLine): GoodsReturnNoteLineDTO {
     return {
-        returnLineId: line.returnLineId.toString(),
+        returnLineId: line.lineId.toString(),
         itemId: line.itemId.toString(),
         goodQuantities: line.goodQuantities,
         badQuantities: line.badQuantities,

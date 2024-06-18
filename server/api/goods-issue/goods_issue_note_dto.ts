@@ -48,7 +48,7 @@ function toGoodsIssueLineDTO(line: GoodsIssueNoteLine): GoodsIssueLineDTO {
         quantityToReturn: line.maxToReturn,
         fulltext: line.fulltext,
         variationValues: toVariationValuesDTO(line.variationsValues),
-        condition: line.condition,
+        condition: line.#condition,
     };
 }
 

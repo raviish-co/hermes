@@ -2,14 +2,14 @@ import { Condition } from "../../shared/condition";
 import { ID } from "../../shared/id";
 
 export class GoodsReceiptNoteLine {
-    #receiptLineId: ID;
+    #lineId: ID;
     #itemId: ID;
     #goodQuantities: number;
     #badQuantities?: number;
     condition: Condition;
 
     constructor(itemId: ID, goodQuantities: number, badQuantities?: number, comments?: string) {
-        this.#receiptLineId = ID.random();
+        this.#lineId = ID.random();
         this.#itemId = itemId;
         this.#goodQuantities = goodQuantities;
         this.condition = new Condition(comments);
@@ -19,8 +19,8 @@ export class GoodsReceiptNoteLine {
         this.#badQuantities = badQuantities;
     }
 
-    get receiptLineId(): ID {
-        return this.#receiptLineId;
+    get lineId(): ID {
+        return this.#lineId;
     }
 
     get itemId(): ID {

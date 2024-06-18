@@ -6,7 +6,6 @@ export class GoodsIssueNoteLine {
     readonly lineId: ID;
     readonly itemId: ID;
     readonly name: string;
-    readonly fulltext: string;
     readonly price: Decimal;
     readonly variationsValues?: Record<string, string>;
     readonly condition?: Condition;
@@ -20,7 +19,6 @@ export class GoodsIssueNoteLine {
         itemId: ID,
         name: string,
         price: Decimal,
-        fulltext: string,
         goodQuantities: number,
         badQuantities?: number,
         variations?: Record<string, string>,
@@ -30,7 +28,6 @@ export class GoodsIssueNoteLine {
         this.itemId = itemId;
         this.name = name;
         this.variationsValues = variations;
-        this.fulltext = fulltext;
         this.price = price;
         this.condition = new Condition(comment);
         this.#goodQuantities = goodQuantities;
@@ -40,6 +37,23 @@ export class GoodsIssueNoteLine {
         this.#netTotal = new Decimal(0);
 
         this.#calculateTotal();
+    }
+
+    static restore(data: any): GoodsIssueNoteLine {
+        const line = new GoodsIssueNoteLine(
+            ID.fromString(data.itemId),
+            data.name,
+            new Decimal(data.price),
+            data.goodQuantities,
+            data.badQuantities,
+            data.variations,
+            data.comments
+        );
+
+        line.#goodQuantitiesReturned = data.goodQuantitiesReturned;
+        line.#badQuantitiesReturned = data.badQuantitiesReturned;
+
+        return line;
     }
 
     returnLine(goodQuantities: number, badQuantities: number = 0): void {

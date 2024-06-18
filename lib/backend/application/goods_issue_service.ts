@@ -112,7 +112,6 @@ export class GoodsIssueService {
             item.itemId,
             item.name,
             item.price,
-            item.fulltext,
             line.goodQuantities,
             line.badQuantities,
             item.variations,

@@ -126,20 +126,11 @@ const _goodsIssueData = [
         userId: ID.fromString("1"),
         returnDate: tomorrow,
         lines: [
-            new GoodsIssueNoteLine(
-                _item.itemId,
-                _item.name,
-                _item.price,
-                _item.fulltext,
-                15,
-                0,
-                _item.variations!
-            ),
+            new GoodsIssueNoteLine(_item.itemId, _item.name, _item.price, 15, 0, _item.variations!),
             new GoodsIssueNoteLine(
                 _item2.itemId,
                 _item2.name,
                 _item2.price,
-                _item2.fulltext,
                 15,
                 0,
 
@@ -161,7 +152,6 @@ const _goodsIssueData = [
                 _item4.itemId,
                 _item4.name,
                 _item4.price,
-                _item4.fulltext,
                 3,
                 0,
 
@@ -171,7 +161,6 @@ const _goodsIssueData = [
                 _item5.itemId,
                 _item5.name,
                 _item5.price,
-                _item5.fulltext,
                 2,
                 0,
 
@@ -193,7 +182,6 @@ const _goodsIssueData = [
                 _item6.itemId,
                 _item6.name,
                 _item6.price,
-                _item6.fulltext,
                 2,
                 0,
 
@@ -215,7 +203,6 @@ const _goodsIssueData = [
                 _item7.itemId,
                 _item7.name,
                 _item7.price,
-                _item7.fulltext,
                 3,
                 0,
 
@@ -238,7 +225,6 @@ const _goodsIssueData = [
                 _item9.itemId,
                 _item9.name,
                 _item9.price,
-                _item9.fulltext,
                 3,
                 0,
 
@@ -248,7 +234,6 @@ const _goodsIssueData = [
                 _item10.itemId,
                 _item10.name,
                 _item10.price,
-                _item10.fulltext,
                 3,
                 0,
 
@@ -270,7 +255,6 @@ const _goodsIssueData = [
                 _item11.itemId,
                 _item11.name,
                 _item11.price,
-                _item11.fulltext,
                 10,
                 10,
 
@@ -280,7 +264,6 @@ const _goodsIssueData = [
                 _item12.itemId,
                 _item12.name,
                 _item12.price,
-                _item12.fulltext,
                 10,
                 10,
 

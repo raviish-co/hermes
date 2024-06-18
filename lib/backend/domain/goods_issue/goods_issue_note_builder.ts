@@ -45,7 +45,7 @@ export class GoodsIssueNoteBuilder {
 
         if (!this.#userId) return left(new Error("userId is required"));
 
-        const goodsIssue = new GoodsIssueNote(
+        const note = new GoodsIssueNote(
             this.#noteId,
             this.#purpose,
             this.#userId,
@@ -53,6 +53,6 @@ export class GoodsIssueNoteBuilder {
             this.#lines
         );
 
-        return right(goodsIssue);
+        return right(note);
     }
 }

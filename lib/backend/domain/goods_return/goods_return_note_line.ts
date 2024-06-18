@@ -2,7 +2,7 @@ import { ID } from "../../shared/id";
 import { Condition } from "../../shared/condition";
 
 export class GoodsReturnNoteLine {
-    readonly returnLineId: ID;
+    readonly lineId: ID;
     readonly itemId: ID;
     readonly name: string;
     readonly variationsValues?: Record<string, string>;
@@ -18,7 +18,7 @@ export class GoodsReturnNoteLine {
         variationsValues?: Record<string, string>,
         comment?: string
     ) {
-        this.returnLineId = ID.random();
+        this.lineId = ID.random();
         this.itemId = itemId;
         this.name = name;
         this.variationsValues = variationsValues;

@@ -1,8 +1,9 @@
+import { Decimal } from "../../shared/decimal";
+import { ID } from "../../shared/id";
 import type { GoodsReturnNoteLine } from "../goods_return/goods_return_note_line";
 import { GoodsIssueNoteLine } from "./goods_issue_note_line";
-import { Decimal } from "../../shared/decimal";
+import type { NoteOptions } from "./goods_issue_note_options";
 import { Purpose } from "./purpose";
-import { ID } from "../../shared/id";
 
 enum Status {
     Pending = "Por Devolver",
@@ -15,8 +16,8 @@ export class GoodsIssueNote {
     readonly userId: ID;
     readonly lines: GoodsIssueNoteLine[];
     readonly returnDate: Date;
-    readonly issuedAt: Date;
     readonly fulltext: string;
+    #issuedAt: Date;
     #status: Status;
     #total: Decimal;
     #securityDeposit: Decimal;
@@ -32,9 +33,9 @@ export class GoodsIssueNote {
         this.noteId = noteId;
         this.purpose = purpose;
         this.userId = user;
-        this.issuedAt = new Date();
         this.returnDate = returnDate;
         this.lines = [];
+        this.#issuedAt = new Date();
         this.#status = Status.Pending;
         this.#total = new Decimal(0);
         this.#securityDeposit = new Decimal(0);
@@ -43,6 +44,30 @@ export class GoodsIssueNote {
         this.fulltext = this.#buildFulltext();
 
         this.#addLines(lines);
+    }
+
+    static restore(data: NoteOptions): GoodsIssueNote {
+        const purpose = new Purpose(
+            data.purpose.description,
+            data.purpose.notes,
+            data.purpose.details
+        );
+
+        const note = new GoodsIssueNote(
+            ID.fromString(data.noteId),
+            purpose,
+            ID.random(),
+            data.returnDate,
+            data.lines.map(GoodsIssueNoteLine.restore)
+        );
+
+        note.updateStatus(data.status);
+        note.#issuedAt = data.issuedAt;
+        note.#total = new Decimal(data.total);
+        note.#securityDeposit = new Decimal(data.securityDeposit);
+        note.#securityDepositWithheld = new Decimal(data.securityDepositWithheld);
+
+        return note;
     }
 
     verifyTotal(total: number, securityDeposit: number): boolean {
@@ -89,6 +114,10 @@ export class GoodsIssueNote {
         return this.#total;
     }
 
+    get issuedAt(): Date {
+        return this.#issuedAt;
+    }
+
     #addLines(lines: GoodsIssueNoteLine[]): void {
         lines.forEach((line) => this.#addLine(line));
         this.#calculateSecurityDeposit();
@@ -130,5 +159,14 @@ export class GoodsIssueNote {
         return Object.values(this.purpose)
             .map((v) => v.toLowerCase())
             .join(" ");
+    }
+
+    private updateStatus(status: string) {
+        if (Status.Pending === status) {
+            this.#status = Status.Pending;
+            return;
+        }
+
+        this.#status = Status.Returned;
     }
 }
