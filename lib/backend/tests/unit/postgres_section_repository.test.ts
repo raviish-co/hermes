@@ -7,14 +7,6 @@ import { ID } from "../../shared/id";
 
 describe("PostgresSectionRepository", () => {
     it("Deve salva uma secção no repositório", async () => {
-        const prisma = {
-            section: {
-                create: async (_args: object) => {
-                    return { sectionId: "1", name: "T-shirts" };
-                },
-            },
-        };
-
         const sectionRepository = new PostgresSectionRepository(prisma as PrismaClient);
         const section = new Section(ID.random(), "T-shirts", ID.random());
         const spy = vi.spyOn(prisma.section, "create");
@@ -32,8 +24,6 @@ describe("PostgresSectionRepository", () => {
     });
 
     it("Deve encontrar as secções do repositório", async () => {
-        const prisma = { section: { findMany: async () => [] as any } };
-
         const sectionRepository = new PostgresSectionRepository(prisma as PrismaClient);
         const spy = vi.spyOn(prisma.section, "findMany");
 
@@ -44,15 +34,7 @@ describe("PostgresSectionRepository", () => {
     });
 
     it("Deve recuperar as secções do repositório", async () => {
-        const prisma = {
-            section: {
-                findMany: async () => {
-                    return [{ sectionId: "1", name: "T-shirts" }];
-                },
-            },
-        };
-
-        const sectionRepository = new PostgresSectionRepository(prisma as PrismaClient);
+        const sectionRepository = new PostgresSectionRepository(prisma);
 
         const sections = await sectionRepository.getAll();
 
@@ -62,14 +44,7 @@ describe("PostgresSectionRepository", () => {
     });
 
     it("Deve encontrar uma secção pelo nome", async () => {
-        const prisma = {
-            section: {
-                findFirst: async () => {
-                    return { sectionId: "1", name: "T-shirts" };
-                },
-            },
-        };
-        const sectionRepository = new PostgresSectionRepository(prisma as PrismaClient);
+        const sectionRepository = new PostgresSectionRepository(prisma);
         const spy = vi.spyOn(prisma.section, "findFirst");
 
         await sectionRepository.findByName("T-shirts");
@@ -82,15 +57,7 @@ describe("PostgresSectionRepository", () => {
     });
 
     it("Deve recuperar uma secção pelo nome", async () => {
-        const prisma = {
-            section: {
-                findFirst: async () => {
-                    return { sectionId: "1", name: "T-shirts" };
-                },
-            },
-        };
-
-        const sectionRepository = new PostgresSectionRepository(prisma as PrismaClient);
+        const sectionRepository = new PostgresSectionRepository(prisma);
 
         const sectionOrErr = await sectionRepository.findByName("T-shirts");
         const section = <Section>sectionOrErr.value;
@@ -100,9 +67,8 @@ describe("PostgresSectionRepository", () => {
         expect(section.sectionId.toString()).toEqual("1");
     });
 
-    it("Deve recuperar uma secção pelo nome", async () => {
-        const prisma = { section: { findFirst: async () => null } };
-
+    it("Deve retornar **SectionNotFound** não existir uma seção no repositório com tal nome", async () => {
+        const prisma = { section: { findFirst: async (_args: object) => null } };
         const sectionRepository = new PostgresSectionRepository(prisma as PrismaClient);
 
         const sectionOrErr = await sectionRepository.findByName("T-shirts");
@@ -112,9 +78,7 @@ describe("PostgresSectionRepository", () => {
     });
 
     it("Deve encontrar uma secção pelo ID", async () => {
-        const prisma = { section: { findUnique: async (_args: object) => null } };
-
-        const sectionRepository = new PostgresSectionRepository(prisma as PrismaClient);
+        const sectionRepository = new PostgresSectionRepository(prisma);
         const spy = vi.spyOn(prisma.section, "findUnique");
 
         await sectionRepository.findById(ID.fromString("1"));
@@ -137,3 +101,14 @@ describe("PostgresSectionRepository", () => {
         expect(sectionOrErr.value).toBeInstanceOf(SectionNotFound);
     });
 });
+
+const prisma = {
+    section: {
+        create: async (_args: object) => ({}),
+        findMany: async (_args: object) => _sections,
+        findFirst: async () => _sections[0],
+        findUnique: async (_args: object) => _sections[0],
+    },
+} as unknown as PrismaClient;
+
+const _sections = [{ sectionId: "1", name: "T-shirts" }];
