@@ -1,9 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
+import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
 import { PostgresGoodsIssueNoteRepository } from "../../persistense/postgres/postgres_goods_issue_note_repository";
 import { ID } from "../../shared/id";
-import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
 
 describe("PostgresGoodsIssueNoteRepository - geById", () => {
     it("Deve encontrar a guia de saída pelo seu ID", async () => {
@@ -84,7 +84,7 @@ describe("PostgresGoodsIssueNoteRepository - getAll", () => {
 
         const notes = await noteRepository.getAll();
 
-        expect(notes.length).toEqual(1);
+        expect(notes.length).toEqual(2);
         expect(notes[0].lines.length).toEqual(1);
     });
 });
@@ -156,11 +156,43 @@ describe("PostgresGoodsIssueNoteRepository - search", () => {
     });
 });
 
+describe("PostgresGoodsIssueNoteRepository - update", () => {
+    it("Deve actualizar a guia de saída", async () => {
+        const noteRepository = new PostgresGoodsIssueNoteRepository(prisma);
+        const note = GoodsIssueNote.restore(_notes[1]);
+        const spy = vi.spyOn(prisma.goodsIssueNote, "update");
+
+        await noteRepository.update(note);
+
+        expect(spy).toBeCalled();
+        expect(spy).toBeCalledTimes(1);
+        expect(spy).toBeCalledWith({
+            where: { noteId: note.noteId.toString() },
+            data: {
+                status: note.status,
+                lines: {
+                    updateMany: {
+                        where: { noteId: note.noteId.toString() },
+                        data: _notes[1].lines.map((line) => ({
+                            where: { lineId: line.lineId },
+                            data: {
+                                goodQuantitiesReturned: line.goodQuantitiesReturned,
+                                badQuantitiesReturned: line.badQuantitiesReturned,
+                            },
+                        })),
+                    },
+                },
+            },
+        });
+    });
+});
+
 const prisma = {
     goodsIssueNote: {
         findUnique: async (_args: object) => _notes[0],
         findMany: async (_args: object) => _notes,
         create: async (_args: object) => ({}),
+        update: async (_args: object) => ({}),
     },
 } as unknown as PrismaClient;
 
@@ -178,10 +210,38 @@ const _notes = [
         fulltext: "dummy dummy dummy",
         total: 0,
         securityDeposit: 0,
-        securityDepositWithheld: 0,
         lines: [
             {
                 lineId: "1",
+                productId: "1",
+                name: "dummy",
+                price: 0,
+                goodQuantities: 1,
+                badQuantities: 0,
+                goodQuantitiesReturned: 0,
+                badQuantitiesReturned: 0,
+                netTotal: 0,
+                comments: "dummy",
+                variations: JSON.stringify({ "1": "Cor: Azul", "2": "Tamanho: L" }),
+            },
+        ],
+    },
+    {
+        noteId: "2",
+        purpose: {
+            description: "dummy",
+            notes: "dummy",
+            details: "dummy",
+        },
+        returnDate: new Date("01-01-2021T00:00:00"),
+        issuedAt: new Date("01-01-2021T00:00:00"),
+        status: "Por Devolver",
+        fulltext: "dummy dummy dummy",
+        total: 0,
+        securityDeposit: 0,
+        lines: [
+            {
+                lineId: "2",
                 productId: "1",
                 name: "dummy",
                 price: 0,
