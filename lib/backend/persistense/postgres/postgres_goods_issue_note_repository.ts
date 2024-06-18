@@ -1,7 +1,7 @@
 import type { PrismaClient } from "@prisma/client";
-import type { NoteOptions } from "../../domain/goods_issue/goods_issue_note_options";
 import { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
+import type { NoteOptions } from "../../domain/goods_issue/goods_issue_note_options";
 import type { GoodsIssueNoteRepository } from "../../domain/goods_issue/goods_issue_note_repository";
 import { left, right, type Either } from "../../shared/either";
 import type { ID } from "../../shared/id";
@@ -71,8 +71,18 @@ export class PostgresGoodsIssueNoteRepository implements GoodsIssueNoteRepositor
         });
     }
 
-    search(query: string): Promise<GoodsIssueNote[]> {
-        throw new Error("Method not implemented.");
+    async search(query: string): Promise<GoodsIssueNote[]> {
+        const notesData = await this.#prisma.goodsIssueNote.findMany({
+            where: {
+                OR: [
+                    { noteId: { contains: query } },
+                    { fulltext: { contains: query.toLowerCase() } },
+                ],
+            },
+            include: { purpose: true, lines: true },
+        });
+
+        return notesData.map((note) => GoodsIssueNote.restore(note as NoteOptions));
     }
 
     update(note: GoodsIssueNote): Promise<void> {
