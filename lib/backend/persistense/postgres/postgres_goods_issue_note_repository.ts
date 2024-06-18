@@ -24,8 +24,12 @@ export class PostgresGoodsIssueNoteRepository implements GoodsIssueNoteRepositor
         return right(GoodsIssueNote.restore(noteData as unknown as NoteOptions));
     }
 
-    getAll(): Promise<GoodsIssueNote[]> {
-        throw new Error("Method not implemented.");
+    async getAll(): Promise<GoodsIssueNote[]> {
+        const notesData = await this.#prisma.goodsIssueNote.findMany({
+            include: { purpose: true, lines: true },
+        });
+
+        return notesData.map((note) => GoodsIssueNote.restore(note as unknown as NoteOptions));
     }
 
     save(note: GoodsIssueNote): Promise<void> {
