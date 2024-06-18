@@ -4,7 +4,7 @@ import type { GoodsReceiptNoteRepository } from "../../domain/goods_receipt/good
 import { Condition } from "../../shared/condition";
 
 function goodsReceiptNoteFactory(data: any) {
-    const lines = data.receiptNoteLines.map((line: any) => ({
+    const lines = data.lines.map((line: any) => ({
         receiptLineId: line.receiptLineId,
         itemId: line.productId,
         goodQuantities: line.goodQuantities,
@@ -23,7 +23,7 @@ export class PostgresGoodsReceiptNoteRepository implements GoodsReceiptNoteRepos
 
     async getAll(): Promise<GoodsReceiptNote[]> {
         const notesData = await this.#prisma.goodsReceiptNote.findMany({
-            include: { receiptNoteLines: true },
+            include: { lines: true },
         });
 
         return notesData.map(goodsReceiptNoteFactory);
@@ -34,10 +34,10 @@ export class PostgresGoodsReceiptNoteRepository implements GoodsReceiptNoteRepos
             data: {
                 noteId: note.noteId.toString(),
                 entryDate: note.entryDate,
-                receiptNoteLines: {
+                lines: {
                     createMany: {
                         data: note.lines.map((line) => ({
-                            receiptLineId: line.receiptLineId.toString(),
+                            lineId: line.lineId.toString(),
                             productId: line.itemId.toString(),
                             goodQuantities: line.goodQuantities,
                             badQuantities: line.badQuantities,

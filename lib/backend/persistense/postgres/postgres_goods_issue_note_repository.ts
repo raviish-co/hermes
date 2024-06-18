@@ -1,8 +1,9 @@
 import type { PrismaClient } from "@prisma/client";
-import type { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
-import type { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
+import type { NoteOptions } from "../../domain/goods_issue/goods_issue_note_options";
+import { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
+import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
 import type { GoodsIssueNoteRepository } from "../../domain/goods_issue/goods_issue_note_repository";
-import type { Either } from "../../shared/either";
+import { left, right, type Either } from "../../shared/either";
 import type { ID } from "../../shared/id";
 
 export class PostgresGoodsIssueNoteRepository implements GoodsIssueNoteRepository {
@@ -13,8 +14,14 @@ export class PostgresGoodsIssueNoteRepository implements GoodsIssueNoteRepositor
     }
 
     async getById(noteId: ID): Promise<Either<GoodsIssueNoteNotFound, GoodsIssueNote>> {
-        await this.#prisma.goodsIssueNote.findUnique({ where: { noteId: noteId.toString() } });
-        return {} as unknown as Either<GoodsIssueNoteNotFound, GoodsIssueNote>;
+        const noteData = await this.#prisma.goodsIssueNote.findUnique({
+            where: { noteId: noteId.toString() },
+            include: { purpose: true, lines: true },
+        });
+
+        if (!noteData) return left(new GoodsIssueNoteNotFound());
+
+        return right(GoodsIssueNote.restore(noteData as unknown as NoteOptions));
     }
 
     getAll(): Promise<GoodsIssueNote[]> {
