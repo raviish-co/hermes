@@ -96,9 +96,32 @@ describe("PostgresGoodsReturnNoteRepository - getById", () => {
     });
 });
 
+describe("PostgresGoodsReturnNoteRepository - getAll", () => {
+    it("Deve buscar as notas de devolução no repositório", async () => {
+        const noteRepository = new PostgresGoodsReturnNoteRepository(prisma);
+        const spy = vi.spyOn(prisma.goodsReturnNote, "findMany");
+
+        await noteRepository.getAll();
+
+        expect(spy).toBeCalled();
+        expect(spy).toBeCalledTimes(1);
+        expect(spy).toBeCalledWith({ include: { lines: true } });
+    });
+
+    it("Deve recuperar as notas de devolução no repositório", async () => {
+        const noteRepository = new PostgresGoodsReturnNoteRepository(prisma);
+
+        const notes = await noteRepository.getAll();
+
+        expect(notes.length).toEqual(1);
+        expect(notes[0].lines.length).toEqual(2);
+    });
+});
+
 const prisma = {
     goodsReturnNote: {
         findUnique: async (_args: object) => _notes[0],
+        findMany: async (_args: object) => _notes,
     },
 } as unknown as PrismaClient;
 
