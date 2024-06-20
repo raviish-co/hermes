@@ -8,37 +8,33 @@ export class ItemStockRepositoryStub implements ItemStockRepository {
     constructor() {
         _data.forEach((i) => {
             const itemStock = new ItemStock(i.itemId, i.goodQuantities, i.badQuantities);
-            this.#data[itemStock.itemStockId.toString()] = itemStock;
+            this.save(itemStock);
         });
     }
 
-    getAll(): Promise<ItemStock[]> {
-        return Promise.resolve(this.records);
+    async getAll(): Promise<ItemStock[]> {
+        return this.records;
     }
 
-    save(itemStock: ItemStock): Promise<void> {
+    async save(itemStock: ItemStock): Promise<void> {
         this.#data[itemStock.itemStockId.toString()] = itemStock;
-        return Promise.resolve(undefined);
     }
 
-    updateAll(itemStocks: ItemStock[]): Promise<void> {
-        itemStocks.forEach((i) => {
-            this.#data[i.itemStockId.toString()] = i;
-        });
-        return Promise.resolve(undefined);
+    async updateAll(itemStocks: ItemStock[]): Promise<void> {
+        itemStocks.forEach(this.save.bind(this));
     }
 
-    findAll(itemIds: ID[]): Promise<ItemStock[]> {
+    async findAll(itemIds: ID[]): Promise<ItemStock[]> {
         const ids = itemIds.map((i) => i.toString());
-        return Promise.resolve(this.records.filter((i) => ids.includes(i.itemId.toString())));
+        return this.records.filter((i) => ids.includes(i.itemId.toString()));
     }
 
-    findAllInStock(): Promise<ItemStock[]> {
-        return Promise.resolve(this.records.filter((i) => !i.isOutOfStock()));
+    async findAllInStock(): Promise<ItemStock[]> {
+        return this.records.filter((i) => !i.isOutOfStock());
     }
 
-    findAllOutOfStock(): Promise<ItemStock[]> {
-        return Promise.resolve(this.records.filter((i) => i.isOutOfStock()));
+    async findAllOutOfStock(): Promise<ItemStock[]> {
+        return this.records.filter((i) => i.isOutOfStock());
     }
 
     get records(): ItemStock[] {
