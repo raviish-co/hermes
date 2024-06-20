@@ -89,6 +89,31 @@ describe("PostgresItemStockRepository - findAll", () => {
     });
 });
 
+describe("PostgresItemStockRepository - findAllInStock", () => {
+    it("Deve encontrar os artigos que o stock não está esgotado", async () => {
+        const stockRepo = new PostgresItemStockRepository(prisma);
+        const spy = vi.spyOn(prisma.stock, "findMany");
+
+        await stockRepo.findAllInStock();
+
+        expect(spy).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledWith({
+            where: {
+                OR: [{ goodQuantities: { gt: 0 } }, { badQuantities: { gt: 0 } }],
+            },
+        });
+    });
+
+    it("Deve retornar os artigos encontrados", async () => {
+        const stockRepo = new PostgresItemStockRepository(prisma);
+
+        const itemsStock = await stockRepo.findAllInStock();
+
+        expect(itemsStock.length).toBe(1);
+    });
+});
+
 const prisma = {
     stock: {
         findMany: async (_args: object) => _itemsStock,
