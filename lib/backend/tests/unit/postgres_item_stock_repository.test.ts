@@ -47,10 +47,27 @@ describe("PostgresItemStockRepository - save", () => {
     });
 });
 
+describe("PostgresItemStockRepository - updateAll", () => {
+    it("Deve atualizar o stock dos artigos", async () => {
+        const stockRepo = new PostgresItemStockRepository(prisma);
+        const spy = vi.spyOn(prisma.stock, "update");
+        const itemStocks = [
+            ItemStock.create(ID.fromString("1")),
+            ItemStock.create(ID.fromString("2")),
+        ];
+
+        await stockRepo.updateAll(itemStocks);
+
+        expect(spy).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalledTimes(2);
+    });
+});
+
 const prisma = {
     stock: {
         findMany: async (_args: object) => _itemsStock,
         create: async (_args: object) => ({}),
+        update: async (_args: object) => ({}),
     },
 } as unknown as PrismaClient;
 
