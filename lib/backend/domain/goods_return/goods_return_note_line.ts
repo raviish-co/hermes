@@ -4,7 +4,7 @@ import { Condition } from "../../shared/condition";
 export class GoodsReturnNoteLine {
     readonly lineId: ID;
     readonly itemId: ID;
-    readonly name: string;
+    readonly description: string;
     readonly variationsValues?: Record<string, string>;
     readonly #goodQuantities: number;
     readonly #badQuantities: number;
@@ -12,7 +12,7 @@ export class GoodsReturnNoteLine {
 
     constructor(
         itemId: ID,
-        name: string,
+        description: string,
         goodQuantities: number,
         badQuantities?: number,
         variationsValues?: Record<string, string>,
@@ -20,7 +20,7 @@ export class GoodsReturnNoteLine {
     ) {
         this.lineId = ID.random();
         this.itemId = itemId;
-        this.name = name;
+        this.description = description;
         this.variationsValues = variationsValues;
         this.#goodQuantities = goodQuantities;
         this.#badQuantities = badQuantities ?? 0;

@@ -10,15 +10,16 @@ export class GoodsReturnNote {
     readonly issuedAt: Date;
 
     constructor(
-        goodsReturnNoteId: ID,
+        noteId: ID,
         goodsIssueNoteId: ID,
-        returnLines: GoodsReturnNoteLine[],
-        securityDepositWithheld: number
+        lines: GoodsReturnNoteLine[],
+        securityDepositWithheld: number,
+        issuedAt?: Date
     ) {
+        this.noteId = noteId;
         this.goodsIssueNoteId = goodsIssueNoteId;
-        this.noteId = goodsReturnNoteId;
-        this.lines = returnLines;
+        this.lines = lines;
         this.securityDepositWithheld = new Decimal(securityDepositWithheld);
-        this.issuedAt = new Date();
+        this.issuedAt = issuedAt ?? new Date();
     }
 }

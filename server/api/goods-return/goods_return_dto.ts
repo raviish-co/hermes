@@ -46,7 +46,7 @@ function toGoodsReturnNoteLineDTO(line: GoodsReturnNoteLine): GoodsReturnNoteLin
         goodQuantities: line.goodQuantities,
         badQuantities: line.badQuantities,
         total: line.total,
-        name: line.name,
+        name: line.description,
         variationValues: toVariationValuesDTO(line.variationsValues),
         condition: line.condition,
     };
