@@ -45,8 +45,12 @@ export class PostgresGoodsReturnNoteRepository implements GoodsReturnNoteReposit
         return right(goodsReturnNoteFactory(noteData));
     }
 
-    getAll(): Promise<GoodsReturnNote[]> {
-        throw new Error("Method not implemented.");
+    async getAll(): Promise<GoodsReturnNote[]> {
+        const notesData = await this.#prisma.goodsReturnNote.findMany({
+            include: { lines: true },
+        });
+
+        return notesData.map(goodsReturnNoteFactory);
     }
 
     save(note: GoodsReturnNote): Promise<void> {
