@@ -13,7 +13,7 @@ function goodsReturnNoteFactory(data: any) {
             line.description,
             line.goodQuantities,
             line.badQuantities,
-            line.variations,
+            JSON.parse(line.variations),
             line.comment
         );
     });
@@ -53,7 +53,27 @@ export class PostgresGoodsReturnNoteRepository implements GoodsReturnNoteReposit
         return notesData.map(goodsReturnNoteFactory);
     }
 
-    save(note: GoodsReturnNote): Promise<void> {
-        throw new Error("Method not implemented.");
+    async save(note: GoodsReturnNote): Promise<void> {
+        await this.#prisma.goodsReturnNote.create({
+            data: {
+                noteId: note.noteId.toString(),
+                goodsIssueNoteId: note.goodsIssueNoteId.toString(),
+                securityDepositWithheld: note.securityDepositWithheld.value,
+                issuedAt: note.issuedAt,
+                lines: {
+                    createMany: {
+                        data: note.lines.map((line) => ({
+                            lineId: line.itemId.toString(),
+                            productId: line.itemId.toString(),
+                            description: line.description,
+                            goodQuantities: line.goodQuantities,
+                            badQuantities: line.badQuantities,
+                            comments: line.condition.comment,
+                            variations: JSON.stringify(line.variationsValues),
+                        })),
+                    },
+                },
+            },
+        });
     }
 }
