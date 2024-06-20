@@ -2,6 +2,7 @@ import { GoodsIssueNoteLine } from "~/lib/backend/domain/goods_issue/goods_issue
 import { GoodsIssueNote } from "~/lib/backend/domain/goods_issue/goods_issue_note";
 import { Purpose } from "~/lib/backend/domain/goods_issue/purpose";
 import { toVariationValuesDTO } from "../items/item_dto";
+import { Condition } from "~/lib/backend/shared/condition";
 
 interface VariationValues {
     variationId: string;
@@ -19,9 +20,8 @@ interface GoodsIssueLineDTO {
     badQuantities: number;
     goodQuantitiesReturned: number;
     badQuantitiesReturned: number;
-    fulltext: string;
     variationValues: VariationValues[];
-    condition: any;
+    condition?: Condition;
 }
 
 interface GoodsIssueNoteDTO {
@@ -46,9 +46,8 @@ function toGoodsIssueLineDTO(line: GoodsIssueNoteLine): GoodsIssueLineDTO {
         quantityRequested: line.total,
         quantityReturned: line.quantityReturned,
         quantityToReturn: line.maxToReturn,
-        fulltext: line.fulltext,
         variationValues: toVariationValuesDTO(line.variationsValues),
-        condition: line.#condition,
+        condition: line.condition,
     };
 }
 
