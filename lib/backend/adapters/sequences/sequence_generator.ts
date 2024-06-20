@@ -10,7 +10,7 @@ export class SequenceGenerator implements Generator {
         this.initial = initial;
     }
 
-    generate(code: string): string {
+    async generate(code: string): Promise<string> {
         const next = this.#nextValue(code);
         const newId = this.#format(code, next);
         this.storage.save(code, next);

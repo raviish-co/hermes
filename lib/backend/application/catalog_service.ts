@@ -77,7 +77,7 @@ export class CatalogService {
     }
 
     async registerItem(data: ItemDTO): Promise<Either<ItemError, void>> {
-        const itemId = this.#generator.generate(Sequence.Item);
+        const itemId = await this.#generator.generate(Sequence.Item);
 
         const voidOrSectionErr = await this.#verifySectionId(data.sectionId);
         if (voidOrSectionErr.isLeft()) return left(voidOrSectionErr.value);
@@ -126,7 +126,7 @@ export class CatalogService {
         const voidOrErr = await this.#verifyVariationsIds(variationsIds);
         if (voidOrErr.isLeft()) return left(voidOrErr.value);
 
-        const categoryId = this.#generator.generate(Sequence.Category);
+        const categoryId = await this.#generator.generate(Sequence.Category);
 
         const category = new Category(ID.fromString(categoryId), name, variationsIds, description);
 

@@ -39,11 +39,11 @@ export class GoodsReturnService {
     }
 
     async returningGoods(
-        noteId: string,
+        goodsIssueNoteId: string,
         securityDepositWithheld: number,
         itemsData: ItemData[]
     ): Promise<Either<GoodsReturnNoteError, void>> {
-        const noteOrErr = await this.#goodsIssueRepository.getById(ID.fromString(noteId));
+        const noteOrErr = await this.#goodsIssueRepository.getById(ID.fromString(goodsIssueNoteId));
         if (noteOrErr.isLeft()) return left(noteOrErr.value);
 
         if (noteOrErr.value.isReturned()) return left(new GoodsIssueNoteHasBeenReturned());
@@ -56,8 +56,9 @@ export class GoodsReturnService {
         if (itemsOrErr.isLeft()) return left(itemsOrErr.value);
 
         const returnLines = this.#buildReturnLines(itemsData, itemsOrErr.value);
+        const noteId = await this.#buildReturnNoteId();
         const returnNote = new GoodsReturnNote(
-            this.#buildReturnNoteId(),
+            noteId,
             noteOrErr.value.noteId,
             returnLines,
             securityDepositWithheld
@@ -85,8 +86,9 @@ export class GoodsReturnService {
         return right(noteOrErr.value);
     }
 
-    #buildReturnNoteId(): ID {
-        return ID.fromString(this.#generator.generate(Sequence.GoodsReturnNote));
+    async #buildReturnNoteId(): Promise<ID> {
+        const sequence = await this.#generator.generate(Sequence.GoodsReturnNote);
+        return ID.fromString(sequence);
     }
 
     #buildReturnLines(itemsData: ItemData[], items: Item[]): GoodsReturnNoteLine[] {

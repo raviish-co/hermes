@@ -82,7 +82,7 @@ export class ImportService {
         const itemsStock = await this.#itemStockRepository.findAll(itemsIds);
         const noteLines = this.buildNoteLines(itemsStock);
 
-        const noteId = this.#generator.generate(Sequence.GoodsReceiptNote);
+        const noteId = await this.#generator.generate(Sequence.GoodsReceiptNote);
         const entryDate = new Date();
         const noteOrErr = new GoodsReceiptNoteBuilder()
             .withNoteId(noteId)
@@ -167,7 +167,7 @@ export class ImportService {
             Object.values(csvRow.variations)
         );
         const categoryId = categoryOrErr.value.categoryId.toString();
-        const itemId = this.#generator.generate(Sequence.Item);
+        const itemId = await this.#generator.generate(Sequence.Item);
         const itemOrErr = new ItemBuilder()
             .withItemId(itemId)
             .withName(csvRow.name)

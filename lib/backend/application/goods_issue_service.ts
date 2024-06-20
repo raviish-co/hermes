@@ -52,7 +52,7 @@ export class GoodsIssueService {
         if (voidOrErr.isLeft()) return left(voidOrErr.value);
 
         const lines = this.#buildNoteLines(itemsOrErr.value, data.lines);
-        const noteId = this.#buildNoteId();
+        const noteId = await this.#buildNoteId();
         const noteOrErr = new GoodsIssueNoteBuilder()
             .withNoteId(noteId)
             .withPurpose(purpose)
@@ -85,8 +85,8 @@ export class GoodsIssueService {
         return await this.#noteRepository.search(query);
     }
 
-    #buildNoteId() {
-        return this.#generator.generate(Sequence.GoodIssueNote);
+    async #buildNoteId() {
+        return await this.#generator.generate(Sequence.GoodIssueNote);
     }
 
     #buildPurpose(data: PurposeDTO) {

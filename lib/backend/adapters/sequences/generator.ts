@@ -1,3 +1,3 @@
 export interface Generator {
-    generate(code: string): string;
+    generate(code: string): Promise<string>;
 }

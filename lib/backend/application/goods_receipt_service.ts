@@ -45,7 +45,7 @@ export class GoodsReceiptService {
         this.#incrementItemsStock(itemStocks, data.lines);
 
         const lines = this.#buildLines(data.lines);
-        const noteId = this.#generator.generate(Sequence.GoodsReceiptNote);
+        const noteId = await this.#generator.generate(Sequence.GoodsReceiptNote);
         const noteOrErr = new GoodsReceiptNoteBuilder()
             .withNoteId(noteId)
             .withEntryDate(data.entryDate)
