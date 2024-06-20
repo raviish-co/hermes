@@ -76,7 +76,20 @@ export class PostgresItemStockRepository implements ItemStockRepository {
         return stocksData.map(stockFactory);
     }
 
-    findAllOutOfStock(): Promise<ItemStock[]> {
-        throw new Error("Method not implemented.");
+    async findAllOutOfStock(): Promise<ItemStock[]> {
+        const stocksData = await this.#prisma.stock.findMany({
+            where: {
+                AND: {
+                    goodQuantities: {
+                        equals: 0,
+                    },
+                    badQuantities: {
+                        equals: 0,
+                    },
+                },
+            },
+        });
+
+        return stocksData.map(stockFactory);
     }
 }
