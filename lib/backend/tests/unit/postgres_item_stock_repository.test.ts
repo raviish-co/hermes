@@ -1,8 +1,8 @@
-import { describe, expect, it, vi } from "vitest";
-import { PostgresItemStockRepository } from "../../persistense/postgres/postgres_item_stock_repository";
 import type { PrismaClient } from "@prisma/client";
-import { ID } from "../../shared/id";
+import { describe, expect, it, vi } from "vitest";
 import { ItemStock } from "../../domain/warehouse/item_stock";
+import { PostgresItemStockRepository } from "../../persistense/postgres/postgres_item_stock_repository";
+import { ID } from "../../shared/id";
 
 describe("PostgresItemStockRepository - getAll", () => {
     it("Deve encontrar os artigos em stock", async () => {
@@ -109,6 +109,34 @@ describe("PostgresItemStockRepository - findAllInStock", () => {
         const stockRepo = new PostgresItemStockRepository(prisma);
 
         const itemsStock = await stockRepo.findAllInStock();
+
+        expect(itemsStock.length).toBe(1);
+    });
+});
+
+describe("PostgresItemStockRepository - findAllOutOfStock", () => {
+    it("Deve encontrar os artigos que o stock está esgotado", async () => {
+        const stockRepo = new PostgresItemStockRepository(prisma);
+        const spy = vi.spyOn(prisma.stock, "findMany");
+
+        await stockRepo.findAllOutOfStock();
+
+        expect(spy).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledWith({
+            where: {
+                AND: {
+                    goodQuantities: { equals: 0 },
+                    badQuantities: { equals: 0 },
+                },
+            },
+        });
+    });
+
+    it("Deve retornar os artigos encontrados", async () => {
+        const stockRepo = new PostgresItemStockRepository(prisma);
+
+        const itemsStock = await stockRepo.findAllOutOfStock();
 
         expect(itemsStock.length).toBe(1);
     });
