@@ -1,10 +1,10 @@
+import type { PrismaClient } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { GoodsReturnNote } from "../../domain/goods_return/goods_return_note";
+import { GoodsReturnNoteLine } from "../../domain/goods_return/goods_return_note_line";
+import { GoodsReturnNoteNotFound } from "../../domain/goods_return/goods_return_note_not_found_error";
 import { PostgresGoodsReturnNoteRepository } from "../../persistense/postgres/postgres_goods_return_note_repository";
 import { ID } from "../../shared/id";
-import type { PrismaClient } from "@prisma/client";
-import { GoodsReturnNoteNotFound } from "../../domain/goods_return/goods_return_note_not_found_error";
-import { GoodsReturnNoteLine } from "../../domain/goods_return/goods_return_note_line";
 
 describe("PostgresGoodsReturnNoteRepository - getById", () => {
     it("Deve retonar uma nota pelo Id", async () => {
