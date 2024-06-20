@@ -3,7 +3,6 @@ import { ID } from "../../shared/id";
 export class ItemStock {
     #itemStockId: ID;
     #itemId: ID;
-    #total: number;
     #goodQuantities: number;
     #badQuantities: number;
 
@@ -12,11 +11,21 @@ export class ItemStock {
         this.#itemId = itemId;
         this.#goodQuantities = goodQuantities;
         this.#badQuantities = badQuantities;
-        this.#total = goodQuantities + badQuantities;
     }
 
     static create(itemId: ID): ItemStock {
         return new ItemStock(itemId, 0, 0);
+    }
+
+    static restore(
+        itemStockId: string,
+        itemId: string,
+        goodQuantities: number,
+        badQuantities: number
+    ): ItemStock {
+        const itemStock = new ItemStock(ID.fromString(itemId), goodQuantities, badQuantities);
+        itemStock.#itemStockId = ID.fromString(itemStockId);
+        return itemStock;
     }
 
     isOutOfStock(): boolean {
