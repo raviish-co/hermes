@@ -30,8 +30,18 @@ export class PostgresItemStockRepository implements ItemStockRepository {
         });
     }
 
-    updateAll(itemStocks: ItemStock[]): Promise<void> {
-        throw new Error("Method not implemented.");
+    async updateAll(itemStocks: ItemStock[]): Promise<void> {
+        itemStocks.forEach(async (itemStock) => {
+            await this.#prisma.stock.update({
+                where: {
+                    stockId: itemStock.itemStockId.toString(),
+                },
+                data: {
+                    goodQuantities: itemStock.goodQuantities,
+                    badQuantities: itemStock.badQuantities,
+                },
+            });
+        });
     }
 
     findAll(itemIds: ID[]): Promise<ItemStock[]> {
