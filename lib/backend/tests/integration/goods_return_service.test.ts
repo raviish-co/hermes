@@ -350,8 +350,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         const noteOrErr = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
         const note = <GoodsReturnNote>noteOrErr.value;
 
-        expect(note.lines[0].name).toBe("T-shirt desportiva gola redonda");
-        expect(note.lines[1].name).toBe("Calça Jeans Skinny");
+        expect(note.lines[0].description).toBe("T-shirt desportiva gola redonda");
+        expect(note.lines[1].description).toBe("Calça Jeans Skinny");
     });
 
     it("Deve armazenar a variação dos artigos devolvidos no repositório", async () => {
