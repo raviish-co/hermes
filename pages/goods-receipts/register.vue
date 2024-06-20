@@ -41,7 +41,9 @@ function newGoodsReceipt() {
                 >
                     Dar entrada
                 </button>
-                <button class="btn-light" @click="note.clearLines()">Cancelar</button>
+                <button class="btn-light" @click="$router.push('/goods-receipts/')">
+                    Cancelar
+                </button>
             </div>
         </div>
     </section>
