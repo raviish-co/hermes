@@ -63,6 +63,32 @@ describe("PostgresItemStockRepository - updateAll", () => {
     });
 });
 
+describe("PostgresItemStockRepository - findAll", () => {
+    it("Deve encontrar os artigos pelo ID", async () => {
+        const stockRepo = new PostgresItemStockRepository(prisma);
+        const spy = vi.spyOn(prisma.stock, "findMany");
+
+        await stockRepo.findAll([ID.fromString("1")]);
+
+        expect(spy).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledWith({
+            where: {
+                productId: { in: ["1"] },
+            },
+        });
+    });
+
+    it("Deve retornar os artigos encontrados", async () => {
+        const stockRepo = new PostgresItemStockRepository(prisma);
+
+        const itemsStock = await stockRepo.findAll([ID.fromString("1")]);
+
+        expect(itemsStock.length).toBe(1);
+        expect(itemsStock[0].itemId.equals(ID.fromString("1"))).toBeTruthy();
+    });
+});
+
 const prisma = {
     stock: {
         findMany: async (_args: object) => _itemsStock,
@@ -74,7 +100,7 @@ const prisma = {
 const _itemsStock = [
     {
         stockId: "1",
-        itemId: "1",
+        productId: "1",
         goodQuantities: 10,
         badQuantities: 0,
     },
