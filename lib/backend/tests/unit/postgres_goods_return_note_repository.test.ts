@@ -1,9 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
-import type { GoodsReturnNote } from "../../domain/goods_return/goods_return_note";
+import { GoodsReturnNote } from "../../domain/goods_return/goods_return_note";
 import { PostgresGoodsReturnNoteRepository } from "../../persistense/postgres/postgres_goods_return_note_repository";
 import { ID } from "../../shared/id";
 import type { PrismaClient } from "@prisma/client";
 import { GoodsReturnNoteNotFound } from "../../domain/goods_return/goods_return_note_not_found_error";
+import { GoodsReturnNoteLine } from "../../domain/goods_return/goods_return_note_line";
 
 describe("PostgresGoodsReturnNoteRepository - getById", () => {
     it("Deve retonar uma nota pelo Id", async () => {
@@ -118,12 +119,68 @@ describe("PostgresGoodsReturnNoteRepository - getAll", () => {
     });
 });
 
+describe("PostgresGoodsReturnNoteRepository - save", () => {
+    it("Deve salvar a nota de devolução no repositório", async () => {
+        const noteRepository = new PostgresGoodsReturnNoteRepository(prisma);
+        const spy = vi.spyOn(prisma.goodsReturnNote, "create");
+
+        await noteRepository.save(note);
+
+        expect(spy).toBeCalled();
+        expect(spy).toBeCalledTimes(1);
+        expect(spy).toBeCalledWith({
+            data: {
+                noteId: "1",
+                goodsIssueNoteId: "1",
+                securityDepositWithheld: 1000,
+                issuedAt: note.issuedAt,
+                lines: {
+                    createMany: {
+                        data: [
+                            {
+                                lineId: "1",
+                                productId: "1",
+                                description: "Item description",
+                                goodQuantities: 1,
+                                badQuantities: 0,
+                                comments: "Comment",
+                                variations: JSON.stringify({
+                                    "1": "Cor: Preta",
+                                    "2": "Tamanho: P",
+                                }),
+                            },
+                        ],
+                    },
+                },
+            },
+        });
+    });
+});
+
 const prisma = {
     goodsReturnNote: {
         findUnique: async (_args: object) => _notes[0],
         findMany: async (_args: object) => _notes,
+        create: async (_args: object) => ({}),
     },
 } as unknown as PrismaClient;
+
+const note = new GoodsReturnNote(
+    ID.fromString("1"),
+    ID.fromString("1"),
+    [
+        new GoodsReturnNoteLine(
+            ID.fromString("1"),
+            "Item description",
+            1,
+            0,
+            { "1": "Cor: Preta", "2": "Tamanho: P" },
+            "Comment"
+        ),
+    ],
+    1000,
+    new Date()
+);
 
 const _notes = [
     {
@@ -139,7 +196,7 @@ const _notes = [
                 goodQuantities: 1,
                 badQuantities: 0,
                 comments: "Comment",
-                variations: { "1": "Cor: Preta", "2": "Tamanho: P" },
+                variations: JSON.stringify({ "1": "Cor: Preta", "2": "Tamanho: P" }),
             },
             {
                 lineId: "2",
@@ -147,7 +204,7 @@ const _notes = [
                 description: "Item description",
                 goodQuantities: 10,
                 badQuantities: 1,
-                variations: { "1": "Cor: Branca", "2": "Tamanho: M" },
+                variations: JSON.stringify({ "1": "Cor: Branca", "2": "Tamanho: M" }),
                 comments: "Comment",
             },
         ],
