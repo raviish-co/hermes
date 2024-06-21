@@ -72,15 +72,16 @@ export class GoodsIssueNoteLine {
     }
 
     isFullyReturned(): boolean {
-        return (
-            this.#goodQuantities === this.#goodQuantitiesReturned &&
-            this.#badQuantities === this.#badQuantitiesReturned
-        );
+        return this.#calculateQuantitiesReturned() === this.total;
     }
 
     #calculateTotal(): void {
         const factor = new Decimal(this.total);
         this.#netTotal = this.price.multiply(factor);
+    }
+
+    #calculateQuantitiesReturned() {
+        return this.goodQuantitiesReturned + this.badQuantitiesReturned;
     }
 
     #range() {
