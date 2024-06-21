@@ -196,8 +196,6 @@ describe("PostgresItemRepository - getAll", () => {
         expect(spy).toBeCalledTimes(1);
         expect(spy).toBeCalledWith({
             include: { variations: true },
-            skip: 0,
-            take: 0,
         });
     });
 

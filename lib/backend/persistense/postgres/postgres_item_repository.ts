@@ -38,19 +38,32 @@ export class PostgresItemRepository implements ItemRepository {
     }
 
     async getAll(opts?: PaginatorOptions): Promise<Pagination<Item>> {
+        if (!opts) {
+            const itemsData = await this.#prisma.product.findMany({
+                include: { variations: true },
+            });
+
+            return {
+                result: itemsData.map(itemFactory),
+                pageToken: 0,
+                perPage: 0,
+                total: itemsData.length,
+            };
+        }
+
         const itemsData = await this.#prisma.product.findMany({
             include: { variations: true },
-            skip: opts ? (opts.pageToken - 1) * opts.perPage : 0,
-            take: opts ? opts.perPage : 0,
+            skip: (opts.pageToken - 1) * opts.perPage,
+            take: opts.perPage,
         });
 
         const items = itemsData.map(itemFactory);
 
         return {
             result: items,
-            pageToken: opts ? opts.pageToken : 0,
-            perPage: opts ? opts.perPage : 0,
-            total: items.length,
+            pageToken: opts.pageToken,
+            perPage: opts.perPage,
+            total: Math.ceil(items.length / opts.perPage),
         };
     }
 
