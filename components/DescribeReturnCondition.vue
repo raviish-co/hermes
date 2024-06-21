@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import type { VDialog } from "#build/components";
 import type { Note } from "~/lib/frontend/domain/note";
+import type { ConditionModel } from "~/lib/frontend/models/condition";
 
 const dialogRef = ref<typeof VDialog>();
 const itemId = ref<string>("");
 const goodQuantities = ref<number>(0);
 const badQuantitites = ref<number>(0);
 const maxLimit = ref<number>(0);
+const comment = ref<string>("");
 
 const isDisabled = computed(() => {
     if (!goodQuantities.value && !badQuantitites.value) return true;
@@ -24,6 +26,10 @@ const isDisabled = computed(() => {
 
 function save() {
     props.note.updateQuantitiesToReturn(itemId.value, goodQuantities.value, badQuantitites.value);
+    if (comment) {
+        const condition = { status: "Mau", comment: comment.value };
+        props.note.updateCondition(itemId.value, condition as ConditionModel);
+    }
     dialogRef.value?.close();
 }
 
@@ -51,7 +57,12 @@ const props = defineProps<{ note: Note }>();
             type="number"
             v-model="badQuantitites"
         />
-        <textarea placeholder="Comentário" rows="3" class="input-field resize-none" />
+        <textarea
+            placeholder="Comentário"
+            rows="3"
+            class="input-field resize-none"
+            v-model="comment"
+        />
         <button class="btn-secondary" :disabled="isDisabled" @click="save()">Salvar</button>
     </VDialog>
 </template>
