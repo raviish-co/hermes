@@ -44,20 +44,21 @@ onMounted(async () => {
                 </div>
             </section>
 
-            <VNote :isReturned="true">
+            <VNote :isReturned="true" :showButtons="false">
                 <div class="overflow-y-auto">
                     <table class="table">
                         <thead>
                             <tr class="text-left">
-                                <th class="min-w-20 w-20">Id</th>
                                 <th class="min-w-64 w-64">Artigo</th>
-                                <th class="min-w-20 w-20">Estado</th>
+                                <th class="min-w-20 w-20">Bom Estado</th>
+                                <th class="min-w-20 w-20">Mau Estado</th>
+                                <th class="min-w-20 w-20">Total</th>
+                                <th class="min-w-20 w-20">Comentário</th>
                             </tr>
                         </thead>
 
                         <tbody>
                             <tr v-for="line in note?.lines">
-                                <td>{{ line.itemId }}</td>
                                 <td>
                                     {{ line.name }}
 
@@ -67,7 +68,10 @@ onMounted(async () => {
                                         {{ formatVariationValues(line.variationValues) }}
                                     </span>
                                 </td>
-                                <td>{{ line.condition?.status }}</td>
+                                <td>{{ line.goodQuantities }}</td>
+                                <td>{{ line.badQuantities }}</td>
+                                <td>{{ line.total }}</td>
+                                <td>{{ line.condition?.comment }}</td>
                             </tr>
                         </tbody>
                     </table>
