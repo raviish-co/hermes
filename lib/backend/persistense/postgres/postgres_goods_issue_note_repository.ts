@@ -74,6 +74,8 @@ export class PostgresGoodsIssueNoteRepository implements GoodsIssueNoteRepositor
         const notesData = await this.#prisma.goodsIssueNote.findMany({
             where: {
                 OR: [
+                    { noteId: { contains: query.toLowerCase() } },
+                    { noteId: { contains: query.toUpperCase() } },
                     { noteId: { contains: query } },
                     { fulltext: { contains: query.toLowerCase() } },
                 ],
@@ -87,21 +89,17 @@ export class PostgresGoodsIssueNoteRepository implements GoodsIssueNoteRepositor
     async update(note: GoodsIssueNote): Promise<void> {
         await this.#prisma.goodsIssueNote.update({
             where: { noteId: note.noteId.toString() },
-            data: {
-                status: note.status,
-                lines: {
-                    updateMany: {
-                        where: { noteId: note.noteId.toString() },
-                        data: note.lines.map((line) => ({
-                            where: { lineId: line.lineId.toString() },
-                            data: {
-                                goodQuantitiesReturned: line.goodQuantitiesReturned,
-                                badQuantitiesReturned: line.badQuantitiesReturned,
-                            },
-                        })),
-                    },
+            data: { status: note.status },
+        });
+
+        note.lines.forEach(async (line) => {
+            await this.#prisma.goodsIssueNoteLine.update({
+                where: { lineId: line.lineId.toString() },
+                data: {
+                    goodQuantitiesReturned: line.goodQuantitiesReturned,
+                    badQuantitiesReturned: line.badQuantitiesReturned,
                 },
-            },
+            });
         });
     }
 

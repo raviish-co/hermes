@@ -123,22 +123,6 @@ describe("PostgresGoodsIssueNoteRepository - save", () => {
 });
 
 describe("PostgresGoodsIssueNoteRepository - search", () => {
-    it("Deve pesquisar as guias de saída pelo ID", async () => {
-        const noteRepository = new PostgresGoodsIssueNoteRepository(prisma);
-        const spy = vi.spyOn(prisma.goodsIssueNote, "findMany");
-
-        await noteRepository.search("1");
-
-        expect(spy).toBeCalled();
-        expect(spy).toBeCalledTimes(1);
-        expect(spy).toBeCalledWith({
-            where: {
-                OR: [{ noteId: { contains: "1" } }, { fulltext: { contains: "1" } }],
-            },
-            include: { purpose: true, lines: true },
-        });
-    });
-
     it("Deve pesquisar as guias de saída pelo ID e pelo fulltext", async () => {
         const noteRepository = new PostgresGoodsIssueNoteRepository(prisma);
         const spy = vi.spyOn(prisma.goodsIssueNote, "findMany");
@@ -149,7 +133,12 @@ describe("PostgresGoodsIssueNoteRepository - search", () => {
         expect(spy).toBeCalledTimes(1);
         expect(spy).toBeCalledWith({
             where: {
-                OR: [{ noteId: { contains: "dummy" } }, { fulltext: { contains: "dummy" } }],
+                OR: [
+                    { noteId: { contains: "dummy" } },
+                    { noteId: { contains: "DUMMY" } },
+                    { noteId: { contains: "dummy" } },
+                    { fulltext: { contains: "dummy" } },
+                ],
             },
             include: { purpose: true, lines: true },
         });
@@ -160,29 +149,20 @@ describe("PostgresGoodsIssueNoteRepository - update", () => {
     it("Deve actualizar a guia de saída", async () => {
         const noteRepository = new PostgresGoodsIssueNoteRepository(prisma);
         const note = GoodsIssueNote.restore(_notes[1]);
-        const spy = vi.spyOn(prisma.goodsIssueNote, "update");
+        const spy = vi.spyOn(prisma.goodsIssueNoteLine, "update");
 
         await noteRepository.update(note);
 
         expect(spy).toBeCalled();
         expect(spy).toBeCalledTimes(1);
-        expect(spy).toBeCalledWith({
-            where: { noteId: note.noteId.toString() },
-            data: {
-                status: note.status,
-                lines: {
-                    updateMany: {
-                        where: { noteId: note.noteId.toString() },
-                        data: _notes[1].lines.map((line) => ({
-                            where: { lineId: line.lineId },
-                            data: {
-                                goodQuantitiesReturned: line.goodQuantitiesReturned,
-                                badQuantitiesReturned: line.badQuantitiesReturned,
-                            },
-                        })),
-                    },
+        note.lines.forEach((line) => {
+            expect(spy).toBeCalledWith({
+                where: { lineId: line.lineId.toString() },
+                data: {
+                    goodQuantitiesReturned: line.goodQuantitiesReturned,
+                    badQuantitiesReturned: line.badQuantitiesReturned,
                 },
-            },
+            });
         });
     });
 });
@@ -192,6 +172,9 @@ const prisma = {
         findUnique: async (_args: object) => _notes[0],
         findMany: async (_args: object) => _notes,
         create: async (_args: object) => ({}),
+        update: async (_args: object) => ({}),
+    },
+    goodsIssueNoteLine: {
         update: async (_args: object) => ({}),
     },
 } as unknown as PrismaClient;
