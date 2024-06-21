@@ -34,6 +34,11 @@ function isReturned() {
 }
 
 function newGoodsReturn() {
+    if (securityDepositWithHeld.value.toString().length === 0) {
+        alert("Por favor, insira o valor a reter.");
+        return;
+    }
+
     goodsReturnService
         .new(
             goodsIssueNote.value.goodsIssueNoteId,
@@ -114,6 +119,7 @@ function newGoodsReturn() {
                     <span class="font-medium">Caução a reter (Kz):</span>
                     <input
                         class="input-field max-w-32"
+                        type="number"
                         v-model="securityDepositWithHeld"
                         :disabled="editSecurityDeposit"
                     />
