@@ -5,7 +5,7 @@ import { Condition } from "../../shared/condition";
 
 function goodsReceiptNoteFactory(data: any) {
     const lines = data.lines.map((line: any) => ({
-        receiptLineId: line.receiptLineId,
+        lineId: line.lineId,
         itemId: line.productId,
         goodQuantities: line.goodQuantities,
         badQuantities: line.badQuantities,
