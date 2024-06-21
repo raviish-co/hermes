@@ -138,7 +138,7 @@ describe("PostgresGoodsReturnNoteRepository - save", () => {
                     createMany: {
                         data: [
                             {
-                                lineId: "1",
+                                lineId: note.lines[0].lineId.toString(),
                                 productId: "1",
                                 description: "Item description",
                                 goodQuantities: 1,

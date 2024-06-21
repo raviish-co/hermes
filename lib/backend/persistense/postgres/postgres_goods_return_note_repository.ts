@@ -63,7 +63,7 @@ export class PostgresGoodsReturnNoteRepository implements GoodsReturnNoteReposit
                 lines: {
                     createMany: {
                         data: note.lines.map((line) => ({
-                            lineId: line.itemId.toString(),
+                            lineId: line.lineId.toString(),
                             productId: line.itemId.toString(),
                             description: line.description,
                             goodQuantities: line.goodQuantities,
