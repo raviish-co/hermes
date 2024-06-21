@@ -78,9 +78,10 @@ export class ImportService {
         }
 
         const itemsIds = this.#buildItemsIds(lines);
+        const itemsStockOrErr = await this.#itemStockRepository.findAll(itemsIds);
+        if (itemsStockOrErr.isLeft()) return left(itemsStockOrErr.value);
 
-        const itemsStock = await this.#itemStockRepository.findAll(itemsIds);
-        const noteLines = this.buildNoteLines(itemsStock);
+        const noteLines = this.buildNoteLines(itemsStockOrErr.value);
 
         const noteId = await this.#generator.generate(Sequence.GoodsReceiptNote);
         const entryDate = new Date();
@@ -94,8 +95,8 @@ export class ImportService {
 
         await this.#goodsReceiptNoteRepository.save(noteOrErr.value);
 
-        this.#increaseItemsStock(itemsStock, lines);
-        this.#itemStockRepository.updateAll(itemsStock);
+        this.#increaseItemsStock(itemsStockOrErr.value, lines);
+        this.#itemStockRepository.updateAll(itemsStockOrErr.value);
 
         return right(undefined);
     }

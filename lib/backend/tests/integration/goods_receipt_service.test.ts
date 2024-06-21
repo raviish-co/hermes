@@ -11,6 +11,7 @@ import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_sto
 import { ID } from "../../shared/id";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
+import type { ItemStock } from "../../domain/warehouse/item_stock";
 
 describe("GoodsReceiptService - Entrada de mercadorias", () => {
     it("Deve retornar um erro **InvalidEntryDate** se a data de entrada de mercadoria não for definida", async () => {
@@ -83,11 +84,12 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
         await service.new(data);
 
         const itemIds = [ID.fromString("1001"), ID.fromString("1002")];
-        const items = await itemStockRepository.findAll(itemIds);
+        const itemsStockOrErr = await itemStockRepository.findAll(itemIds);
+        const itemsStock = <ItemStock[]>itemsStockOrErr.value;
 
-        expect(items.length).toBe(2);
-        expect(items[0].total).toBe(60);
-        expect(items[1].total).toBe(30);
+        expect(itemsStock.length).toBe(2);
+        expect(itemsStock[0].total).toBe(60);
+        expect(itemsStock[1].total).toBe(30);
     });
 
     it("Se existir um conjunto de itens em mau estado, o seu número deve ser actualizado no stock", async () => {
@@ -112,11 +114,13 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
         await service.new(data);
 
         const itemIds = [ID.fromString("1002"), ID.fromString("1003")];
-        const items = await itemStockRepository.findAll(itemIds);
+        const itemsStockOrErr = await itemStockRepository.findAll(itemIds);
 
-        expect(items.length).toBe(2);
-        expect(items[0].badQuantities).toBe(10);
-        expect(items[1].badQuantities).toBe(15);
+        const itemsStock = <ItemStock[]>itemsStockOrErr.value;
+
+        expect(itemsStock.length).toBe(2);
+        expect(itemsStock[0].badQuantities).toBe(10);
+        expect(itemsStock[1].badQuantities).toBe(15);
     });
 
     it("Deve salva a guia de entrada de mercadoria no repositório", async () => {
@@ -189,7 +193,7 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
             entryDate: "2024-03-01T16:40:00",
             userId: "1000",
         };
-        const generator = { generate: () => THE_ID };
+        const generator = { generate: async () => THE_ID };
 
         const { service, goodsReceiptNoteRepository } = makeService({ generator });
 

@@ -16,6 +16,7 @@ import { ID } from "../../shared/id";
 import { GoodsIssueNoteRepositoryStub } from "../stubs/goods_issue_note_repository_stub";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
+import type { ItemStock } from "../../domain/warehouse/item_stock";
 
 describe("GoodsIssueService - Saída de mercadoria", () => {
     it("Deve retornar error **InvalidPurpose** se não existir", async () => {
@@ -181,16 +182,16 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
 
         await service.new(goodsIssueData);
 
-        const itemsStock = await itemStockRepository.findAll([
+        const itemsStockOrErr = await itemStockRepository.findAll([
             ID.fromString("1001"),
             ID.fromString("1002"),
         ]);
 
-        expect(itemsStock.length).toBe(2);
-
+        const itemsStock = <ItemStock[]>itemsStockOrErr.value;
         const stock1 = itemsStock[0];
         const stock2 = itemsStock[1];
 
+        expect(itemsStock.length).toBe(2);
         expect(stock1.total).toEqual(8);
         expect(stock2.total).toEqual(7);
     });
@@ -211,7 +212,9 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
 
         await service.new(data);
 
-        const itemsStock = await itemStockRepository.findAll([ID.fromString("1008")]);
+        const itemsStockOrErr = await itemStockRepository.findAll([ID.fromString("1008")]);
+
+        const itemsStock = <ItemStock[]>itemsStockOrErr.value;
 
         expect(itemsStock.length).toBe(1);
 

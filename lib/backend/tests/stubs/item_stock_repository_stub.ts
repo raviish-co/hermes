@@ -1,5 +1,7 @@
 import { ItemStock } from "../../domain/warehouse/item_stock";
+import { ItemStockNotFound } from "../../domain/warehouse/item_stock_not_found";
 import type { ItemStockRepository } from "../../domain/warehouse/item_stock_repository";
+import { left, right, type Either } from "../../shared/either";
 import { ID } from "../../shared/id";
 
 export class ItemStockRepositoryStub implements ItemStockRepository {
@@ -24,9 +26,20 @@ export class ItemStockRepositoryStub implements ItemStockRepository {
         itemStocks.forEach(this.save.bind(this));
     }
 
-    async findAll(itemIds: ID[]): Promise<ItemStock[]> {
+    async findAll(itemIds: ID[]): Promise<Either<ItemStockNotFound, ItemStock[]>> {
         const ids = itemIds.map((i) => i.toString());
-        return this.records.filter((i) => ids.includes(i.itemId.toString()));
+
+        const stocks = [];
+
+        for (const i of itemIds) {
+            const stock = this.records.find((stock) => stock.itemId.equals(i));
+            if (!stock) {
+                return left(new ItemStockNotFound());
+            }
+            stocks.push(stock);
+        }
+
+        return right(stocks);
     }
 
     async findAllInStock(): Promise<ItemStock[]> {

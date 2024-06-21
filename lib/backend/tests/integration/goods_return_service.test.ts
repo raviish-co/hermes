@@ -14,6 +14,7 @@ import { ID } from "../../shared/id";
 import { GoodsIssueNoteRepositoryStub } from "../stubs/goods_issue_note_repository_stub";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
+import type { ItemStock } from "../../domain/warehouse/item_stock";
 
 describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve efetuar a devolução de um conjunto de artigos", async () => {
@@ -106,10 +107,12 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
 
-        const itemsStock = await itemStockRepository.findAll([
+        const itemsStockOrErr = await itemStockRepository.findAll([
             ID.fromString("1009"),
             ID.fromString("1010"),
         ]);
+
+        const itemsStock = <ItemStock[]>itemsStockOrErr.value;
 
         expect(itemsStock.length).toBe(2);
 
@@ -127,10 +130,12 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods("GS - 1006", securityDepositWithHeld, data);
 
-        const itemsStock = await itemStockRepository.findAll([
+        const itemsStockOrErr = await itemStockRepository.findAll([
             ID.fromString("1011"),
             ID.fromString("1012"),
         ]);
+
+        const itemsStock = <ItemStock[]>itemsStockOrErr.value;
 
         expect(itemsStock.length).toBe(2);
         expect(itemsStock[0].goodQuantities).toBe(6);

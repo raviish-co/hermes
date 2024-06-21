@@ -3,6 +3,7 @@ import { FileNotSupported } from "~/lib/backend/adapters/readers/file_not_suppor
 import { InvalidFileHeader } from "~/lib/backend/adapters/readers/invalid_file_header_error";
 import { makeServices } from "~/lib/backend/main";
 import { HttpStatus } from "../http_status";
+import { ItemStockNotFound } from "~/lib/backend/domain/warehouse/item_stock_not_found";
 
 const { importService } = makeServices();
 
@@ -34,10 +35,17 @@ export default defineEventHandler(async (event) => {
         });
     }
 
+    if (voidOrErr.value instanceof ItemStockNotFound) {
+        throw createError({
+            statusCode: HttpStatus.NotFound,
+            statusMessage: "Artigos em armazem nao encontrados.",
+        });
+    }
+
     if (voidOrErr.value instanceof Error) {
         throw createError({
             statusCode: HttpStatus.ServerError,
-            statusMessage: "Erro ao importar artigos.",
+            statusMessage: "Erro carregar os artigos em armazem.",
         });
     }
 

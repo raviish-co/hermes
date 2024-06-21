@@ -14,6 +14,8 @@ import { SectionNotFound } from "../../domain/catalog/departments/section_not_fo
 import type { SectionRepository } from "../../domain/catalog/departments/section_repository";
 import { VariationNotFound } from "../../domain/catalog/variations/variation_not_found_error";
 import type { VariationRepository } from "../../domain/catalog/variations/variation_repository";
+import type { ItemStock } from "../../domain/warehouse/item_stock";
+import { ItemStockNotFound } from "../../domain/warehouse/item_stock_not_found";
 import { InmemCategoryRepository } from "../../persistense/inmem/inmem_category_repository";
 import { InmemGoodsReceiptNoteRepository } from "../../persistense/inmem/inmem_goods_receipt_note_repository";
 import { InmemItemRepository } from "../../persistense/inmem/inmem_item_repository";
@@ -207,11 +209,13 @@ describe("Import Service - Upload Items in Stock", async () => {
 
         await service.uploadItemsInStock(file);
 
-        const itemsStock = await itemStockRepository.findAll([
+        const itemsStockOrErr = await itemStockRepository.findAll([
             ID.fromString("1001"),
             ID.fromString("1002"),
             ID.fromString("1003"),
         ]);
+
+        const itemsStock = <ItemStock[]>itemsStockOrErr.value;
 
         expect(itemsStock.length).toBe(3);
         expect(itemsStock[0].goodQuantities).toBe(20);
@@ -225,11 +229,13 @@ describe("Import Service - Upload Items in Stock", async () => {
 
         await service.uploadItemsInStock(file);
 
-        const itemsStock = await itemStockRepository.findAll([
+        const itemsStockOrErr = await itemStockRepository.findAll([
             ID.fromString("1001"),
             ID.fromString("1002"),
             ID.fromString("1003"),
         ]);
+
+        const itemsStock = <ItemStock[]>itemsStockOrErr.value;
 
         expect(itemsStock.length).toBe(3);
 
@@ -278,6 +284,20 @@ describe("Import Service - Upload Items in Stock", async () => {
 
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(InvalidFileHeader);
+    });
+
+    it("Deve retornar **ItemNotFound** caso algum artigo não seja encontrado no repositório", async () => {
+        const { service } = makeService();
+        const data = `id,boas,com_defeito 
+        1001,10,5
+        1002,8,5
+        1004,5,10`;
+        const file = new File([data], "filename.csv", { type: "text/csv" });
+
+        const error = await service.uploadItemsInStock(file);
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(ItemStockNotFound);
     });
 });
 

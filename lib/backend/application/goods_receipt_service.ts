@@ -40,9 +40,10 @@ export class GoodsReceiptService {
         const itemsOrErr = await this.#itemRepository.findAll(itemsIds);
         if (itemsOrErr.isLeft()) return left(itemsOrErr.value);
 
-        const itemStocks = await this.#itemStockRepository.findAll(itemsIds);
+        const itemsStockOrErr = await this.#itemStockRepository.findAll(itemsIds);
+        if (itemsStockOrErr.isLeft()) return left(itemsStockOrErr.value);
 
-        this.#incrementItemsStock(itemStocks, data.lines);
+        this.#incrementItemsStock(itemsStockOrErr.value, data.lines);
 
         const lines = this.#buildLines(data.lines);
         const noteId = await this.#generator.generate(Sequence.GoodsReceiptNote);
@@ -57,7 +58,7 @@ export class GoodsReceiptService {
 
         this.#noteRepository.save(noteOrErr.value);
 
-        this.#itemStockRepository.updateAll(itemStocks);
+        this.#itemStockRepository.updateAll(itemsStockOrErr.value);
 
         return right(undefined);
     }

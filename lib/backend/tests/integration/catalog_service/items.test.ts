@@ -11,6 +11,7 @@ import { ItemRepositoryStub } from "../../stubs/item_repository_stub";
 import { SectionRepositoryStub } from "../../stubs/section_repository_stub";
 import { VariationRepositoryStub } from "../../stubs/variation_repository_stub";
 import { catalogService } from "./service";
+import type { ItemStock } from "~/lib/backend/domain/warehouse/item_stock";
 
 describe("CatalogService - Recuperar artigos", () => {
     it("Deve buscar os artigos no repositório", async () => {
@@ -436,7 +437,9 @@ describe("CatalogService - Registar artigo", () => {
         await service.registerItem(data);
 
         const item = await itemRepository.last();
-        const itemsStock = await itemStockRepository.findAll([item.itemId]);
+        const itemsStockOrErr = await itemStockRepository.findAll([item.itemId]);
+
+        const itemsStock = <ItemStock[]>itemsStockOrErr.value;
 
         expect(itemsStock[0].itemId).toBeDefined();
         expect(itemsStock[0].total).toEqual(0);

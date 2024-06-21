@@ -1,6 +1,8 @@
 import type { PrismaClient, Stock } from "@prisma/client";
 import { ItemStock } from "../../domain/warehouse/item_stock";
+import { ItemStockNotFound } from "../../domain/warehouse/item_stock_not_found";
 import type { ItemStockRepository } from "../../domain/warehouse/item_stock_repository";
+import { left, right, type Either } from "../../shared/either";
 import { ID } from "../../shared/id";
 
 function stockFactory(data: Stock): ItemStock {
@@ -44,7 +46,7 @@ export class PostgresItemStockRepository implements ItemStockRepository {
         });
     }
 
-    async findAll(itemIds: ID[]): Promise<ItemStock[]> {
+    async findAll(itemIds: ID[]): Promise<Either<ItemStockNotFound, ItemStock[]>> {
         const stocksData = await this.#prisma.stock.findMany({
             where: {
                 productId: {
@@ -53,7 +55,12 @@ export class PostgresItemStockRepository implements ItemStockRepository {
             },
         });
 
-        return stocksData.map(stockFactory);
+        for (const itemId of itemIds) {
+            const itemStock = stocksData.find((stock) => stock.productId === itemId.toString());
+            if (!itemStock) return left(new ItemStockNotFound());
+        }
+
+        return right(stocksData.map(stockFactory));
     }
 
     async findAllInStock(): Promise<ItemStock[]> {
