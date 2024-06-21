@@ -93,7 +93,7 @@ model GoodsIssueNote {
   fulltext String
   purpose Purpose?
   lines GoodsIssueNoteLine[]
-  goodsReturn GoodsReturnNote[]
+  goodsReturnNotes GoodsReturnNote[]
 
   @@map("goods_issue_notes")
 }
@@ -125,13 +125,15 @@ model Purpose {
   details String?
   note GoodsIssueNote @relation(fields: [noteId], references: [noteId])
   noteId String @unique @map("note_id")
+
+  @@map("purposes")
 }
 
 
 model GoodsReturnNote {
   noteId String @id @unique
   goodsIssueNote GoodsIssueNote @relation(fields: [goodsIssueNoteId], references: [noteId])
-  goodsIssueNoteId String @unique @map("goods_issue_note_id")
+  goodsIssueNoteId String @map("goods_issue_note_id")
   securityDepositWithheld Int @map("security_deposity_with_held")
   issuedAt DateTime @map("issued_at")
   lines GoodsReturnNoteLine[]
@@ -161,10 +163,14 @@ model Stock {
   productId String  @unique @map("product_id") 
   goodQuantities Int @default(0) @map("good_quantities")
   badQuantities Int @default(0) @map("bad_quantities")
+
+  @@map("stock_of_products")
 }
 
 
 model Sequence {
   name String @id @unique
   value Int
+
+  @@map("sequences")
 }
