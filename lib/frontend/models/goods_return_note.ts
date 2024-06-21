@@ -5,7 +5,9 @@ interface GoodsReturnLineNoteModel {
     returnLineId: string;
     itemId: string;
     name: string;
-    quantity: number;
+    goodQuantities: number;
+    badQuantities: number;
+    total: number;
     variationValues?: VariationValueModel[];
     condition?: ConditionModel;
 }
