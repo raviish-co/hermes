@@ -70,6 +70,10 @@ export class NoteLine {
         return this.goodQuantitiesReturned + this.badQuantitiesReturned;
     }
 
+    get quantityToReturn() {
+        return this.goodQuantitiesReturned + this.badQuantitiesReturned;
+    }
+
     get formattedVariationsValues() {
         return formatVariationValues(this.variationsValues);
     }
