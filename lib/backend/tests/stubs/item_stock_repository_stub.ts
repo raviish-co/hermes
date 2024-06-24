@@ -22,6 +22,10 @@ export class ItemStockRepositoryStub implements ItemStockRepository {
         this.#data[itemStock.itemStockId.toString()] = itemStock;
     }
 
+    async saveAll(itemStocks: ItemStock[]): Promise<void> {
+        itemStocks.forEach(this.save.bind(this));
+    }
+
     async updateAll(itemStocks: ItemStock[]): Promise<void> {
         itemStocks.forEach(this.save.bind(this));
     }

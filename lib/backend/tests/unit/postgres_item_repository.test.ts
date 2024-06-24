@@ -523,6 +523,7 @@ const prisma = {
         findMany: async (_args: object) => _products,
         findUnique: async (_args: object) => _products[0],
         update: async (_args: object) => ({}),
+        count: async (_args: object) => 4,
     },
     productVariations: {
         createMany: async (_args: object) => ({}),

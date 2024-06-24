@@ -48,6 +48,39 @@ describe("PostgresItemStockRepository - save", () => {
     });
 });
 
+describe("PostgresItemStockRepository - saveAll", () => {
+    it("Deve salvar o stock dos artigos", async () => {
+        const stockRepo = new PostgresItemStockRepository(prisma);
+        const spy = vi.spyOn(prisma.stock, "createMany");
+
+        const itemStocks = [
+            ItemStock.create(ID.fromString("1")),
+            ItemStock.create(ID.fromString("2")),
+        ];
+
+        await stockRepo.saveAll(itemStocks);
+
+        expect(spy).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledWith({
+            data: [
+                {
+                    stockId: itemStocks[0].itemStockId.toString(),
+                    productId: "1",
+                    goodQuantities: 0,
+                    badQuantities: 0,
+                },
+                {
+                    stockId: itemStocks[1].itemStockId.toString(),
+                    productId: "2",
+                    goodQuantities: 0,
+                    badQuantities: 0,
+                },
+            ],
+        });
+    });
+});
+
 describe("PostgresItemStockRepository - updateAll", () => {
     it("Deve atualizar o stock dos artigos", async () => {
         const stockRepo = new PostgresItemStockRepository(prisma);
@@ -158,6 +191,7 @@ const prisma = {
     stock: {
         findMany: async (_args: object) => _itemsStock,
         create: async (_args: object) => ({}),
+        createMany: async (_args: object) => ({}),
         update: async (_args: object) => ({}),
     },
 } as unknown as PrismaClient;

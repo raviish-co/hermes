@@ -57,13 +57,15 @@ export class PostgresItemRepository implements ItemRepository {
             take: opts.perPage,
         });
 
+        const total = await this.#prisma.product.count();
+
         const items = itemsData.map(itemFactory);
 
         return {
             result: items,
             pageToken: opts.pageToken,
             perPage: opts.perPage,
-            total: Math.ceil(items.length / opts.perPage),
+            total: Math.ceil(total / opts.perPage),
         };
     }
 
