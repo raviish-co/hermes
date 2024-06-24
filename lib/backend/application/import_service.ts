@@ -1,6 +1,10 @@
-import { processLine, VALID_ITEM_STOCK_CSV_HEADER } from "../adapters/readers/csv_reader";
+import {
+    processLine as buildCsvRow,
+    VALID_ITEM_STOCK_CSV_HEADER,
+    type CsvRow,
+} from "../adapters/readers/csv_reader";
 import { FileEmpty } from "../adapters/readers/file_empty_error";
-import { EmptyLine } from "../adapters/readers/file_empty_line_error";
+import { InvalidCsvRow } from "../adapters/readers/file_empty_line_error";
 import { FileNotSupported } from "../adapters/readers/file_not_supported_error";
 import { InvalidFileHeader } from "../adapters/readers/invalid_file_header_error";
 import type { Reader } from "../adapters/readers/reader";
@@ -16,7 +20,7 @@ import type { VariationRepository } from "../domain/catalog/variations/variation
 import { GoodsReceiptNoteBuilder } from "../domain/goods_receipt/goods_receipt_note_builder";
 import { GoodsReceiptNoteLine } from "../domain/goods_receipt/goods_receipt_note_line";
 import type { GoodsReceiptNoteRepository } from "../domain/goods_receipt/goods_receipt_note_repository";
-import type { ItemStock } from "../domain/warehouse/item_stock";
+import { ItemStock } from "../domain/warehouse/item_stock";
 import type { ItemStockRepository } from "../domain/warehouse/item_stock_repository";
 import { Decimal } from "../shared/decimal";
 import { left, right, type Either } from "../shared/either";
@@ -29,7 +33,7 @@ export class ImportService {
     #categoryRepository: CategoryRepository;
     #sectionRepository: SectionRepository;
     #variationRepository: VariationRepository;
-    #goodsReceiptNoteRepository: GoodsReceiptNoteRepository;
+    #noteRepository: GoodsReceiptNoteRepository;
     #generator: Generator;
     #reader: Reader;
 
@@ -39,7 +43,7 @@ export class ImportService {
         categoryRepository: CategoryRepository,
         sectionRepository: SectionRepository,
         variationRepository: VariationRepository,
-        goodsReceiptNoteRepository: GoodsReceiptNoteRepository,
+        noteRepository: GoodsReceiptNoteRepository,
         generator: Generator,
         reader: Reader
     ) {
@@ -48,7 +52,7 @@ export class ImportService {
         this.#categoryRepository = categoryRepository;
         this.#sectionRepository = sectionRepository;
         this.#variationRepository = variationRepository;
-        this.#goodsReceiptNoteRepository = goodsReceiptNoteRepository;
+        this.#noteRepository = noteRepository;
         this.#generator = generator;
         this.#reader = reader;
     }
@@ -62,7 +66,10 @@ export class ImportService {
         const itemsOrErr = await this.#buildItems(lines);
         if (itemsOrErr.isLeft()) return left(itemsOrErr.value);
 
+        const itemsStock = itemsOrErr.value.map((item) => ItemStock.create(item.itemId));
+
         await this.#itemRepository.saveAll(itemsOrErr.value);
+        await this.#itemStockRepository.saveAll(itemsStock);
 
         return right(undefined);
     }
@@ -81,19 +88,17 @@ export class ImportService {
         const itemsStockOrErr = await this.#itemStockRepository.findAll(itemsIds);
         if (itemsStockOrErr.isLeft()) return left(itemsStockOrErr.value);
 
-        const noteLines = this.buildNoteLines(itemsStockOrErr.value);
-
         const noteId = await this.#generator.generate(Sequence.GoodsReceiptNote);
         const entryDate = new Date();
         const noteOrErr = new GoodsReceiptNoteBuilder()
             .withNoteId(noteId)
-            .withLines(noteLines)
+            .withLines(this.#buildNoteLines(itemsStockOrErr.value))
             .withEntryDate(entryDate.toISOString())
             .build();
 
         if (noteOrErr.isLeft()) return left(noteOrErr.value);
 
-        await this.#goodsReceiptNoteRepository.save(noteOrErr.value);
+        await this.#noteRepository.save(noteOrErr.value);
 
         this.#increaseItemsStock(itemsStockOrErr.value, lines);
         this.#itemStockRepository.updateAll(itemsStockOrErr.value);
@@ -105,7 +110,9 @@ export class ImportService {
         const items: Item[] = [];
 
         for (const line of lines.slice(1)) {
-            const itemOrErr = await this.#buildLine(line, lines);
+            const csvRow = buildCsvRow(line, lines);
+            const itemOrErr = await this.#processCsvRow(csvRow);
+
             if (itemOrErr.isLeft()) return left(itemOrErr.value);
             items.push(itemOrErr.value);
         }
@@ -124,7 +131,7 @@ export class ImportService {
         return itemsIds;
     }
 
-    buildNoteLines(itemsStock: ItemStock[]) {
+    #buildNoteLines(itemsStock: ItemStock[]) {
         const lines: GoodsReceiptNoteLine[] = [];
 
         for (const itemStock of itemsStock) {
@@ -139,43 +146,23 @@ export class ImportService {
         return lines;
     }
 
-    async #buildLine(line: string, headers: string[]): Promise<Either<Error, Item>> {
-        const values = line.split(",").map((v) => v.trim());
-        if (values.includes("")) return left(new EmptyLine());
+    async #processCsvRow(csvRow: CsvRow): Promise<Either<Error, Item>> {
+        if (!csvRow.name.trim() || !csvRow.price) return left(new InvalidCsvRow());
 
-        const csvRow = processLine(line, headers);
-        const variationsNames = Object.keys(csvRow.variations).map((v) =>
-            (v.charAt(0).toUpperCase() + v.slice(1)).trim()
-        );
-        const variationsValues = Object.values(csvRow.variations).map((v) =>
-            (v.charAt(0).toUpperCase() + v.slice(1)).trim()
-        );
-
-        const categoryOrErr = await this.#categoryRepository.findByName(csvRow.category);
+        const categoryOrErr = await this.#buildCategory(csvRow);
         if (categoryOrErr.isLeft()) return left(categoryOrErr.value);
 
-        const sectionOrErr = await this.#sectionRepository.findByName(csvRow.section);
+        const sectionOrErr = await this.#buildSection(csvRow);
         if (sectionOrErr.isLeft()) return left(sectionOrErr.value);
 
-        const variationsOrErr = await this.#variationRepository.findByNames(variationsNames);
-        if (variationsOrErr.isLeft()) return left(variationsOrErr.value);
-
-        const voidOrErr = await this.#variationRepository.verifyValues(variationsValues);
-        if (voidOrErr.isLeft()) return left(voidOrErr.value);
-
-        const variations = this.#makeItemVariationsValues(
-            variationsOrErr.value,
-            Object.values(csvRow.variations)
-        );
-        const categoryId = categoryOrErr.value.categoryId.toString();
         const itemId = await this.#generator.generate(Sequence.Item);
         const itemOrErr = new ItemBuilder()
             .withItemId(itemId)
             .withName(csvRow.name)
             .withPrice(new Decimal(csvRow.price))
-            .withCategoryId(categoryId)
-            .withSectionId(sectionOrErr.value.sectionId.toString())
-            .withVariationsValues(variations)
+            .withCategoryId(categoryOrErr.value?.categoryId)
+            .withSectionId(sectionOrErr.value?.sectionId)
+            .withVariationsValues(categoryOrErr.value?.variations)
             .build();
 
         if (itemOrErr.isLeft()) return left(itemOrErr.value);
@@ -183,7 +170,7 @@ export class ImportService {
         return right(itemOrErr.value);
     }
 
-    #makeItemVariationsValues(variations: Variation[], values: string[]): Record<string, string> {
+    #makeVariationsValues(variations: Variation[], values: string[]): Record<string, string> {
         const result: Record<string, string> = {};
         for (const variation of variations) {
             const value = values[variations.indexOf(variation)];
@@ -214,4 +201,52 @@ export class ImportService {
             itemStock.increase(Number(goodQuantities), Number(badQuantities));
         }
     }
+
+    async #buildCategory(csvRow: CsvRow): Promise<Either<Error, CategorRow>> {
+        if (!csvRow.category.trim()) return right({ categoryId: "", variations: {} });
+
+        const categoryOrErr = await this.#categoryRepository.findByName(csvRow.category);
+        if (categoryOrErr.isLeft()) return left(categoryOrErr.value);
+
+        const variationsNames = Object.keys(csvRow.variations).map((v) =>
+            (v.charAt(0).toUpperCase() + v.slice(1)).trim()
+        );
+        const variationsValues = Object.values(csvRow.variations).map((v) =>
+            (v.charAt(0).toUpperCase() + v.slice(1)).trim()
+        );
+
+        const variationsOrErr = await this.#variationRepository.findByNames(variationsNames);
+        if (variationsOrErr.isLeft()) return left(variationsOrErr.value);
+
+        const voidOrErr = await this.#variationRepository.verifyValues(variationsValues);
+        if (voidOrErr.isLeft()) return left(voidOrErr.value);
+
+        const variations = this.#makeVariationsValues(
+            variationsOrErr.value,
+            Object.values(csvRow.variations)
+        );
+
+        return right({
+            categoryId: categoryOrErr.value.categoryId.toString(),
+            variations: variations,
+        });
+    }
+
+    async #buildSection(csvRow: CsvRow): Promise<Either<Error, SectionRow>> {
+        if (!csvRow.section.trim()) return right({ sectionId: "" });
+
+        const sectionOrErr = await this.#sectionRepository.findByName(csvRow.section);
+        if (sectionOrErr.isLeft()) return left(sectionOrErr.value);
+
+        return right({ sectionId: sectionOrErr.value.sectionId.toString() });
+    }
 }
+
+type CategorRow = {
+    categoryId: string;
+    variations: Record<string, string>;
+};
+
+type SectionRow = {
+    sectionId: string;
+};

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { CsvReader } from "../../adapters/readers/csv_reader";
 import { FileEmpty } from "../../adapters/readers/file_empty_error";
-import { EmptyLine } from "../../adapters/readers/file_empty_line_error";
+import { InvalidCsvRow } from "../../adapters/readers/file_empty_line_error";
 import { FileNotSupported } from "../../adapters/readers/file_not_supported_error";
 import { InvalidFileHeader } from "../../adapters/readers/invalid_file_header_error";
 import { SequenceGenerator } from "../../adapters/sequences/sequence_generator";
@@ -198,7 +198,77 @@ describe("Test Upload Items", async () => {
         const error = await service.uploadItems(file);
 
         expect(error.isLeft()).toBeTruthy();
-        expect(error.value).toBeInstanceOf(EmptyLine);
+        expect(error.value).toBeInstanceOf(InvalidCsvRow);
+    });
+
+    it("Deve carregar os artigos sem seção", async () => {
+        const { service, itemRepository, categoryRepository, sectionRepository } = makeService();
+        await sectionRepository.save(section);
+        await categoryRepository.save(category);
+
+        const data = `nome,preco,categoria,seccao,cor,marca
+        Produto 1,100.00,Categoria 1,,Preto,Nike
+        Produto 2,200.00,Categoria 1,Secao 1,Preto,Rebock
+        Produto 3,300.00,Categoria 1,,Preto,Adidas
+        Produto 4,400.00,Categoria 1,Secao 1,Preto,Nike
+        Produto 5,500.00,Categoria 1,,Preto,Rebock`;
+
+        const file = new File([data], "filename.csv", { type: "text/csv" });
+
+        await service.uploadItems(file);
+
+        const { result: items } = await itemRepository.getAll({
+            pageToken: 1,
+            perPage: 12,
+        });
+
+        expect(items.length).toBe(5);
+    });
+
+    it("Deve carregar os artigos sem categoria", async () => {
+        const { service, itemRepository, categoryRepository, sectionRepository } = makeService();
+        await sectionRepository.save(section);
+        await categoryRepository.save(category);
+
+        const data = `nome,preco,categoria,seccao,cor,marca
+        Produto 1,100.00,,Secao 1,Preto,Nike
+        Produto 2,200.00,Categoria 1,Secao 1,Preto,Rebock
+        Produto 3,300.00,,Secao 1,Preto,Adidas
+        Produto 4,400.00,Categoria 1,Secao 1,Preto,Nike
+        Produto 5,500.00,,Secao 1,Preto,Rebock`;
+
+        const file = new File([data], "filename.csv", { type: "text/csv" });
+
+        await service.uploadItems(file);
+
+        const { result: items } = await itemRepository.getAll({
+            pageToken: 1,
+            perPage: 12,
+        });
+
+        expect(items.length).toBe(5);
+    });
+
+    it("Deve criar o stock dos artigos que foram carregados", async () => {
+        const { service, itemStockRepository, categoryRepository, sectionRepository } =
+            makeService();
+        await sectionRepository.save(section);
+        await categoryRepository.save(category);
+
+        await service.uploadItems(file);
+
+        const itemsStockOrErr = await itemStockRepository.findAll([
+            ID.fromString("RVS - 0001"),
+            ID.fromString("RVS - 0002"),
+            ID.fromString("RVS - 0003"),
+            ID.fromString("RVS - 0004"),
+            ID.fromString("RVS - 0005"),
+        ]);
+
+        const itemsStock = <ItemStock[]>itemsStockOrErr.value;
+
+        expect(itemsStock.length).toBe(5);
+        expect(itemsStock.every((i) => i.total == 0)).toBeTruthy();
     });
 });
 
@@ -316,9 +386,6 @@ Produto 1,100.00,Categoria 1,Secao 1,Preto,Nike
 Produto 2,200.00,Categoria 1,Secao 1,Preto,Zara
 Produto 3,300.00,Categoria 1,Secao 1,Preto,Adidas
 Produto 4,400.00,Categoria 1,Secao 1,Preto,Nike`;
-
-const variationFormatData = `nome,preco,estado,categoria,seccao,variacoes
-Produto 1,100.00,1,some-comment,Categoria 1,Secao 1,Cor-Preto`;
 
 const file = new File([csvData], "filename.csv", { type: "text/csv" });
 
