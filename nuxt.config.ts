@@ -60,13 +60,13 @@ export default defineNuxtConfig({
                 },
             ],
         },
-        // workbox: {
-        //     navigateFallback: "/",
-        // },
-        // devOptions: {
-        //     enabled: true,
-        //     type: "module",
-        // },
+        workbox: {
+            navigateFallback: "/",
+        },
+        devOptions: {
+            enabled: true,
+            type: "module",
+        },
     },
     devtools: { enabled: false },
     css: ["~/assets/css/main.css"],
@@ -77,4 +77,9 @@ export default defineNuxtConfig({
         },
     },
     plugins: ["~/plugins/app_created"],
+    runtimeConfig: {
+        public: {
+            databaseUrl: process.env.NUXT_DATABASE_URL,
+        },
+    },
 });
