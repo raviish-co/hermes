@@ -1,4 +1,4 @@
-export class EmptyLine extends Error {
+export class InvalidCsvRow extends Error {
     constructor() {
         super("Empty file");
     }

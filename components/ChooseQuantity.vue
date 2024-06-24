@@ -1,7 +1,7 @@
 <script setup lang="ts">
 interface Props {
     modelValue?: number;
-    initital: number;
+    initital?: number;
     limit?: number;
 }
 
@@ -37,7 +37,7 @@ function updateQuantity(e: Event) {
         class="input-number text-center"
         placeholder="QTD"
         min="1"
-        :value="modelValue === 0 ? 0 : modelValue"
+        :value="modelValue == 0 ? 0 : modelValue"
         :max="limit"
         :required="true"
         @input="updateQuantity"

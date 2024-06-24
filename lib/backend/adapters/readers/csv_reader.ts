@@ -2,7 +2,7 @@ import type { Reader } from "./reader";
 
 export const VALID_ITEM_STOCK_CSV_HEADER = ["id,boas,com_defeito"];
 
-interface CsvRow {
+export interface CsvRow {
     name: string;
     price: number;
     category: string;

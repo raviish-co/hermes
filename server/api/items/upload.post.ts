@@ -1,5 +1,5 @@
 import { FileEmpty } from "~/lib/backend/adapters/readers/file_empty_error";
-import { EmptyLine } from "~/lib/backend/adapters/readers/file_empty_line_error";
+import { InvalidCsvRow } from "~/lib/backend/adapters/readers/file_empty_line_error";
 import { FileNotSupported } from "~/lib/backend/adapters/readers/file_not_supported_error";
 import { InvalidFileHeader } from "~/lib/backend/adapters/readers/invalid_file_header_error";
 import { VariationNotFound } from "~/lib/backend/domain/catalog/variations/variation_not_found_error";
@@ -36,7 +36,7 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    if (voidOrErr.value instanceof EmptyLine) {
+    if (voidOrErr.value instanceof InvalidCsvRow) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
             statusMessage: "Arquivo contem linhas vazias.",
