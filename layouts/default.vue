@@ -69,7 +69,7 @@ function toggleMenu() {
 
                 <NuxtLink to="/goods-receipts/upload/" class="nuxt-link">
                     <span class="material-symbols-outlined text-xl"> upload </span>
-                    <span>Import stock</span>
+                    <span>Importar stock</span>
                 </NuxtLink>
 
                 <NuxtLink to="/items" class="nuxt-link">
