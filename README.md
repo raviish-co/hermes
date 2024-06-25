@@ -34,10 +34,10 @@ Para executar a aplicação atráves da sua imagem em Docker siga os seguintes p
 - Construção da Imagem
 
 ```bash
-docker build -f .build/Dockerfile -t hermes .
+docker build --build-arg DATABASE_URL="database-url" -f .build/Dockerfile -t hermes .
 ```
 
-> NOTA: Substitua `hermes` pelo nome real da sua imagem docker
+> NOTA: Substitua `database-url` pela url real de conexão a base de dados.
 
 - Execução do Container
 
