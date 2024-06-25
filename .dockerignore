@@ -8,3 +8,5 @@ node_modules
 .raviish.db
 .raviish.db-journal
 .README.md
+.build
+.env.example
