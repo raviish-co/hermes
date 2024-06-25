@@ -1,5 +1,3 @@
-import { DefaultPurposeSpecification } from "./adapters/default_purpose_specification";
-import { CsvReader } from "./adapters/readers/csv_reader";
 import { CatalogService } from "./application/catalog_service";
 import { DashboardService } from "./application/dashboard_service";
 import { GoodsIssueService } from "./application/goods_issue_service";
@@ -8,12 +6,7 @@ import { GoodsReturnService } from "./application/goods_return_service";
 import { ImportService } from "./application/import_service";
 import { PurposeService } from "./application/purpose_service";
 import { WarehouseService } from "./application/warehouse_service";
-import { create } from "./context";
-import { VariationRepositoryStub } from "./tests/stubs/variation_repository_stub";
-
-const csvReader = new CsvReader();
-const variationRepository = new VariationRepositoryStub();
-const purposeSpec = new DefaultPurposeSpecification();
+import { createContext } from "./context";
 
 interface Services {
     goodsIssueService: GoodsIssueService;
@@ -26,21 +19,21 @@ interface Services {
     warehouseService: WarehouseService;
 }
 
-export const makeServices = (): Services => {
-    const ctx = create();
+const ctx = createContext();
 
+export const makeServices = (): Services => {
     const goodsIssueService = new GoodsIssueService(
         ctx.itemRepository,
         ctx.itemStockRepository,
         ctx.goodsIssueRepository,
         ctx.sequenceGenerator,
-        purposeSpec
+        ctx.purposeSpec
     );
 
     const catalogService = new CatalogService(
         ctx.itemRepository,
         ctx.itemStockRepository,
-        variationRepository,
+        ctx.variationRepository,
         ctx.categoryRepository,
         ctx.sectionRepository,
         ctx.sequenceGenerator
@@ -51,10 +44,10 @@ export const makeServices = (): Services => {
         ctx.itemStockRepository,
         ctx.categoryRepository,
         ctx.sectionRepository,
-        variationRepository,
+        ctx.variationRepository,
         ctx.goodsReceiptRepository,
         ctx.sequenceGenerator,
-        csvReader
+        ctx.csvReader
     );
 
     const purposeService = new PurposeService();

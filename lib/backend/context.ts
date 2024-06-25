@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client";
+import { DefaultPurposeSpecification } from "./adapters/default_purpose_specification";
+import { CsvReader } from "./adapters/readers/csv_reader";
 import { SequenceGenerator } from "./adapters/sequences/sequence_generator";
 import { Enviroment } from "./env";
 import { InmemGoodsIssueNoteRepository } from "./persistense/inmem/inmem_goods_issue_note_repository";
@@ -17,8 +19,13 @@ import { CategoryRepositoryStub } from "./tests/stubs/category_repository_stub";
 import { ItemRepositoryStub } from "./tests/stubs/item_repository_stub";
 import { ItemStockRepositoryStub } from "./tests/stubs/item_stock_repository_stub";
 import { SectionRepositoryStub } from "./tests/stubs/section_repository_stub";
+import { VariationRepositoryStub } from "./tests/stubs/variation_repository_stub";
 
-export function create() {
+const csvReader = new CsvReader();
+const variationRepository = new VariationRepositoryStub();
+const purposeSpec = new DefaultPurposeSpecification();
+
+export function createContext() {
     if (process.env.NODE_ENV === Enviroment.Development) {
         return devContext();
     }
@@ -28,6 +35,7 @@ export function create() {
 
 function devContext() {
     const sequenceStorage = new InmemSequenceStorage();
+
     return {
         itemRepository: new ItemRepositoryStub(),
         goodsIssueRepository: new InmemGoodsIssueNoteRepository(),
@@ -37,6 +45,9 @@ function devContext() {
         goodsReceiptRepository: new InmemGoodsReceiptNoteRepository(),
         goodsReturnRepository: new InmemGoodsReturnNoteRepository(),
         itemStockRepository: new ItemStockRepositoryStub(),
+        variationRepository,
+        purposeSpec,
+        csvReader,
     };
 }
 
@@ -52,5 +63,8 @@ function productionContext() {
         itemStockRepository: new PostgresItemStockRepository(prisma),
         goodsReceiptRepository: new PostgresGoodsReceiptNoteRepository(prisma),
         goodsReturnRepository: new PostgresGoodsReturnNoteRepository(prisma),
+        purposeSpec,
+        csvReader,
+        variationRepository,
     };
 }
