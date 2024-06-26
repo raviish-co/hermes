@@ -29,11 +29,13 @@ function showDecribeCondition(line: NoteLine) {
 function changeQuantity(line: NoteLine, quantity: number) {
     line.updateQuantitiesToReturn(quantity, 0);
 
-    if (props.goodsReturnNote.lines.some((l) => l.quantityToReturn === 0)) {
+    if (props.goodsReturnNote.lines.some((l) => l.quantityToReturn === 0 && l.totalToReturn > 0)) {
         emits("invalid-line", true);
     }
 
-    const isValid = props.goodsReturnNote.lines.every((l) => l.quantityToReturn > 0);
+    const isValid = props.goodsReturnNote.lines.every(
+        (l) => l.quantityToReturn > 0 || l.totalToReturn === 0
+    );
     emits("invalid-line", !isValid);
 }
 function addLine(line: GoodsIssueNoteLine, quantity: number) {
@@ -94,7 +96,7 @@ function showRequestedLines() {
                         <td class="text-center">
                             <ChooseQuantity
                                 :limit="line.totalToReturn"
-                                :model-value="line.quantityToReturn"
+                                :model-value="1"
                                 :class="{ 'input-disabled border-none': line.isFullyReturned() }"
                                 @update-quantity="changeQuantity(line, $event)"
                             />

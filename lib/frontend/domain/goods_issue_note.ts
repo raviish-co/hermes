@@ -1,6 +1,6 @@
+import { formatCurrency } from "../helpers/format_currency";
 import type { GoodsIssueNoteModel } from "../models/goods_issue_note";
 import { GoodsIssueNoteLine } from "./goods_issue_note_line";
-import { formatCurrency } from "../helpers/format_currency";
 import { Note, type LineOptions } from "./note";
 import { Purpose } from "./purpose";
 
@@ -42,12 +42,8 @@ export class GoodsIssueNote extends Note {
             noteLine.quantityRequested = line.quantityRequested;
             noteLine.quantityReturned = line.quantityReturned;
 
-            noteLine.goodQuantitiesReturned = line.goodQuantitiesReturned;
+            noteLine.goodQuantitiesReturned = 0;
             noteLine.badQuantitiesReturned = 0;
-
-            if (line.goodQuantitiesReturned == 0) {
-                line.goodQuantitiesReturned = 1;
-            }
 
             note.lines.push(noteLine);
         }
