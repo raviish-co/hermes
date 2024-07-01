@@ -1,37 +1,39 @@
 {
-    "name": "nuxt-app",
-    "private": true,
-    "type": "module",
-    "engines": {
-        "node": "^18 || >=20",
-        "npm": ">=9.6.3"
-    },
-    "prisma": {
-        "schema": "./lib/backend/persistense/prisma/schema.prisma"
-    },
-    "scripts": {
-        "build": "nuxt build",
-        "dev": "nuxt dev",
-        "generate": "nuxt generate",
-        "preview": "nuxt preview",
-        "postinstall": "nuxt prepare",
-        "clean": "rm -rf .nuxt dist node_modules"
-    },
-    "devDependencies": {
-        "@nuxt/devtools": "latest",
-        "@tailwindcss/forms": "^0.5.7",
-        "@types/uuid": "^9.0.8",
-        "@vitest/coverage-v8": "^1.2.2",
-        "autoprefixer": "^10.4.16",
-        "git-commit-msg-linter": "^5.0.8",
-        "nuxt": "^3.12.2",
-        "postcss": "^8.4.32",
-        "tailwindcss": "^3.4.0",
-        "vitest": "^1.2.0",
-        "vue": "^3.3.12",
-        "vue-router": "^4.2.5"
-    },
-    "dependencies": {
-        "@prisma/client": "^5.9.1"
-    }
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^18 || >=20",
+    "npm": ">=9.6.3"
+  },
+  "prisma": {
+    "schema": "./lib/backend/persistense/prisma/schema.prisma"
+  },
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "generate:prisma": "prisma generate && cp -r node_modules/.prisma __prisma__",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "clean": "rm -rf .nuxt dist node_modules"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "latest",
+    "@tailwindcss/forms": "^0.5.7",
+    "@types/uuid": "^9.0.8",
+    "@vitest/coverage-v8": "^1.2.2",
+    "autoprefixer": "^10.4.16",
+    "git-commit-msg-linter": "^5.0.8",
+    "nuxt": "^3.12.2",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0",
+    "vitest": "^1.2.0",
+    "vue": "^3.3.12",
+    "vue-router": "^4.2.5",
+    "prisma": "^5.16.1"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.9.1"
+  }
 }

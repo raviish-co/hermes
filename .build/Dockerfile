@@ -1,15 +1,22 @@
 FROM oven/bun:1-alpine
 
-WORKDIR /hermes/
+WORKDIR /hermes
 
 
-COPY package.json package-lock.json bun.lockb /hermes/
+COPY package.json .
+
+
 
 RUN bun install
 
-COPY . /hermes/
 
-RUN bunx prisma generate
+
+
+COPY . .
+
+RUN rm -fr node_modules/.prisma
+RUN cp -r __prisma__ node_modules/.prisma
+
 
 EXPOSE 8080
 
