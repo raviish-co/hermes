@@ -1,8 +1,8 @@
+import { useCatalogService } from "~/composables/useCatalogService";
 import { SectionNotFound } from "~/lib/backend/domain/catalog/departments/section_not_found_error";
-import { makeServices } from "~/lib/backend/main";
 import { HttpStatus } from "../http_status";
 
-const { catalogService } = makeServices();
+const catalogService = useCatalogService();
 
 export default defineEventHandler(async (event) => {
     const itemId = getRouterParam(event, "id", { decode: true });

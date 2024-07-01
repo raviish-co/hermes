@@ -1,11 +1,11 @@
+import { useGoodsIssueService } from "~/composables/useGoodsIssueService";
 import { InsufficientStock } from "~/lib/backend/domain/catalog/items/insufficient_stock_error";
 import { ItemNotFound } from "~/lib/backend/domain/catalog/items/item_not_found_error";
 import { InvalidPurpose } from "~/lib/backend/domain/goods_issue/invalid_purpose_error";
 import { InvalidTotal } from "~/lib/backend/domain/goods_issue/invalid_total_error";
 import { HttpStatus } from "~/server/api/http_status";
-import { makeServices } from "~/lib/backend/main";
 
-const { goodsIssueService } = makeServices();
+const goodsIssueService = useGoodsIssueService();
 
 export default defineEventHandler(async (event) => {
     const { data } = await readBody(event);

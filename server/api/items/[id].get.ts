@@ -1,8 +1,8 @@
-import { makeServices } from "~/lib/backend/main";
+import { useCatalogService } from "~/composables/useCatalogService";
 import { HttpStatus } from "../http_status";
 import { toItemDTO } from "./item_dto";
 
-const { catalogService } = makeServices();
+const catalogService = useCatalogService();
 
 export default defineEventHandler(async (event) => {
     const itemId = getRouterParam(event, "id", { decode: true });

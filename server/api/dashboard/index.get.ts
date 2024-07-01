@@ -1,6 +1,6 @@
-import { makeServices } from "~/lib/backend/main";
+import { useDashboardService } from "~/composables/useDashboardService";
 
-const { dashboardService } = makeServices();
+const dashboardService = useDashboardService();
 
 export default defineEventHandler(async (event) => {
     const totalExpiredGoodsIssueNotes = await dashboardService.totalExpiredGoodsIssueNotes();

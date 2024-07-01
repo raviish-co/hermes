@@ -1,8 +1,8 @@
+import { useGoodsReceiptService } from "~/composables/useGoodsReceiptService";
 import { GoodsReceiptNote } from "~/lib/backend/domain/goods_receipt/goods_receipt_note";
 import { GoodsReceiptNoteLine } from "~/lib/backend/domain/goods_receipt/goods_receipt_note_line";
-import { makeServices } from "~/lib/backend/main";
 
-const { goodsReceiptService } = makeServices();
+const goodsReceiptService = useGoodsReceiptService();
 
 interface GoodsReceiptNoteLineDTO {
     lineId: string;

@@ -36,8 +36,6 @@ export default defineNuxtConfig({
     },
     plugins: ["~/plugins/app_created"],
     runtimeConfig: {
-        public: {
-            databaseUrl: process.env.NUXT_DATABASE_URL,
-        },
+        databaseUrl: "",
     },
 });

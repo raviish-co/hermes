@@ -1,7 +1,7 @@
+import { useCatalogService } from "~/composables/useCatalogService";
 import { Section } from "~/lib/backend/domain/catalog/departments/section";
-import { makeServices } from "~/lib/backend/main";
 
-const { catalogService } = makeServices();
+const catalogService = useCatalogService();
 
 interface SectionDTO {
     sectionId: string;

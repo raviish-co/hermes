@@ -1,7 +1,7 @@
+import { useGoodsIssueService } from "~/composables/useGoodsIssueService";
 import { toGoodsIssueNoteDTO } from "./goods_issue_note_dto";
-import { makeServices } from "~/lib/backend/main";
 
-const { goodsIssueService } = makeServices();
+const goodsIssueService = useGoodsIssueService();
 
 export default defineEventHandler(async (event) => {
     const result = await goodsIssueService.list();

@@ -1,7 +1,7 @@
+import { useWarehouseService } from "~/composables/useWarehouseService";
 import { ItemStock } from "~/lib/backend/domain/warehouse/item_stock";
-import { makeServices } from "~/lib/backend/main";
 
-const { warehouseService } = makeServices();
+const warehouseService = useWarehouseService();
 
 interface ItemStockDTO {
     itemId: string;

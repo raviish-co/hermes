@@ -1,24 +1,22 @@
-FROM node:20-alpine
+FROM oven/bun:1-alpine
 
-WORKDIR /raviish/
+WORKDIR /hermes/
 
 
-COPY package.json /raviish/
-COPY package-lock.json /raviish/
+COPY package.json package-lock.json bun.lockb /hermes/
 
-ARG DATABASE_URL
-RUN echo "NUXT_DATABASE_URL=$DATABASE_URL" >> .env
+RUN bun install
 
-RUN npm ci
-COPY . /raviish/
+COPY . /hermes/
 
-RUN npx prisma generate
-RUN npx prisma migrate deploy
-RUN npm run build
+RUN bunx prisma generate
 
 EXPOSE 8080
 
 ENV HOST=0.0.0.0
 ENV PORT=8080
 
-ENTRYPOINT [ "node", ".output/server/index.mjs" ]
+ENTRYPOINT [ "bun", "run", "dev" ]
+
+# ENTRYPOINT [ "bun", ".output/server/index.mjs" ]
+

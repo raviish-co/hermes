@@ -1,12 +1,12 @@
+import { useImportService } from "~/composables/useImportService";
 import { FileEmpty } from "~/lib/backend/adapters/readers/file_empty_error";
 import { InvalidCsvRow } from "~/lib/backend/adapters/readers/file_empty_line_error";
 import { FileNotSupported } from "~/lib/backend/adapters/readers/file_not_supported_error";
 import { InvalidFileHeader } from "~/lib/backend/adapters/readers/invalid_file_header_error";
 import { VariationNotFound } from "~/lib/backend/domain/catalog/variations/variation_not_found_error";
-import { makeServices } from "~/lib/backend/main";
 import { HttpStatus } from "~/server/api/http_status";
 
-const { importService } = makeServices();
+const importService = useImportService();
 
 export default defineEventHandler(async (event) => {
     const formData = await readFormData(event);

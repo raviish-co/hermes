@@ -34,17 +34,16 @@ Para executar a aplicação atráves da sua imagem em Docker siga os seguintes p
 - Construção da Imagem
 
 ```bash
-docker build --build-arg DATABASE_URL="database-url" -f .build/Dockerfile -t hermes .
+docker build -f .build/Dockerfile -t hermes .
 ```
-
-> NOTA: Substitua `database-url` pela url real de conexão a base de dados.
 
 - Execução do Container
 
 ```bash
-docker run -d -p 3000:8080 hermes
+docker run -d -e NUXT_DATABASE_URL="database-url" -p 3000:8080 hermes
 ```
 
+> NOTA: Substitua `database-url` pela url real de conexão a base de dados.
 > NOTA: `hermes` é o nome que deu a imagem no passo acima, opcionalmente, também pode definir do nome do container na flag --name="container-name"
 
 Depois de executar o comando acima a aplicação estará disponível no seguinte endereço: <http://localhost:3000>
@@ -56,13 +55,13 @@ Para executar a aplicação no ambiente de desenvolvimento siga os seguintes pas
 - Instalação das dependências
 
 ```bash
-npm install
+bun install
 ```
 
 - Executar servidor de desenvolvimente
 
 ```bash
-npm run dev
+bun run dev
 ```
 
 Para o ambiente de desenvolvimento a aplicação estará disponível no seguinte endereço: <http://localhost:3000>

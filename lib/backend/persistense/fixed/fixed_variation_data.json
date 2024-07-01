@@ -1,0 +1,27 @@
+[
+    {
+        "id": "1",
+        "name": "Cor",
+        "values": ["Preto", "Branco", "Vermelho", "Castanho", "Azul", "Verde", "Amarelo"]
+    },
+    {
+        "id": "2",
+        "name": "Marca",
+        "values": ["Nike", "Adidas", "Rebock", "Gucci", "Puma", "Fila", "Polo"]
+    },
+    {
+        "id": "3",
+        "name": "Espessura",
+        "values": ["Fino", "Grosso"]
+    },
+    {
+        "id": "4",
+        "name": "Material",
+        "values": ["Algodão", "Poliester", "Seda"]
+    },
+    {
+        "id": "5",
+        "name": "Tamanho",
+        "values": ["S", "M", "L", "XL"]
+    }
+]

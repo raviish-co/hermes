@@ -1,9 +1,9 @@
+import { useGoodsIssueService } from "~/composables/useGoodsIssueService";
 import { GoodsIssueNoteNotFound } from "~/lib/backend/domain/goods_issue/goods_issue_note_not_found_error";
-import { toGoodsIssueNoteDTO } from "./goods_issue_note_dto";
-import { makeServices } from "~/lib/backend/main";
 import { HttpStatus } from "../http_status";
+import { toGoodsIssueNoteDTO } from "./goods_issue_note_dto";
 
-const { goodsIssueService } = makeServices();
+const goodsIssueService = useGoodsIssueService();
 
 export default defineEventHandler(async (event) => {
     const noteId = getRouterParam(event, "id", { decode: true });

@@ -1,8 +1,8 @@
-import { makeServices } from "~/lib/backend/main";
-import { toGoodsIssueNoteDTO } from "./goods_issue_note_dto";
+import { useGoodsIssueService } from "~/composables/useGoodsIssueService";
 import { HttpStatus } from "../http_status";
+import { toGoodsIssueNoteDTO } from "./goods_issue_note_dto";
 
-const { goodsIssueService } = makeServices();
+const goodsIssueService = useGoodsIssueService();
 
 export default defineEventHandler(async (event) => {
     const { query } = getQuery<{ query: string }>(event);

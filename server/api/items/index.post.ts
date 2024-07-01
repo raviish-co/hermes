@@ -1,9 +1,9 @@
-import { VariationNotFound } from "~/lib/backend/domain/catalog/variations/variation_not_found_error";
+import { useCatalogService } from "~/composables/useCatalogService";
 import { SectionNotFound } from "~/lib/backend/domain/catalog/departments/section_not_found_error";
-import { makeServices } from "~/lib/backend/main";
+import { VariationNotFound } from "~/lib/backend/domain/catalog/variations/variation_not_found_error";
 import { HttpStatus } from "../http_status";
 
-const { catalogService } = makeServices();
+const catalogService = useCatalogService();
 
 export default defineEventHandler(async (event) => {
     const data = await readBody(event);

@@ -1,6 +1,6 @@
-import { makeServices } from "@backend/main";
+import { usePurposeService } from "~/composables/usePurposeService";
 
-const { purposeService } = makeServices();
+const purposeService = usePurposeService();
 
 interface PurposeDTO {
     description: string;

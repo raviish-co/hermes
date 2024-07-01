@@ -1,9 +1,9 @@
+import { useCatalogService } from "~/composables/useCatalogService";
 import { CategoryAlreadyExists } from "~/lib/backend/domain/catalog/categories/category_already_exists_error";
 import { VariationNotFound } from "~/lib/backend/domain/catalog/variations/variation_not_found_error";
-import { makeServices } from "~/lib/backend/main";
 import { HttpStatus } from "../http_status";
 
-const { catalogService } = makeServices();
+const catalogService = useCatalogService();
 
 export default defineEventHandler(async (event) => {
     const data = await readBody(event);
