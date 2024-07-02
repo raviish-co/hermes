@@ -1,4 +1,4 @@
-import { FixedVariationRepository } from "~/lib/backend/persistense/fixed/fixed_variation_repository";
+import { FixedVariationRepository } from "~/lib/backend/persistence/fixed/fixed_variation_repository";
 
 const repository = new FixedVariationRepository();
 

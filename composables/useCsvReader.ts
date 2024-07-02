@@ -1,5 +1,5 @@
-import { CsvReader } from "~/lib/backend/adapters/readers/csv_reader";
+import { DefaultCsvReader } from "~/lib/backend/adapters/readers/default_csv_reader";
 
-const csvReader = new CsvReader();
+const csvReader = new DefaultCsvReader();
 
 export const useCsvReader = () => csvReader;

@@ -1,10 +1,10 @@
-import { InmemCategoryRepository } from "~/lib/backend/persistense/inmem/inmem_category_repository";
-import { PostgresCategoryRepository } from "~/lib/backend/persistense/postgres/postgres_category_repository";
+import { PostgresCategoryRepository } from "~/lib/backend/persistence/postgres/postgres_category_repository";
+import { CategoryRepositoryStub } from "~/lib/backend/tests/stubs/category_repository_stub";
 import { usePrismaClient } from "./usePrismaClient";
 
 const repository =
     process.env.NODE_ENV === "development"
-        ? new InmemCategoryRepository()
+        ? new CategoryRepositoryStub()
         : new PostgresCategoryRepository(usePrismaClient());
 
 export const useCategoryRepository = () => repository;

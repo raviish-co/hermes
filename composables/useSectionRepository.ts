@@ -1,10 +1,10 @@
-import { InmemSectionRepository } from "~/lib/backend/persistense/inmem/inmem_section_repository";
-import { PostgresSectionRepository } from "~/lib/backend/persistense/postgres/postgres_section_repository";
+import { PostgresSectionRepository } from "~/lib/backend/persistence/postgres/postgres_section_repository";
+import { SectionRepositoryStub } from "~/lib/backend/tests/stubs/section_repository_stub";
 import { usePrismaClient } from "./usePrismaClient";
 
 const repository =
     process.env.NODE_ENV === "development"
-        ? new InmemSectionRepository()
+        ? new SectionRepositoryStub()
         : new PostgresSectionRepository(usePrismaClient());
 
 export const useSectionRepository = () => repository;

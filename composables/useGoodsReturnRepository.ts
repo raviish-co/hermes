@@ -1,5 +1,5 @@
-import { InmemGoodsReturnNoteRepository } from "~/lib/backend/persistense/inmem/inmem_goods_return_note_repository";
-import { PostgresGoodsReturnNoteRepository } from "~/lib/backend/persistense/postgres/postgres_goods_return_note_repository";
+import { InmemGoodsReturnNoteRepository } from "~/lib/backend/persistence/inmem/inmem_goods_return_note_repository";
+import { PostgresGoodsReturnNoteRepository } from "~/lib/backend/persistence/postgres/postgres_goods_return_note_repository";
 import { usePrismaClient } from "./usePrismaClient";
 
 const repository =
