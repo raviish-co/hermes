@@ -1,4 +1,4 @@
-import { PostgresItemStockRepository } from "~/lib/backend/persistense/postgres/postgres_item_stock_repository";
+import { PostgresItemStockRepository } from "~/lib/backend/persistence/postgres/postgres_item_stock_repository";
 import { ItemStockRepositoryStub } from "~/lib/backend/tests/stubs/item_stock_repository_stub";
 import { usePrismaClient } from "./usePrismaClient";
 
