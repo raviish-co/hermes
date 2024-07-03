@@ -1,7 +1,7 @@
 import { useWarehouseService } from "~/composables/useWarehouseService";
 import { ItemStock } from "~/lib/backend/domain/warehouse/item_stock";
 
-const warehouseService = useWarehouseService();
+const service = useWarehouseService();
 
 interface ItemStockDTO {
     itemId: string;
@@ -20,6 +20,6 @@ function toItemStockDTO(stock: ItemStock): ItemStockDTO {
 }
 
 export default defineEventHandler(async (event) => {
-    const itemsStock = await warehouseService.listItemStock();
+    const itemsStock = await service.listItemStock();
     return itemsStock.map(toItemStockDTO);
 });

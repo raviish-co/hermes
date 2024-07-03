@@ -1,6 +1,6 @@
 import { usePurposeService } from "~/composables/usePurposeService";
 
-const purposeService = usePurposeService();
+const service = usePurposeService();
 
 interface PurposeDTO {
     description: string;
@@ -17,6 +17,6 @@ function toPurposeDTO(p: any): PurposeDTO {
 }
 
 export default defineEventHandler(async () => {
-    const specs = await purposeService.listPurposeSpecifications();
+    const specs = await service.listPurposeSpecifications();
     return specs.map(toPurposeDTO);
 });

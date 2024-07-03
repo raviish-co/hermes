@@ -2,7 +2,7 @@ import { useCatalogService } from "~/composables/useCatalogService";
 import { HttpStatus } from "../http_status";
 import { toItemDTO } from "./item_dto";
 
-const catalogService = useCatalogService();
+const service = useCatalogService();
 
 export default defineEventHandler(async (event) => {
     const itemId = getRouterParam(event, "id", { decode: true });
@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    const itemOrErr = await catalogService.getItem(itemId);
+    const itemOrErr = await service.getItem(itemId);
 
     if (itemOrErr.isLeft()) {
         throw createError({

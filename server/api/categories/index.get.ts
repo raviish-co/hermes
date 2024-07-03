@@ -1,7 +1,7 @@
 import { useCatalogService } from "~/composables/useCatalogService";
 import { Category } from "~/lib/backend/domain/catalog/categories/category";
 
-const catalogService = useCatalogService();
+const service = useCatalogService();
 
 interface CategoryDTO {
     categoryId: string;
@@ -20,6 +20,6 @@ function toCategoryDTO(category: Category): CategoryDTO {
 }
 
 export default defineEventHandler(async (event) => {
-    const categories = await catalogService.listCategories();
+    const categories = await service.listCategories();
     return categories.map(toCategoryDTO);
 });

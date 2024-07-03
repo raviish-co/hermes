@@ -3,7 +3,7 @@ import { GoodsReturnNoteNotFound } from "~/lib/backend/domain/goods_return/goods
 import { HttpStatus } from "../http_status";
 import { toGoodsReturnNoteDTO } from "./goods_return_dto";
 
-const goodsReturnService = useGoodsReturnService();
+const service = useGoodsReturnService();
 
 export default defineEventHandler(async (event) => {
     const noteId = getRouterParam(event, "id", { decode: true });
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    const noteOrErr = await goodsReturnService.get(noteId);
+    const noteOrErr = await service.get(noteId);
 
     if (noteOrErr.value instanceof GoodsReturnNoteNotFound) {
         throw createError({

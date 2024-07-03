@@ -3,12 +3,12 @@ import { CategoryAlreadyExists } from "~/lib/backend/domain/catalog/categories/c
 import { VariationNotFound } from "~/lib/backend/domain/catalog/variations/variation_not_found_error";
 import { HttpStatus } from "../http_status";
 
-const catalogService = useCatalogService();
+const service = useCatalogService();
 
 export default defineEventHandler(async (event) => {
     const data = await readBody(event);
 
-    const voidOrErr = await catalogService.registerCategory(
+    const voidOrErr = await service.registerCategory(
         data.name,
         data.variationsIds,
         data.description
@@ -25,6 +25,13 @@ export default defineEventHandler(async (event) => {
         throw createError({
             statusCode: HttpStatus.NotFound,
             statusMessage: "Variacao nao encontrada",
+        });
+    }
+
+    if (voidOrErr instanceof Error) {
+        throw createError({
+            statusCode: HttpStatus.ServerError,
+            statusMessage: "Erro ao registar categoria",
         });
     }
 

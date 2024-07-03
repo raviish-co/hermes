@@ -3,12 +3,12 @@ import { SectionNotFound } from "~/lib/backend/domain/catalog/departments/sectio
 import { VariationNotFound } from "~/lib/backend/domain/catalog/variations/variation_not_found_error";
 import { HttpStatus } from "../http_status";
 
-const catalogService = useCatalogService();
+const service = useCatalogService();
 
 export default defineEventHandler(async (event) => {
     const data = await readBody(event);
 
-    const voidOrErr = await catalogService.registerItem(data);
+    const voidOrErr = await service.registerItem(data);
 
     if (voidOrErr.value instanceof SectionNotFound) {
         throw createError({

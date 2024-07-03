@@ -1,13 +1,13 @@
 import { useDashboardService } from "~/composables/useDashboardService";
 
-const dashboardService = useDashboardService();
+const service = useDashboardService();
 
 export default defineEventHandler(async (event) => {
-    const totalExpiredGoodsIssueNotes = await dashboardService.totalExpiredGoodsIssueNotes();
-    const totalOutOfStockItems = await dashboardService.totalOutOfStockItems();
-    const totalInStockItems = await dashboardService.totalInStockItems();
-    const totalInventoryValue = await dashboardService.totalInventoryValue();
-    const percentageOfItemsInStock = await dashboardService.percentageOfItemsInStock();
+    const totalExpiredGoodsIssueNotes = await service.totalExpiredGoodsIssueNotes();
+    const totalOutOfStockItems = await service.totalOutOfStockItems();
+    const totalInStockItems = await service.totalInStockItems();
+    const totalInventoryValue = await service.totalInventoryValue();
+    const percentageOfItemsInStock = await service.percentageOfItemsInStock();
 
     setResponseStatus(event, 200);
 

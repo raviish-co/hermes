@@ -5,12 +5,12 @@ import { InvalidPurpose } from "~/lib/backend/domain/goods_issue/invalid_purpose
 import { InvalidTotal } from "~/lib/backend/domain/goods_issue/invalid_total_error";
 import { HttpStatus } from "~/server/api/http_status";
 
-const goodsIssueService = useGoodsIssueService();
+const service = useGoodsIssueService();
 
 export default defineEventHandler(async (event) => {
     const { data } = await readBody(event);
 
-    const voidOrErr = await goodsIssueService.new(data);
+    const voidOrErr = await service.new(data);
 
     if (voidOrErr.value instanceof InvalidPurpose) {
         throw createError({
@@ -40,7 +40,7 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    if (voidOrErr.isLeft()) {
+    if (voidOrErr instanceof Error) {
         throw createError({
             statusCode: HttpStatus.ServerError,
             statusMessage: "Erro ao efetuar a saida de artigos",

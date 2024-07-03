@@ -1,7 +1,7 @@
 import { useCatalogService } from "~/composables/useCatalogService";
 import { Section } from "~/lib/backend/domain/catalog/departments/section";
 
-const catalogService = useCatalogService();
+const service = useCatalogService();
 
 interface SectionDTO {
     sectionId: string;
@@ -18,6 +18,6 @@ function toSectionDTO(section: Section): SectionDTO {
 }
 
 export default defineEventHandler(async (event) => {
-    const sections = await catalogService.listSections();
+    const sections = await service.listSections();
     return sections.map(toSectionDTO);
 });

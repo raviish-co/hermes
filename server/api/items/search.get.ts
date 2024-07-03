@@ -1,7 +1,7 @@
 import { useCatalogService } from "~/composables/useCatalogService";
 import { toItemDTO } from "./item_dto";
 
-const catalogService = useCatalogService();
+const service = useCatalogService();
 
 export default defineEventHandler(async (event) => {
     const { query, pageToken, perPage } = getQuery<{
@@ -10,11 +10,7 @@ export default defineEventHandler(async (event) => {
         perPage?: string;
     }>(event);
 
-    const { result, total } = await catalogService.searchItems(
-        query,
-        Number(pageToken),
-        Number(perPage)
-    );
+    const { result, total } = await service.searchItems(query, Number(pageToken), Number(perPage));
 
     const items = result.map(toItemDTO);
 

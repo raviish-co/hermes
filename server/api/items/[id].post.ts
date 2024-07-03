@@ -2,7 +2,7 @@ import { useCatalogService } from "~/composables/useCatalogService";
 import { SectionNotFound } from "~/lib/backend/domain/catalog/departments/section_not_found_error";
 import { HttpStatus } from "../http_status";
 
-const catalogService = useCatalogService();
+const service = useCatalogService();
 
 export default defineEventHandler(async (event) => {
     const itemId = getRouterParam(event, "id", { decode: true });
@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    const voidOrErr = await catalogService.updateItem(itemId, data);
+    const voidOrErr = await service.updateItem(itemId, data);
 
     if (voidOrErr.value instanceof SectionNotFound) {
         throw createError({

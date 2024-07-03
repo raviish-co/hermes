@@ -5,14 +5,14 @@ import { InvalidFileHeader } from "~/lib/backend/adapters/readers/invalid_file_h
 import { ItemStockNotFound } from "~/lib/backend/domain/warehouse/item_stock_not_found";
 import { HttpStatus } from "../http_status";
 
-const importService = useImportService();
+const service = useImportService();
 
 export default defineEventHandler(async (event) => {
     const formData = await readFormData(event);
 
     const file = formData.get("file") as File;
 
-    const voidOrErr = await importService.uploadItemsInStock(file);
+    const voidOrErr = await service.uploadItemsInStock(file);
 
     if (voidOrErr.value instanceof InvalidFileHeader) {
         throw createError({

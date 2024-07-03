@@ -4,12 +4,12 @@ import { InvalidEntryDate } from "~/lib/backend/domain/goods_receipt/invalid_ent
 import { InvalidLines } from "~/lib/backend/domain/goods_receipt/invalid_lines_error";
 import { HttpStatus } from "../http_status";
 
-const goodsReceiptService = useGoodsReceiptService();
+const service = useGoodsReceiptService();
 
 export default defineEventHandler(async (event) => {
     const { data } = await readBody(event);
 
-    const voidOrErr = await goodsReceiptService.new(data);
+    const voidOrErr = await service.new(data);
 
     if (voidOrErr.value instanceof InvalidEntryDate) {
         throw createError({
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    if (voidOrErr.isLeft()) {
+    if (voidOrErr instanceof Error) {
         throw createError({
             statusCode: HttpStatus.ServerError,
             statusMessage: "Erro ao efeturar saida de mercadoria",

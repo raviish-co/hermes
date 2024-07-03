@@ -1,19 +1,16 @@
 import { useGoodsReturnService } from "~/composables/useGoodsReturnService";
 import { GoodsIssueNoteHasBeenReturned } from "~/lib/backend/domain/goods_issue/goods_issue_note_has_been_returned_error";
 import { GoodsIssueNoteNotFound } from "~/lib/backend/domain/goods_issue/goods_issue_note_not_found_error";
+import { GoodsIssueLineNotFound } from "~/lib/backend/domain/goods_issue/goods_lssue_line_not_found_error";
 import { InvalidGoodsIssueLineQuantity } from "~/lib/backend/domain/goods_issue/invalid_goods_issue_line_quantity_error";
 import { HttpStatus } from "../http_status";
 
-const goodsReturnService = useGoodsReturnService();
+const service = useGoodsReturnService();
 
 export default defineEventHandler(async (event) => {
     const { noteId, securityDepositWithHeld, itemsData } = await readBody(event);
 
-    const voidOrErr = await goodsReturnService.returningGoods(
-        noteId,
-        securityDepositWithHeld,
-        itemsData
-    );
+    const voidOrErr = await service.returningGoods(noteId, securityDepositWithHeld, itemsData);
 
     if (voidOrErr.value instanceof GoodsIssueNoteNotFound) {
         throw createError({
@@ -36,7 +33,14 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    if (voidOrErr.isLeft()) {
+    if (voidOrErr.value instanceof GoodsIssueLineNotFound) {
+        throw createError({
+            statusMessage: "Artigo para devolucao nao encontrado.",
+            statusCode: HttpStatus.NotFound,
+        });
+    }
+
+    if (voidOrErr instanceof Error) {
         throw createError({
             statusMessage: "Erro ao registrar a devolucao.",
             statusCode: HttpStatus.ServerError,

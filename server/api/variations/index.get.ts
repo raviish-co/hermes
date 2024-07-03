@@ -1,7 +1,7 @@
 import { useCatalogService } from "~/composables/useCatalogService";
 import { Variation } from "~/lib/backend/domain/catalog/variations/variation";
 
-const catalogService = useCatalogService();
+const service = useCatalogService();
 
 interface VariationDTO {
     variationId: string;
@@ -18,6 +18,6 @@ function toVariationDTO(v: Variation): VariationDTO {
 }
 
 export default defineEventHandler(async () => {
-    const variations = await catalogService.listVariations();
+    const variations = await service.listVariations();
     return variations.map(toVariationDTO);
 });

@@ -6,14 +6,14 @@ import { InvalidFileHeader } from "~/lib/backend/adapters/readers/invalid_file_h
 import { VariationNotFound } from "~/lib/backend/domain/catalog/variations/variation_not_found_error";
 import { HttpStatus } from "~/server/api/http_status";
 
-const importService = useImportService();
+const service = useImportService();
 
 export default defineEventHandler(async (event) => {
     const formData = await readFormData(event);
 
     const file = formData.get("file") as File;
 
-    const voidOrErr = await importService.uploadItems(file);
+    const voidOrErr = await service.uploadItems(file);
 
     if (voidOrErr.value instanceof InvalidFileHeader) {
         throw createError({
