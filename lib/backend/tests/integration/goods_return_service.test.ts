@@ -111,8 +111,6 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
             ID.fromString("1010"),
         ]);
 
-        // const itemsStock = <ItemStock[]>itemsStockOrErr.value;
-
         expect(itemsStock.length).toBe(2);
 
         expect(itemsStock[0].total).toBe(8);
@@ -133,8 +131,6 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
             ID.fromString("1011"),
             ID.fromString("1012"),
         ]);
-
-        // const itemsStock = <ItemStock[]>itemsStockOrErr.value;
 
         expect(itemsStock.length).toBe(2);
         expect(itemsStock[0].goodQuantities).toBe(6);

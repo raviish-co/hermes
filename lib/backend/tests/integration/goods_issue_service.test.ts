@@ -187,8 +187,6 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
             ID.fromString("1002"),
         ]);
 
-        // const itemsStock = <ItemStock[]>itemsStockOrErr.value;
-
         const stock1 = itemsStock[0];
         const stock2 = itemsStock[1];
 
@@ -214,8 +212,6 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
         await service.new(data);
 
         const itemsStock = await itemStockRepository.findAll([ID.fromString("1008")]);
-
-        // const itemsStock = <ItemStock[]>itemsStockOrErr.value;
 
         expect(itemsStock.length).toBe(1);
 

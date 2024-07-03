@@ -124,10 +124,6 @@ export class GoodsIssueService {
 
         const itemsStock = await this.#itemStockRepository.findAll(itemsIds);
 
-        // if (itemStockOrErr.isLeft()) return left(itemStockOrErr.value);
-
-        // const itemsStock = itemStockOrErr.value;
-
         for (const idx in itemsStock) {
             const item = items[idx];
             const line = data.lines[idx];

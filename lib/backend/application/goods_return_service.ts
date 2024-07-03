@@ -114,10 +114,6 @@ export class GoodsReturnService {
     async #increaseStock(itemsIds: ID[], itemsData: ItemData[]) {
         const itemsStock = await this.#itemStockRepository.findAll(itemsIds);
 
-        // if (itemsStockOrErr.isL) return left(itemsStockOrErr.value);
-
-        // const itemsStock = itemsStockOrErr.value;
-
         for (const stock of itemsStock) {
             const data = itemsData.find((item) => stock.itemId.equals(ID.fromString(item.itemId)))!;
             stock.increase(data.goodQuantities, data.badQuantities);
