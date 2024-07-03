@@ -7,9 +7,8 @@ import { GoodsReceiptNoteLine } from "../domain/goods_receipt/goods_receipt_note
 import type { GoodsReceiptNoteRepository } from "../domain/goods_receipt/goods_receipt_note_repository";
 import { InvalidEntryDate } from "../domain/goods_receipt/invalid_entry_date_error";
 import { InvalidLines } from "../domain/goods_receipt/invalid_lines_error";
-import type { ItemStock } from "../domain/warehouse/item_stock";
+import { ItemStock } from "../domain/warehouse/item_stock";
 import type { ItemStockRepository } from "../domain/warehouse/item_stock_repository";
-import { convertToIds } from "../shared/convert_to_ids";
 import { left, right, type Either } from "../shared/either";
 import type { GoodsReceiptError } from "../shared/errors";
 import { ID } from "../shared/id";
@@ -34,16 +33,15 @@ export class GoodsReceiptService {
 
     async new(data: NoteDTO): Promise<Either<GoodsReceiptError, void>> {
         if (!data.entryDate) return left(new InvalidEntryDate(data.entryDate));
+
         if (this.#isValidLines(data)) return left(new InvalidLines());
 
-        const itemsIds = convertToIds(data.lines.map((line) => line.itemId));
+        const itemsIds = data.lines.map(({ itemId }) => ID.fromString(itemId));
+
         const itemsOrErr = await this.#itemRepository.findAll(itemsIds);
         if (itemsOrErr.isLeft()) return left(itemsOrErr.value);
 
-        const itemsStockOrErr = await this.#itemStockRepository.findAll(itemsIds);
-        if (itemsStockOrErr.isLeft()) return left(itemsStockOrErr.value);
-
-        this.#incrementItemsStock(itemsStockOrErr.value, data.lines);
+        const itemsStock = await this.#adjustStockLevels(itemsIds, data.lines);
 
         const lines = this.#buildLines(data.lines);
         const noteId = await this.#generator.generate(Sequence.GoodsReceiptNote);
@@ -58,7 +56,7 @@ export class GoodsReceiptService {
 
         this.#noteRepository.save(noteOrErr.value);
 
-        this.#itemStockRepository.updateAll(itemsStockOrErr.value);
+        this.#itemStockRepository.saveAll(itemsStock);
 
         return right(undefined);
     }
@@ -67,12 +65,27 @@ export class GoodsReceiptService {
         return this.#noteRepository.getAll();
     }
 
-    #isValidLines(data: NoteDTO) {
-        return !data.lines || data.lines.length === 0;
-    }
+    async #adjustStockLevels(itemIds: ID[], lines: NoteLineDTO[]) {
+        const itemsStock = await this.#itemStockRepository.findAll(itemIds);
+        for (const line of lines) {
+            const itemStock = itemsStock.find((is) => is.itemId.toString() === line.itemId);
 
-    #incrementItemsStock(items: ItemStock[], lines: NoteLineDTO[]) {
-        items.forEach((i, idx) => i.increase(lines[idx].goodQuantities, lines[idx].badQuantities));
+            if (!itemStock) {
+                const newStock = new ItemStock(
+                    ID.fromString(line.itemId),
+                    line.goodQuantities,
+                    line.badQuantities
+                );
+
+                itemsStock.push(newStock);
+
+                continue;
+            }
+
+            itemStock.increase(line.goodQuantities, line.badQuantities);
+        }
+
+        return itemsStock;
     }
 
     #buildLines(lines: NoteLineDTO[]): GoodsReceiptNoteLine[] {
@@ -86,6 +99,10 @@ export class GoodsReceiptService {
             line.badQuantities,
             line.comment
         );
+    }
+
+    #isValidLines(data: NoteDTO) {
+        return !data.lines || data.lines.length === 0;
     }
 }
 

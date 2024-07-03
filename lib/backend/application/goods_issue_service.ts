@@ -122,10 +122,11 @@ export class GoodsIssueService {
     async #reduceStock(items: Item[], data: NoteDTO): Promise<Either<InsufficientStock, void>> {
         const itemsIds = this.#buildItemsIds(data.lines);
 
-        const itemStockOrErr = await this.#itemStockRepository.findAll(itemsIds);
-        if (itemStockOrErr.isLeft()) return left(itemStockOrErr.value);
+        const itemsStock = await this.#itemStockRepository.findAll(itemsIds);
 
-        const itemsStock = itemStockOrErr.value;
+        // if (itemStockOrErr.isLeft()) return left(itemStockOrErr.value);
+
+        // const itemsStock = itemStockOrErr.value;
 
         for (const idx in itemsStock) {
             const item = items[idx];

@@ -7,7 +7,7 @@ import { FileEmpty } from "../adapters/readers/file_empty_error";
 import { InvalidCsvRow } from "../adapters/readers/file_empty_line_error";
 import { FileNotSupported } from "../adapters/readers/file_not_supported_error";
 import { InvalidFileHeader } from "../adapters/readers/invalid_file_header_error";
-import type { CsvReader } from "../adapters/readers/csv_reader";
+import type { CsvReader } from "../adapters/readers/reader";
 import type { Generator } from "../adapters/sequences/generator";
 import { Sequence } from "../adapters/sequences/sequence";
 import type { CategoryRepository } from "../domain/catalog/categories/category_repository";
@@ -21,6 +21,7 @@ import { GoodsReceiptNoteBuilder } from "../domain/goods_receipt/goods_receipt_n
 import { GoodsReceiptNoteLine } from "../domain/goods_receipt/goods_receipt_note_line";
 import type { GoodsReceiptNoteRepository } from "../domain/goods_receipt/goods_receipt_note_repository";
 import { ItemStock } from "../domain/warehouse/item_stock";
+import { ItemStockNotFound } from "../domain/warehouse/item_stock_not_found";
 import type { ItemStockRepository } from "../domain/warehouse/item_stock_repository";
 import { Decimal } from "../shared/decimal";
 import { left, right, type Either } from "../shared/either";
@@ -66,10 +67,7 @@ export class ImportService {
         const itemsOrErr = await this.#buildItems(lines);
         if (itemsOrErr.isLeft()) return left(itemsOrErr.value);
 
-        const itemsStock = itemsOrErr.value.map((item) => ItemStock.create(item.itemId));
-
         await this.#itemRepository.saveAll(itemsOrErr.value);
-        await this.#itemStockRepository.saveAll(itemsStock);
 
         return right(undefined);
     }
@@ -85,14 +83,17 @@ export class ImportService {
         }
 
         const itemsIds = this.#buildItemsIds(lines);
-        const itemsStockOrErr = await this.#itemStockRepository.findAll(itemsIds);
-        if (itemsStockOrErr.isLeft()) return left(itemsStockOrErr.value);
+        const itemsStock = await this.#itemStockRepository.findAll(itemsIds);
+
+        if (this.#hasIncompleteItemsStock(itemsStock, itemsIds)) {
+            return left(new ItemStockNotFound());
+        }
 
         const noteId = await this.#generator.generate(Sequence.GoodsReceiptNote);
         const entryDate = new Date();
         const noteOrErr = new GoodsReceiptNoteBuilder()
             .withNoteId(noteId)
-            .withLines(this.#buildNoteLines(itemsStockOrErr.value))
+            .withLines(this.#buildNoteLines(itemsStock))
             .withEntryDate(entryDate.toISOString())
             .build();
 
@@ -100,8 +101,9 @@ export class ImportService {
 
         await this.#noteRepository.save(noteOrErr.value);
 
-        this.#increaseItemsStock(itemsStockOrErr.value, lines);
-        this.#itemStockRepository.updateAll(itemsStockOrErr.value);
+        this.#increaseItemsStock(itemsStock, lines);
+
+        this.#itemStockRepository.updateAll(itemsStock);
 
         return right(undefined);
     }
@@ -179,14 +181,6 @@ export class ImportService {
         return result;
     }
 
-    #isCsvFile(file: File): boolean {
-        return file.type === "text/csv";
-    }
-
-    #isEmptyFile(lines: string[]): boolean {
-        return lines.length <= 1;
-    }
-
     #increaseItemsStock(itemsStock: ItemStock[], lines: string[]) {
         for (const line of lines.slice(1)) {
             const [itemId, goodQuantities, badQuantities] = line.split(",");
@@ -239,6 +233,18 @@ export class ImportService {
         if (sectionOrErr.isLeft()) return left(sectionOrErr.value);
 
         return right({ sectionId: sectionOrErr.value.sectionId.toString() });
+    }
+
+    #hasIncompleteItemsStock(itemsStock: ItemStock[], itemsIds: ID[]) {
+        return itemsStock.length !== itemsIds.length;
+    }
+
+    #isCsvFile(file: File): boolean {
+        return file.type === "text/csv";
+    }
+
+    #isEmptyFile(lines: string[]): boolean {
+        return lines.length <= 1;
     }
 }
 

@@ -30,20 +30,18 @@ export class ItemStockRepositoryStub implements ItemStockRepository {
         itemStocks.forEach(this.save.bind(this));
     }
 
-    async findAll(itemIds: ID[]): Promise<Either<ItemStockNotFound, ItemStock[]>> {
-        const ids = itemIds.map((i) => i.toString());
-
+    async findAll(itemIds: ID[]): Promise<ItemStock[]> {
         const stocks = [];
 
         for (const i of itemIds) {
             const stock = this.records.find((stock) => stock.itemId.equals(i));
-            if (!stock) {
-                return left(new ItemStockNotFound());
-            }
+
+            if (!stock) continue;
+
             stocks.push(stock);
         }
 
-        return right(stocks);
+        return stocks;
     }
 
     async findAllInStock(): Promise<ItemStock[]> {

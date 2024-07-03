@@ -106,12 +106,12 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(goodsIssueNoteId, securityDepositWithHeld, itemsData);
 
-        const itemsStockOrErr = await itemStockRepository.findAll([
+        const itemsStock = await itemStockRepository.findAll([
             ID.fromString("1009"),
             ID.fromString("1010"),
         ]);
 
-        const itemsStock = <ItemStock[]>itemsStockOrErr.value;
+        // const itemsStock = <ItemStock[]>itemsStockOrErr.value;
 
         expect(itemsStock.length).toBe(2);
 
@@ -129,12 +129,12 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods("GS - 1006", securityDepositWithHeld, data);
 
-        const itemsStockOrErr = await itemStockRepository.findAll([
+        const itemsStock = await itemStockRepository.findAll([
             ID.fromString("1011"),
             ID.fromString("1012"),
         ]);
 
-        const itemsStock = <ItemStock[]>itemsStockOrErr.value;
+        // const itemsStock = <ItemStock[]>itemsStockOrErr.value;
 
         expect(itemsStock.length).toBe(2);
         expect(itemsStock[0].goodQuantities).toBe(6);

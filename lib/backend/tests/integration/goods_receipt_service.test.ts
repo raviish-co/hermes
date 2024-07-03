@@ -2,13 +2,15 @@ import { describe, expect, it } from "vitest";
 import type { Generator } from "../../adapters/sequences/generator";
 import { SequenceGenerator } from "../../adapters/sequences/sequence_generator";
 import { GoodsReceiptService } from "../../application/goods_receipt_service";
+import { Item } from "../../domain/catalog/items/item";
 import { ItemNotFound } from "../../domain/catalog/items/item_not_found_error";
 import { InvalidEntryDate } from "../../domain/goods_receipt/invalid_entry_date_error";
 import { InvalidLines } from "../../domain/goods_receipt/invalid_lines_error";
-import type { ItemStock } from "../../domain/warehouse/item_stock";
 import type { ItemStockRepository } from "../../domain/warehouse/item_stock_repository";
 import { InmemGoodsReceiptNoteRepository } from "../../persistence/inmem/inmem_goods_receipt_note_repository";
+import { InmemItemRepository } from "../../persistence/inmem/inmem_item_repository";
 import { InmemSequenceStorage } from "../../persistence/inmem/inmem_sequence_storage";
+import { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
@@ -84,8 +86,7 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
         await service.new(data);
 
         const itemIds = [ID.fromString("1001"), ID.fromString("1002")];
-        const itemsStockOrErr = await itemStockRepository.findAll(itemIds);
-        const itemsStock = <ItemStock[]>itemsStockOrErr.value;
+        const itemsStock = await itemStockRepository.findAll(itemIds);
 
         expect(itemsStock.length).toBe(2);
         expect(itemsStock[0].total).toBe(60);
@@ -114,9 +115,7 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
         await service.new(data);
 
         const itemIds = [ID.fromString("1002"), ID.fromString("1003")];
-        const itemsStockOrErr = await itemStockRepository.findAll(itemIds);
-
-        const itemsStock = <ItemStock[]>itemsStockOrErr.value;
+        const itemsStock = await itemStockRepository.findAll(itemIds);
 
         expect(itemsStock.length).toBe(2);
         expect(itemsStock[0].badQuantities).toBe(10);
@@ -233,6 +232,56 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
         expect(note.lines[1].condition.status).toBe("Mau");
         expect(note.lines[1].condition.comment).toBe("Gola rasgada");
     });
+
+    it("Deve criar os registos de stock, para os artigos que não tenham stock, ", async () => {
+        const item = new Item(ID.fromString("2000"), "Camisa", new Decimal(1000));
+        const item1 = new Item(ID.fromString("2001"), "Camisa", new Decimal(1000));
+        const items = [item, item1];
+        const itemRepository = new InmemItemRepository(items);
+        const { service, itemStockRepository } = makeService({ itemRepository });
+
+        await itemRepository.saveAll([item, item1]);
+
+        const data = {
+            lines: [
+                { itemId: "2000", goodQuantities: 2 },
+                { itemId: "2001", goodQuantities: 2 },
+            ],
+            entryDate: "2024-03-01T16:40:00",
+            userId: "1000",
+        };
+
+        await service.new(data);
+
+        const itemIds = [ID.fromString("2000"), ID.fromString("2000")];
+        const itemsStock = await itemStockRepository.findAll(itemIds);
+
+        expect(itemsStock.length).toBe(2);
+        expect(itemsStock[0].total).toBe(2);
+        expect(itemsStock[1].total).toBe(2);
+    });
+
+    it("Deve actualizar as quantidades de stock, para os artigos que já tenham stock", async () => {
+        const { service, itemStockRepository } = makeService();
+
+        const data = {
+            lines: [
+                { itemId: "1001", goodQuantities: 2 },
+                { itemId: "1002", goodQuantities: 2 },
+            ],
+            entryDate: "2024-03-01T16:40:00",
+            userId: "1000",
+        };
+
+        await service.new(data);
+
+        const itemIds = [ID.fromString("1001"), ID.fromString("1002")];
+        const itemsStock = await itemStockRepository.findAll(itemIds);
+
+        expect(itemsStock.length).toBe(2);
+        expect(itemsStock[0].total).toBe(12);
+        expect(itemsStock[1].total).toBe(12);
+    });
 });
 
 describe("GoodsReceiptService - Listar guias de entrada de mercadoria", () => {
@@ -262,9 +311,11 @@ describe("GoodsReceiptService - Listar guias de entrada de mercadoria", () => {
         expect(notes.length).toBe(0);
     });
 });
+
 interface Options {
     generator?: Generator;
     itemStockRepository?: ItemStockRepository;
+    itemRepository?: InmemItemRepository;
 }
 
 const makeService = (options?: Options) => {
@@ -272,7 +323,7 @@ const makeService = (options?: Options) => {
     const sequenceGenerator = options?.generator ?? new SequenceGenerator(storage);
     const itemStockRepository = options?.itemStockRepository ?? new ItemStockRepositoryStub();
     const goodsReceiptNoteRepository = new InmemGoodsReceiptNoteRepository();
-    const itemRepository = new ItemRepositoryStub();
+    const itemRepository = options?.itemRepository ?? new ItemRepositoryStub();
     const service = new GoodsReceiptService(
         itemRepository,
         itemStockRepository,

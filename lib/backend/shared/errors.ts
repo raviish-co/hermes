@@ -15,7 +15,6 @@ import type { CategoryAlreadyExists } from "../domain/catalog/categories/categor
 import type { VariationNotFound } from "../domain/catalog/variations/variation_not_found_error";
 import type { CategoryNotFound } from "../domain/catalog/categories/category_not_found_error";
 import type { SectionNotFound } from "../domain/catalog/departments/section_not_found_error";
-import type { ItemStockNotFound } from "../domain/warehouse/item_stock_not_found";
 
 export type GoodsIssueNoteError = InvalidPurpose | ItemNotFound | InvalidTotal | InsufficientStock;
 
@@ -25,12 +24,7 @@ export type GoodsReturnNoteError =
     | GoodsIssueLineNotFound
     | GoodsIssueNoteHasBeenReturned;
 
-export type FileError =
-    | InvalidFileHeader
-    | FileEmpty
-    | FileNotSupported
-    | ItemStockNotFound
-    | Error;
+export type FileError = InvalidFileHeader | FileEmpty | FileNotSupported | Error;
 
 export type GoodsReceiptError = InvalidEntryDate | InvalidLines | ItemNotFound;
 

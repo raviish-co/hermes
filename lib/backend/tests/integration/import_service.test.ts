@@ -14,7 +14,6 @@ import { SectionNotFound } from "../../domain/catalog/departments/section_not_fo
 import type { SectionRepository } from "../../domain/catalog/departments/section_repository";
 import { VariationNotFound } from "../../domain/catalog/variations/variation_not_found_error";
 import type { VariationRepository } from "../../domain/catalog/variations/variation_repository";
-import type { ItemStock } from "../../domain/warehouse/item_stock";
 import { ItemStockNotFound } from "../../domain/warehouse/item_stock_not_found";
 import { InmemCategoryRepository } from "../../persistence/inmem/inmem_category_repository";
 import { InmemGoodsReceiptNoteRepository } from "../../persistence/inmem/inmem_goods_receipt_note_repository";
@@ -248,28 +247,6 @@ describe("Test Upload Items", async () => {
 
         expect(items.length).toBe(5);
     });
-
-    it("Deve criar o stock dos artigos que foram carregados", async () => {
-        const { service, itemStockRepository, categoryRepository, sectionRepository } =
-            makeService();
-        await sectionRepository.save(section);
-        await categoryRepository.save(category);
-
-        await service.uploadItems(file);
-
-        const itemsStockOrErr = await itemStockRepository.findAll([
-            ID.fromString("RVS - 0001"),
-            ID.fromString("RVS - 0002"),
-            ID.fromString("RVS - 0003"),
-            ID.fromString("RVS - 0004"),
-            ID.fromString("RVS - 0005"),
-        ]);
-
-        const itemsStock = <ItemStock[]>itemsStockOrErr.value;
-
-        expect(itemsStock.length).toBe(5);
-        expect(itemsStock.every((i) => i.total == 0)).toBeTruthy();
-    });
 });
 
 describe("Import Service - Upload Items in Stock", async () => {
@@ -279,13 +256,11 @@ describe("Import Service - Upload Items in Stock", async () => {
 
         await service.uploadItemsInStock(file);
 
-        const itemsStockOrErr = await itemStockRepository.findAll([
+        const itemsStock = await itemStockRepository.findAll([
             ID.fromString("1001"),
             ID.fromString("1002"),
             ID.fromString("1003"),
         ]);
-
-        const itemsStock = <ItemStock[]>itemsStockOrErr.value;
 
         expect(itemsStock.length).toBe(3);
         expect(itemsStock[0].goodQuantities).toBe(20);
@@ -299,13 +274,11 @@ describe("Import Service - Upload Items in Stock", async () => {
 
         await service.uploadItemsInStock(file);
 
-        const itemsStockOrErr = await itemStockRepository.findAll([
+        const itemsStock = await itemStockRepository.findAll([
             ID.fromString("1001"),
             ID.fromString("1002"),
             ID.fromString("1003"),
         ]);
-
-        const itemsStock = <ItemStock[]>itemsStockOrErr.value;
 
         expect(itemsStock.length).toBe(3);
 

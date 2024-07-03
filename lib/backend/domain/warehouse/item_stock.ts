@@ -6,11 +6,11 @@ export class ItemStock {
     #goodQuantities: number;
     #badQuantities: number;
 
-    constructor(itemId: ID, goodQuantities: number, badQuantities: number) {
+    constructor(itemId: ID, goodQuantities: number, badQuantities?: number) {
         this.#itemStockId = ID.random();
         this.#itemId = itemId;
         this.#goodQuantities = goodQuantities;
-        this.#badQuantities = badQuantities;
+        this.#badQuantities = badQuantities ?? 0;
     }
 
     static create(itemId: ID): ItemStock {
