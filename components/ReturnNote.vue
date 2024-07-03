@@ -13,12 +13,13 @@ interface Props {
     goodsReturnNote: GoodsReturnNote;
     goodsIssueNote: GoodsIssueNote;
     isReturned: boolean;
+    quantities: number[];
 }
-
 const emits = defineEmits<Emits>();
 const props = defineProps<Props>();
 const describeConditionRef = ref<typeof DescribeReturnCondition>();
 const chooseNoteLineRef = ref<typeof ChooseNoteLine>();
+const hasEmptyQuantity = computed(() => props.quantities.some((q) => q.toString() === ""));
 
 function showDecribeCondition(line: NoteLine) {
     if (line.isFullyReturned()) return;
@@ -26,21 +27,15 @@ function showDecribeCondition(line: NoteLine) {
     describeConditionRef.value?.show(line.itemId, line.totalToReturn);
 }
 
-function changeQuantity(line: NoteLine, quantity: number) {
-    line.updateQuantitiesToReturn(quantity, 0);
-
-    if (props.goodsReturnNote.lines.some((l) => l.quantityToReturn === 0 && l.totalToReturn > 0)) {
-        emits("invalid-line", true);
-    }
-
-    const isValid = props.goodsReturnNote.lines.every(
-        (l) => l.quantityToReturn > 0 || l.totalToReturn === 0
-    );
-    emits("invalid-line", !isValid);
-}
 function addLine(line: GoodsIssueNoteLine, quantity: number) {
     props.goodsReturnNote.addLine(line, quantity);
-    if (props.goodsReturnNote.lines.length >= 1) emits("invalid-line", false);
+    props.goodsReturnNote.updateQuantitiesToReturn(line.itemId, quantity, 0);
+
+    const i = props.goodsReturnNote.lines.findIndex((l) => l.itemId === line.itemId);
+
+    props.quantities[i] = quantity;
+
+    emits("invalid-line", false);
 }
 
 function removeLine(itemId: string) {
@@ -57,6 +52,29 @@ function clearLines() {
 function showRequestedLines() {
     if (props.goodsIssueNote.lines.length === props.goodsReturnNote.lines.length) return;
     chooseNoteLineRef.value?.show();
+}
+
+function changeLineQuantity(line: NoteLine, quantity: number) {
+    line.updateQuantitiesToReturn(quantity, 0);
+
+    if (hasEmptyQuantity) {
+        emits("invalid-line", true);
+        return;
+    }
+
+    emits("invalid-line", false);
+}
+
+function updateQuantity(data: { itemId: string; total: number }) {
+    const line = props.goodsReturnNote.lines.find((l) => l.itemId === data.itemId);
+
+    if (!line) return;
+
+    const idx = props.goodsReturnNote.lines.indexOf(line);
+
+    props.quantities[idx] = Number(data.total);
+
+    emits("invalid-line", hasEmptyQuantity.value);
 }
 </script>
 <template>
@@ -94,11 +112,16 @@ function showRequestedLines() {
                         </td>
 
                         <td class="text-center">
-                            <ChooseQuantity
-                                :limit="line.totalToReturn"
-                                :model-value="1"
-                                :class="{ 'input-disabled border-none': line.isFullyReturned() }"
-                                @update-quantity="changeQuantity(line, $event)"
+                            <input
+                                type="number"
+                                class="input-number text-center"
+                                placeholder="QTD"
+                                v-model="quantities[idx]"
+                                min="1"
+                                :max="line.totalToReturn"
+                                :required="true"
+                                :disabled="line.isFullyReturned()"
+                                @input="changeLineQuantity(line, quantities[idx])"
                             />
                         </td>
 
@@ -118,7 +141,11 @@ function showRequestedLines() {
         </div>
     </VNote>
 
-    <DescribeReturnCondition ref="describeConditionRef" :note="goodsReturnNote" />
+    <DescribeReturnCondition
+        ref="describeConditionRef"
+        :note="goodsReturnNote"
+        @update-quantity="updateQuantity"
+    />
 
     <ChooseNoteLine
         ref="chooseNoteLineRef"

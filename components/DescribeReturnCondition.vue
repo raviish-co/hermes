@@ -10,6 +10,12 @@ const badQuantitites = ref<number>(0);
 const maxLimit = ref<number>(0);
 const comment = ref<string>("");
 
+interface Emits {
+    (e: "update-quantity", value: { itemId: string; total: number }): void;
+}
+
+const emits = defineEmits<Emits>();
+
 const isDisabled = computed(() => {
     if (!goodQuantities.value && !badQuantitites.value) return true;
 
@@ -31,6 +37,13 @@ function save() {
         props.note.updateCondition(itemId.value, condition as ConditionModel);
     }
     dialogRef.value?.close();
+
+    const total = goodQuantities.value + badQuantitites.value;
+
+    emits("update-quantity", {
+        itemId: itemId.value,
+        total,
+    });
 }
 
 function show(id: string, limit: number) {

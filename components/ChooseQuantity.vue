@@ -37,7 +37,7 @@ function updateQuantity(e: Event) {
         class="input-number text-center"
         placeholder="QTD"
         min="1"
-        :value="1"
+        :value="modelValue ? modelValue : 1"
         :max="limit"
         :required="true"
         @input="updateQuantity"

@@ -58,11 +58,14 @@ defineExpose({ show });
                             </span>
                         </td>
                         <td>
-                            <ChooseQuantity
-                                :initital="1"
-                                :limit="line.maxToReturn"
-                                :model-value="quantities[idx]"
-                                @update-quantity="quantities[idx] = $event"
+                            <input
+                                type="number"
+                                class="input-number text-center"
+                                placeholder="QTD"
+                                v-model="quantities[idx]"
+                                min="1"
+                                :max="line.totalToReturn"
+                                :required="true"
                                 @enter="$emit('chooseLine', line, quantities[idx])"
                                 @tab="$emit('chooseLine', line, quantities[idx])"
                             />

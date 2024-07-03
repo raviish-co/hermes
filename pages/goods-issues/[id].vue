@@ -5,6 +5,7 @@ import { GoodsReturnNote } from "~/lib/frontend/domain/goods_return_note";
 import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
 import { formatDate } from "~/lib/frontend/helpers/format_date";
 
+const quantities = ref<number[]>([]);
 const securityDepositWithHeld = ref<number>(0);
 const goodsReturnNote = ref<GoodsReturnNote>({} as GoodsReturnNote);
 const goodsIssueNote = ref<GoodsIssueNote>({} as GoodsIssueNote);
@@ -22,6 +23,7 @@ goodsIssueService
     .then((result) => {
         goodsIssueNote.value = GoodsIssueNote.build(result);
         goodsReturnNote.value = new GoodsReturnNote(goodsIssueNote.value.lines);
+        quantities.value = goodsIssueNote.value.lines?.map((l) => l.totalToReturn);
     })
     .catch((err) => alert(err.statusMessage));
 
@@ -85,6 +87,7 @@ function newGoodsReturn() {
             :goods-return-note="(goodsReturnNote as GoodsReturnNote)"
             :goods-issue-note="(goodsIssueNote as GoodsIssueNote)"
             :is-returned="isReturned()"
+            :quantities="quantities"
             @invalid-line="invalidLine = $event"
         />
     </section>
