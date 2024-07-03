@@ -1,21 +1,16 @@
-FROM oven/bun:1-alpine
+FROM node:22-alpine
 
 WORKDIR /hermes
 
 
-COPY package.json .
+COPY package*.json .
 
-
-
-RUN bun install
-
-
-
+RUN npm ci
 
 COPY . .
 
-RUN rm -fr node_modules/.prisma
-RUN cp -r __prisma__ node_modules/.prisma
+RUN npx prisma generate
+RUN npm run build
 
 
 EXPOSE 8080
@@ -23,7 +18,6 @@ EXPOSE 8080
 ENV HOST=0.0.0.0
 ENV PORT=8080
 
-ENTRYPOINT [ "bun", "run", "dev" ]
 
-# ENTRYPOINT [ "bun", ".output/server/index.mjs" ]
+ENTRYPOINT [ "node", ".output/server/index.mjs" ]
 

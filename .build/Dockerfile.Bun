@@ -1,0 +1,25 @@
+FROM oven/bun:1-debian
+
+WORKDIR /hermes
+
+
+COPY package.json .
+
+
+RUN bun install --verbose
+
+COPY . .
+
+RUN bun run build
+RUN rm -fr node_modules/.prisma
+RUN cp -r __prisma__ node_modules/.prisma
+
+
+EXPOSE 8080
+
+ENV HOST=0.0.0.0
+ENV PORT=8080
+
+
+ENTRYPOINT [ "bun", ".output/server/index.mjs" ]
+
