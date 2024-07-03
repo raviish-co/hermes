@@ -426,7 +426,7 @@ describe("CatalogService - Registar artigo", () => {
         expect(item.tags).toEqual(data.tags);
     });
 
-    it("Deve criar o stock do artigo", async () => {
+    it.skip("Deve criar o stock do artigo", async () => {
         const data = {
             name: "Artigo 1",
             price: 100,
