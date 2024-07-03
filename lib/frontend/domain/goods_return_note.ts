@@ -11,7 +11,7 @@ export class GoodsReturnNote extends Note {
         lines.forEach((line) => this.lines.push(line));
     }
 
-    addLine(line: GoodsIssueNoteLine, quantity: number) {
+    override addLine(line: GoodsIssueNoteLine, quantity: number) {
         if (!quantity) return;
 
         if (line.isFullyReturned()) return;

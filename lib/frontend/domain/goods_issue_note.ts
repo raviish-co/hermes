@@ -11,7 +11,7 @@ export class GoodsIssueNote extends Note {
     returnDate: string;
     grossTotal: number = 0;
     securityDeposit: number = 0;
-    lines: GoodsIssueNoteLine[] = [];
+    override lines: GoodsIssueNoteLine[] = [];
 
     constructor(returnDate: string) {
         super();
@@ -51,7 +51,7 @@ export class GoodsIssueNote extends Note {
         return note;
     }
 
-    addLine(options: LineOptions, quantity: number, stock?: number) {
+    override addLine(options: LineOptions, quantity: number, stock?: number) {
         if (!quantity || !stock) return;
 
         if (this.isSameLine(options.itemId)) return;
@@ -67,13 +67,13 @@ export class GoodsIssueNote extends Note {
         this.calculate();
     }
 
-    removeLine(itemId: string) {
+    override removeLine(itemId: string) {
         this.lines = this.lines.filter((line) => line.itemId !== itemId);
         this.resetGrossTotalAndSecurityDeposit();
         this.calculate();
     }
 
-    changeQuantity(itemId: string, quantity: number) {
+    override changeQuantity(itemId: string, quantity: number) {
         const line = this.findLine(itemId);
 
         if (!line) return;
@@ -91,7 +91,7 @@ export class GoodsIssueNote extends Note {
         this.purpose = purpose;
     }
 
-    isValid() {
+    override isValid() {
         return (
             this.lines.length > 0 &&
             this.returnDate !== "" &&
@@ -100,7 +100,7 @@ export class GoodsIssueNote extends Note {
         );
     }
 
-    clearLines() {
+    override clearLines() {
         this.lines = [];
         this.resetGrossTotalAndSecurityDeposit();
     }
@@ -110,11 +110,11 @@ export class GoodsIssueNote extends Note {
         this.purpose.clear();
     }
 
-    findLine(itemId: string) {
+    override findLine(itemId: string) {
         return this.lines.find((line) => line.itemId === itemId);
     }
 
-    createLine(options: LineOptions, quantity: number, stock: number) {
+    override createLine(options: LineOptions, quantity: number, stock: number) {
         const line = new GoodsIssueNoteLine(
             options.itemId,
             options.name,
