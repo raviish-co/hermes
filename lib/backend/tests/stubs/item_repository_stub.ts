@@ -1,5 +1,5 @@
 import { Item } from "../../domain/catalog/items/item";
-import { InmemItemRepository } from "../../persistense/inmem/inmem_item_repository";
+import { InmemItemRepository } from "../../persistence/inmem/inmem_item_repository";
 import { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
 

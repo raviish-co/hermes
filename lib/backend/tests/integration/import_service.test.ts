@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CsvReader } from "../../adapters/readers/csv_reader";
+import { DefaultCsvReader } from "../../adapters/readers/default_csv_reader";
 import { FileEmpty } from "../../adapters/readers/file_empty_error";
 import { InvalidCsvRow } from "../../adapters/readers/file_empty_line_error";
 import { FileNotSupported } from "../../adapters/readers/file_not_supported_error";
@@ -16,12 +16,12 @@ import { VariationNotFound } from "../../domain/catalog/variations/variation_not
 import type { VariationRepository } from "../../domain/catalog/variations/variation_repository";
 import type { ItemStock } from "../../domain/warehouse/item_stock";
 import { ItemStockNotFound } from "../../domain/warehouse/item_stock_not_found";
-import { InmemCategoryRepository } from "../../persistense/inmem/inmem_category_repository";
-import { InmemGoodsReceiptNoteRepository } from "../../persistense/inmem/inmem_goods_receipt_note_repository";
-import { InmemItemRepository } from "../../persistense/inmem/inmem_item_repository";
-import { InmemSectionRepository } from "../../persistense/inmem/inmem_section_repository";
-import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
-import { InmemVariationRepository } from "../../persistense/inmem/inmem_variation_repository";
+import { InmemCategoryRepository } from "../../persistence/inmem/inmem_category_repository";
+import { InmemGoodsReceiptNoteRepository } from "../../persistence/inmem/inmem_goods_receipt_note_repository";
+import { InmemItemRepository } from "../../persistence/inmem/inmem_item_repository";
+import { InmemSectionRepository } from "../../persistence/inmem/inmem_section_repository";
+import { InmemSequenceStorage } from "../../persistence/inmem/inmem_sequence_storage";
+import { InmemVariationRepository } from "../../persistence/inmem/inmem_variation_repository";
 import { ID } from "../../shared/id";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
 import { VariationRepositoryStub } from "../stubs/variation_repository_stub";
@@ -417,7 +417,7 @@ function makeService(deps?: Dependencies) {
     const variationRepository = deps?.variationRepository ?? new VariationRepositoryStub();
     const itemStockRepository = new ItemStockRepositoryStub();
     const goodsReceiptNoteRepository = new InmemGoodsReceiptNoteRepository();
-    const csvReader = new CsvReader();
+    const csvReader = new DefaultCsvReader();
 
     const service = new ImportService(
         itemRepository,

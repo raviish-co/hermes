@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
-import { PostgresSequenceGenerator } from "../../persistense/postgres/postgres_sequence_generator";
+import { PostgresSequenceGenerator } from "../../persistence/postgres/postgres_sequence_generator";
 
 describe("PostgresSequenceGenerator - generate", () => {
     it("Deve gerar uma sequencia", async () => {

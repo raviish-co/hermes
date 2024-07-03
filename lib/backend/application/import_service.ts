@@ -2,12 +2,12 @@ import {
     processLine as buildCsvRow,
     VALID_ITEM_STOCK_CSV_HEADER,
     type CsvRow,
-} from "../adapters/readers/csv_reader";
+} from "../adapters/readers/default_csv_reader";
 import { FileEmpty } from "../adapters/readers/file_empty_error";
 import { InvalidCsvRow } from "../adapters/readers/file_empty_line_error";
 import { FileNotSupported } from "../adapters/readers/file_not_supported_error";
 import { InvalidFileHeader } from "../adapters/readers/invalid_file_header_error";
-import type { Reader } from "../adapters/readers/reader";
+import type { CsvReader } from "../adapters/readers/csv_reader";
 import type { Generator } from "../adapters/sequences/generator";
 import { Sequence } from "../adapters/sequences/sequence";
 import type { CategoryRepository } from "../domain/catalog/categories/category_repository";
@@ -35,7 +35,7 @@ export class ImportService {
     #variationRepository: VariationRepository;
     #noteRepository: GoodsReceiptNoteRepository;
     #generator: Generator;
-    #reader: Reader;
+    #reader: CsvReader;
 
     constructor(
         itemRepository: ItemRepository,
@@ -45,7 +45,7 @@ export class ImportService {
         variationRepository: VariationRepository,
         noteRepository: GoodsReceiptNoteRepository,
         generator: Generator,
-        reader: Reader
+        reader: CsvReader
     ) {
         this.#itemRepository = itemRepository;
         this.#itemStockRepository = itemStockRepository;

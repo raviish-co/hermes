@@ -1,20 +1,19 @@
 import { describe, expect, it } from "vitest";
 import { SequenceGenerator } from "../../adapters/sequences/sequence_generator";
 import { GoodsReturnService } from "../../application/goods_return_service";
-import type { Item } from "../../domain/catalog/items/item";
 import type { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
 import { GoodsIssueLineNotFound } from "../../domain/goods_issue/goods_lssue_line_not_found_error";
 import { InvalidGoodsIssueLineQuantity } from "../../domain/goods_issue/invalid_goods_issue_line_quantity_error";
 import type { GoodsReturnNote } from "../../domain/goods_return/goods_return_note";
 import { GoodsReturnNoteNotFound } from "../../domain/goods_return/goods_return_note_not_found_error";
-import { InmemGoodsReturnNoteRepository } from "../../persistense/inmem/inmem_goods_return_note_repository";
-import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
+import type { ItemStock } from "../../domain/warehouse/item_stock";
+import { InmemGoodsReturnNoteRepository } from "../../persistence/inmem/inmem_goods_return_note_repository";
+import { InmemSequenceStorage } from "../../persistence/inmem/inmem_sequence_storage";
 import { ID } from "../../shared/id";
 import { GoodsIssueNoteRepositoryStub } from "../stubs/goods_issue_note_repository_stub";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
-import type { ItemStock } from "../../domain/warehouse/item_stock";
 
 describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve efetuar a devolução de um conjunto de artigos", async () => {

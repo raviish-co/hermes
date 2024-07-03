@@ -1,7 +1,7 @@
 import { Item } from "../../domain/catalog/items/item";
 import { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { GoodsIssueNoteLine } from "../../domain/goods_issue/goods_issue_note_line";
-import { InmemGoodsIssueNoteRepository } from "../../persistense/inmem/inmem_goods_issue_note_repository";
+import { InmemGoodsIssueNoteRepository } from "../../persistence/inmem/inmem_goods_issue_note_repository";
 import { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
 

@@ -1,10 +1,10 @@
-import { InmemVariationRepository } from "../../../persistense/inmem/inmem_variation_repository";
-import { InmemItemRepository } from "../../../persistense/inmem/inmem_item_repository";
+import { InmemVariationRepository } from "../../../persistence/inmem/inmem_variation_repository";
+import { InmemItemRepository } from "../../../persistence/inmem/inmem_item_repository";
 import { CatalogService } from "../../../application/catalog_service";
 import { SequenceGenerator } from "../../../adapters/sequences/sequence_generator";
-import { InmemSequenceStorage } from "../../../persistense/inmem/inmem_sequence_storage";
-import { InmemCategoryRepository } from "../../../persistense/inmem/inmem_category_repository";
-import { InmemSectionRepository } from "../../../persistense/inmem/inmem_section_repository";
+import { InmemSequenceStorage } from "../../../persistence/inmem/inmem_sequence_storage";
+import { InmemCategoryRepository } from "../../../persistence/inmem/inmem_category_repository";
+import { InmemSectionRepository } from "../../../persistence/inmem/inmem_section_repository";
 import type { ItemRepository } from "../../../domain/catalog/items/item_repository";
 import type { VariationRepository } from "../../../domain/catalog/variations/variation_repository";
 import type { CategoryRepository } from "../../../domain/catalog/categories/category_repository";
@@ -29,7 +29,6 @@ export function catalogService(deps?: Dependecies) {
 
     const service = new CatalogService(
         itemRepository,
-        itemStockRepository,
         variationRepository,
         categoryRepository,
         sectionRepository,

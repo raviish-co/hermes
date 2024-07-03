@@ -1,4 +1,4 @@
-import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
+import { InmemSequenceStorage } from "../../persistence/inmem/inmem_sequence_storage";
 import { SequenceGenerator } from "../../adapters/sequences/sequence_generator";
 import { describe, expect, it } from "vitest";
 

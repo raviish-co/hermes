@@ -1,4 +1,4 @@
-import { InmemCategoryRepository } from "../../persistense/inmem/inmem_category_repository";
+import { InmemCategoryRepository } from "../../persistence/inmem/inmem_category_repository";
 import { Category } from "../../domain/catalog/categories/category";
 import { ID } from "../../shared/id";
 

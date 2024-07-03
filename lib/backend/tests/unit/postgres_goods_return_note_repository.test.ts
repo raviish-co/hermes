@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { GoodsReturnNote } from "../../domain/goods_return/goods_return_note";
 import { GoodsReturnNoteLine } from "../../domain/goods_return/goods_return_note_line";
 import { GoodsReturnNoteNotFound } from "../../domain/goods_return/goods_return_note_not_found_error";
-import { PostgresGoodsReturnNoteRepository } from "../../persistense/postgres/postgres_goods_return_note_repository";
+import { PostgresGoodsReturnNoteRepository } from "../../persistence/postgres/postgres_goods_return_note_repository";
 import { ID } from "../../shared/id";
 
 describe("PostgresGoodsReturnNoteRepository - getById", () => {

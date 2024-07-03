@@ -1,3 +1,3 @@
-export interface Reader {
+export interface CsvReader {
     read(file: File): Promise<string[]>;
 }

@@ -10,13 +10,13 @@ import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_not
 import type { GoodsIssueNoteRepository } from "../../domain/goods_issue/goods_issue_note_repository";
 import { InvalidPurpose } from "../../domain/goods_issue/invalid_purpose_error";
 import { InvalidTotal } from "../../domain/goods_issue/invalid_total_error";
-import { InmemGoodsIssueNoteRepository } from "../../persistense/inmem/inmem_goods_issue_note_repository";
-import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
+import type { ItemStock } from "../../domain/warehouse/item_stock";
+import { InmemGoodsIssueNoteRepository } from "../../persistence/inmem/inmem_goods_issue_note_repository";
+import { InmemSequenceStorage } from "../../persistence/inmem/inmem_sequence_storage";
 import { ID } from "../../shared/id";
 import { GoodsIssueNoteRepositoryStub } from "../stubs/goods_issue_note_repository_stub";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
-import type { ItemStock } from "../../domain/warehouse/item_stock";
 
 describe("GoodsIssueService - Saída de mercadoria", () => {
     it("Deve retornar error **InvalidPurpose** se não existir", async () => {

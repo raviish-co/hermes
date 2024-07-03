@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { GoodsIssueNoteRepositoryStub } from "../stubs/goods_issue_note_repository_stub";
-import { InmemGoodsIssueNoteRepository } from "../../persistense/inmem/inmem_goods_issue_note_repository";
 import { DashboardService } from "../../application/dashboard_service";
-import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
 import { ItemStock } from "../../domain/warehouse/item_stock";
+import type { ItemStockNotFound } from "../../domain/warehouse/item_stock_not_found";
+import { InmemGoodsIssueNoteRepository } from "../../persistence/inmem/inmem_goods_issue_note_repository";
+import { InmemItemRepository } from "../../persistence/inmem/inmem_item_repository";
+import { right, type Either } from "../../shared/either";
 import { ID } from "../../shared/id";
+import { GoodsIssueNoteRepositoryStub } from "../stubs/goods_issue_note_repository_stub";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
-import { InmemItemRepository } from "../../persistense/inmem/inmem_item_repository";
+import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
 
 describe("Dashboard Service - Total de guias de saída vencidas", async () => {
     it("Deve retornar 0 se não houver guias de saída vencidas", async () => {
@@ -215,11 +217,12 @@ describe("DashboardService - Percentagem do estado das mercadorias em stock", as
 
 const itemStockRepositoryMock = {
     getAll: async () => [],
-    findAllOutOfStock: async () => [],
-    findAllInStock: async () => [],
     save: async (itemStock: ItemStock) => undefined,
+    saveAll: async (itemStocks: ItemStock[]) => undefined,
     updateAll: async (itemStocks: ItemStock[]) => undefined,
-    findAll: async (itemIds: ID[]) => [],
+    findAll: async (itemIds: ID[]): Promise<Either<ItemStockNotFound, ItemStock[]>> => right([]),
+    findAllInStock: async () => [],
+    findAllOutOfStock: async () => [],
 };
 
 const items = [

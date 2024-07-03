@@ -1,4 +1,4 @@
-import type { Reader } from "./reader";
+import type { CsvReader } from "./csv_reader";
 
 export const VALID_ITEM_STOCK_CSV_HEADER = ["id,boas,com_defeito"];
 
@@ -10,7 +10,7 @@ export interface CsvRow {
     variations: Record<string, string>;
 }
 
-export class CsvReader implements Reader {
+export class DefaultCsvReader implements CsvReader {
     async read(file: File): Promise<string[]> {
         return (await file.text()).split("\n");
     }

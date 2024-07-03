@@ -2,7 +2,7 @@ import type { PrismaClient } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { GoodsReceiptNote } from "../../domain/goods_receipt/goods_receipt_note";
 import { GoodsReceiptNoteLine } from "../../domain/goods_receipt/goods_receipt_note_line";
-import { PostgresGoodsReceiptNoteRepository } from "../../persistense/postgres/postgres_goods_receipt_note_repository";
+import { PostgresGoodsReceiptNoteRepository } from "../../persistence/postgres/postgres_goods_receipt_note_repository";
 import { ID } from "../../shared/id";
 
 describe("PostgresGoodsReceiptNoteRepository - save", () => {

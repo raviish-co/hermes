@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { Variation } from "../../../domain/catalog/variations/variation";
-import { InmemVariationRepository } from "../../../persistense/inmem/inmem_variation_repository";
+import { InmemVariationRepository } from "../../../persistence/inmem/inmem_variation_repository";
 import { ID } from "../../../shared/id";
 import { CategoryRepositoryStub } from "../../stubs/category_repository_stub";
 import { ItemRepositoryStub } from "../../stubs/item_repository_stub";

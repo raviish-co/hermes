@@ -2,7 +2,7 @@ import type { PrismaClient } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { ItemStock } from "../../domain/warehouse/item_stock";
 import { ItemStockNotFound } from "../../domain/warehouse/item_stock_not_found";
-import { PostgresItemStockRepository } from "../../persistense/postgres/postgres_item_stock_repository";
+import { PostgresItemStockRepository } from "../../persistence/postgres/postgres_item_stock_repository";
 import { ID } from "../../shared/id";
 
 describe("PostgresItemStockRepository - getAll", () => {

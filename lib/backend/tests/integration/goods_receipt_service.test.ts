@@ -5,13 +5,13 @@ import { GoodsReceiptService } from "../../application/goods_receipt_service";
 import { ItemNotFound } from "../../domain/catalog/items/item_not_found_error";
 import { InvalidEntryDate } from "../../domain/goods_receipt/invalid_entry_date_error";
 import { InvalidLines } from "../../domain/goods_receipt/invalid_lines_error";
+import type { ItemStock } from "../../domain/warehouse/item_stock";
 import type { ItemStockRepository } from "../../domain/warehouse/item_stock_repository";
-import { InmemGoodsReceiptNoteRepository } from "../../persistense/inmem/inmem_goods_receipt_note_repository";
-import { InmemSequenceStorage } from "../../persistense/inmem/inmem_sequence_storage";
+import { InmemGoodsReceiptNoteRepository } from "../../persistence/inmem/inmem_goods_receipt_note_repository";
+import { InmemSequenceStorage } from "../../persistence/inmem/inmem_sequence_storage";
 import { ID } from "../../shared/id";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
-import type { ItemStock } from "../../domain/warehouse/item_stock";
 
 describe("GoodsReceiptService - Entrada de mercadorias", () => {
     it("Deve retornar um erro **InvalidEntryDate** se a data de entrada de mercadoria não for definida", async () => {

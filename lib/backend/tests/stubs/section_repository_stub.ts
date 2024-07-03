@@ -1,4 +1,4 @@
-import { InmemSectionRepository } from "../../persistense/inmem/inmem_section_repository";
+import { InmemSectionRepository } from "../../persistence/inmem/inmem_section_repository";
 import { Section } from "../../domain/catalog/departments/section";
 import { ID } from "../../shared/id";
 

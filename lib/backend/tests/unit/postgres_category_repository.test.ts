@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { Category } from "../../domain/catalog/categories/category";
 import { CategoryNotFound } from "../../domain/catalog/categories/category_not_found_error";
-import { PostgresCategoryRepository } from "../../persistense/postgres/postgres_category_repository";
+import { PostgresCategoryRepository } from "../../persistence/postgres/postgres_category_repository";
 import { ID } from "../../shared/id";
 
 describe("PostgresCategoryRepostory - getById", () => {
