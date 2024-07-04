@@ -44,7 +44,7 @@ onMounted(async () => {
         </div>
 
         <NuxtLink to="/goods-receipts/register">
-            <button class="btn-circle mt-8 ml-auto block">
+            <button class="btn-circle">
                 <span class="material-symbols-outlined">add</span>
             </button>
         </NuxtLink>

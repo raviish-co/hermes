@@ -98,7 +98,7 @@ h1 {
 }
 
 .btn-circle {
-    @apply w-12 h-12 bg-secondary-600 text-white rounded-full text-4xl;
+    @apply w-12 h-12 bg-secondary-600 text-white rounded-full text-4xl fixed bottom-8 right-6 mt-8 ml-auto lg:relative lg:block;
 }
 
 .footer {
