@@ -1,4 +1,4 @@
-FROM oven/bun:1-debian
+FROM oven/bun:1-alpine
 
 WORKDIR /hermes
 
@@ -11,8 +11,6 @@ RUN bun install --verbose
 COPY . .
 
 RUN bun run build
-RUN rm -fr node_modules/.prisma
-RUN cp -r __prisma__ node_modules/.prisma
 
 
 EXPOSE 8080
