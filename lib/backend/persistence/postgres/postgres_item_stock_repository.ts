@@ -1,8 +1,6 @@
 import type { PrismaClient, Stock } from "@prisma/client";
 import { ItemStock } from "../../domain/warehouse/item_stock";
-import { ItemStockNotFound } from "../../domain/warehouse/item_stock_not_found";
 import type { ItemStockRepository } from "../../domain/warehouse/item_stock_repository";
-import { left, right, type Either } from "../../shared/either";
 import { ID } from "../../shared/id";
 
 function stockFactory(data: Stock): ItemStock {
@@ -33,14 +31,26 @@ export class PostgresItemStockRepository implements ItemStockRepository {
     }
 
     async saveAll(itemStocks: ItemStock[]): Promise<void> {
-        await this.#prisma.stock.createMany({
-            data: itemStocks.map((itemStock) => ({
-                stockId: itemStock.itemStockId.toString(),
-                productId: itemStock.itemId.toString(),
-                goodQuantities: itemStock.goodQuantities,
-                badQuantities: itemStock.badQuantities,
-            })),
-        });
+        const ids = itemStocks.map((itemStock) => itemStock.itemId.toString());
+        const records = await this.#prisma.stock.findMany({ where: { productId: { in: ids } } });
+
+        const itemsStockToUpdate: ItemStock[] = [];
+        const itemStockToCreate: ItemStock[] = [];
+
+        for (const itemStock of itemStocks) {
+            const record = records.find((r) => r.productId === itemStock.itemId.toString());
+
+            if (!record) {
+                itemStockToCreate.push(itemStock);
+                continue;
+            }
+
+            itemsStockToUpdate.push(itemStock);
+        }
+
+        this.#updateItemsStock(itemsStockToUpdate);
+
+        await this.#createItemsStock(itemStockToCreate);
     }
 
     async updateAll(itemStocks: ItemStock[]): Promise<void> {
@@ -57,7 +67,7 @@ export class PostgresItemStockRepository implements ItemStockRepository {
         });
     }
 
-    async findAll(itemIds: ID[]): Promise<Either<ItemStockNotFound, ItemStock[]>> {
+    async findAll(itemIds: ID[]): Promise<ItemStock[]> {
         const stocksData = await this.#prisma.stock.findMany({
             where: {
                 productId: {
@@ -66,12 +76,7 @@ export class PostgresItemStockRepository implements ItemStockRepository {
             },
         });
 
-        for (const itemId of itemIds) {
-            const itemStock = stocksData.find((stock) => stock.productId === itemId.toString());
-            if (!itemStock) return left(new ItemStockNotFound());
-        }
-
-        return right(stocksData.map(stockFactory));
+        return stocksData.map(stockFactory);
     }
 
     async findAllInStock(): Promise<ItemStock[]> {
@@ -109,5 +114,38 @@ export class PostgresItemStockRepository implements ItemStockRepository {
         });
 
         return stocksData.map(stockFactory);
+    }
+
+    async #createItemsStock(itemsStock: ItemStock[]) {
+        if (itemsStock.length === 0) {
+            return;
+        }
+
+        await this.#prisma.stock.createMany({
+            data: itemsStock.map((itemStock) => ({
+                stockId: itemStock.itemStockId.toString(),
+                productId: itemStock.itemId.toString(),
+                goodQuantities: itemStock.goodQuantities,
+                badQuantities: itemStock.badQuantities,
+            })),
+        });
+    }
+
+    #updateItemsStock(itemsStock: ItemStock[]) {
+        if (itemsStock.length === 0) {
+            return;
+        }
+
+        itemsStock.forEach(async (itemStock) => {
+            await this.#prisma.stock.update({
+                where: {
+                    stockId: itemStock.itemStockId.toString(),
+                },
+                data: {
+                    goodQuantities: itemStock.goodQuantities,
+                    badQuantities: itemStock.badQuantities,
+                },
+            });
+        });
     }
 }

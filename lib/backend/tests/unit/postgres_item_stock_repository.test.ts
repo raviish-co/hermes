@@ -116,21 +116,10 @@ describe("PostgresItemStockRepository - findAll", () => {
     it("Deve retornar os artigos encontrados", async () => {
         const stockRepo = new PostgresItemStockRepository(prisma);
 
-        const itemsStockOrErr = await stockRepo.findAll([ID.fromString("1")]);
-
-        const itemsStock = <ItemStock[]>itemsStockOrErr.value;
+        const itemsStock = await stockRepo.findAll([ID.fromString("1")]);
 
         expect(itemsStock.length).toBe(1);
         expect(itemsStock[0].itemId.equals(ID.fromString("1"))).toBeTruthy();
-    });
-
-    it("Deve retornar um erro se não encontrar stock de algum artigo", async () => {
-        const stockRepo = new PostgresItemStockRepository(prisma);
-
-        const error = await stockRepo.findAll([ID.fromString("2")]);
-
-        expect(error.isLeft()).toBeTruthy();
-        expect(error.value).toBeInstanceOf(ItemStockNotFound);
     });
 });
 
