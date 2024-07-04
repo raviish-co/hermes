@@ -103,7 +103,7 @@ export class ImportService {
 
         this.#increaseItemsStock(itemsStock, lines);
 
-        this.#itemStockRepository.updateAll(itemsStock);
+        this.#itemStockRepository.saveAll(itemsStock);
 
         return right(undefined);
     }

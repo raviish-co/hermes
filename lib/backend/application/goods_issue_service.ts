@@ -137,7 +137,7 @@ export class GoodsIssueService {
             stock.reduce(line.goodQuantities, line.badQuantities);
         }
 
-        await this.#itemStockRepository.updateAll(itemsStock);
+        await this.#itemStockRepository.saveAll(itemsStock);
 
         return right(undefined);
     }

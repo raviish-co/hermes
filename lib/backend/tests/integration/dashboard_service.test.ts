@@ -1,10 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { DashboardService } from "../../application/dashboard_service";
 import { ItemStock } from "../../domain/warehouse/item_stock";
-import type { ItemStockNotFound } from "../../domain/warehouse/item_stock_not_found";
 import { InmemGoodsIssueNoteRepository } from "../../persistence/inmem/inmem_goods_issue_note_repository";
 import { InmemItemRepository } from "../../persistence/inmem/inmem_item_repository";
-import { right, type Either } from "../../shared/either";
 import { ID } from "../../shared/id";
 import { GoodsIssueNoteRepositoryStub } from "../stubs/goods_issue_note_repository_stub";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
@@ -220,7 +218,7 @@ const itemStockRepositoryMock = {
     save: async (itemStock: ItemStock) => undefined,
     saveAll: async (itemStocks: ItemStock[]) => undefined,
     updateAll: async (itemStocks: ItemStock[]) => undefined,
-    findAll: async (itemIds: ID[]): Promise<Either<ItemStockNotFound, ItemStock[]>> => right([]),
+    findAll: async (itemIds: ID[]): Promise<ItemStock[]> => [],
     findAllInStock: async () => [],
     findAllOutOfStock: async () => [],
 };

@@ -20,19 +20,17 @@ export class PostgresItemStockRepository implements ItemStockRepository {
     }
 
     async save(itemStock: ItemStock): Promise<void> {
-        await this.#prisma.stock.create({
-            data: {
-                stockId: itemStock.itemStockId.toString(),
-                productId: itemStock.itemId.toString(),
-                goodQuantities: itemStock.goodQuantities,
-                badQuantities: itemStock.badQuantities,
-            },
-        });
+        throw new Error("Method not implemented.");
     }
 
     async saveAll(itemStocks: ItemStock[]): Promise<void> {
         const ids = itemStocks.map((itemStock) => itemStock.itemId.toString());
         const records = await this.#prisma.stock.findMany({ where: { productId: { in: ids } } });
+
+        if (records.length === 0) {
+            await this.#createItemsStock(itemStocks);
+            return;
+        }
 
         const itemsStockToUpdate: ItemStock[] = [];
         const itemStockToCreate: ItemStock[] = [];
@@ -51,10 +49,6 @@ export class PostgresItemStockRepository implements ItemStockRepository {
         this.#updateItemsStock(itemsStockToUpdate);
 
         await this.#createItemsStock(itemStockToCreate);
-    }
-
-    async updateAll(itemStocks: ItemStock[]): Promise<void> {
-        this.#updateItemsStock(itemStocks);
     }
 
     async findAll(itemIds: ID[]): Promise<ItemStock[]> {

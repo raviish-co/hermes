@@ -119,7 +119,7 @@ export class GoodsReturnService {
             stock.increase(data.goodQuantities, data.badQuantities);
         }
 
-        this.#itemStockRepository.updateAll(itemsStock);
+        this.#itemStockRepository.saveAll(itemsStock);
     }
 
     #verifyQuantities(items: ItemData[], lines: GoodsIssueNoteLine[]): Either<Error, void> {
