@@ -54,17 +54,7 @@ export class PostgresItemStockRepository implements ItemStockRepository {
     }
 
     async updateAll(itemStocks: ItemStock[]): Promise<void> {
-        itemStocks.forEach(async (itemStock) => {
-            await this.#prisma.stock.update({
-                where: {
-                    stockId: itemStock.itemStockId.toString(),
-                },
-                data: {
-                    goodQuantities: itemStock.goodQuantities,
-                    badQuantities: itemStock.badQuantities,
-                },
-            });
-        });
+        this.#updateItemsStock(itemStocks);
     }
 
     async findAll(itemIds: ID[]): Promise<ItemStock[]> {
