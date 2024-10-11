@@ -1,9 +1,8 @@
-
 name: Kubernates CI/CD
 
 on:
     push:
-      tags: ["*"]
+        tags: ["*"]
 jobs:
     build:
         runs-on: ubuntu-latest
@@ -38,14 +37,11 @@ jobs:
             - name: Update deployment file with image
               run: sed -i "s|<IMAGE>|$IMAGE|" $GITHUB_WORKSPACE/.deployments/k8s/deployment.yaml
 
-            - name: Update deployment file with antbox server
-              run: sed -i "s|<NUXT_DATABASE_URL>|$${{ vars.NUXT_DATABASE_URL }}|" $GITHUB_WORKSPACE/.deployments/k8s/deployment.yaml
-
-            - name: Save DigitalOcean kubeconfig with short-lived credentials
+            - name: Save Digital Ocean kubeconfig with short-lived credentials
               run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ vars.DIGITALOCEAN_K8S_CLUSTER_NAME }}
 
             - name: Deploy to DigitalOcean Kubernetes
               run: kubectl apply -f $GITHUB_WORKSPACE/.deployments/k8s/deployment.yaml
 
             - name: Verify deployment
-              run: kubectl -n zafir rollout status deployment/portal
+              run: kubectl -n zafir rollout status deployment/hermes
