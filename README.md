@@ -31,6 +31,14 @@ cd hermes
 
 Para executar a aplicação atráves da sua imagem em Docker siga os seguintes passos:
 
+- Configuração da Base de Dados
+
+Para aplicar as migrações na base de dados em produção
+
+```bash
+npx prisma migrate deploy
+```
+
 - Construção da Imagem
 
 ```bash
