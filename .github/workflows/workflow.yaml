@@ -16,8 +16,6 @@ jobs:
                   echo "TAG=$TAG" >> $GITHUB_ENV
                   echo "IMAGE=zafircoao/raviish-hermes:$TAG" >> $GITHUB_ENV
                   echo "HOME=/tmp" >> $GITHUB_ENV
-                  echo "${{ secrets.DOCKERHUB_USERNAME }}"
-                  echo "${{ secrets.DOCKERHUB_TOKEN }}"
 
             - name: Build container image
               run: docker build -f .build/Dockerfile -t "$IMAGE" .
@@ -37,7 +35,7 @@ jobs:
               run: docker push $IMAGE
 
             - name: Update deployment file with image
-              run: sed -i "s|<IMAGE>|$IMAGE|" $GITHUB_WORKSPACE/.deployments/k8s/hermes-deploy.yaml
+              run: sed -i "s|<IMAGE>|$IMAGE|" $GITHUB_WORKSPACE/.deployment/k8s/hermes-deploy.yaml
 
             - name: Save Digital Ocean kubeconfig with short-lived credentials
               run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ vars.DIGITALOCEAN_K8S_CLUSTER_NAME }}
