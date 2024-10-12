@@ -14,9 +14,8 @@ import type { ItemRepository } from "../domain/catalog/items/item_repository";
 import { Variation } from "../domain/catalog/variations/variation";
 import type { VariationNotFound } from "../domain/catalog/variations/variation_not_found_error";
 import type { VariationRepository } from "../domain/catalog/variations/variation_repository";
-import { ItemStock } from "../domain/warehouse/item_stock";
 import { Decimal } from "../shared/decimal";
-import { left, right, type Either } from "../shared/either";
+import { type Either, left, right } from "../shared/either";
 import type { ItemError, RegisterCategoryError } from "../shared/errors";
 import { ID } from "../shared/id";
 import type { Pagination } from "../shared/pagination";
@@ -33,7 +32,7 @@ export class CatalogService {
         variationRepository: VariationRepository,
         categoryRepository: CategoryRepository,
         sectionRepository: SectionRepository,
-        generator: Generator
+        generator: Generator,
     ) {
         this.#itemRepository = itemRepository;
         this.#variationRepository = variationRepository;
@@ -42,7 +41,10 @@ export class CatalogService {
         this.#generator = generator;
     }
 
-    async listItems(pageToken: number = 1, perPage: number = 12): Promise<Pagination<Item>> {
+    async listItems(
+        pageToken: number = 1,
+        perPage: number = 12,
+    ): Promise<Pagination<Item>> {
         return await this.#itemRepository.getAll({ pageToken, perPage });
     }
 
@@ -61,13 +63,15 @@ export class CatalogService {
     async searchItems(
         query: string,
         pageToken: number = 1,
-        perPage: number = 12
+        perPage: number = 12,
     ): Promise<Pagination<Item>> {
         return await this.#itemRepository.search(query, { pageToken, perPage });
     }
 
     async getItem(itemId: string): Promise<Either<ItemNotFound, Item>> {
-        const itemOrErr = await this.#itemRepository.getById(ID.fromString(itemId));
+        const itemOrErr = await this.#itemRepository.getById(
+            ID.fromString(itemId),
+        );
         if (itemOrErr.isLeft()) return left(itemOrErr.value);
         return right(itemOrErr.value);
     }
@@ -81,9 +85,15 @@ export class CatalogService {
         const voidOrCategoryErr = await this.#verifyCategory(data.categoryId);
         if (voidOrCategoryErr.isLeft()) return left(voidOrCategoryErr.value);
 
-        const variationsIds = data.variations?.map((v) => ID.fromString(v.variationId));
-        const voidOrVariationsErr = await this.#verifyVariationsIds(variationsIds);
-        if (voidOrVariationsErr.isLeft()) return left(voidOrVariationsErr.value);
+        const variationsIds = data.variations?.map((v) =>
+            ID.fromString(v.variationId)
+        );
+        const voidOrVariationsErr = await this.#verifyVariationsIds(
+            variationsIds,
+        );
+        if (voidOrVariationsErr.isLeft()) {
+            return left(voidOrVariationsErr.value);
+        }
 
         const variationsValues = this.#buildVariationsValues(data.variations);
         const itemOrErr = new ItemBuilder()
@@ -100,8 +110,6 @@ export class CatalogService {
 
         const item = itemOrErr.value;
 
-        const stock = ItemStock.create(item.itemId);
-
         await this.#itemRepository.save(item);
 
         return right(undefined);
@@ -110,7 +118,7 @@ export class CatalogService {
     async registerCategory(
         name: string,
         variations?: string[],
-        description?: string
+        description?: string,
     ): Promise<Either<RegisterCategoryError, void>> {
         const exists = await this.#categoryRepository.exists(name);
         if (exists) return left(new CategoryAlreadyExists());
@@ -122,7 +130,12 @@ export class CatalogService {
 
         const categoryId = await this.#generator.generate(Sequence.Category);
 
-        const category = new Category(ID.fromString(categoryId), name, variationsIds, description);
+        const category = new Category(
+            ID.fromString(categoryId),
+            name,
+            variationsIds,
+            description,
+        );
 
         await this.#categoryRepository.save(category);
 
@@ -131,9 +144,11 @@ export class CatalogService {
 
     async updateItem(
         itemId: string,
-        data: ItemDTO
+        data: ItemDTO,
     ): Promise<Either<ItemNotFound | SectionNotFound, void>> {
-        const itemOrErr = await this.#itemRepository.getById(ID.fromString(itemId));
+        const itemOrErr = await this.#itemRepository.getById(
+            ID.fromString(itemId),
+        );
         if (itemOrErr.isLeft()) return left(itemOrErr.value);
 
         const voidOrSectionErr = await this.#verifySectionId(data.sectionId);
@@ -142,9 +157,15 @@ export class CatalogService {
         const voidOrCategoryErr = await this.#verifyCategory(data.categoryId);
         if (voidOrCategoryErr.isLeft()) return left(voidOrCategoryErr.value);
 
-        const variationsIds = data.variations?.map((v) => ID.fromString(v.variationId));
-        const voidOrVariationsErr = await this.#verifyVariationsIds(variationsIds);
-        if (voidOrVariationsErr.isLeft()) return left(voidOrVariationsErr.value);
+        const variationsIds = data.variations?.map((v) =>
+            ID.fromString(v.variationId)
+        );
+        const voidOrVariationsErr = await this.#verifyVariationsIds(
+            variationsIds,
+        );
+        if (voidOrVariationsErr.isLeft()) {
+            return left(voidOrVariationsErr.value);
+        }
 
         const variationsValues = this.#buildVariationsValues(data.variations);
 
@@ -165,30 +186,42 @@ export class CatalogService {
         return right(undefined);
     }
 
-    async #verifyCategory(categoryId?: string): Promise<Either<CategoryNotFound, void>> {
+    async #verifyCategory(
+        categoryId?: string,
+    ): Promise<Either<CategoryNotFound, void>> {
         if (!categoryId) return right(undefined);
 
-        const category = await this.#categoryRepository.getById(ID.fromString(categoryId));
+        const category = await this.#categoryRepository.getById(
+            ID.fromString(categoryId),
+        );
 
         if (category.isLeft()) return left(category.value);
 
         return right(undefined);
     }
 
-    async #verifyVariationsIds(variationsIds?: ID[]): Promise<Either<VariationNotFound, void>> {
+    async #verifyVariationsIds(
+        variationsIds?: ID[],
+    ): Promise<Either<VariationNotFound, void>> {
         if (!variationsIds) return right(undefined);
 
-        const variations = await this.#variationRepository.vertifyIds(variationsIds);
+        const variations = await this.#variationRepository.vertifyIds(
+            variationsIds,
+        );
 
         if (variations.isLeft()) return left(variations.value);
 
         return right(undefined);
     }
 
-    async #verifySectionId(sectionId?: string): Promise<Either<SectionNotFound, void>> {
+    async #verifySectionId(
+        sectionId?: string,
+    ): Promise<Either<SectionNotFound, void>> {
         if (!sectionId) return right(undefined);
 
-        const section = await this.#sectionRepository.findById(ID.fromString(sectionId));
+        const section = await this.#sectionRepository.findById(
+            ID.fromString(sectionId),
+        );
 
         if (section.isLeft()) return left(section.value);
 
@@ -206,7 +239,8 @@ export class CatalogService {
 
         const variations: Record<string, string> = {};
         for (const variation of data) {
-            variations[variation.variationId] = `${variation.name}: ${variation.value}`;
+            variations[variation.variationId] =
+                `${variation.name}: ${variation.value}`;
         }
 
         return variations;
