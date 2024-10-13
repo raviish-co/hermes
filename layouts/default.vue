@@ -13,6 +13,10 @@ function logout() {
 function toggleMenu() {
     visibility.value = !visibility.value;
 }
+
+onMounted(() => {
+    auth.checkAuth();
+});
 </script>
 
 <template>
