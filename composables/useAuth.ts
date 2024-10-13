@@ -28,15 +28,21 @@ export function useAuth() {
         return;
     };
 
-    onMounted(() => {
-        checkAuth();
-    });
+    const getToken = () => {
+        const user = getUser();
+        if (!user) {
+            return "";
+        }
+
+        return user.token;
+    };
 
     return {
         isAuthenticated,
         login,
         logout,
         checkAuth,
+        getToken,
     };
 }
 
