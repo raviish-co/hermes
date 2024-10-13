@@ -1,6 +1,7 @@
 import { useGoodsReceiptService } from "~/composables/useGoodsReceiptService";
 import { GoodsReceiptNote } from "~/lib/backend/domain/goods_receipt/goods_receipt_note";
 import { GoodsReceiptNoteLine } from "~/lib/backend/domain/goods_receipt/goods_receipt_note_line";
+import { checkAnonymousUser } from "../check_anonymous_user";
 
 const service = useGoodsReceiptService();
 
@@ -18,7 +19,9 @@ interface GoodsReceiptNoteDTO {
     lines: GoodsReceiptNoteLineDTO[];
 }
 
-function toGoodsReceiptNoteLineDTO(line: GoodsReceiptNoteLine): GoodsReceiptNoteLineDTO {
+function toGoodsReceiptNoteLineDTO(
+    line: GoodsReceiptNoteLine,
+): GoodsReceiptNoteLineDTO {
     return {
         lineId: line.lineId.toString(),
         itemId: line.itemId.toString(),
@@ -37,6 +40,8 @@ function toGoodsReceiptNoteDTO(note: GoodsReceiptNote): GoodsReceiptNoteDTO {
 }
 
 export default defineEventHandler(async (event) => {
+    checkAnonymousUser(event);
+
     const notes = await service.list();
     return notes.map(toGoodsReceiptNoteDTO);
 });

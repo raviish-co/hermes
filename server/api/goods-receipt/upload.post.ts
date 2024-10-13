@@ -3,11 +3,14 @@ import { FileEmpty } from "~/lib/backend/adapters/readers/file_empty_error";
 import { FileNotSupported } from "~/lib/backend/adapters/readers/file_not_supported_error";
 import { InvalidFileHeader } from "~/lib/backend/adapters/readers/invalid_file_header_error";
 import { ItemStockNotFound } from "~/lib/backend/domain/warehouse/item_stock_not_found";
+import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
 
 const service = useImportService();
 
 export default defineEventHandler(async (event) => {
+    checkAnonymousUser(event);
+
     const formData = await readFormData(event);
 
     const file = formData.get("file") as File;

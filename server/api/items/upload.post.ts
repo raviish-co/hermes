@@ -5,10 +5,13 @@ import { FileNotSupported } from "~/lib/backend/adapters/readers/file_not_suppor
 import { InvalidFileHeader } from "~/lib/backend/adapters/readers/invalid_file_header_error";
 import { VariationNotFound } from "~/lib/backend/domain/catalog/variations/variation_not_found_error";
 import { HttpStatus } from "~/server/api/http_status";
+import { checkAnonymousUser } from "../check_anonymous_user";
 
 const service = useImportService();
 
 export default defineEventHandler(async (event) => {
+    checkAnonymousUser(event);
+
     const formData = await readFormData(event);
 
     const file = formData.get("file") as File;

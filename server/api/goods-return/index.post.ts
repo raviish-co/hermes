@@ -3,14 +3,23 @@ import { GoodsIssueNoteHasBeenReturned } from "~/lib/backend/domain/goods_issue/
 import { GoodsIssueNoteNotFound } from "~/lib/backend/domain/goods_issue/goods_issue_note_not_found_error";
 import { GoodsIssueLineNotFound } from "~/lib/backend/domain/goods_issue/goods_lssue_line_not_found_error";
 import { InvalidGoodsIssueLineQuantity } from "~/lib/backend/domain/goods_issue/invalid_goods_issue_line_quantity_error";
+import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
 
 const service = useGoodsReturnService();
 
 export default defineEventHandler(async (event) => {
-    const { noteId, securityDepositWithHeld, itemsData } = await readBody(event);
+    checkAnonymousUser(event);
 
-    const voidOrErr = await service.returningGoods(noteId, securityDepositWithHeld, itemsData);
+    const { noteId, securityDepositWithHeld, itemsData } = await readBody(
+        event,
+    );
+
+    const voidOrErr = await service.returningGoods(
+        noteId,
+        securityDepositWithHeld,
+        itemsData,
+    );
 
     if (voidOrErr.value instanceof GoodsIssueNoteNotFound) {
         throw createError({

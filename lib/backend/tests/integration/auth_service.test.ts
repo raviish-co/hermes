@@ -1,7 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 import { AuthService } from "../../application/auth_service";
 import { AuthenticationFailed } from "../../domain/auth/authentication_failed_error";
-import type { TokenGenerator } from "../../domain/auth/token_generator";
+import { InvalidTokenError } from "../../domain/auth/invalid_token_error";
+import type {
+    TokenGenerator,
+    VerifyToken,
+} from "../../domain/auth/token_generator";
 import { User } from "../../domain/auth/user";
 import type { UserRepository } from "../../domain/auth/user_repository";
 import { InmemUserRepository } from "../../persistence/inmem/inmem_user_repository";
@@ -9,6 +13,10 @@ import { InmemUserRepository } from "../../persistence/inmem/inmem_user_reposito
 class FakeTokenGenerator implements TokenGenerator {
     async generate(_username: string): Promise<string> {
         return "token";
+    }
+
+    async verify(_token: string): Promise<VerifyToken> {
+        return { username: "john.doe", isValid: true };
     }
 }
 
@@ -67,6 +75,49 @@ describe("Auth Service - Login", async () => {
             username: "john.doe",
             name: "John Doe",
             token: "token",
+        });
+    });
+});
+
+describe("Auth Service - VerifyToken", async () => {
+    it("Deve verificar se o token é válido", async () => {
+        const tokenGenerator: TokenGenerator = new FakeTokenGenerator();
+        const spy = vi.spyOn(tokenGenerator, "verify");
+        const service = makeService(tokenGenerator);
+
+        await service.verifyToken("token");
+
+        expect(spy).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalledOnce();
+        expect(spy).toHaveBeenCalledWith("token");
+    });
+
+    it("Deve retornar **InvalidToken** quando o token não for válido", async () => {
+        const tokenGenerator: TokenGenerator = new FakeTokenGenerator();
+        vi.spyOn(tokenGenerator, "verify").mockReturnValue(
+            Promise.resolve({ username: "--empty--", isValid: false }),
+        );
+        const service = makeService(tokenGenerator);
+
+        const err = await service.verifyToken("invalid_token");
+
+        expect(err.isLeft()).toBeTruthy();
+        expect(err.value).toBeInstanceOf(InvalidTokenError);
+    });
+
+    it("Deve retornar o username com base no token a ser verificado", async () => {
+        const tokenGenerator: TokenGenerator = new FakeTokenGenerator();
+        vi.spyOn(tokenGenerator, "verify").mockReturnValue(
+            Promise.resolve({ username: "john.doe", isValid: true }),
+        );
+        const service = makeService();
+
+        const output = await service.verifyToken("token");
+
+        expect(output.isRight()).toBeTruthy();
+        expect(output.value).toEqual({
+            username: "john.doe",
+            isValid: true,
         });
     });
 });

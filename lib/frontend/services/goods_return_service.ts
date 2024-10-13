@@ -1,21 +1,35 @@
 import type { GoodsReturnNoteModel } from "../models/goods_return_note";
 import type { NoteLine } from "../domain/note_line";
 
+const auth = useAuth();
+
 export class GoodsReturnService {
-    async new(noteId: string, securityDepositWithHeld: number, lines: NoteLine[]) {
+    async new(
+        noteId: string,
+        securityDepositWithHeld: number,
+        lines: NoteLine[],
+    ) {
         const data: GoodsReturnDTO = {
             noteId,
             securityDepositWithHeld,
             itemsData: lines.map(this.#toItemDTO),
         };
 
-        return await $fetch("/api/goods-return", { method: "post", body: data });
+        return await $fetch("/api/goods-return", {
+            method: "post",
+            body: data,
+            headers: this.headers,
+        });
     }
 
     async getById(noteId: string): Promise<GoodsReturnNoteModel> {
-        const response = await $fetch<GoodsReturnNoteModel>(`/api/goods-return/${noteId}`, {
-            method: "get",
-        });
+        const response = await $fetch<GoodsReturnNoteModel>(
+            `/api/goods-return/${noteId}`,
+            {
+                method: "get",
+                headers: this.headers,
+            },
+        );
 
         return {
             goodsIssueNoteId: response.goodsIssueNoteId,
@@ -27,9 +41,13 @@ export class GoodsReturnService {
     }
 
     async list(): Promise<GoodsReturnNoteModel[]> {
-        const response = await $fetch<GoodsReturnNoteModel[]>(`/api/goods-return`, {
-            method: "get",
-        });
+        const response = await $fetch<GoodsReturnNoteModel[]>(
+            `/api/goods-return`,
+            {
+                method: "get",
+                headers: this.headers,
+            },
+        );
 
         return response.map((data) => ({
             goodsIssueNoteId: data.goodsIssueNoteId,
@@ -46,6 +64,12 @@ export class GoodsReturnService {
             goodQuantities: line.goodQuantitiesReturned,
             badQuantities: line.badQuantitiesReturned,
             comment: line.condition?.comment,
+        };
+    }
+
+    get headers() {
+        return {
+            "X-Access-Token": auth.getToken(),
         };
     }
 }

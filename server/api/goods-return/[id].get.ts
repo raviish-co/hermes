@@ -1,11 +1,14 @@
 import { useGoodsReturnService } from "~/composables/useGoodsReturnService";
 import { GoodsReturnNoteNotFound } from "~/lib/backend/domain/goods_return/goods_return_note_not_found_error";
+import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
 import { toGoodsReturnNoteDTO } from "./goods_return_dto";
 
 const service = useGoodsReturnService();
 
 export default defineEventHandler(async (event) => {
+    checkAnonymousUser(event);
+
     const noteId = getRouterParam(event, "id", { decode: true });
 
     if (!noteId) {

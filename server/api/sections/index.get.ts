@@ -1,5 +1,6 @@
 import { useCatalogService } from "~/composables/useCatalogService";
 import { Section } from "~/lib/backend/domain/catalog/departments/section";
+import { checkAnonymousUser } from "../check_anonymous_user";
 
 const service = useCatalogService();
 
@@ -18,6 +19,8 @@ function toSectionDTO(section: Section): SectionDTO {
 }
 
 export default defineEventHandler(async (event) => {
+    checkAnonymousUser(event);
+
     const sections = await service.listSections();
     return sections.map(toSectionDTO);
 });

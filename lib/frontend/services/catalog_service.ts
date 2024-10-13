@@ -1,12 +1,14 @@
 import type { ItemModel } from "@frontend/models/item";
 import type { VariationModel } from "@frontend/models/variation";
-import type { CategoryModel } from "../models/category";
-import type { SectionModel } from "../models/section";
+import type { CategoryModel } from "@frontend/models/category";
+import type { SectionModel } from "@frontend/models/section";
+
+const auth = useAuth();
 
 export class CatalogService {
     async listItems(
         pageToken: number = 1,
-        perPage: number = 8
+        perPage: number = 8,
     ): Promise<{ items: ItemModel[]; total: number }> {
         const response = await $fetch("/api/items", {
             method: "get",
@@ -14,30 +16,40 @@ export class CatalogService {
                 pageToken,
                 perPage,
             },
+            headers: this.headers,
         });
 
         return { items: response.items, total: response.total };
     }
 
     async listVariations(): Promise<VariationModel[]> {
-        const variations = await $fetch("/api/variations", { method: "get" });
+        const variations = await $fetch("/api/variations", {
+            method: "get",
+            headers: this.headers,
+        });
         return variations;
     }
 
     async listCategories(): Promise<CategoryModel[]> {
-        const categories = await $fetch("/api/categories", { method: "get" });
+        const categories = await $fetch("/api/categories", {
+            method: "get",
+            headers: this.headers,
+        });
         return categories;
     }
 
     async listSections(): Promise<SectionModel[]> {
-        const sections = await $fetch("/api/sections", { method: "get" });
+        const sections = await $fetch("/api/sections", {
+            method: "get",
+            headers: this.headers,
+        });
         return sections;
     }
 
     async searchItems(
         query: string,
         pageToken: number = 1,
-        perPage: number = 8
+        perPage: number = 8,
     ): Promise<{ items: ItemModel[]; total: number }> {
         const response = await $fetch("/api/items/search", {
             method: "get",
@@ -46,30 +58,53 @@ export class CatalogService {
                 pageToken,
                 perPage,
             },
+            headers: this.headers,
         });
 
         return { items: response.items, total: response.total };
     }
 
     async getItem(itemId: string): Promise<ItemModel> {
-        const item = await $fetch(`/api/items/${itemId}`, { method: "get" });
+        const item = await $fetch(`/api/items/${itemId}`, {
+            method: "get",
+            headers: this.headers,
+        });
         return this.#toItemModel(item);
     }
 
     async registerItem(data: ItemDTO) {
-        return await $fetch("/api/items", { method: "post", body: data });
+        return await $fetch("/api/items", {
+            method: "post",
+            body: data,
+            headers: this.headers,
+        });
     }
 
     async updateItem(itemId: string, data: ItemDTO) {
         return await $fetch(`/api/items/${itemId}`, {
             method: "post",
             body: data,
+            headers: this.headers,
         });
     }
 
-    async registerCategory(name: string, variationsIds: string[], description?: string) {
+    async registerCategory(
+        name: string,
+        variationsIds: string[],
+        description?: string,
+    ) {
         const data = { name, variationsIds, description };
-        return await $fetch("/api/categories", { method: "post", body: data });
+        return await $fetch("/api/categories", {
+            method: "post",
+            body: data,
+            headers: this.headers,
+        });
+    }
+
+    get headers() {
+        return {
+            "X-Access-Token": auth.getToken(),
+        };
     }
 
     #toItemModel(data: any): ItemModel {

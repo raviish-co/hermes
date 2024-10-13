@@ -1,5 +1,6 @@
 import { useWarehouseService } from "~/composables/useWarehouseService";
 import { ItemStock } from "~/lib/backend/domain/warehouse/item_stock";
+import { checkAnonymousUser } from "../check_anonymous_user";
 
 const service = useWarehouseService();
 
@@ -20,6 +21,8 @@ function toItemStockDTO(stock: ItemStock): ItemStockDTO {
 }
 
 export default defineEventHandler(async (event) => {
+    checkAnonymousUser(event);
+
     const itemsStock = await service.listItemStock();
     return itemsStock.map(toItemStockDTO);
 });

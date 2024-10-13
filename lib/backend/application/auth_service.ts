@@ -1,5 +1,9 @@
 import { AuthenticationFailed } from "../domain/auth/authentication_failed_error";
-import type { TokenGenerator } from "../domain/auth/token_generator";
+import { InvalidTokenError } from "../domain/auth/invalid_token_error";
+import type {
+    TokenGenerator,
+    VerifyToken,
+} from "../domain/auth/token_generator";
 import type { UserRepository } from "../domain/auth/user_repository";
 import { Username } from "../domain/auth/username";
 import { type Either, left, right } from "../shared/either";
@@ -31,6 +35,16 @@ export class AuthService {
         const token = await this.#tokenGenerator.generate(username);
 
         return right({ username, token, name: userOrErr.value.name });
+    }
+
+    async verifyToken(
+        token: string,
+    ): Promise<Either<InvalidTokenError, VerifyToken>> {
+        const result = await this.#tokenGenerator.verify(token);
+
+        if (!result.isValid) return left(new InvalidTokenError());
+
+        return right(result);
     }
 }
 

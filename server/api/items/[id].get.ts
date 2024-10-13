@@ -1,10 +1,13 @@
 import { useCatalogService } from "~/composables/useCatalogService";
+import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
 import { toItemDTO } from "./item_dto";
 
 const service = useCatalogService();
 
 export default defineEventHandler(async (event) => {
+    checkAnonymousUser(event);
+
     const itemId = getRouterParam(event, "id", { decode: true });
 
     if (!itemId) {

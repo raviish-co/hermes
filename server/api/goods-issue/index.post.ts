@@ -4,10 +4,13 @@ import { ItemNotFound } from "~/lib/backend/domain/catalog/items/item_not_found_
 import { InvalidPurpose } from "~/lib/backend/domain/goods_issue/invalid_purpose_error";
 import { InvalidTotal } from "~/lib/backend/domain/goods_issue/invalid_total_error";
 import { HttpStatus } from "~/server/api/http_status";
+import { checkAnonymousUser } from "../check_anonymous_user";
 
 const service = useGoodsIssueService();
 
 export default defineEventHandler(async (event) => {
+    checkAnonymousUser(event);
+
     const { data } = await readBody(event);
 
     const voidOrErr = await service.new(data);

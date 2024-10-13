@@ -1,6 +1,6 @@
 import { useCatalogService } from "~/composables/useCatalogService";
 import { Variation } from "~/lib/backend/domain/catalog/variations/variation";
-
+import { checkAnonymousUser } from "../check_anonymous_user";
 const service = useCatalogService();
 
 interface VariationDTO {
@@ -17,7 +17,9 @@ function toVariationDTO(v: Variation): VariationDTO {
     };
 }
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
+    checkAnonymousUser(event);
+
     const variations = await service.listVariations();
     return variations.map(toVariationDTO);
 });

@@ -1,9 +1,13 @@
 import { useDashboardService } from "~/composables/useDashboardService";
+import { checkAnonymousUser } from "../check_anonymous_user";
 
 const service = useDashboardService();
 
 export default defineEventHandler(async (event) => {
-    const totalExpiredGoodsIssueNotes = await service.totalExpiredGoodsIssueNotes();
+    checkAnonymousUser(event);
+
+    const totalExpiredGoodsIssueNotes = await service
+        .totalExpiredGoodsIssueNotes();
     const totalOutOfStockItems = await service.totalOutOfStockItems();
     const totalInStockItems = await service.totalInStockItems();
     const totalInventoryValue = await service.totalInventoryValue();

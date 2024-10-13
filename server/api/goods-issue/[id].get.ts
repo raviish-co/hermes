@@ -1,11 +1,14 @@
 import { useGoodsIssueService } from "~/composables/useGoodsIssueService";
 import { GoodsIssueNoteNotFound } from "~/lib/backend/domain/goods_issue/goods_issue_note_not_found_error";
+import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
 import { toGoodsIssueNoteDTO } from "./goods_issue_note_dto";
 
 const service = useGoodsIssueService();
 
 export default defineEventHandler(async (event) => {
+    checkAnonymousUser(event);
+
     const noteId = getRouterParam(event, "id", { decode: true });
 
     if (!noteId) {

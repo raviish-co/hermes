@@ -1,4 +1,5 @@
 import { usePurposeService } from "~/composables/usePurposeService";
+import { checkAnonymousUser } from "./check_anonymous_user";
 
 const service = usePurposeService();
 
@@ -16,7 +17,9 @@ function toPurposeDTO(p: any): PurposeDTO {
     };
 }
 
-export default defineEventHandler(async () => {
+export default defineEventHandler(async (event) => {
+    checkAnonymousUser(event);
+
     const specs = await service.listPurposeSpecifications();
     return specs.map(toPurposeDTO);
 });

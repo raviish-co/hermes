@@ -1,6 +1,9 @@
-import jwt from "jsonwebtoken";
+import jwt, { type JwtPayload } from "jsonwebtoken";
 
-import type { TokenGenerator } from "../../domain/auth/token_generator";
+import type {
+    TokenGenerator,
+    VerifyToken,
+} from "../../domain/auth/token_generator";
 
 export class JSONWebToken implements TokenGenerator {
     constructor(private secretKey: string, private expiresIn: string) {}
@@ -11,5 +14,24 @@ export class JSONWebToken implements TokenGenerator {
         });
 
         return token;
+    }
+
+    async verify(token: string): Promise<VerifyToken> {
+        const verifyToken = {
+            username: "--empty--",
+            isValid: false,
+        };
+
+        const payload = jwt.verify(token, this.secretKey);
+        if (!payload) {
+            return verifyToken;
+        }
+
+        const { username } = payload as JwtPayload;
+
+        verifyToken.username = username;
+        verifyToken.isValid = true;
+
+        return verifyToken;
     }
 }
