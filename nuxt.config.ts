@@ -7,10 +7,12 @@ export default defineNuxtConfig({
         server: true,
         client: true,
     },
+
     alias: {
         "@backend": fileURLToPath(new URL("./lib/backend", import.meta.url)),
         "@frontend": fileURLToPath(new URL("./lib/frontend", import.meta.url)),
     },
+
     app: {
         head: {
             charset: "utf-8",
@@ -18,7 +20,8 @@ export default defineNuxtConfig({
             link: [
                 {
                     rel: "stylesheet",
-                    href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200",
+                    href:
+                        "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200",
                 },
                 {
                     rel: "manifest",
@@ -27,15 +30,25 @@ export default defineNuxtConfig({
             ],
         },
     },
+
     css: ["~/assets/css/main.css"],
+
     postcss: {
         plugins: {
             tailwindcss: {},
             autoprefixer: {},
         },
     },
+
     plugins: ["~/plugins/app_created"],
+
     runtimeConfig: {
         databaseUrl: "",
     },
+
+    routeRules: {
+        "/**": { appMiddleware: ["auth-guard"], ssr: false },
+    },
+
+    compatibilityDate: "2024-10-12",
 });

@@ -1,10 +1,17 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 
-const menuVisibility = ref<boolean>(false);
+const visibility = ref<boolean>(false);
+const auth = useAuth();
+
+function logout() {
+    toggleMenu();
+
+    auth.logout();
+}
 
 function toggleMenu() {
-    menuVisibility.value = !menuVisibility.value;
+    visibility.value = !visibility.value;
 }
 </script>
 
@@ -15,6 +22,7 @@ function toggleMenu() {
         >
             <span
                 class="material-symbols-outlined absolute text-white text-3xl my-auto left-8 cursor-pointer"
+                v-if="auth.isAuthenticated.value"
                 @click="toggleMenu"
             >
                 menu
@@ -35,7 +43,7 @@ function toggleMenu() {
 
         <div
             class="z-50 fixed shadow-lg bottom-0 bg-white flex text-sm w-4/5 min-w-52 sm:w-80 h-screen flex-col justify-start items-start p-0 top-0"
-            :class="{ hidden: !menuVisibility }"
+            :class="{ hidden: !visibility }"
         >
             <div class="w-full h-24 bg-primary relative">
                 <span
@@ -80,6 +88,11 @@ function toggleMenu() {
                 <NuxtLink to="/categories" class="nuxt-link">
                     <span class="material-symbols-outlined"> category </span>
                     <span>Categorias</span>
+                </NuxtLink>
+
+                <NuxtLink class="nuxt-link cursor-pointer" @click="logout()">
+                    <span class="material-symbols-outlined"> logout </span>
+                    <span>Sair</span>
                 </NuxtLink>
             </div>
         </div>
