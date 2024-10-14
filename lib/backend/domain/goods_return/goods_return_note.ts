@@ -4,6 +4,7 @@ import { ID } from "../../shared/id";
 
 export class GoodsReturnNote {
     readonly noteId: ID;
+    readonly userId: ID;
     readonly goodsIssueNoteId: ID;
     readonly lines: GoodsReturnNoteLine[];
     readonly securityDepositWithheld: Decimal;
@@ -14,9 +15,11 @@ export class GoodsReturnNote {
         goodsIssueNoteId: ID,
         lines: GoodsReturnNoteLine[],
         securityDepositWithheld: number,
-        issuedAt?: Date
+        userId: ID,
+        issuedAt?: Date,
     ) {
         this.noteId = noteId;
+        this.userId = userId;
         this.goodsIssueNoteId = goodsIssueNoteId;
         this.lines = lines;
         this.securityDepositWithheld = new Decimal(securityDepositWithheld);

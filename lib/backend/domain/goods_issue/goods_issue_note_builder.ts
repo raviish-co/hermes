@@ -50,7 +50,7 @@ export class GoodsIssueNoteBuilder {
             this.#purpose,
             this.#userId,
             this.#returnDate,
-            this.#lines
+            this.#lines,
         );
 
         return right(note);
