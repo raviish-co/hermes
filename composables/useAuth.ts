@@ -37,12 +37,32 @@ export function useAuth() {
         return user.token;
     };
 
+    const getName = () => {
+        const user = getUser();
+        if (!user) {
+            return "";
+        }
+
+        return user.name;
+    };
+
+    const getUsername = () => {
+        const user = getUser();
+        if (!user) {
+            return "";
+        }
+
+        return user.username;
+    };
+
     return {
         isAuthenticated,
         login,
         logout,
         checkAuth,
         getToken,
+        getName,
+        getUsername,
     };
 }
 
