@@ -14,6 +14,7 @@ const invalidLine = ref<boolean>(false);
 
 const goodsReturnService = new GoodsReturnService();
 const goodsIssueService = new GoodsIssueService();
+const auth = useAuth();
 
 const route = useRoute();
 const noteId = route.params.id as string;
@@ -45,7 +46,7 @@ function newGoodsReturn() {
         .new(
             goodsIssueNote.value.goodsIssueNoteId,
             securityDepositWithHeld.value,
-            goodsReturnNote.value.returnLines
+            goodsReturnNote.value.returnLines,
         )
         .then((res) => alert(res.message))
         .catch((err) => alert(err.statusMessage));
@@ -69,7 +70,7 @@ function newGoodsReturn() {
 
         <section class="space-y-4 mb-4">
             <div class="input-container">
-                <div class="input-disabled">John Doe</div>
+                <div class="input-disabled">{{ auth.getName() }}</div>
                 <div class="input-disabled">
                     {{ goodsIssueNote.returnDate ? formatDate(goodsIssueNote.returnDate) : "" }}
                 </div>
@@ -84,8 +85,8 @@ function newGoodsReturn() {
         </section>
 
         <ReturnNote
-            :goods-return-note="(goodsReturnNote as GoodsReturnNote)"
-            :goods-issue-note="(goodsIssueNote as GoodsIssueNote)"
+            :goods-return-note="goodsReturnNote as GoodsReturnNote"
+            :goods-issue-note="goodsIssueNote as GoodsIssueNote"
             :is-returned="isReturned()"
             :quantities="quantities"
             @invalid-line="invalidLine = $event"

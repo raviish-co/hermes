@@ -5,6 +5,7 @@ import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
 import type { ChoosePurpose } from "#build/components";
 
 const returnDate = getCurrentLocalDateTime();
+const auth = useAuth();
 const service = new GoodsIssueService();
 const note = reactive(new GoodsIssueNote(returnDate));
 const wasSubmitted = ref<boolean>(false);
@@ -30,7 +31,7 @@ function clear() {
 
         <section class="space-y-4 mb-4">
             <div class="input-container">
-                <div class="input-disabled">John Doe</div>
+                <div class="input-disabled">{{ auth.getName() }}</div>
                 <input v-model="note.returnDate" type="datetime-local" class="input-field" />
             </div>
 

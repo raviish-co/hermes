@@ -6,6 +6,7 @@ import { GoodsReceiptNote } from "~/lib/frontend/domain/goods_receipt_note";
 const entryDate = getCurrentLocalDateTime();
 const note = reactive(new GoodsReceiptNote(entryDate));
 const service = new GoodsReceiptService();
+const auth = useAuth();
 
 function newGoodsReceipt() {
     service
@@ -24,11 +25,11 @@ function newGoodsReceipt() {
 
         <section class="space-y-4 mb-4">
             <div class="input-container">
-                <div class="input-disabled">John Doe</div>
+                <div class="input-disabled">{{ auth.getName() }}</div>
                 <input v-model="note.entryDate" type="datetime-local" class="input-field" />
             </div>
         </section>
-        <ReceiptNote :note="(note as GoodsReceiptNote)" />
+        <ReceiptNote :note="note as GoodsReceiptNote" />
     </section>
 
     <section class="footer">
