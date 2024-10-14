@@ -13,6 +13,7 @@ export class GoodsReturnService {
             noteId,
             securityDepositWithHeld,
             itemsData: lines.map(this.#toItemDTO),
+            userId: auth.getUsername(),
         };
 
         return await $fetch("/api/goods-return", {
@@ -85,4 +86,5 @@ interface GoodsReturnDTO {
     noteId: string;
     securityDepositWithHeld: number;
     itemsData: ItemDTO[];
+    userId: string;
 }

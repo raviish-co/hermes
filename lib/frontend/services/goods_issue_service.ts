@@ -59,6 +59,7 @@ export class GoodsIssueService {
             returnDate: note.returnDate,
             purpose: note.purpose,
             lines: note.lines.map(this.#toNoteLine),
+            userId: auth.getUsername(),
         };
     }
 
@@ -96,6 +97,7 @@ interface NoteDTO {
     total: number;
     returnDate: string;
     lines: LineDTO[];
+    userId: string;
     purpose: {
         description: string;
         details?: string;

@@ -44,6 +44,7 @@ export class GoodsReceiptService {
     #toGoodsReceiptDTO(note: GoodsReceiptNote): NoteDTO {
         return {
             entryDate: note.entryDate,
+            userId: auth.getUsername(),
             lines: note.lines.map(this.#toGoodsReceiptLineDTO),
         };
     }
@@ -57,6 +58,7 @@ export class GoodsReceiptService {
 
 interface NoteDTO {
     entryDate: string;
+    userId: string;
     lines: NoteLineDTO[];
 }
 
