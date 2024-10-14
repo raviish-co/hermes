@@ -29,7 +29,7 @@ export class GoodsIssueService {
         itemStockRepository: ItemStockRepository,
         noteRepository: GoodsIssueNoteRepository,
         generator: Generator,
-        purposeSpecification: PurposeSpecification
+        purposeSpecification: PurposeSpecification,
     ) {
         this.#itemRepository = itemRepository;
         this.#itemStockRepository = itemStockRepository;
@@ -63,7 +63,9 @@ export class GoodsIssueService {
 
         if (noteOrErr.isLeft()) return left(noteOrErr.value);
 
-        if (!noteOrErr.value.isSameTotal(data.total)) return left(new InvalidTotal());
+        if (!noteOrErr.value.isSameTotal(data.total)) {
+            return left(new InvalidTotal());
+        }
 
         await this.#noteRepository.save(noteOrErr.value);
 
@@ -74,8 +76,12 @@ export class GoodsIssueService {
         return await this.#noteRepository.getAll();
     }
 
-    async get(noteId: string): Promise<Either<GoodsIssueNoteNotFound, GoodsIssueNote>> {
-        const noteOrErr = await this.#noteRepository.getById(ID.fromString(noteId));
+    async get(
+        noteId: string,
+    ): Promise<Either<GoodsIssueNoteNotFound, GoodsIssueNote>> {
+        const noteOrErr = await this.#noteRepository.getById(
+            ID.fromString(noteId),
+        );
         if (noteOrErr.isLeft()) return left(noteOrErr.value);
 
         return right(noteOrErr.value);
@@ -115,11 +121,14 @@ export class GoodsIssueService {
             line.goodQuantities,
             line.badQuantities,
             item.variations,
-            line.comment
+            line.comment,
         );
     }
 
-    async #reduceStock(items: Item[], data: NoteDTO): Promise<Either<InsufficientStock, void>> {
+    async #reduceStock(
+        items: Item[],
+        data: NoteDTO,
+    ): Promise<Either<InsufficientStock, void>> {
         const itemsIds = this.#buildItemsIds(data.lines);
 
         const itemsStock = await this.#itemStockRepository.findAll(itemsIds);
@@ -128,7 +137,9 @@ export class GoodsIssueService {
             const item = items[idx];
             const line = data.lines[idx];
 
-            const stock = itemsStock.find((stock) => stock.itemId.equals(item.itemId))!;
+            const stock = itemsStock.find((stock) =>
+                stock.itemId.equals(item.itemId)
+            )!;
 
             if (!stock.canReduce(line.goodQuantities, line.badQuantities)) {
                 return left(new InsufficientStock(item.itemId.toString()));
