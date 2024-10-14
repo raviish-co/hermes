@@ -1,4 +1,4 @@
-export class InvalidTokenError extends Error {
+export class InvalidUsernameError extends Error {
     constructor() {
         super("User name already exists");
     }

@@ -6,7 +6,7 @@ import { type Either, left, right } from "../../shared/either";
 
 export class InmemUserRepository implements UserRepository {
     #users: Record<string, User> = {
-        "john.doe": new User("john.doe", "josan5368", "John Doe"),
+        "john.doe": new User("john.doe", "josan5368", "João Santos"),
     };
 
     async getByUsername(
