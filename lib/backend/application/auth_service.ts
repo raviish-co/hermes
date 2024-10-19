@@ -49,7 +49,11 @@ export class AuthService {
         const token = await this.#tokenGenerator.generate(username);
 
         return right({ username, token, name: userOrErr.value.name });
+    }
 
+    async generateOtp(username: string): Promise<void> {
+        const otp = Math.floor(1000 + Math.random() * 9000).toString()
+        this.#otpStorage.save(username, otp);
     }
 
     async registerUser(

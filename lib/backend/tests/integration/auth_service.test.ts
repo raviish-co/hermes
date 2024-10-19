@@ -58,7 +58,7 @@ describe("Auth Service - Login", async () => {
     });
 
     it("Deve criar o token de autênticação", async () => {
-        const tokenGenerator: TokenGenerator = new FakeTokenGenerator();
+        const tokenGenerator = new FakeTokenGenerator();
         const { service } = makeService(tokenGenerator);
 
         const spy = vi.spyOn(tokenGenerator, "generate");
@@ -123,7 +123,7 @@ describe("Auth Service - Login", async () => {
 
 describe("Auth Service - VerifyToken", async () => {
     it("Deve verificar se o token é válido", async () => {
-        const tokenGenerator: TokenGenerator = new FakeTokenGenerator();
+        const tokenGenerator = new FakeTokenGenerator();
         const spy = vi.spyOn(tokenGenerator, "verify");
         const { service } = makeService(tokenGenerator);
 
@@ -135,7 +135,7 @@ describe("Auth Service - VerifyToken", async () => {
     });
 
     it("Deve retornar **InvalidToken** quando o token não for válido", async () => {
-        const tokenGenerator: TokenGenerator = new FakeTokenGenerator();
+        const tokenGenerator = new FakeTokenGenerator();
         vi.spyOn(tokenGenerator, "verify").mockReturnValue(
             Promise.resolve({ username: "--empty--", isValid: false }),
         );
@@ -148,7 +148,7 @@ describe("Auth Service - VerifyToken", async () => {
     });
 
     it("Deve retornar o username com base no token a ser verificado", async () => {
-        const tokenGenerator: TokenGenerator = new FakeTokenGenerator();
+        const tokenGenerator = new FakeTokenGenerator();
         vi.spyOn(tokenGenerator, "verify").mockReturnValue(
             Promise.resolve({ username: "john.doe", isValid: true }),
         );
@@ -238,13 +238,25 @@ describe("Auth Service - Register User", async () => {
 });
 
 
+describe("Auth Service - Generate OTP", async () => {
+    it("Deve gerar o OTP com 4 dígitos", async () => {
+        const { service, otpStorage } = makeService();
+
+        await service.generateOtp("johndoe123");
+
+        const otp = otpStorage.get("johndoe123");
+
+        expect(otp).toHaveLength(4);
+    })
+});
+
 function makeService(tokenGenerator?: TokenGenerator) {
     const user = User.create("johndoe123", "123@Password", "John Doe");
 
     const userRepository: UserRepository = new InmemUserRepository();
     userRepository.save(<User> user.value);
 
-    const otpStorage: OtpStorage = new InmemOtpStorage()
+    const otpStorage = new InmemOtpStorage()
     otpStorage.save("johndoe123", "0000");
 
     const service = new AuthService(
