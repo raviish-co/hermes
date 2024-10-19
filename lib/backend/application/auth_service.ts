@@ -1,6 +1,7 @@
 import { AuthenticationFailed } from "../domain/auth/authentication_failed_error";
 import { InvalidTokenError } from "../domain/auth/invalid_token_error";
 import type { InvalidUsernameError } from "../domain/auth/invalid_username_error";
+import type { OtpStorage } from "../domain/auth/otp_storage";
 import type {
     TokenGenerator,
     VerifyToken,
@@ -10,17 +11,22 @@ import type { UserRepository } from "../domain/auth/user_repository";
 import { Username } from "../domain/auth/username";
 import { UsernameAlreadyExists } from "../domain/auth/username_already_exists_error";
 import { type Either, left, right } from "../shared/either";
+import { AuthFactory } from "../domain/auth/auth_factory";
+
 
 export class AuthService {
     #userRepository: UserRepository;
     #tokenGenerator: TokenGenerator;
+    #otpStorage: OtpStorage;
 
     constructor(
         userRepository: UserRepository,
         tokenGenerator: TokenGenerator,
+        otpStorage: OtpStorage,
     ) {
         this.#userRepository = userRepository;
         this.#tokenGenerator = tokenGenerator;
+        this.#otpStorage = otpStorage;
     }
 
     async login(
@@ -32,12 +38,18 @@ export class AuthService {
         );
         if (userOrErr.isLeft()) return left(new AuthenticationFailed());
 
-        const isValid = userOrErr.value.checkPassword(password);
+        const factory = new AuthFactory(this.#otpStorage);
+
+        const authenticator = factory.create(password);
+
+        const isValid = authenticator.authenticate(userOrErr.value, password);
+
         if (!isValid) return left(new AuthenticationFailed());
 
         const token = await this.#tokenGenerator.generate(username);
 
         return right({ username, token, name: userOrErr.value.name });
+
     }
 
     async registerUser(
@@ -72,7 +84,7 @@ type UserData = {
     password: string;
 };
 
-type UserDTO = {
+export type UserDTO = {
     username: string;
     name: string;
     token: string;
