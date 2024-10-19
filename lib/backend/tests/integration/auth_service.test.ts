@@ -90,6 +90,16 @@ describe("Auth Service - Login", async () => {
 
         expect(output.isRight()).toBeTruthy();
     })
+
+    it("Deve remover o OTP depois do autenticação ser efectuada com sucesso", async() => {
+        const { service, otpStorage } = makeService();
+
+        await service.login("johndoe123", "0000");
+
+        const otp = otpStorage.get("johndoe123");
+
+        expect(otp).toBeUndefined();
+    })
 });
 
 describe("Auth Service - VerifyToken", async () => {
