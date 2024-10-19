@@ -9,8 +9,6 @@ export class OtpAuthenticator implements Authenticator {
     authenticate(user: User, password: string): boolean {
         const otp = this.otpStorage.get(user.username.value);
 
-        console.log(otp);
-
         if (!otp) return false;
 
         if (otp === password) {

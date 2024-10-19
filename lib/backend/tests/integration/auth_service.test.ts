@@ -110,6 +110,15 @@ describe("Auth Service - Login", async () => {
         expect(output.isLeft()).toBeTruthy();
         expect(output.value).toBeInstanceOf(AuthenticationFailed);
     })
+
+    it("Deve retornar **AuthenticationFailed** quando o OTP for inválido", async () => {
+        const { service } = makeService();
+
+        const output = await service.login("johndoe123", "1234");
+
+        expect(output.isLeft()).toBeTruthy();
+        expect(output.value).toBeInstanceOf(AuthenticationFailed);
+    })
 });
 
 describe("Auth Service - VerifyToken", async () => {
