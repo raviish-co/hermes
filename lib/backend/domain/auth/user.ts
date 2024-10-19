@@ -1,7 +1,5 @@
 import { Password } from "./password";
 import { Username } from "./username";
-import { type Either, left, right } from "../../shared/either";
-import { InvalidUsernameError } from "./invalid_username_error";
 
 export class User {
     readonly username: Username;
@@ -16,18 +14,6 @@ export class User {
         this.#phoneNumber = phoneNumber;
     }
 
-    static create(
-        username: string,
-        password: string,
-        name: string,
-        phoneNumber: string,
-    ): Either<InvalidUsernameError, User> {
-        if (!Username.isValid(username)) {
-            return left(new InvalidUsernameError());
-        }
-
-        return right(new User(username, password, name, phoneNumber));
-    }
 
     checkPassword(password: string): boolean {
         return this.#password.isValid(password);
