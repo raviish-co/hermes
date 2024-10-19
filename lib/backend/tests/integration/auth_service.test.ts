@@ -100,6 +100,16 @@ describe("Auth Service - Login", async () => {
 
         expect(otp).toBeUndefined();
     })
+
+    it("Deve retornar **AuthenticationFailed** quando não encontrar o OTP", async () => {
+        const { service, otpStorage } = makeService();
+        otpStorage.remove("johndoe123");
+
+        const output = await service.login("johndoe123", "0000");
+
+        expect(output.isLeft()).toBeTruthy();
+        expect(output.value).toBeInstanceOf(AuthenticationFailed);
+    })
 });
 
 describe("Auth Service - VerifyToken", async () => {
