@@ -12,21 +12,25 @@ import { Username } from "../domain/auth/username";
 import { UsernameAlreadyExists } from "../domain/auth/username_already_exists_error";
 import { type Either, left, right } from "../shared/either";
 import { AuthFactory } from "../domain/auth/auth_factory";
+import type { Sender } from "../domain/auth/sender";
 
 
 export class AuthService {
     #userRepository: UserRepository;
     #tokenGenerator: TokenGenerator;
     #otpStorage: OtpStorage;
+    #otpSender: Sender;
 
     constructor(
         userRepository: UserRepository,
         tokenGenerator: TokenGenerator,
         otpStorage: OtpStorage,
+        otpSender: Sender,
     ) {
         this.#userRepository = userRepository;
         this.#tokenGenerator = tokenGenerator;
         this.#otpStorage = otpStorage;
+        this.#otpSender = otpSender;
     }
 
     async login(
@@ -52,8 +56,16 @@ export class AuthService {
     }
 
     async generateOtp(username: string): Promise<void> {
+        const userOrErr = await this.#userRepository.getByUsername(
+            Username.fromString(username),
+        );
+        if (userOrErr.isLeft()) return;
+
+
         const otp = Math.floor(1000 + Math.random() * 9000).toString()
         this.#otpStorage.save(username, otp);
+
+        await this.#otpSender.send(userOrErr.value.phoneNumber, otp);
     }
 
     async registerUser(

@@ -7,23 +7,26 @@ export class User {
     readonly username: Username;
     readonly #password: Password;
     #name: string;
+    #phoneNumber: string;
 
-    constructor(username: string, password: string, name: string) {
+    constructor(username: string, password: string, name: string, phoneNumber: string) {
         this.username = Username.fromString(username);
         this.#password = Password.fromString(password);
         this.#name = name;
+        this.#phoneNumber = phoneNumber;
     }
 
     static create(
         username: string,
         password: string,
         name: string,
+        phoneNumber: string,
     ): Either<InvalidUsernameError, User> {
         if (!Username.isValid(username)) {
             return left(new InvalidUsernameError());
         }
 
-        return right(new User(username, password, name));
+        return right(new User(username, password, name, phoneNumber));
     }
 
     checkPassword(password: string): boolean {
@@ -32,6 +35,10 @@ export class User {
 
     get name(): string {
         return this.#name;
+    }
+
+    get phoneNumber(): string {
+        return this.#phoneNumber;
     }
 
     get password(): Password {

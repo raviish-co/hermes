@@ -12,8 +12,8 @@ import { Username } from "../../domain/auth/username";
 import { InmemUserRepository } from "../../persistence/inmem/inmem_user_repository";
 import { UsernameAlreadyExists } from "../../domain/auth/username_already_exists_error";
 import { InvalidUsernameError } from "../../domain/auth/invalid_username_error";
-import type { OtpStorage } from "../../domain/auth/otp_storage";
 import { InmemOtpStorage } from "./../../persistence/inmem/inmem_otp_storage";
+import { ConsoleOtpSender } from "./../../adapters/console/console_otp_sender";
 
 class FakeTokenGenerator implements TokenGenerator {
     async generate(_username: string): Promise<string> {
@@ -248,13 +248,29 @@ describe("Auth Service - Generate OTP", async () => {
 
         expect(otp).toHaveLength(4);
     })
+
+    it("Deve enviar o OTP para o Utilizador", async () => {
+        const { service, otpSender, otpStorage } = makeService();
+
+        const spy = vi.spyOn(otpSender, "send");
+
+        await service.generateOtp("johndoe123");
+
+        const otp = otpStorage.get("johndoe123");
+
+        expect(spy).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalledOnce();
+        expect(spy).toHaveBeenCalledWith("911000011", otp);
+    })
 });
 
 function makeService(tokenGenerator?: TokenGenerator) {
-    const user = User.create("johndoe123", "123@Password", "John Doe");
+    const user = User.create("johndoe123", "123@Password", "John Doe", "911000011");
 
     const userRepository: UserRepository = new InmemUserRepository();
     userRepository.save(<User> user.value);
+
+    const otpSender = new ConsoleOtpSender();
 
     const otpStorage = new InmemOtpStorage()
     otpStorage.save("johndoe123", "0000");
@@ -263,11 +279,13 @@ function makeService(tokenGenerator?: TokenGenerator) {
         userRepository,
         tokenGenerator ?? new FakeTokenGenerator(),
         otpStorage,
+        otpSender,
     );
 
     return {
         service,
         userRepository,
         otpStorage,
+        otpSender
     };
 }
