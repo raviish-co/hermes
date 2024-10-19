@@ -8,6 +8,7 @@ export type NoteOptions = {
     returnDate: Date;
     issuedAt: Date;
     status: string;
+    userId: string;
     total: number;
     securityDeposit: number;
     lines: LineOptions[];

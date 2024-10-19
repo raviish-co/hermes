@@ -11,10 +11,16 @@ function goodsReceiptNoteFactory(data: any) {
         badQuantities: line.badQuantities,
         condition: new Condition(line.comments),
     }));
-    return new GoodsReceiptNote(data.noteId, data.entryDate, lines);
+    return new GoodsReceiptNote(
+        data.noteId,
+        data.entryDate,
+        lines,
+        data.userId,
+    );
 }
 
-export class PostgresGoodsReceiptNoteRepository implements GoodsReceiptNoteRepository {
+export class PostgresGoodsReceiptNoteRepository
+    implements GoodsReceiptNoteRepository {
     #prisma: PrismaClient;
 
     constructor(prisma: PrismaClient) {
@@ -34,6 +40,7 @@ export class PostgresGoodsReceiptNoteRepository implements GoodsReceiptNoteRepos
             data: {
                 noteId: note.noteId.toString(),
                 entryDate: note.entryDate,
+                userId: note.userId.toString(),
                 lines: {
                     createMany: {
                         data: note.lines.map((line) => ({

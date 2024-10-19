@@ -26,7 +26,7 @@ describe("PostgresGoodsIssueNoteRepository - geById", () => {
 
         const noteOrErr = await noteRepository.getById(ID.fromString("1"));
 
-        const note = <GoodsIssueNote>noteOrErr.value;
+        const note = <GoodsIssueNote> noteOrErr.value;
 
         expect(note.noteId.toString()).toEqual("1");
         expect(note.status).toEqual("Por Devolver");
@@ -38,7 +38,7 @@ describe("PostgresGoodsIssueNoteRepository - geById", () => {
 
         const noteOrErr = await noteRepository.getById(ID.fromString("1"));
 
-        const note = <GoodsIssueNote>noteOrErr.value;
+        const note = <GoodsIssueNote> noteOrErr.value;
 
         expect(note.lines.length).toEqual(1);
     });
@@ -48,10 +48,13 @@ describe("PostgresGoodsIssueNoteRepository - geById", () => {
 
         const noteOrErr = await noteRepository.getById(ID.fromString("1"));
 
-        const note = <GoodsIssueNote>noteOrErr.value;
+        const note = <GoodsIssueNote> noteOrErr.value;
 
         expect(note.lines[0].variationsValues).toBeDefined();
-        expect(note.lines[0].variationsValues).toEqual({ "1": "Cor: Azul", "2": "Tamanho: L" });
+        expect(note.lines[0].variationsValues).toEqual({
+            "1": "Cor: Azul",
+            "2": "Tamanho: L",
+        });
     });
 
     it("Deve retornar **GoodsIssueNoteNotFoundError** se a guia de saída não for encontrada", async () => {
@@ -72,7 +75,7 @@ describe("PostgresGoodsIssueNoteRepository - getAll", () => {
         const noteRepository = new PostgresGoodsIssueNoteRepository(prisma);
         const spy = vi.spyOn(prisma.goodsIssueNote, "findMany");
 
-        const notes = await noteRepository.getAll();
+        await noteRepository.getAll();
 
         expect(spy).toBeCalled();
         expect(spy).toBeCalledTimes(1);
@@ -99,6 +102,35 @@ describe("PostgresGoodsIssueNoteRepository - save", () => {
 
         expect(spy).toBeCalled();
         expect(spy).toBeCalledTimes(1);
+        expect(spy).toBeCalledWith({
+            data: {
+                ..._notes[0],
+                purpose: {
+                    create: {
+                        ..._notes[0].purpose,
+                    },
+                },
+                lines: {
+                    createMany: {
+                        data: [
+                            {
+                                ..._notes[0].lines[0],
+                                lineId: "1",
+                            },
+                        ],
+                    },
+                },
+            },
+        });
+    });
+
+    it("Deve salvar a guia de saída com o utilizador que a criou", async () => {
+        const noteRepository = new PostgresGoodsIssueNoteRepository(prisma);
+        const note = GoodsIssueNote.restore(_notes[0]);
+        const spy = vi.spyOn(prisma.goodsIssueNote, "create");
+
+        await noteRepository.save(note);
+
         expect(spy).toBeCalledWith({
             data: {
                 ..._notes[0],
@@ -193,6 +225,7 @@ const _notes = [
         fulltext: "dummy dummy dummy",
         total: 0,
         securityDeposit: 0,
+        userId: "johndoe123",
         lines: [
             {
                 lineId: "1",
@@ -205,7 +238,10 @@ const _notes = [
                 badQuantitiesReturned: 0,
                 netTotal: 0,
                 comments: "dummy",
-                variations: JSON.stringify({ "1": "Cor: Azul", "2": "Tamanho: L" }),
+                variations: JSON.stringify({
+                    "1": "Cor: Azul",
+                    "2": "Tamanho: L",
+                }),
             },
         ],
     },
@@ -221,6 +257,7 @@ const _notes = [
         status: "Por Devolver",
         fulltext: "dummy dummy dummy",
         total: 0,
+        userId: "johndoe123",
         securityDeposit: 0,
         lines: [
             {
@@ -234,7 +271,10 @@ const _notes = [
                 badQuantitiesReturned: 0,
                 netTotal: 0,
                 comments: "dummy",
-                variations: JSON.stringify({ "1": "Cor: Azul", "2": "Tamanho: L" }),
+                variations: JSON.stringify({
+                    "1": "Cor: Azul",
+                    "2": "Tamanho: L",
+                }),
             },
         ],
     },

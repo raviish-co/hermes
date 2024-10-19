@@ -27,7 +27,7 @@ export class GoodsIssueNote {
         purpose: Purpose,
         user: ID,
         returnDate: Date,
-        lines: GoodsIssueNoteLine[]
+        lines: GoodsIssueNoteLine[],
     ) {
         this.noteId = noteId;
         this.purpose = purpose;
@@ -48,15 +48,15 @@ export class GoodsIssueNote {
         const purpose = new Purpose(
             data.purpose.description,
             data.purpose.notes,
-            data.purpose.details
+            data.purpose.details,
         );
 
         const note = new GoodsIssueNote(
             ID.fromString(data.noteId),
             purpose,
-            ID.random(),
+            ID.fromString(data.userId),
             data.returnDate,
-            data.lines.map(GoodsIssueNoteLine.restore)
+            data.lines.map(GoodsIssueNoteLine.restore),
         );
 
         note.updateStatus(data.status);
@@ -68,7 +68,8 @@ export class GoodsIssueNote {
     }
 
     verifyTotal(total: number, securityDeposit: number): boolean {
-        return !this.isSameTotal(total) || !this.isSameSecurityDeposit(securityDeposit);
+        return !this.isSameTotal(total) ||
+            !this.isSameSecurityDeposit(securityDeposit);
     }
 
     returnTheGoods(lines: GoodsReturnNoteLine[]): void {
@@ -123,11 +124,19 @@ export class GoodsIssueNote {
 
     #returnLines(lines: GoodsReturnNoteLine[]): void {
         for (const line of lines) {
-            this.#returnLine(line.itemId, line.goodQuantities, line.badQuantities);
+            this.#returnLine(
+                line.itemId,
+                line.goodQuantities,
+                line.badQuantities,
+            );
         }
     }
 
-    #returnLine(itemId: ID, goodQuantities: number, badQuantities: number): void {
+    #returnLine(
+        itemId: ID,
+        goodQuantities: number,
+        badQuantities: number,
+    ): void {
         const line = this.#findLineByItemId(itemId);
         line.returnLine(goodQuantities, badQuantities);
     }

@@ -18,6 +18,7 @@ describe("PostgresGoodsReceiptNoteRepository - save", () => {
             data: {
                 noteId: note.noteId.toString(),
                 entryDate: note.entryDate,
+                userId: note.userId.toString(),
                 lines: {
                     createMany: {
                         data: noteLines.map((line) => ({
@@ -43,6 +44,7 @@ describe("PostgresGoodsReceiptNoteRepository - save", () => {
             data: {
                 noteId: note.noteId.toString(),
                 entryDate: note.entryDate,
+                userId: note.userId.toString(),
                 lines: {
                     createMany: {
                         data: noteLines.map((line) => ({
@@ -68,6 +70,7 @@ describe("PostgresGoodsReceiptNoteRepository - save", () => {
             data: {
                 noteId: note.noteId.toString(),
                 entryDate: note.entryDate,
+                userId: note.userId.toString(),
                 lines: {
                     createMany: {
                         data: noteLines.map((line) => ({
@@ -93,6 +96,33 @@ describe("PostgresGoodsReceiptNoteRepository - save", () => {
             data: {
                 noteId: note.noteId.toString(),
                 entryDate: note.entryDate,
+                userId: note.userId.toString(),
+                lines: {
+                    createMany: {
+                        data: noteLines.map((line) => ({
+                            lineId: line.lineId.toString(),
+                            productId: line.itemId.toString(),
+                            goodQuantities: line.goodQuantities,
+                            badQuantities: line.badQuantities,
+                            comments: line.condition.comment,
+                        })),
+                    },
+                },
+            },
+        });
+    });
+
+    it("Deve salvar a guia de entrada com o utilizador que a criou", async () => {
+        const noteRepository = new PostgresGoodsReceiptNoteRepository(prisma);
+        const spy = vi.spyOn(prisma.goodsReceiptNote, "create");
+
+        await noteRepository.save(note);
+
+        expect(spy).toHaveBeenCalledWith({
+            data: {
+                noteId: note.noteId.toString(),
+                entryDate: note.entryDate,
+                userId: note.userId.toString(),
                 lines: {
                     createMany: {
                         data: noteLines.map((line) => ({
@@ -139,11 +169,17 @@ const noteLines: GoodsReceiptNoteLine[] = [
     new GoodsReceiptNoteLine(ID.random(), 10),
     new GoodsReceiptNoteLine(ID.random(), 10, 5, "Comentário"),
 ];
-const note = new GoodsReceiptNote(ID.random(), new Date(), noteLines);
+const note = new GoodsReceiptNote(
+    ID.random(),
+    new Date(),
+    noteLines,
+    ID.fromString("userId"),
+);
 const _notes = [
     {
         noteId: "1",
         entryDate: "2021-09-01T00:00:00.000Z",
+        userId: "userId",
         lines: [
             {
                 lineId: "1",
@@ -157,6 +193,7 @@ const _notes = [
     {
         noteId: "2",
         entryDate: "2021-09-02T00:00:00.000Z",
+        userId: "userId",
         lines: [
             {
                 lineId: "2",

@@ -3,7 +3,7 @@ import { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
 import type { NoteOptions } from "../../domain/goods_issue/goods_issue_note_options";
 import type { GoodsIssueNoteRepository } from "../../domain/goods_issue/goods_issue_note_repository";
-import { left, right, type Either } from "../../shared/either";
+import { type Either, left, right } from "../../shared/either";
 import type { ID } from "../../shared/id";
 
 export class PostgresGoodsIssueNoteRepository implements GoodsIssueNoteRepository {
@@ -48,6 +48,7 @@ export class PostgresGoodsIssueNoteRepository implements GoodsIssueNoteRepositor
                 securityDeposit: note.securityDeposit.value,
                 status: note.status,
                 total: note.total.value,
+                userId: note.userId.toString(),
                 fulltext: note.fulltext,
                 lines: {
                     createMany: {
