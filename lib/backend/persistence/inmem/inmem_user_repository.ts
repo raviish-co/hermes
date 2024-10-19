@@ -5,9 +5,13 @@ import type { Username } from "../../domain/auth/username";
 import { type Either, left, right } from "../../shared/either";
 
 export class InmemUserRepository implements UserRepository {
-    #users: Record<string, User> = {
-        "john.doe": new User("john.doe", "josan5368", "João Santos"),
-    };
+    #users: Record<string, User> = {};
+
+    constructor(users?: User[]) {
+        if (!users) return;
+
+        this.#populate(users);
+    }
 
     async getByUsername(
         username: Username,
@@ -21,4 +25,11 @@ export class InmemUserRepository implements UserRepository {
     async save(user: User): Promise<void> {
         this.#users[user.username.value] = user;
     }
+
+    #populate(users: User[]) {
+        users.forEach((user) => {
+            this.#users[user.username.value] = user;
+        });
+    }
+
 }

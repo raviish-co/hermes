@@ -23,4 +23,23 @@ export class AuthService {
             };
         }
     }
+
+    async generateOtp(username: string): Promise<{message: string} | void> {
+        try {
+            await $fetch("/api/auth/generate-otp/", {
+                method: "post",
+                body: { username },
+            });
+        } catch (error: any) {
+
+            if (error.statusCode === 404) {
+                return { message: "Utilizador inválido" };
+            }
+
+            return {
+                message:
+                    "Erro desconhecido, contacte o administrador do sistema.",
+            };
+        }
+    }
 }
