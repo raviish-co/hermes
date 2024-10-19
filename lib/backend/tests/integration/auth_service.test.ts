@@ -12,6 +12,8 @@ import { Username } from "../../domain/auth/username";
 import { InmemUserRepository } from "../../persistence/inmem/inmem_user_repository";
 import { UsernameAlreadyExists } from "../../domain/auth/username_already_exists_error";
 import { InvalidUsernameError } from "../../domain/auth/invalid_username_error";
+import type { OtpStorage } from "../../domain/auth/otp_storage";
+import { InmemOtpStorage } from "./../../persistence/inmem/inmem_otp_storage";
 
 class FakeTokenGenerator implements TokenGenerator {
     async generate(_username: string): Promise<string> {
@@ -80,6 +82,14 @@ describe("Auth Service - Login", async () => {
             token: "token",
         });
     });
+
+    it("Deve fazer login com o OTP password", async () => {
+        const { service } = makeService();
+
+        const output = await service.login("johndoe123", "0000")
+
+        expect(output.isRight()).toBeTruthy();
+    })
 });
 
 describe("Auth Service - VerifyToken", async () => {
@@ -198,20 +208,25 @@ describe("Auth Service - Register User", async () => {
     });
 });
 
+
 function makeService(tokenGenerator?: TokenGenerator) {
     const user = User.create("johndoe123", "123@Password", "John Doe");
 
     const userRepository: UserRepository = new InmemUserRepository();
-
     userRepository.save(<User> user.value);
+
+    const otpStorage: OtpStorage = new InmemOtpStorage()
+    otpStorage.save("johndoe123", "0000");
 
     const service = new AuthService(
         userRepository,
         tokenGenerator ?? new FakeTokenGenerator(),
+        otpStorage,
     );
 
     return {
         service,
         userRepository,
+        otpStorage,
     };
 }
