@@ -1,7 +1,5 @@
 import { ItemStock } from "../../domain/warehouse/item_stock";
-import { ItemStockNotFound } from "../../domain/warehouse/item_stock_not_found";
 import type { ItemStockRepository } from "../../domain/warehouse/item_stock_repository";
-import { left, right, type Either } from "../../shared/either";
 import { ID } from "../../shared/id";
 
 export class ItemStockRepositoryStub implements ItemStockRepository {
