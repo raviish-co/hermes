@@ -17,7 +17,7 @@ describe("Auth Service - Login", async () => {
     it("Deve efectuar o login do utilizador", async () => {
         const { service } = makeService();
 
-        const output = await service.login("johndoe123", "123@Password");
+        const output = await service.login("johndoe123", "123@Password", "Default");
 
         expect(output.isRight()).toBeTruthy();
         expect(output.value).toEqual({
@@ -39,7 +39,7 @@ describe("Auth Service - Login", async () => {
     it("Deve retornar **AuthenticationFailed** quanto a senha for inválida", async () => {
         const { service } = makeService();
 
-        const err = await service.login("john.doe", "Password");
+        const err = await service.login("john.doe", "Password", "Default");
 
         expect(err.isLeft()).toBeTruthy();
         expect(err.value).toBeInstanceOf(AuthenticationFailed);
@@ -51,7 +51,7 @@ describe("Auth Service - Login", async () => {
 
         const spy = vi.spyOn(tokenGenerator, "generate");
 
-        await service.login("johndoe123", "123@Password");
+        await service.login("johndoe123", "123@Password", "Default");
 
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledOnce();
@@ -61,7 +61,7 @@ describe("Auth Service - Login", async () => {
     it("Deve retornar os dados do utilizador quando o login foi bem sucedido", async () => {
         const { service } = makeService();
 
-        const output = await service.login("johndoe123", "123@Password");
+        const output = await service.login("johndoe123", "123@Password", "Default");
 
         expect(output.isRight()).toBeTruthy();
         expect(output.value).toEqual({

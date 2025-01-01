@@ -12,7 +12,7 @@ import type { Generator } from "../adapters/sequences/generator";
 import { Sequence } from "../adapters/sequences/sequence";
 import type { CategoryRepository } from "../domain/catalog/categories/category_repository";
 import type { SectionRepository } from "../domain/catalog/departments/section_repository";
-import { Item } from "../domain/catalog/items/item";
+import type { Item } from "../domain/catalog/items/item";
 import { ItemBuilder } from "../domain/catalog/items/item_builder";
 import type { ItemRepository } from "../domain/catalog/items/item_repository";
 import type { Variation } from "../domain/catalog/variations/variation";
@@ -20,7 +20,7 @@ import type { VariationRepository } from "../domain/catalog/variations/variation
 import { GoodsReceiptNoteBuilder } from "../domain/goods_receipt/goods_receipt_note_builder";
 import { GoodsReceiptNoteLine } from "../domain/goods_receipt/goods_receipt_note_line";
 import type { GoodsReceiptNoteRepository } from "../domain/goods_receipt/goods_receipt_note_repository";
-import { ItemStock } from "../domain/warehouse/item_stock";
+import type { ItemStock } from "../domain/warehouse/item_stock";
 import { ItemStockNotFound } from "../domain/warehouse/item_stock_not_found";
 import type { ItemStockRepository } from "../domain/warehouse/item_stock_repository";
 import { Decimal } from "../shared/decimal";
@@ -176,7 +176,7 @@ export class ImportService {
         const result: Record<string, string> = {};
         for (const variation of variations) {
             const value = values[variations.indexOf(variation)];
-            result[variation.variationId.toString()] = variation.name + ": " + value;
+            result[variation.variationId.toString()] = `${variation.name}: ${value}`;
         }
         return result;
     }

@@ -34,6 +34,7 @@ export class AuthService {
     async login(
         username: string,
         password: string,
+        mode = "Otp"
     ): Promise<Either<AuthenticationFailed, UserDTO>> {
         const userOrErr = await this.#userRepository.getByUsername(
             Username.fromString(username),
@@ -42,7 +43,7 @@ export class AuthService {
 
         const factory = new AuthFactory(this.#otpStorage);
 
-        const authenticator = factory.create(password);
+        const authenticator = factory.create(mode);
 
         const isValid = authenticator.authenticate(userOrErr.value, password);
 
@@ -59,7 +60,7 @@ export class AuthService {
         );
         if (userOrErr.isLeft()) return left(new UserNotFound());
 
-        const otp = Math.floor(1000 + Math.random() * 9000).toString()
+        const otp = generateCode()
 
         this.#otpStorage.save(username, otp);
 
@@ -77,6 +78,10 @@ export class AuthService {
 
         return right(result);
     }
+}
+
+function generateCode() {
+    return Math.floor(1000 + Math.random() * 9000).toString();
 }
 
 export type UserDTO = {

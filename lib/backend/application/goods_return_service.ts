@@ -8,7 +8,7 @@ import type { GoodsIssueNoteRepository } from "../domain/goods_issue/goods_issue
 import { GoodsIssueLineNotFound } from "../domain/goods_issue/goods_lssue_line_not_found_error";
 import { InvalidGoodsIssueLineQuantity } from "../domain/goods_issue/invalid_goods_issue_line_quantity_error";
 import { GoodsReturnNoteBuilder } from "../domain/goods_return/goods_return_note_builder";
-import { GoodsReturnNote } from "../domain/goods_return/goods_return_note";
+import type { GoodsReturnNote } from "../domain/goods_return/goods_return_note";
 import { GoodsReturnNoteLine } from "../domain/goods_return/goods_return_note_line";
 import type { GoodsReturnNoteNotFound } from "../domain/goods_return/goods_return_note_not_found_error";
 import type { GoodsReturnNoteRepository } from "../domain/goods_return/goods_return_note_repository";

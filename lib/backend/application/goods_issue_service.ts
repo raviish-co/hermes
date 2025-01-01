@@ -1,7 +1,7 @@
 import type { Generator } from "../adapters/sequences/generator";
 import { Sequence } from "../adapters/sequences/sequence";
 import { InsufficientStock } from "../domain/catalog/items/insufficient_stock_error";
-import { Item } from "../domain/catalog/items/item";
+import type { Item } from "../domain/catalog/items/item";
 import type { ItemRepository } from "../domain/catalog/items/item_repository";
 import type { GoodsIssueNote } from "../domain/goods_issue/goods_issue_note";
 import { GoodsIssueNoteBuilder } from "../domain/goods_issue/goods_issue_note_builder";

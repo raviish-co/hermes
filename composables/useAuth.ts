@@ -1,4 +1,4 @@
-import { type UserModel } from "~/lib/frontend/models/user";
+import type { UserModel } from "~/lib/frontend/models/user";
 
 const USERNAME_KEY = "raviish::username";
 const TOKEN_KEY = "raviiish::token";

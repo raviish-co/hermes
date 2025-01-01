@@ -69,24 +69,21 @@ function validateForm(username: string, password: string) {
 }
 </script>
 <template>
-    <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+    <div class="h-screen -mt-24 flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
         <div class="mt-16 sm:mx-auto sm:w-full sm:max-w-md border px-8 py-16 shadow-sm">
             <div v-if="!sentStatus" class="space-y-6">
                 <h2 class="text-center text-3xl font-bold leading-9 tracking-tight text-gray-900">
                     Iniciar sessão
                 </h2>
                 <form class="space-y-6">
-                    <p class="text-center text-gray-500 mt-4">Digite o nome do seu Utilizador</p>
-
+                    <p class="text-sm text-gray-500 mt-4">
+                        Digite o seu utilizador para receber o código de autenticação
+                    </p>
                     <div class="text-red-500 mt-1 text-center mb-4" v-if="error.message">
                         {{ error.message }}
                     </div>
                     <div>
-                        <input
-                            placeholder="Nome de utilizador"
-                            class="input-field"
-                            v-model="username"
-                        />
+                        <input placeholder="Utilizador" class="input-field" v-model="username" />
                     </div>
                     <div class="text-red-500 text-sm mt-1" v-if="error.username">
                         {{ error.username }}
