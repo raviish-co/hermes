@@ -9,6 +9,10 @@ coverage
 
 # Node dependencies
 node_modules
+package-lock.json
+
+# Bun dependecies
+bun.lockb
 
 # Logs
 logs
@@ -24,9 +28,8 @@ logs
 .env.*
 !.env.example
 
-
 # Database
 *.db
 *.sqlite3
 *.sqlite
-*.db-journal
+*.db-journal 

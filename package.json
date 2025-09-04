@@ -28,7 +28,7 @@
         "git-commit-msg-linter": "^5.0.8",
         "nuxt": "^3.12.2",
         "postcss": "^8.4.32",
-        "prisma": "^5.16.1",
+        "prisma": "^6.15.0",
         "tailwindcss": "^3.4.0",
         "vitest": "^1.2.0",
         "vue": "^3.3.12",
