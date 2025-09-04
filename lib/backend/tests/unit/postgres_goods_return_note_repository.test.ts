@@ -13,7 +13,7 @@ describe("PostgresGoodsReturnNoteRepository - getById", () => {
 
         const noteOrErr = await noteRepository.getById(noteId);
 
-        const note = <GoodsReturnNote> noteOrErr.value;
+        const note = <GoodsReturnNote>noteOrErr.value;
 
         expect(note.noteId.equals(noteId)).toBeTruthy();
     });
@@ -39,7 +39,7 @@ describe("PostgresGoodsReturnNoteRepository - getById", () => {
 
         const noteOrErr = await noteRepository.getById(noteId);
 
-        const note = <GoodsReturnNote> noteOrErr.value;
+        const note = <GoodsReturnNote>noteOrErr.value;
 
         expect(note.goodsIssueNoteId.toString()).toEqual("1");
         expect(note.securityDepositWithheld.value).toEqual(1000);
@@ -50,9 +50,7 @@ describe("PostgresGoodsReturnNoteRepository - getById", () => {
             goodsReturnNote: { findUnique: async (_args: object) => null },
         };
         const noteId = ID.random();
-        const noteRepository = new PostgresGoodsReturnNoteRepository(
-            prisma as PrismaClient,
-        );
+        const noteRepository = new PostgresGoodsReturnNoteRepository(prisma as PrismaClient);
 
         const noteOrErr = await noteRepository.getById(noteId);
 
@@ -62,6 +60,13 @@ describe("PostgresGoodsReturnNoteRepository - getById", () => {
 
     it("Ao recuperar a nota deve incluir as linhas", async () => {
         const noteId = ID.fromString("1");
+        const prisma = {
+            goodsReturnNote: {
+                findUnique: async (_args: object) => _notes[0],
+                findMany: async (_args: object) => _notes,
+                create: async (_args: object) => ({}),
+            },
+        } as unknown as PrismaClient;
         const noteRepository = new PostgresGoodsReturnNoteRepository(prisma);
         const spy = vi.spyOn(prisma.goodsReturnNote, "findUnique");
 
@@ -81,7 +86,7 @@ describe("PostgresGoodsReturnNoteRepository - getById", () => {
 
         const noteOrErr = await noteRepository.getById(noteId);
 
-        const note = <GoodsReturnNote> noteOrErr.value;
+        const note = <GoodsReturnNote>noteOrErr.value;
 
         expect(note.lines.length).toEqual(2);
         expect(note.lines[0].total).toEqual(1);
@@ -94,7 +99,7 @@ describe("PostgresGoodsReturnNoteRepository - getById", () => {
 
         const noteOrErr = await noteRepository.getById(noteId);
 
-        const note = <GoodsReturnNote> noteOrErr.value;
+        const note = <GoodsReturnNote>noteOrErr.value;
 
         expect(note.lines[0].variationsValues).toEqual({
             "1": "Cor: Preta",
@@ -186,12 +191,12 @@ const note = new GoodsReturnNote(
             1,
             0,
             { "1": "Cor: Preta", "2": "Tamanho: P" },
-            "Comment",
+            "Comment"
         ),
     ],
     1000,
     ID.fromString("userId"),
-    new Date(),
+    new Date()
 );
 
 const _notes = [

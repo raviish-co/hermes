@@ -21,232 +21,207 @@ import { ID } from "../shared/id";
 import type { Pagination } from "../shared/pagination";
 
 export class CatalogService {
-	#itemRepository: ItemRepository;
-	#categoryRepository: CategoryRepository;
-	#variationRepository: VariationRepository;
-	#sectionRepository: SectionRepository;
-	#generator: Generator;
+    #itemRepository: ItemRepository;
+    #categoryRepository: CategoryRepository;
+    #variationRepository: VariationRepository;
+    #sectionRepository: SectionRepository;
+    #generator: Generator;
 
-	constructor(
-		itemRepository: ItemRepository,
-		variationRepository: VariationRepository,
-		categoryRepository: CategoryRepository,
-		sectionRepository: SectionRepository,
-		generator: Generator,
-	) {
-		this.#itemRepository = itemRepository;
-		this.#variationRepository = variationRepository;
-		this.#categoryRepository = categoryRepository;
-		this.#sectionRepository = sectionRepository;
-		this.#generator = generator;
-	}
+    constructor(
+        itemRepository: ItemRepository,
+        variationRepository: VariationRepository,
+        categoryRepository: CategoryRepository,
+        sectionRepository: SectionRepository,
+        generator: Generator
+    ) {
+        this.#itemRepository = itemRepository;
+        this.#variationRepository = variationRepository;
+        this.#categoryRepository = categoryRepository;
+        this.#sectionRepository = sectionRepository;
+        this.#generator = generator;
+    }
 
-	async listItems(pageToken = 1, perPage = 12): Promise<Pagination<Item>> {
-		return await this.#itemRepository.getAll({ pageToken, perPage });
-	}
+    async listItems(pageToken = 1, perPage = 12): Promise<Pagination<Item>> {
+        return await this.#itemRepository.getAll({ pageToken, perPage });
+    }
 
-	async listCategories(): Promise<Category[]> {
-		return await this.#categoryRepository.getAll();
-	}
+    async listCategories(): Promise<Category[]> {
+        return await this.#categoryRepository.getAll();
+    }
 
-	async listVariations(): Promise<Variation[]> {
-		return await this.#variationRepository.getAll();
-	}
+    async listVariations(): Promise<Variation[]> {
+        return await this.#variationRepository.getAll();
+    }
 
-	async listSections(): Promise<Section[]> {
-		return await this.#sectionRepository.getAll();
-	}
+    async listSections(): Promise<Section[]> {
+        return await this.#sectionRepository.getAll();
+    }
 
-	async searchItems(
-		query: string,
-		pageToken = 1,
-		perPage = 12,
-	): Promise<Pagination<Item>> {
-		return await this.#itemRepository.search(query, { pageToken, perPage });
-	}
+    async searchItems(query: string, pageToken = 1, perPage = 12): Promise<Pagination<Item>> {
+        return await this.#itemRepository.search(query, { pageToken, perPage });
+    }
 
-	async getItem(itemId: string): Promise<Either<ItemNotFound, Item>> {
-		const itemOrErr = await this.#itemRepository.getById(ID.fromString(itemId));
-		if (itemOrErr.isLeft()) return left(itemOrErr.value);
-		return right(itemOrErr.value);
-	}
+    async getItem(itemId: string): Promise<Either<ItemNotFound, Item>> {
+        const itemOrErr = await this.#itemRepository.getById(ID.fromString(itemId));
+        if (itemOrErr.isLeft()) return left(itemOrErr.value);
+        return right(itemOrErr.value);
+    }
 
-	async registerItem(data: ItemDTO): Promise<Either<ItemError, void>> {
-		const itemId = await this.#generator.generate(Sequence.Item);
+    async registerItem(data: ItemDTO): Promise<Either<ItemError, void>> {
+        const itemId = await this.#generator.generate(Sequence.Item);
 
-		const voidOrSectionErr = await this.#verifySectionId(data.sectionId);
-		if (voidOrSectionErr.isLeft()) return left(voidOrSectionErr.value);
+        const voidOrSectionErr = await this.#verifySectionId(data.sectionId);
+        if (voidOrSectionErr.isLeft()) return left(voidOrSectionErr.value);
 
-		const voidOrCategoryErr = await this.#verifyCategory(data.categoryId);
-		if (voidOrCategoryErr.isLeft()) return left(voidOrCategoryErr.value);
+        const voidOrCategoryErr = await this.#verifyCategory(data.categoryId);
+        if (voidOrCategoryErr.isLeft()) return left(voidOrCategoryErr.value);
 
-		const variationsIds = data.variations?.map((v) =>
-			ID.fromString(v.variationId),
-		);
-		const voidOrVariationsErr = await this.#verifyVariationsIds(variationsIds);
-		if (voidOrVariationsErr.isLeft()) {
-			return left(voidOrVariationsErr.value);
-		}
+        const variationsIds = data.variations?.map((v) => ID.fromString(v.variationId));
+        const voidOrVariationsErr = await this.#verifyVariationsIds(variationsIds);
+        if (voidOrVariationsErr.isLeft()) {
+            return left(voidOrVariationsErr.value);
+        }
 
-		const variationsValues = this.#buildVariationsValues(data.variations);
-		const itemOrErr = new ItemBuilder()
-			.withItemId(itemId)
-			.withName(data.name)
-			.withPrice(new Decimal(data.price))
-			.withCategoryId(data.categoryId)
-			.withSectionId(data.sectionId)
-			.withVariationsValues(variationsValues)
-			.withTags(data.tags)
-			.build();
+        const variationsValues = this.#buildVariationsValues(data.variations);
+        const itemOrErr = new ItemBuilder()
+            .withItemId(itemId)
+            .withName(data.name)
+            .withPrice(new Decimal(data.price))
+            .withCategoryId(data.categoryId)
+            .withSectionId(data.sectionId)
+            .withVariationsValues(variationsValues)
+            .withTags(data.tags)
+            .build();
 
-		if (itemOrErr.isLeft()) return left(itemOrErr.value);
+        if (itemOrErr.isLeft()) return left(itemOrErr.value);
 
-		const item = itemOrErr.value;
+        const item = itemOrErr.value;
 
-		await this.#itemRepository.save(item);
+        await this.#itemRepository.save(item);
 
-		return right(undefined);
-	}
+        return right(undefined);
+    }
 
-	async registerCategory(
-		name: string,
-		variations?: string[],
-		description?: string,
-	): Promise<Either<RegisterCategoryError, void>> {
-		const exists = await this.#categoryRepository.exists(name);
-		if (exists) return left(new CategoryAlreadyExists());
+    async registerCategory(
+        name: string,
+        variations?: string[],
+        description?: string
+    ): Promise<Either<RegisterCategoryError, void>> {
+        const exists = await this.#categoryRepository.exists(name);
+        if (exists) return left(new CategoryAlreadyExists());
 
-		const variationsIds = this.#buildVariationsIds(variations);
+        const variationsIds = this.#buildVariationsIds(variations);
 
-		const voidOrErr = await this.#verifyVariationsIds(variationsIds);
-		if (voidOrErr.isLeft()) return left(voidOrErr.value);
+        const voidOrErr = await this.#verifyVariationsIds(variationsIds);
+        if (voidOrErr.isLeft()) return left(voidOrErr.value);
 
-		const categoryId = await this.#generator.generate(Sequence.Category);
+        const categoryId = await this.#generator.generate(Sequence.Category);
 
-		const category = new Category(
-			ID.fromString(categoryId),
-			name,
-			variationsIds,
-			description,
-		);
+        const category = new Category(ID.fromString(categoryId), name, variationsIds, description);
 
-		await this.#categoryRepository.save(category);
+        await this.#categoryRepository.save(category);
 
-		return right(undefined);
-	}
+        return right(undefined);
+    }
 
-	async updateItem(
-		itemId: string,
-		data: ItemDTO,
-	): Promise<Either<ItemNotFound | SectionNotFound, void>> {
-		const itemOrErr = await this.#itemRepository.getById(ID.fromString(itemId));
-		if (itemOrErr.isLeft()) return left(itemOrErr.value);
+    async updateItem(
+        itemId: string,
+        data: ItemDTO
+    ): Promise<Either<ItemNotFound | SectionNotFound, void>> {
+        const itemOrErr = await this.#itemRepository.getById(ID.fromString(itemId));
+        if (itemOrErr.isLeft()) return left(itemOrErr.value);
 
-		const voidOrSectionErr = await this.#verifySectionId(data.sectionId);
-		if (voidOrSectionErr.isLeft()) return left(voidOrSectionErr.value);
+        const voidOrSectionErr = await this.#verifySectionId(data.sectionId);
+        if (voidOrSectionErr.isLeft()) return left(voidOrSectionErr.value);
 
-		const voidOrCategoryErr = await this.#verifyCategory(data.categoryId);
-		if (voidOrCategoryErr.isLeft()) return left(voidOrCategoryErr.value);
+        const voidOrCategoryErr = await this.#verifyCategory(data.categoryId);
+        if (voidOrCategoryErr.isLeft()) return left(voidOrCategoryErr.value);
 
-		const variationsIds = data.variations?.map((v) =>
-			ID.fromString(v.variationId),
-		);
-		const voidOrVariationsErr = await this.#verifyVariationsIds(variationsIds);
-		if (voidOrVariationsErr.isLeft()) {
-			return left(voidOrVariationsErr.value);
-		}
+        const variationsIds = data.variations?.map((v) => ID.fromString(v.variationId));
+        const voidOrVariationsErr = await this.#verifyVariationsIds(variationsIds);
+        if (voidOrVariationsErr.isLeft()) {
+            return left(voidOrVariationsErr.value);
+        }
 
-		const variationsValues = this.#buildVariationsValues(data.variations);
+        const variationsValues = this.#buildVariationsValues(data.variations);
 
-		const item = new ItemBuilder()
-			.withItemId(itemOrErr.value.itemId.toString())
-			.withName(data.name)
-			.withPrice(new Decimal(data.price))
-			.withSectionId(data.sectionId)
-			.withCategoryId(data.categoryId)
-			.withVariationsValues(variationsValues)
-			.withTags(data.tags)
-			.build();
+        const item = new ItemBuilder()
+            .withItemId(itemOrErr.value.itemId.toString())
+            .withName(data.name)
+            .withPrice(new Decimal(data.price))
+            .withSectionId(data.sectionId)
+            .withCategoryId(data.categoryId)
+            .withVariationsValues(variationsValues)
+            .withTags(data.tags)
+            .build();
 
-		if (item.isLeft()) return left(item.value);
+        if (item.isLeft()) return left(item.value);
 
-		this.#itemRepository.update(item.value);
+        this.#itemRepository.update(item.value);
 
-		return right(undefined);
-	}
+        return right(undefined);
+    }
 
-	async #verifyCategory(
-		categoryId?: string,
-	): Promise<Either<CategoryNotFound, void>> {
-		if (!categoryId) return right(undefined);
+    async #verifyCategory(categoryId?: string): Promise<Either<CategoryNotFound, void>> {
+        if (!categoryId) return right(undefined);
 
-		const category = await this.#categoryRepository.getById(
-			ID.fromString(categoryId),
-		);
+        const category = await this.#categoryRepository.getById(ID.fromString(categoryId));
 
-		if (category.isLeft()) return left(category.value);
+        if (category.isLeft()) return left(category.value);
 
-		return right(undefined);
-	}
+        return right(undefined);
+    }
 
-	async #verifyVariationsIds(
-		variationsIds?: ID[],
-	): Promise<Either<VariationNotFound, void>> {
-		if (!variationsIds) return right(undefined);
+    async #verifyVariationsIds(variationsIds?: ID[]): Promise<Either<VariationNotFound, void>> {
+        if (!variationsIds) return right(undefined);
 
-		const variations =
-			await this.#variationRepository.vertifyIds(variationsIds);
+        const variations = await this.#variationRepository.vertifyIds(variationsIds);
 
-		if (variations.isLeft()) return left(variations.value);
+        if (variations.isLeft()) return left(variations.value);
 
-		return right(undefined);
-	}
+        return right(undefined);
+    }
 
-	async #verifySectionId(
-		sectionId?: string,
-	): Promise<Either<SectionNotFound, void>> {
-		if (!sectionId) return right(undefined);
+    async #verifySectionId(sectionId?: string): Promise<Either<SectionNotFound, void>> {
+        if (!sectionId) return right(undefined);
 
-		const section = await this.#sectionRepository.findById(
-			ID.fromString(sectionId),
-		);
+        const section = await this.#sectionRepository.findById(ID.fromString(sectionId));
 
-		if (section.isLeft()) return left(section.value);
+        if (section.isLeft()) return left(section.value);
 
-		return right(undefined);
-	}
+        return right(undefined);
+    }
 
-	#buildVariationsIds(variations?: string[]) {
-		if (!variations) return;
+    #buildVariationsIds(variations?: string[]) {
+        if (!variations) return;
 
-		return variations.map(ID.fromString);
-	}
+        return variations.map(ID.fromString);
+    }
 
-	#buildVariationsValues(data?: VariationDTO[]): Record<string, string> {
-		if (!data) return {};
+    #buildVariationsValues(data?: VariationDTO[]): Record<string, string> {
+        if (!data) return {};
 
-		const variations: Record<string, string> = {};
-		for (const variation of data) {
-			variations[variation.variationId] =
-				`${variation.name}: ${variation.value}`;
-		}
+        const variations: Record<string, string> = {};
+        for (const variation of data) {
+            variations[variation.variationId] = `${variation.name}: ${variation.value}`;
+        }
 
-		return variations;
-	}
+        return variations;
+    }
 }
 
 type ItemDTO = {
-	name: string;
-	price: number;
-	categoryId?: string;
-	sectionId?: string;
-	variations?: VariationDTO[];
-	comment?: string;
-	tags?: string[];
+    name: string;
+    price: number;
+    categoryId?: string;
+    sectionId?: string;
+    variations?: VariationDTO[];
+    comment?: string;
+    tags?: string[];
 };
 
 type VariationDTO = {
-	variationId: string;
-	name: string;
-	value: string;
+    variationId: string;
+    name: string;
+    value: string;
 };

@@ -26,7 +26,7 @@ describe("PostgresGoodsIssueNoteRepository - geById", () => {
 
         const noteOrErr = await noteRepository.getById(ID.fromString("1"));
 
-        const note = <GoodsIssueNote> noteOrErr.value;
+        const note = <GoodsIssueNote>noteOrErr.value;
 
         expect(note.noteId.toString()).toEqual("1");
         expect(note.status).toEqual("Por Devolver");
@@ -38,7 +38,7 @@ describe("PostgresGoodsIssueNoteRepository - geById", () => {
 
         const noteOrErr = await noteRepository.getById(ID.fromString("1"));
 
-        const note = <GoodsIssueNote> noteOrErr.value;
+        const note = <GoodsIssueNote>noteOrErr.value;
 
         expect(note.lines.length).toEqual(1);
     });
@@ -48,7 +48,7 @@ describe("PostgresGoodsIssueNoteRepository - geById", () => {
 
         const noteOrErr = await noteRepository.getById(ID.fromString("1"));
 
-        const note = <GoodsIssueNote> noteOrErr.value;
+        const note = <GoodsIssueNote>noteOrErr.value;
 
         expect(note.lines[0].variationsValues).toBeDefined();
         expect(note.lines[0].variationsValues).toEqual({
@@ -156,6 +156,17 @@ describe("PostgresGoodsIssueNoteRepository - save", () => {
 
 describe("PostgresGoodsIssueNoteRepository - search", () => {
     it("Deve pesquisar as guias de saída pelo ID e pelo fulltext", async () => {
+        const prisma = {
+            goodsIssueNote: {
+                findUnique: async (_args: object) => _notes[0],
+                findMany: async (_args: object) => _notes,
+                create: async (_args: object) => ({}),
+                update: async (_args: object) => ({}),
+            },
+            goodsIssueNoteLine: {
+                update: async (_args: object) => ({}),
+            },
+        } as unknown as PrismaClient;
         const noteRepository = new PostgresGoodsIssueNoteRepository(prisma);
         const spy = vi.spyOn(prisma.goodsIssueNote, "findMany");
 

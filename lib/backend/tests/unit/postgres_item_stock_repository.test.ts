@@ -6,8 +6,8 @@ import { ID } from "../../shared/id";
 
 describe("PostgresItemStockRepository - getAll", () => {
     it("Deve encontrar os artigos em stock", async () => {
+        const { prisma, stockRepo } = await createSetup();
         const spy = vi.spyOn(prisma.stock, "findMany");
-        const stockRepo = new PostgresItemStockRepository(prisma);
 
         await stockRepo.getAll();
 
@@ -16,7 +16,7 @@ describe("PostgresItemStockRepository - getAll", () => {
     });
 
     it("Deve recuperar os artigos em stock", async () => {
-        const stockRepo = new PostgresItemStockRepository(prisma);
+        const { stockRepo } = await createSetup();
 
         const itemsStock = await stockRepo.getAll();
 
@@ -67,7 +67,7 @@ describe("PostgresItemStockRepository - saveAll", () => {
     });
 
     it("Deve atualizar o stock dos artigos caso existam registos dos artigos no armazém", async () => {
-        const stockRepo = new PostgresItemStockRepository(prisma);
+        const { stockRepo, prisma } = await createSetup();
         const spy = vi.spyOn(prisma.stock, "update");
 
         const itemStocks = [
@@ -91,7 +91,7 @@ describe("PostgresItemStockRepository - saveAll", () => {
     });
 
     it("Deve criar os artigos em stock para os artigos que não existem e atualizar os artigos em stock para os que existem", async () => {
-        const stockRepo = new PostgresItemStockRepository(prisma);
+        const { prisma, stockRepo } = await createSetup();
         const spyCreate = vi.spyOn(prisma.stock, "createMany");
         const spyUpdate = vi.spyOn(prisma.stock, "update");
 
@@ -111,7 +111,7 @@ describe("PostgresItemStockRepository - saveAll", () => {
 
 describe("PostgresItemStockRepository - findAll", () => {
     it("Deve encontrar os artigos pelo ID", async () => {
-        const stockRepo = new PostgresItemStockRepository(prisma);
+        const { stockRepo, prisma } = await createSetup();
         const spy = vi.spyOn(prisma.stock, "findMany");
 
         await stockRepo.findAll([ID.fromString("1")]);
@@ -126,7 +126,7 @@ describe("PostgresItemStockRepository - findAll", () => {
     });
 
     it("Deve retornar os artigos encontrados", async () => {
-        const stockRepo = new PostgresItemStockRepository(prisma);
+        const { stockRepo } = await createSetup();
 
         const itemsStock = await stockRepo.findAll([ID.fromString("1")]);
 
@@ -137,7 +137,7 @@ describe("PostgresItemStockRepository - findAll", () => {
 
 describe("PostgresItemStockRepository - findAllInStock", () => {
     it("Deve encontrar os artigos que o stock não está esgotado", async () => {
-        const stockRepo = new PostgresItemStockRepository(prisma);
+        const { stockRepo, prisma } = await createSetup();
         const spy = vi.spyOn(prisma.stock, "findMany");
 
         await stockRepo.findAllInStock();
@@ -152,7 +152,7 @@ describe("PostgresItemStockRepository - findAllInStock", () => {
     });
 
     it("Deve retornar os artigos encontrados", async () => {
-        const stockRepo = new PostgresItemStockRepository(prisma);
+        const { stockRepo } = await createSetup();
 
         const itemsStock = await stockRepo.findAllInStock();
 
@@ -162,7 +162,7 @@ describe("PostgresItemStockRepository - findAllInStock", () => {
 
 describe("PostgresItemStockRepository - findAllOutOfStock", () => {
     it("Deve encontrar os artigos que o stock está esgotado", async () => {
-        const stockRepo = new PostgresItemStockRepository(prisma);
+        const { stockRepo, prisma } = await createSetup();
         const spy = vi.spyOn(prisma.stock, "findMany");
 
         await stockRepo.findAllOutOfStock();
@@ -180,27 +180,31 @@ describe("PostgresItemStockRepository - findAllOutOfStock", () => {
     });
 
     it("Deve retornar os artigos encontrados", async () => {
-        const stockRepo = new PostgresItemStockRepository(prisma);
-
+        const { stockRepo } = await createSetup();
         const itemsStock = await stockRepo.findAllOutOfStock();
 
         expect(itemsStock.length).toBe(1);
     });
 });
 
-const prisma = {
-    stock: {
-        findMany: async (_args: object) => _itemsStock,
-        createMany: async (_args: object) => ({}),
-        update: async (_args: object) => ({}),
-    },
-} as unknown as PrismaClient;
+const createSetup = async () => {
+    const prisma = {
+        stock: {
+            findMany: async (_args: object) => itemsStock,
+            createMany: async (_args: object) => ({}),
+            update: async (_args: object) => ({}),
+        },
+    } as unknown as PrismaClient;
+    const stockRepo = new PostgresItemStockRepository(prisma);
 
-const _itemsStock = [
-    {
-        stockId: "1",
-        productId: "1",
-        goodQuantities: 10,
-        badQuantities: 0,
-    },
-];
+    const itemsStock = [
+        {
+            stockId: "1",
+            productId: "1",
+            goodQuantities: 10,
+            badQuantities: 0,
+        },
+    ];
+
+    return { prisma, stockRepo };
+};

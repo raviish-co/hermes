@@ -362,9 +362,6 @@ Produto 4,400.00,Categoria 1,Secao 1,Preto,Nike`;
 
 const file = new File([csvData], "filename.csv", { type: "text/csv" });
 
-const fileHeader = new File(["nome,invali_field"], "filename.csv", {
-    type: "text/csv",
-});
 const fileTxt = new File([], "filename.txt", { type: "text/plain" });
 const emptyFile = new File(["nome,preco,estado,categoria,seccao,variacoes"], "filename.csv", {
     type: "text/csv",

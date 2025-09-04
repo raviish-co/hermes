@@ -9,7 +9,7 @@ import { ID } from "../../shared/id";
 describe("PostgresItemRepository - save", () => {
     it("Deve salvar um artigo no repositorio", async () => {
         const item = new Item(ID.random(), "Artigo 2", new Decimal(10));
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { prisma, itemRepository } = await createSetup();
         const spy = vi.spyOn(prisma.product, "create");
 
         await itemRepository.save(item);
@@ -27,7 +27,7 @@ describe("PostgresItemRepository - save", () => {
     });
 
     it("Deve salvar um artigo com a sua categoria", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { prisma, itemRepository } = await createSetup();
         const item = new Item(ID.random(), "Artigo 1", new Decimal(10), ID.fromString("1"));
         const spy = vi.spyOn(prisma.product, "create");
 
@@ -47,7 +47,7 @@ describe("PostgresItemRepository - save", () => {
     });
 
     it("Deve salvar um artigo com a sua secção", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { prisma, itemRepository } = await createSetup();
         const item = new Item(
             ID.random(),
             "Artigo 1",
@@ -73,7 +73,7 @@ describe("PostgresItemRepository - save", () => {
     });
 
     it("Deve salvar um artigo com a sua categoria e secção", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { prisma, itemRepository } = await createSetup();
         const item = new Item(
             ID.random(),
             "Artigo 1",
@@ -100,8 +100,8 @@ describe("PostgresItemRepository - save", () => {
     });
 
     it("Deve salvar um artigo com as suas variações", async () => {
+        const { prisma, itemRepository } = await createSetup();
         const spy = vi.spyOn(prisma.productVariations, "createMany");
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
         const item = new Item(
             ID.fromString("1"),
             "Artigo 1",
@@ -134,8 +134,8 @@ describe("PostgresItemRepository - save", () => {
             undefined,
             ["tag1", "tag2"]
         );
+        const { itemRepository, prisma } = await createSetup();
         const spy = vi.spyOn(prisma.product, "create");
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
 
         await itemRepository.save(item);
 
@@ -164,8 +164,8 @@ describe("PostgresItemRepository - save", () => {
             { Cor: "Azul" },
             ["tag1", "tag2"]
         );
+        const { prisma, itemRepository } = await createSetup();
         const spy = vi.spyOn(prisma.product, "create");
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
 
         await itemRepository.save(item);
 
@@ -187,7 +187,7 @@ describe("PostgresItemRepository - save", () => {
 
 describe("PostgresItemRepository - getAll", () => {
     it("Deve recuperar os artigos no repositório", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { prisma, itemRepository } = await createSetup();
         const spy = vi.spyOn(prisma.product, "findMany");
 
         await itemRepository.getAll();
@@ -200,8 +200,7 @@ describe("PostgresItemRepository - getAll", () => {
     });
 
     it("Deve retornar os artigos encontrados no repositório", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
-
+        const { itemRepository } = await createSetup();
         const { result: items } = await itemRepository.getAll();
 
         expect(items.length).toEqual(2);
@@ -215,7 +214,7 @@ describe("PostgresItemRepository - getAll", () => {
     });
 
     it("Deve retornar os artigos com as suas variações", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { itemRepository } = await createSetup();
 
         const { result: items } = await itemRepository.getAll();
 
@@ -224,7 +223,7 @@ describe("PostgresItemRepository - getAll", () => {
     });
 
     it("Deve recuperar os artigos páginados", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { itemRepository } = await createSetup();
 
         const {
             result: items,
@@ -240,7 +239,7 @@ describe("PostgresItemRepository - getAll", () => {
 
 describe("PostgresItemRepository - findAll", () => {
     it("Deve encontrar os artigos no repositório", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { prisma, itemRepository } = await createSetup();
         const spy = vi.spyOn(prisma.product, "findMany");
 
         await itemRepository.findAll([ID.fromString("1"), ID.fromString("2")]);
@@ -256,7 +255,7 @@ describe("PostgresItemRepository - findAll", () => {
     });
 
     it("Deve recuperar os artigos no repositório", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { itemRepository } = await createSetup();
 
         const itemsOrErr = await itemRepository.findAll([ID.fromString("1"), ID.fromString("2")]);
 
@@ -267,7 +266,7 @@ describe("PostgresItemRepository - findAll", () => {
     });
 
     it("Deve retornar **ItemNotFound** se não encontrar algum artigo", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { itemRepository } = await createSetup();
 
         const itemsOrErr = await itemRepository.findAll([
             ID.fromString("1"),
@@ -282,7 +281,7 @@ describe("PostgresItemRepository - findAll", () => {
 
 describe("PostgresItemRepository - getById", () => {
     it("Deve encontrar o artigo pelo seu ID", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { prisma, itemRepository } = await createSetup();
         const spy = vi.spyOn(prisma.product, "findUnique");
 
         await itemRepository.getById(ID.fromString("1"));
@@ -298,7 +297,7 @@ describe("PostgresItemRepository - getById", () => {
     });
 
     it("Deve retornar o artigo encontrado", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { itemRepository } = await createSetup();
 
         const itemOrErr = await itemRepository.getById(ID.fromString("1"));
 
@@ -327,7 +326,7 @@ describe("PostgresItemRepository - getById", () => {
 
 describe("PostgresItemRepository - search", () => {
     it("Deve pesquisar os artigos pelo nome, id ou pelo fulltext no repositório", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { prisma, itemRepository } = await createSetup();
         const spy = vi.spyOn(prisma.product, "findMany");
 
         await itemRepository.search("Artigo 1", { pageToken: 1, perPage: 10 });
@@ -349,7 +348,7 @@ describe("PostgresItemRepository - search", () => {
     });
 
     it("Deve pesquisar os artigos pelo nome, id ou pelo fulltext em minúsculas", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { prisma, itemRepository } = await createSetup();
         const spy = vi.spyOn(prisma.product, "findMany");
 
         await itemRepository.search("artigo 1", { pageToken: 1, perPage: 10 });
@@ -371,7 +370,7 @@ describe("PostgresItemRepository - search", () => {
     });
 
     it("Deve retornar o resultado da pesquisa no repositório páginado", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { itemRepository } = await createSetup();
 
         const {
             result: items,
@@ -387,74 +386,74 @@ describe("PostgresItemRepository - search", () => {
 
 describe("PostgresItemRepository - update", () => {
     it("Deve actualizar o artigo no repositório", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { prisma, itemRepository, items } = await createSetup();
         const spy = vi.spyOn(prisma.product, "update");
 
-        await itemRepository.update(_items[0]);
+        await itemRepository.update(items[0]);
 
         expect(spy).toBeCalled();
         expect(spy).toBeCalledTimes(1);
         expect(spy).toBeCalledWith({
-            where: { productId: _items[0].itemId.toString() },
+            where: { productId: items[0].itemId.toString() },
             data: {
-                name: _items[0].name,
-                price: _items[0].price.value,
-                fulltext: _items[0].fulltext,
+                name: items[0].name,
+                price: items[0].price.value,
+                fulltext: items[0].fulltext,
             },
         });
     });
 
     it("Deve actualizar o artigo com categoria e secção", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { prisma, items, itemRepository } = await createSetup();
         const spy = vi.spyOn(prisma.product, "update");
 
-        await itemRepository.update(_items[1]);
+        await itemRepository.update(items[1]);
 
         expect(spy).toBeCalled();
         expect(spy).toBeCalledTimes(1);
         expect(spy).toBeCalledWith({
-            where: { productId: _items[1].itemId.toString() },
+            where: { productId: items[1].itemId.toString() },
             data: {
-                name: _items[1].name,
-                price: _items[1].price.value,
-                categoryId: _items[1].categoryId?.toString(),
-                sectionId: _items[1].sectionId?.toString(),
-                fulltext: _items[1].fulltext,
+                name: items[1].name,
+                price: items[1].price.value,
+                categoryId: items[1].categoryId?.toString(),
+                sectionId: items[1].sectionId?.toString(),
+                fulltext: items[1].fulltext,
             },
         });
     });
 
     it("Deve actualizar os artigos com as suas tags", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { prisma, items, itemRepository } = await createSetup();
         const spy = vi.spyOn(prisma.product, "update");
 
-        await itemRepository.update(_items[2]);
+        await itemRepository.update(items[2]);
 
         expect(spy).toBeCalled();
         expect(spy).toBeCalledTimes(1);
         expect(spy).toBeCalledWith({
-            where: { productId: _items[2].itemId.toString() },
+            where: { productId: items[2].itemId.toString() },
             data: {
-                name: _items[2].name,
-                price: _items[2].price.value,
-                categoryId: _items[2].categoryId?.toString(),
-                sectionId: _items[2].sectionId?.toString(),
-                tags: _items[2].tags?.join(","),
-                fulltext: _items[2].fulltext,
+                name: items[2].name,
+                price: items[2].price.value,
+                categoryId: items[2].categoryId?.toString(),
+                sectionId: items[2].sectionId?.toString(),
+                tags: items[2].tags?.join(","),
+                fulltext: items[2].fulltext,
             },
         });
     });
 
     it("Deve actualizar os artigos com as suas variações", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { itemRepository, prisma, items } = await createSetup();
         const spy = vi.spyOn(prisma.productVariations, "updateMany");
 
-        await itemRepository.update(_items[3]);
+        await itemRepository.update(items[3]);
 
         expect(spy).toBeCalled();
         expect(spy).toBeCalledTimes(1);
         expect(spy).toBeCalledWith({
-            where: { productId: _items[3].itemId.toString() },
+            where: { productId: items[3].itemId.toString() },
             data: [
                 {
                     variationId: "1",
@@ -465,10 +464,10 @@ describe("PostgresItemRepository - update", () => {
     });
 
     it("Não deve actualizar as variações se não existirem", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { prisma, itemRepository, items } = await createSetup();
         const spy = vi.spyOn(prisma.productVariations, "updateMany");
 
-        await itemRepository.update(_items[0]);
+        await itemRepository.update(items[0]);
 
         expect(spy).not.toBeCalled();
     });
@@ -476,15 +475,15 @@ describe("PostgresItemRepository - update", () => {
 
 describe("PostgresItemRepository - saveAll", () => {
     it("Deve salvar um conjunto de artigos no repositório", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { prisma, items, itemRepository } = await createSetup();
         const spy = vi.spyOn(prisma.product, "createMany");
 
-        await itemRepository.saveAll(_items);
+        await itemRepository.saveAll(items);
 
         expect(spy).toBeCalled();
         expect(spy).toBeCalledTimes(1);
         expect(spy).toBeCalledWith({
-            data: _items.map((item) => ({
+            data: items.map((item) => ({
                 productId: item.itemId.toString(),
                 name: item.name,
                 price: item.price.value,
@@ -497,10 +496,10 @@ describe("PostgresItemRepository - saveAll", () => {
     });
 
     it("Deve salvar o conjunto de artigos com as suas variações", async () => {
-        const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+        const { prisma, items, itemRepository } = await createSetup();
         const spy = vi.spyOn(prisma.productVariations, "createMany");
 
-        await itemRepository.saveAll(_items);
+        await itemRepository.saveAll(items);
 
         expect(spy).toBeCalled();
         expect(spy).toBeCalledTimes(1);
@@ -516,19 +515,53 @@ describe("PostgresItemRepository - saveAll", () => {
     });
 });
 
-const prisma = {
-    product: {
-        create: async (_args: object) => ({}),
-        createMany: async (_args: object) => ({}),
-        findMany: async (_args: object) => _products,
-        findUnique: async (_args: object) => _products[0],
-        update: async (_args: object) => ({}),
-        count: async (_args: object) => 4,
-    },
-    productVariations: {
-        createMany: async (_args: object) => ({}),
-        updateMany: async (_args: object) => ({}),
-    },
+const createSetup = async () => {
+    const prisma = {
+        product: {
+            create: async (_args: object) => ({}),
+            createMany: async (_args: object) => ({}),
+            findMany: async (_args: object) => _products,
+            findUnique: async (_args: object) => _products[0],
+            update: async (_args: object) => ({}),
+            count: async (_args: object) => 4,
+        },
+        productVariations: {
+            createMany: async (_args: object) => ({}),
+            updateMany: async (_args: object) => ({}),
+        },
+    };
+    const itemRepository = new PostgresItemRepository(prisma as unknown as PrismaClient);
+
+    const items = [
+        new Item(ID.fromString("1"), "Artigo 1", new Decimal(10), undefined, undefined, {}),
+        new Item(
+            ID.fromString("2"),
+            "Artigo 2",
+            new Decimal(30),
+            ID.fromString("1"),
+            ID.fromString("1")
+        ),
+        new Item(
+            ID.fromString("3"),
+            "Artigo 3",
+            new Decimal(10),
+            ID.fromString("1"),
+            ID.fromString("1"),
+            undefined,
+            ["tag1", "tag2"]
+        ),
+        new Item(
+            ID.fromString("4"),
+            "Artigo 4",
+            new Decimal(10),
+            ID.fromString("1"),
+            ID.fromString("1"),
+            { "1": "Cor: Azul" },
+            ["tag1", "tag2"]
+        ),
+    ];
+
+    return { prisma, items, itemRepository };
 };
 
 const _products = [
@@ -557,33 +590,4 @@ const _products = [
             },
         ],
     },
-];
-
-const _items = [
-    new Item(ID.fromString("1"), "Artigo 1", new Decimal(10), undefined, undefined, {}),
-    new Item(
-        ID.fromString("2"),
-        "Artigo 2",
-        new Decimal(30),
-        ID.fromString("1"),
-        ID.fromString("1")
-    ),
-    new Item(
-        ID.fromString("3"),
-        "Artigo 3",
-        new Decimal(10),
-        ID.fromString("1"),
-        ID.fromString("1"),
-        undefined,
-        ["tag1", "tag2"]
-    ),
-    new Item(
-        ID.fromString("4"),
-        "Artigo 4",
-        new Decimal(10),
-        ID.fromString("1"),
-        ID.fromString("1"),
-        { "1": "Cor: Azul" },
-        ["tag1", "tag2"]
-    ),
 ];

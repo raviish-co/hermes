@@ -209,16 +209,16 @@ describe("DashboardService - Percentagem do estado das mercadorias em stock", as
         const result = await service.percentageOfItemsInStock();
 
         expect(result.badPercentage).toBeDefined();
-        expect(result.badPercentage).greaterThanOrEqual(0);
+        expect(result.badPercentage).toBeGreaterThanOrEqual(0);
     });
 });
 
 const itemStockRepositoryMock = {
     getAll: async () => [],
-    save: async (itemStock: ItemStock) => undefined,
-    saveAll: async (itemStocks: ItemStock[]) => undefined,
-    updateAll: async (itemStocks: ItemStock[]) => undefined,
-    findAll: async (itemIds: ID[]): Promise<ItemStock[]> => [],
+    save: async (_itemStock: ItemStock) => undefined,
+    saveAll: async (_itemStocks: ItemStock[]) => undefined,
+    updateAll: async (_itemStocks: ItemStock[]) => undefined,
+    findAll: async (_itemIds: ID[]): Promise<ItemStock[]> => [],
     findAllInStock: async () => [],
     findAllOutOfStock: async () => [],
 };
