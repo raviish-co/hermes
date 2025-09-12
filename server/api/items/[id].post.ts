@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
     if (voidOrErr.isLeft()) {
         throw createError({
             statusCode: HttpStatus.ServerError,
-            statusMessage: "Erro ao registrar o artigo.",
+            statusMessage: "Erro ao registar o artigo.",
         });
     }
 

@@ -8,6 +8,7 @@ interface ItemStockDTO {
     itemId: string;
     goodQuantities: number;
     badQuantities: number;
+    status: string;
     total: number;
 }
 
@@ -17,6 +18,7 @@ function toItemStockDTO(stock: ItemStock): ItemStockDTO {
         goodQuantities: stock.goodQuantities,
         badQuantities: stock.badQuantities,
         total: stock.total,
+        status: stock.status,
     };
 }
 

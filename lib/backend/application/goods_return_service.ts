@@ -30,7 +30,7 @@ export class GoodsReturnService {
         goodsIssueRepository: GoodsIssueNoteRepository,
         itemRepository: ItemRepository,
         itemStockRepository: ItemStockRepository,
-        generator: Generator,
+        generator: Generator
     ) {
         this.#goodsReturnRepository = goodsReturnRepository;
         this.#goodsIssueRepository = goodsIssueRepository;
@@ -39,32 +39,22 @@ export class GoodsReturnService {
         this.#generator = generator;
     }
 
-    async returningGoods(
-        data: NoteDTO,
-    ): Promise<Either<GoodsReturnNoteError, void>> {
-        const noteOrErr = await this.#goodsIssueRepository.getById(
-            ID.fromString(data.noteId),
-        );
+    async returningGoods(data: NoteDTO): Promise<Either<GoodsReturnNoteError, void>> {
+        const noteOrErr = await this.#goodsIssueRepository.getById(ID.fromString(data.noteId));
         if (noteOrErr.isLeft()) return left(noteOrErr.value);
 
         if (noteOrErr.value.isReturned()) {
             return left(new GoodsIssueNoteHasBeenReturned());
         }
 
-        const voidOrErr = this.#verifyQuantities(
-            data.items,
-            noteOrErr.value.lines,
-        );
+        const voidOrErr = this.#verifyQuantities(data.items, noteOrErr.value.lines);
         if (voidOrErr.isLeft()) return left(voidOrErr.value);
 
         const itemsIds = convertToIds(data.items.map((item) => item.itemId));
         const itemsOrErr = await this.#itemRepository.findAll(itemsIds);
         if (itemsOrErr.isLeft()) return left(itemsOrErr.value);
 
-        const returnLines = this.#buildReturnLines(
-            data.items,
-            itemsOrErr.value,
-        );
+        const returnLines = this.#buildReturnLines(data.items, itemsOrErr.value);
         const noteId = await this.#buildReturnNoteId();
 
         const returnNote = new GoodsReturnNoteBuilder()
@@ -90,33 +80,22 @@ export class GoodsReturnService {
         return await this.#goodsReturnRepository.getAll();
     }
 
-    async get(
-        noteId: string,
-    ): Promise<Either<GoodsReturnNoteNotFound, GoodsReturnNote>> {
-        const noteOrErr = await this.#goodsReturnRepository.getById(
-            ID.fromString(noteId),
-        );
+    async get(noteId: string): Promise<Either<GoodsReturnNoteNotFound, GoodsReturnNote>> {
+        const noteOrErr = await this.#goodsReturnRepository.getById(ID.fromString(noteId));
         if (noteOrErr.isLeft()) return left(noteOrErr.value);
 
         return right(noteOrErr.value);
     }
 
     async #buildReturnNoteId(): Promise<ID> {
-        const sequence = await this.#generator.generate(
-            Sequence.GoodsReturnNote,
-        );
+        const sequence = await this.#generator.generate(Sequence.GoodsReturnNote);
         return ID.fromString(sequence);
     }
 
-    #buildReturnLines(
-        itemsData: ItemData[],
-        items: Item[],
-    ): GoodsReturnNoteLine[] {
+    #buildReturnLines(itemsData: ItemData[], items: Item[]): GoodsReturnNoteLine[] {
         const lines = [];
         for (const itemData of itemsData) {
-            const item = items.find((item) =>
-                item.itemId.equals(ID.fromString(itemData.itemId))
-            )!;
+            const item = items.find((item) => item.itemId.equals(ID.fromString(itemData.itemId)))!;
             lines.push(this.#buidReturnLine(item, itemData));
         }
         return lines;
@@ -129,7 +108,7 @@ export class GoodsReturnService {
             itemData.goodQuantities,
             itemData.badQuantities,
             item.variations,
-            itemData.comment,
+            itemData.comment
         );
     }
 
@@ -137,24 +116,16 @@ export class GoodsReturnService {
         const itemsStock = await this.#itemStockRepository.findAll(itemsIds);
 
         for (const stock of itemsStock) {
-            const data = itemsData.find((item) =>
-                stock.itemId.equals(ID.fromString(item.itemId))
-            )!;
+            const data = itemsData.find((item) => stock.itemId.equals(ID.fromString(item.itemId)))!;
             stock.increase(data.goodQuantities, data.badQuantities);
         }
 
         this.#itemStockRepository.saveAll(itemsStock);
     }
 
-    #verifyQuantities(
-        items: ItemData[],
-        lines: GoodsIssueNoteLine[],
-    ): Either<Error, void> {
+    #verifyQuantities(items: ItemData[], lines: GoodsIssueNoteLine[]): Either<Error, void> {
         for (const item of items) {
-            const line = this.#findGoodsIssueLine(
-                ID.fromString(item.itemId),
-                lines,
-            );
+            const line = this.#findGoodsIssueLine(ID.fromString(item.itemId), lines);
 
             if (!line) return left(new GoodsIssueLineNotFound());
 
@@ -165,10 +136,7 @@ export class GoodsReturnService {
         return right(undefined);
     }
 
-    #findGoodsIssueLine(
-        itemId: ID,
-        lines: GoodsIssueNoteLine[],
-    ): GoodsIssueNoteLine {
+    #findGoodsIssueLine(itemId: ID, lines: GoodsIssueNoteLine[]): GoodsIssueNoteLine {
         return lines.find((line) => line.itemId.equals(itemId))!;
     }
 }
@@ -180,7 +148,7 @@ type ItemData = {
     comment?: string;
 };
 
-type NoteDTO = {
+export type NoteDTO = {
     noteId: string;
     securityDepositWithheld: number;
     items: ItemData[];

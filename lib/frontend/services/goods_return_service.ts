@@ -4,17 +4,14 @@ import type { NoteLine } from "../domain/note_line";
 const auth = useAuth();
 
 export class GoodsReturnService {
-    async new(
-        noteId: string,
-        securityDepositWithHeld: number,
-        lines: NoteLine[],
-    ) {
+    async new(noteId: string, securityDepositWithheld: number, lines: NoteLine[]) {
         const data: GoodsReturnDTO = {
             noteId,
-            securityDepositWithHeld,
-            itemsData: lines.map(this.#toItemDTO),
-            userId: auth.getUsername(),
+            securityDepositWithheld,
+            items: lines.map(this.#toItemDTO),
         };
+
+        console.log("DTO of sented =>", lines);
 
         return await $fetch("/api/goods-return", {
             method: "post",
@@ -24,13 +21,10 @@ export class GoodsReturnService {
     }
 
     async getById(noteId: string): Promise<GoodsReturnNoteModel> {
-        const response = await $fetch<GoodsReturnNoteModel>(
-            `/api/goods-return/${noteId}`,
-            {
-                method: "get",
-                headers: this.headers,
-            },
-        );
+        const response = await $fetch<GoodsReturnNoteModel>(`/api/goods-return/${noteId}`, {
+            method: "get",
+            headers: this.headers,
+        });
 
         return {
             goodsIssueNoteId: response.goodsIssueNoteId,
@@ -42,13 +36,10 @@ export class GoodsReturnService {
     }
 
     async list(): Promise<GoodsReturnNoteModel[]> {
-        const response = await $fetch<GoodsReturnNoteModel[]>(
-            `/api/goods-return`,
-            {
-                method: "get",
-                headers: this.headers,
-            },
-        );
+        const response = await $fetch<GoodsReturnNoteModel[]>(`/api/goods-return`, {
+            method: "get",
+            headers: this.headers,
+        });
 
         return response.map((data) => ({
             goodsIssueNoteId: data.goodsIssueNoteId,
@@ -84,7 +75,6 @@ interface ItemDTO {
 
 interface GoodsReturnDTO {
     noteId: string;
-    securityDepositWithHeld: number;
-    itemsData: ItemDTO[];
-    userId: string;
+    securityDepositWithheld: number;
+    items: ItemDTO[];
 }

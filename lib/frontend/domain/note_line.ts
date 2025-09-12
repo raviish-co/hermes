@@ -7,6 +7,7 @@ export class NoteLine {
     name: string;
     goodQuantities: number = 0;
     badQuantities: number = 0;
+    consignmentPrice: number = 0;
     goodQuantitiesReturned: number = 0;
     badQuantitiesReturned: number = 0;
     quantityReturned: number = 0;
@@ -52,6 +53,10 @@ export class NoteLine {
     updateQuantitiesToReturn(good: number, bad: number) {
         this.goodQuantitiesReturned = good;
         this.badQuantitiesReturned = bad;
+    }
+
+    changeConsignmentPrice(value: number) {
+        this.consignmentPrice = value;
     }
 
     isFullyReturned() {

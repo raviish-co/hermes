@@ -8,9 +8,7 @@ export class GoodsReceiptNote extends Note {
         this.entryDate = entryDate;
     }
 
-    override addLine(options: LineOptions, quantity: number, stock?: number) {
-        console.log(options, quantity, stock);
-
+    override addLine(options: LineOptions, quantity: number, _stock?: number) {
         if (this.isSameLine(options.itemId)) return;
 
         const line = this.createLine(options, quantity, 0);

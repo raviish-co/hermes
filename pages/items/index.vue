@@ -39,6 +39,7 @@ onMounted(() => {
                         <th class="min-w-80 w-80 text-left">Descrição</th>
                         <th class="min-w-40 w-40">Preço Kz</th>
                         <th class="min-w-40 w-40">Stock</th>
+                        <th class="min-w-40 w-40">Status</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -69,6 +70,18 @@ onMounted(() => {
                             </span>
 
                             <span v-else>{{ warehouse.findItemStock(item.itemId)?.total }}</span>
+                        </td>
+                        <td>
+                            <span
+                                v-if="warehouse.findItemStock(item.itemId)?.status === 'Interno'"
+                                class="badge bg-secondary-500 text-white"
+                            >
+                                {{ warehouse.findItemStock(item.itemId)?.status }}
+                            </span>
+
+                            <span v-else class="badge badge-light">{{
+                                warehouse.findItemStock(item.itemId)?.status
+                            }}</span>
                         </td>
                         <td>
                             <NuxtLink :to="`/items/${item.itemId}/`">

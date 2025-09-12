@@ -5,6 +5,7 @@ export class ItemStock {
     #itemId: ID;
     #goodQuantities: number;
     #badQuantities: number;
+    #status: "Consignação" | "Interno" = "Consignação";
 
     constructor(itemId: ID, goodQuantities: number, badQuantities?: number) {
         this.#itemStockId = ID.random();
@@ -76,5 +77,9 @@ export class ItemStock {
 
     get badQuantities(): number {
         return this.#badQuantities;
+    }
+
+    get status(): string {
+        return this.#status;
     }
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AddLineDialog, DescribeCondition } from "#build/components";
+import type { AddLineDialog, DescribeCondition } from "#components";
 import type { GoodsReceiptNote } from "~/lib/frontend/domain/goods_receipt_note";
 import type { NoteLine } from "~/lib/frontend/domain/note_line";
 
@@ -26,6 +26,7 @@ defineProps<{ note: GoodsReceiptNote }>();
                     <tr class="text-left">
                         <th class="min-w-20 w-20">Id</th>
                         <th class="min-w-64 w-64">Artigo</th>
+                        <th class="min-w-64 w-64">Preço de Consignação</th>
                         <th class="min-w-20 w-20 text-center">Qtd</th>
                         <th class="min-w-8 w-8"></th>
                     </tr>
@@ -42,6 +43,18 @@ defineProps<{ note: GoodsReceiptNote }>();
                             <span class="text-light-600 text-sm">
                                 {{ line.formattedVariationsValues }}
                             </span>
+                        </td>
+
+                        <td>
+                            <input
+                                type="number"
+                                class="input-number text-center"
+                                placeholder="Preço de Consignação"
+                                min="1000"
+                                :value="line.consignmentPrice"
+                                @input="line.changeConsignmentPrice(line.consignmentPrice)"
+                                :required="true"
+                            />
                         </td>
 
                         <td>

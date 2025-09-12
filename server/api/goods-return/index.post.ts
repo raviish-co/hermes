@@ -5,21 +5,23 @@ import { GoodsIssueLineNotFound } from "~/lib/backend/domain/goods_issue/goods_l
 import { InvalidGoodsIssueLineQuantity } from "~/lib/backend/domain/goods_issue/invalid_goods_issue_line_quantity_error";
 import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
+import { NoteDTO } from "~/lib/backend/application/goods_return_service";
 
 const service = useGoodsReturnService();
 
 export default defineEventHandler(async (event) => {
     checkAnonymousUser(event);
 
-    const { noteId, securityDepositWithHeld, itemsData } = await readBody(
-        event,
-    );
+    const { noteId, securityDepositWithheld, items } = await readBody(event);
 
-    const voidOrErr = await service.returningGoods(
+    const dto: NoteDTO = {
         noteId,
-        securityDepositWithHeld,
-        itemsData,
-    );
+        securityDepositWithheld,
+        items,
+        userId: event.context.username,
+    };
+
+    const voidOrErr = await service.returningGoods(dto);
 
     if (voidOrErr.value instanceof GoodsIssueNoteNotFound) {
         throw createError({
@@ -51,7 +53,7 @@ export default defineEventHandler(async (event) => {
 
     if (voidOrErr instanceof Error) {
         throw createError({
-            statusMessage: "Erro ao registrar a devolucao.",
+            statusMessage: "Erro ao registar a devolucao.",
             statusCode: HttpStatus.ServerError,
         });
     }

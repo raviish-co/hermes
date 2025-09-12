@@ -7,7 +7,7 @@ export class GoodsReturnNoteBuilder {
     #userId?: ID;
     #goodsIssueNoteId?: ID;
     #lines?: GoodsReturnNoteLine[];
-    #securityDepositWithheld?: number;
+    #securityDepositWithheld: number = 0;
     #issuedAt?: Date;
 
     withNoteId(noteId: ID): GoodsReturnNoteBuilder {
@@ -51,17 +51,13 @@ export class GoodsReturnNoteBuilder {
 
         if (!this.#lines) throw new Error("Lines are required");
 
-        if (!this.#securityDepositWithheld) {
-            throw new Error("Security Deposit Withheld is required");
-        }
-
         return new GoodsReturnNote(
             this.#noteId,
             this.#goodsIssueNoteId,
             this.#lines,
             this.#securityDepositWithheld,
             this.#userId,
-            this.#issuedAt,
+            this.#issuedAt
         );
     }
 }

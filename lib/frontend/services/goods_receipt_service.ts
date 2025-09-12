@@ -38,6 +38,7 @@ export class GoodsReceiptService {
             goodQuantities: line.goodQuantities,
             badQuantities: line.badQuantities,
             condition: line.condition,
+            consignmentPrice: line.consignmentPrice,
         };
     }
 
@@ -65,6 +66,7 @@ interface NoteDTO {
 interface NoteLineDTO {
     itemId: string;
     goodQuantities: number;
+    consignmentPrice: number;
     badQuantities?: number;
     condition?: ConditionModel;
 }

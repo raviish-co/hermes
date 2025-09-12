@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { VDialog } from "#build/components";
+import type { VDialog } from "#components";
 import { initializeQuantities } from "@frontend/helpers/initialize_quantities";
 import type { ItemModel } from "@frontend/models/item";
 import { CatalogService } from "@frontend/services/catalog_service";

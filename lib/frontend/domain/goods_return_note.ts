@@ -8,6 +8,7 @@ export class GoodsReturnNote extends Note {
     }
 
     addLines(lines: GoodsIssueNoteLine[]) {
+        // Mapear as lines. Adicionar os valores aos goodQuantitiesReturned and badQuantitiesReturned
         lines.forEach((line) => this.lines.push(line));
     }
 

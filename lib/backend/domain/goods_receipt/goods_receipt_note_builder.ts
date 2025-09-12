@@ -34,6 +34,8 @@ export class GoodsReceiptNoteBuilder {
 
         if (!this.#entryDate) return left(new Error("entryDate is required"));
 
+        if (!this.#userId) return left(new Error("userId is required"));
+
         const note = new GoodsReceiptNote(this.#noteId, this.#entryDate, this.#lines, this.#userId);
 
         return right(note);

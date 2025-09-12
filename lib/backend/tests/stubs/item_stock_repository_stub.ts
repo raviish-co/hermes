@@ -60,6 +60,7 @@ const _data = [
         itemId: ID.fromString("1001"),
         goodQuantities: 10,
         badQuantities: 0,
+        status: "Interno",
     },
     {
         itemId: ID.fromString("1002"),

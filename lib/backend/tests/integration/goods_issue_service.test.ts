@@ -10,7 +10,6 @@ import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_not
 import type { GoodsIssueNoteRepository } from "../../domain/goods_issue/goods_issue_note_repository";
 import { InvalidPurpose } from "../../domain/goods_issue/invalid_purpose_error";
 import { InvalidTotal } from "../../domain/goods_issue/invalid_total_error";
-import type { ItemStock } from "../../domain/warehouse/item_stock";
 import { InmemGoodsIssueNoteRepository } from "../../persistence/inmem/inmem_goods_issue_note_repository";
 import { InmemSequenceStorage } from "../../persistence/inmem/inmem_sequence_storage";
 import { ID } from "../../shared/id";
@@ -161,6 +160,7 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
         expect(note.lines[0].badQuantities).toEqual(3);
         expect(note.lines[0].total).toEqual(13);
     });
+
     it("Deve retornar **InsufficientStock** se a quantidade de algum artigo solicitado for maior que o seu stock", async () => {
         const lines = [
             { itemId: "1001", goodQuantities: 10 },
