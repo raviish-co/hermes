@@ -6,8 +6,8 @@ import { VariationRepositoryStub } from "../../stubs/variation_repository_stub";
 import { ItemRepositoryStub } from "../../stubs/item_repository_stub";
 import { catalogService } from "./service";
 
-describe("CatalogService - Registrar categoria", () => {
-    it("Deve registrar uma categoria", async () => {
+describe("CatalogService - Registar categoria", () => {
+    it("Deve registar uma categoria", async () => {
         const itemRepository = new ItemRepositoryStub();
 
         const { service, categoryRepository } = catalogService({ itemRepository });
@@ -19,7 +19,7 @@ describe("CatalogService - Registrar categoria", () => {
         expect(categories.length).toEqual(1);
     });
 
-    it("Deve registrar uma categoria com o seu nome no repositório", async () => {
+    it("Deve registar uma categoria com o seu nome no repositório", async () => {
         const name = "Sapatos";
         const itemRepository = new ItemRepositoryStub();
 
@@ -94,7 +94,7 @@ describe("CatalogService - Registrar categoria", () => {
         expect(category.categoryId.toString()).toEqual("RVSC - 1000");
     });
 
-    it("Deve registrar a descrição da categoria", async () => {
+    it("Deve registar a descrição da categoria", async () => {
         const name = "Sapatos";
         const variationsIds = ["1", "2"];
         const description = "Categoria de sapatos";

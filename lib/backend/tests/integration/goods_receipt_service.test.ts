@@ -233,7 +233,7 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
         expect(note.lines[1].condition.comment).toBe("Gola rasgada");
     });
 
-    it("Deve criar os registos de stock, para os artigos que não tenham stock, ", async () => {
+    it("Deve criar os registos de stock, para os artigos que não tenham stock", async () => {
         const item = new Item(ID.fromString("2000"), "Camisa", new Decimal(1000));
         const item1 = new Item(ID.fromString("2001"), "Camisa", new Decimal(1000));
         const items = [item, item1];
@@ -281,6 +281,21 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
         expect(itemsStock.length).toBe(2);
         expect(itemsStock[0].total).toBe(12);
         expect(itemsStock[1].total).toBe(12);
+    });
+
+    it("Deve registar na guia de entrada o preço de consignação dos artigos", async () => {
+        const { service } = makeService();
+
+        const data = {
+            lines: [
+                { itemId: "1001", goodQuantities: 2, consignmentPrice: 100 },
+                { itemId: "1002", goodQuantities: 3, consignmentPrice: 200 },
+            ],
+            entryDate: "2025-09-01T11:00:00",
+            userId: "1000",
+        };
+
+        await service.new(data);
     });
 });
 

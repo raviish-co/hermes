@@ -24,7 +24,7 @@ describe("Test ID generation", () => {
         expect(number).toEqual(1000);
     });
 
-    it("Deve gerar um novo ID incrementando o ID anteriormente registrado", async () => {
+    it("Deve gerar um novo ID incrementando o ID anteriormente registado", async () => {
         const storage = new InmemSequenceStorage();
         const generator = new SequenceGenerator(storage, 1000);
 

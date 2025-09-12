@@ -30,10 +30,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(data);
 
-        const noteOrErr = await goodsReturnNoteRepository.getById(
-            ID.fromString("GD - 1001"),
-        );
-        const note = <GoodsReturnNote> noteOrErr.value;
+        const noteOrErr = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+        const note = <GoodsReturnNote>noteOrErr.value;
 
         expect(note.lines.length).toBe(2);
     });
@@ -53,10 +51,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(data);
 
-        const noteOrErr = await goodsReturnNoteRepository.getById(
-            ID.fromString("GD - 1001"),
-        );
-        const note = <GoodsReturnNote> noteOrErr.value;
+        const noteOrErr = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+        const note = <GoodsReturnNote>noteOrErr.value;
 
         expect(note.lines[0].total).toBe(1);
         expect(note.lines[1].total).toBe(1);
@@ -77,10 +73,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(data);
 
-        const noteOrErr = await goodsReturnNoteRepository.getById(
-            ID.fromString("GD - 1001"),
-        );
-        const note = <GoodsReturnNote> noteOrErr.value;
+        const noteOrErr = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+        const note = <GoodsReturnNote>noteOrErr.value;
 
         expect(note.lines[0].itemId.toString()).toBe("1001");
         expect(note.lines[1].itemId.toString()).toBe("1002");
@@ -105,7 +99,7 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         expect(error.value).toBeInstanceOf(GoodsIssueNoteNotFound);
     });
 
-    it("Deve registrar o valor da calção retida na guia de devolução", async () => {
+    it("Deve registar o valor da calção retida na guia de devolução", async () => {
         const data = {
             noteId: "GS - 1000",
             items: [
@@ -120,14 +114,10 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(data);
 
-        const noteOrErr = await goodsReturnNoteRepository.getById(
-            ID.fromString("GD - 1001"),
-        );
-        const note = <GoodsReturnNote> noteOrErr.value;
+        const noteOrErr = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+        const note = <GoodsReturnNote>noteOrErr.value;
 
-        expect(note.securityDepositWithheld.value).toEqual(
-            securityDepositWithheld,
-        );
+        expect(note.securityDepositWithheld.value).toEqual(securityDepositWithheld);
     });
 
     it("Deve actualizar o stock dos artigos devolvidos", async () => {
@@ -199,10 +189,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(data);
 
-        const noteOrErr = await goodsReturnNoteRepository.getById(
-            ID.fromString("GD - 1001"),
-        );
-        const note = <GoodsReturnNote> noteOrErr.value;
+        const noteOrErr = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+        const note = <GoodsReturnNote>noteOrErr.value;
 
         expect(note.lines[0].badQuantities).toBe(2);
         expect(note.lines[1].badQuantities).toBe(2);
@@ -222,11 +210,9 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(data);
 
-        const noteOrErr = await goodsIssueRepository.getById(
-            ID.fromString(data.noteId),
-        );
+        const noteOrErr = await goodsIssueRepository.getById(ID.fromString(data.noteId));
 
-        const note = <GoodsIssueNote> noteOrErr.value;
+        const note = <GoodsIssueNote>noteOrErr.value;
 
         expect(note.isReturned()).toBeTruthy();
     });
@@ -271,9 +257,7 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve fechar a guida de saída de mercadoria se todos os artigos foram devolvidos", async () => {
         const data = {
             noteId: "GS - 1003",
-            items: [
-                { itemId: "1006", goodQuantities: 2, comment: "Rasgado" },
-            ],
+            items: [{ itemId: "1006", goodQuantities: 2, comment: "Rasgado" }],
             securityDepositWithheld: securityDepositWithheld,
             userId: "johndoe123",
         };
@@ -281,16 +265,14 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(data);
 
-        const noteOrErr = await goodsIssueRepository.getById(
-            ID.fromString(data.noteId),
-        );
+        const noteOrErr = await goodsIssueRepository.getById(ID.fromString(data.noteId));
 
-        const note = <GoodsIssueNote> noteOrErr.value;
+        const note = <GoodsIssueNote>noteOrErr.value;
 
         expect(note.isReturned()).toBeTruthy();
     });
 
-    it("Deve registrar a devolução dos artigos no repositório", async () => {
+    it("Deve registar a devolução dos artigos no repositório", async () => {
         const data = {
             noteId: "GS - 1000",
             items: [
@@ -305,10 +287,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(data);
 
-        const noteOrErr = await goodsReturnNoteRepository.getById(
-            ID.fromString("GD - 1001"),
-        );
-        const note = <GoodsReturnNote> noteOrErr.value;
+        const noteOrErr = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+        const note = <GoodsReturnNote>noteOrErr.value;
 
         expect(note.noteId.toString()).toBe("GD - 1001");
     });
@@ -328,10 +308,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(data);
 
-        const noteOrErr = await goodsReturnNoteRepository.getById(
-            ID.fromString("GD - 1001"),
-        );
-        const note = <GoodsReturnNote> noteOrErr.value;
+        const noteOrErr = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+        const note = <GoodsReturnNote>noteOrErr.value;
 
         expect(note.goodsIssueNoteId.toString()).toBe("GS - 1000");
     });
@@ -351,15 +329,13 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(data);
 
-        const noteOrErr = await goodsReturnNoteRepository.getById(
-            ID.fromString("GD - 1001"),
-        );
-        const note = <GoodsReturnNote> noteOrErr.value;
+        const noteOrErr = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+        const note = <GoodsReturnNote>noteOrErr.value;
 
         expect(note.lines.length).toBe(2);
     });
 
-    it("Deve registrar o memento em que a devolução foi efectuada", async () => {
+    it("Deve registar o memento em que a devolução foi efectuada", async () => {
         const data = {
             noteId: "GS - 1000",
             items: [
@@ -374,17 +350,13 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(data);
 
-        const noteOrErr = await goodsReturnNoteRepository.getById(
-            ID.fromString("GD - 1001"),
-        );
-        const note = <GoodsReturnNote> noteOrErr.value;
+        const noteOrErr = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+        const note = <GoodsReturnNote>noteOrErr.value;
 
-        expect(note.issuedAt.getTime()).toBeLessThanOrEqual(
-            new Date().getTime(),
-        );
+        expect(note.issuedAt.getTime()).toBeLessThanOrEqual(new Date().getTime());
     });
 
-    it("Deve registrar o identificador do documento de devolução", async () => {
+    it("Deve registar o identificador do documento de devolução", async () => {
         const data = {
             noteId: "GS - 1000",
             items: [
@@ -399,10 +371,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(data);
 
-        const noteOrErr = await goodsReturnNoteRepository.getById(
-            ID.fromString("GD - 1001"),
-        );
-        const note = <GoodsReturnNote> noteOrErr.value;
+        const noteOrErr = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+        const note = <GoodsReturnNote>noteOrErr.value;
 
         expect(note.noteId.toString()).toBe("GD - 1001");
     });
@@ -410,9 +380,7 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
     it("Deve retornar o erro **GoodsIssueNoteHasBenReturned** se a guia de saída de mercadoria já foi devolvida por completo", async () => {
         const data = {
             noteId: "GS - 1003",
-            items: [
-                { itemId: "1006", goodQuantities: 2, comment: "Riscado" },
-            ],
+            items: [{ itemId: "1006", goodQuantities: 2, comment: "Riscado" }],
             securityDepositWithheld: securityDepositWithheld,
             userId: "johndoe123",
         };
@@ -441,10 +409,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(data);
 
-        const noteOrErr = await goodsReturnNoteRepository.getById(
-            ID.fromString("GD - 1001"),
-        );
-        const note = <GoodsReturnNote> noteOrErr.value;
+        const noteOrErr = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+        const note = <GoodsReturnNote>noteOrErr.value;
 
         expect(note.lines[0].condition?.comment).toBe("Riscado");
     });
@@ -463,14 +429,10 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(data);
 
-        const noteOrErr = await goodsReturnNoteRepository.getById(
-            ID.fromString("GD - 1001"),
-        );
-        const note = <GoodsReturnNote> noteOrErr.value;
+        const noteOrErr = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+        const note = <GoodsReturnNote>noteOrErr.value;
 
-        expect(note.lines[0].description).toBe(
-            "T-shirt desportiva gola redonda",
-        );
+        expect(note.lines[0].description).toBe("T-shirt desportiva gola redonda");
         expect(note.lines[1].description).toBe("Calça Jeans Skinny");
     });
 
@@ -488,10 +450,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(data);
 
-        const noteOrErr = await goodsReturnNoteRepository.getById(
-            ID.fromString("GD - 1001"),
-        );
-        const note = <GoodsReturnNote> noteOrErr.value;
+        const noteOrErr = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+        const note = <GoodsReturnNote>noteOrErr.value;
 
         expect(note.lines[0].variationsValues).toEqual({
             "1": "Cor: Branco",
@@ -543,10 +503,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
 
         await service.returningGoods(data);
 
-        const noteOrErr = await goodsReturnNoteRepository.getById(
-            ID.fromString("GD - 1001"),
-        );
-        const note = <GoodsReturnNote> noteOrErr.value;
+        const noteOrErr = await goodsReturnNoteRepository.getById(ID.fromString("GD - 1001"));
+        const note = <GoodsReturnNote>noteOrErr.value;
 
         expect(note.userId.toString()).toBe("johndoe123");
     });
@@ -598,7 +556,7 @@ describe("GoodsReturnService - Recuperar guia de devolução", () => {
         await service.returningGoods(data);
 
         const noteOrErr = await service.get("GD - 1001");
-        const note = <GoodsReturnNote> noteOrErr.value;
+        const note = <GoodsReturnNote>noteOrErr.value;
 
         expect(note).toBeDefined();
         expect(note.goodsIssueNoteId.toString()).toEqual(data.noteId);
@@ -630,7 +588,7 @@ function makeService() {
         goodsIssueRepository,
         itemRepository,
         itemStockRepository,
-        generator,
+        generator
     );
 
     return {

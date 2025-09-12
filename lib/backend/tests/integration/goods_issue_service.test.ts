@@ -106,7 +106,7 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
         expect(error.value).toBeInstanceOf(InvalidTotal);
     });
 
-    it("Deve registrar a data de devolução da guia de saída de mercadoria,", async () => {
+    it("Deve registar a data de devolução da guia de saída de mercadoria,", async () => {
         const { service, noteRepository } = makeService();
 
         await service.new(goodsIssueData);
