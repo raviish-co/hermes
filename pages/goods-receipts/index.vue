@@ -14,8 +14,12 @@ onMounted(async () => {
     <div class="section-content">
         <h1 class="page-title">Guias de Entrada</h1>
 
+        <NuxtLink to="/goods-receipts/register">
+            <button class="btn-add"><span>Criar</span> <span class="text-base">+</span></button>
+        </NuxtLink>
+
         <div class="table-container">
-            <div v-if="notes.length > 0" class="overflow-y-auto">
+            <div class="overflow-y-auto">
                 <table class="table text-center">
                     <thead>
                         <tr>
@@ -38,15 +42,9 @@ onMounted(async () => {
                     </tbody>
                 </table>
             </div>
-            <p v-else class="text-gray-500 text-center">
+            <p v-if="notes.length === 0" class="pt-10 text-gray-500 text-center">
                 Não existem guias de entrada no momento. Crie uma nova
             </p>
         </div>
-
-        <NuxtLink to="/goods-receipts/register">
-            <button class="btn-circle">
-                <span class="material-symbols-outlined">add</span>
-            </button>
-        </NuxtLink>
     </div>
 </template>

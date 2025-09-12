@@ -70,7 +70,7 @@ onMounted(() => {
             <InputTags @tags="tags = $event" />
 
             <button class="btn bg-secondary-500" :disabled="isDisabled" @click="register()">
-                Registrar
+                Registar
             </button>
         </div>
     </div>

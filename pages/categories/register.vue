@@ -79,7 +79,7 @@ onMounted(async () => {
             </div>
 
             <button class="btn bg-secondary-500" :disabled="name.length === 0" @click="register()">
-                Registrar
+                Registar
             </button>
         </div>
     </div>

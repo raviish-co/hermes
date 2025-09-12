@@ -42,14 +42,17 @@ onMounted(async () => {
             />
         </div>
 
+        <NuxtLink to="/goods-issues/register">
+            <button class="btn-add"><span>Criar</span> <span class="text-base">+</span></button>
+        </NuxtLink>
+
         <div class="table-container">
             <div class="overflow-y-auto">
-                <p class="p-2">Filtro:</p>
                 <table class="table text-center">
                     <thead>
                         <tr>
                             <th class="min-w-20 w-20">ID</th>
-                            <th class="min-w-40 w-40">Data de devolução</th>
+                            <th class="min-w-40 w-40">Data de saída</th>
                             <th class="min-w-60 w-60">Descrição</th>
                             <th class="min-w-40 w-40">Estado</th>
                         </tr>
@@ -77,15 +80,9 @@ onMounted(async () => {
                     </tbody>
                 </table>
             </div>
-            <p v-if="notes.length === 0" class="text-gray-500 text-center">
-                Não foram encontradas guias de saída.
+            <p v-if="notes.length === 0" class="pt-10 text-gray-500 text-center">
+                Não existem guias de saída no momento. Crie uma nova
             </p>
         </div>
-
-        <NuxtLink to="/goods-issues/register">
-            <button class="btn-circle">
-                <span class="material-symbols-outlined">add</span>
-            </button>
-        </NuxtLink>
     </div>
 </template>

@@ -46,7 +46,7 @@ function newGoodsReturn() {
         .new(
             goodsIssueNote.value.goodsIssueNoteId,
             securityDepositWithHeld.value,
-            goodsReturnNote.value.returnLines,
+            goodsReturnNote.value.returnLines
         )
         .then((res) => alert(res.message))
         .catch((err) => alert(err.statusMessage));

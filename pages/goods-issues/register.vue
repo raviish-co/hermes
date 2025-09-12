@@ -2,7 +2,6 @@
 import { getCurrentLocalDateTime } from "~/lib/frontend/helpers/current_local_date_time";
 import { GoodsIssueService } from "~/lib/frontend/services/goods_issue_service";
 import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
-import type { ChoosePurpose } from "#build/components";
 
 const returnDate = getCurrentLocalDateTime();
 const auth = useAuth();

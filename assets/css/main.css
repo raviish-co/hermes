@@ -82,7 +82,7 @@ h1 {
 }
 
 .table-container {
-    @apply h-[36rem] space-y-2;
+    @apply h-auto space-y-2;
 }
 
 .btn {
@@ -97,8 +97,8 @@ h1 {
     @apply btn bg-light-500;
 }
 
-.btn-circle {
-    @apply w-12 h-12 bg-secondary-600 text-white rounded-full text-4xl fixed bottom-8 right-6 mt-8 ml-auto lg:relative lg:block;
+.btn-add {
+    @apply py-1.5 px-4 items-center bg-secondary-600 text-white text-sm bottom-4 mt-12 ml-auto lg:relative lg:block;
 }
 
 .footer {

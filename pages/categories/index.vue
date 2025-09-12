@@ -10,6 +10,13 @@ onMounted(async () => {
 <template>
     <div class="section-content">
         <h1 class="page-title">Categorias</h1>
+
+        <NuxtLink :to="{ path: '/categories/register' }">
+            <button class="btn-add mt-8 ml-auto block">
+                <span>Criar</span> <span class="text-base">+</span>
+            </button>
+        </NuxtLink>
+
         <div class="table-container overflow-y-auto">
             <table class="table">
                 <thead>
@@ -44,12 +51,10 @@ onMounted(async () => {
                     </tr>
                 </tbody>
             </table>
-        </div>
 
-        <NuxtLink :to="{ path: '/categories/register' }">
-            <button class="btn-circle mt-8 ml-auto block">
-                <span class="material-symbols-outlined">add</span>
-            </button>
-        </NuxtLink>
+            <p v-if="catalog.categories.value.length === 0" class="pt-10 text-gray-500 text-center">
+                Não existem categorias no momento. Crie uma nova
+            </p>
+        </div>
     </div>
 </template>

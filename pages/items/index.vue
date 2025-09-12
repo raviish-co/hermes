@@ -25,6 +25,12 @@ onMounted(() => {
             />
         </div>
 
+        <NuxtLink :to="{ path: '/items/register' }">
+            <button class="btn-add block ml-auto">
+                <span>Registar</span> <span class="text-base">+</span>
+            </button>
+        </NuxtLink>
+
         <div class="table-container overflow-y-auto mb-6">
             <table class="table">
                 <thead>
@@ -72,14 +78,14 @@ onMounted(() => {
                     </tr>
                 </tbody>
             </table>
+
+            <p v-if="catalog.items.value.length === 0" class="pt-10 text-gray-500 text-center">
+                Não existem artigos no momento. Registe um novo
+            </p>
         </div>
 
-        <ThePagination :total="toValue(catalog.pages)" @changed="catalog.changePage($event)" />
-
-        <NuxtLink :to="{ path: '/items/register' }">
-            <button class="btn-circle block ml-auto">
-                <span class="material-symbols-outlined">add</span>
-            </button>
-        </NuxtLink>
+        <div class="mb-10">
+            <ThePagination :total="toValue(catalog.pages)" @changed="catalog.changePage($event)" />
+        </div>
     </div>
 </template>

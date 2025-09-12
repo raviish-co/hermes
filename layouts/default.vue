@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { NuxtLink } from "#components";
 import { ref } from "vue";
 
 const visibility = ref<boolean>(false);

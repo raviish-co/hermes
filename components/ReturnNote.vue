@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { ChooseNoteLine, DescribeReturnCondition } from "#build/components";
-import type { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
-import type { GoodsIssueNoteLine } from "~/lib/frontend/domain/goods_issue_note_line";
-import type { GoodsReturnNote } from "~/lib/frontend/domain/goods_return_note";
+import type { ChooseNoteLine, DescribeReturnCondition } from "#components";
+import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
+import { GoodsIssueNoteLine } from "~/lib/frontend/domain/goods_issue_note_line";
+import { GoodsReturnNote } from "~/lib/frontend/domain/goods_return_note";
 import type { NoteLine } from "~/lib/frontend/domain/note_line";
 
 interface Emits {
@@ -15,8 +15,10 @@ interface Props {
     isReturned: boolean;
     quantities: number[];
 }
+
 const emits = defineEmits<Emits>();
 const props = defineProps<Props>();
+
 const describeConditionRef = ref<typeof DescribeReturnCondition>();
 const chooseNoteLineRef = ref<typeof ChooseNoteLine>();
 const hasEmptyQuantity = computed(() => props.quantities.some((q) => q.toString() === ""));
