@@ -42,8 +42,8 @@ export class GoodsIssueNote extends Note {
             noteLine.quantityRequested = line.quantityRequested;
             noteLine.quantityReturned = line.quantityReturned;
 
-            noteLine.goodQuantitiesReturned = 0;
-            noteLine.badQuantitiesReturned = 0;
+            noteLine.goodQuantitiesReturned = line.goodQuantities - line.goodQuantitiesReturned;
+            noteLine.badQuantitiesReturned = line.badQuantities - line.badQuantitiesReturned;
 
             note.lines.push(noteLine);
         }

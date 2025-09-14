@@ -59,7 +59,7 @@ function showRequestedLines() {
 function changeLineQuantity(line: NoteLine, quantity: number) {
     line.updateQuantitiesToReturn(quantity, 0);
 
-    if (hasEmptyQuantity) {
+    if (hasEmptyQuantity.value) {
         emits("invalid-line", true);
         return;
     }

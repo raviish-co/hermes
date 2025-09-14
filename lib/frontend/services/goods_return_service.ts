@@ -11,8 +11,6 @@ export class GoodsReturnService {
             items: lines.map(this.#toItemDTO),
         };
 
-        console.log("DTO of sented =>", lines);
-
         return await $fetch("/api/goods-return", {
             method: "post",
             body: data,
