@@ -98,7 +98,7 @@ h1 {
 }
 
 .btn-add {
-    @apply py-1.5 px-4 items-center bg-secondary-600 text-white text-sm bottom-4 mt-12 ml-auto lg:relative lg:block;
+    @apply py-1.5 px-4 items-center bg-secondary-600 text-white text-sm bottom-4 mt-12 ml-auto relative block;
 }
 
 .footer {
