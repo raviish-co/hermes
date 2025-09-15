@@ -1,5 +1,7 @@
 import { ItemStock } from "../../domain/warehouse/item_stock";
+import { ItemStockNotFound } from "../../domain/warehouse/item_stock_not_found";
 import type { ItemStockRepository } from "../../domain/warehouse/item_stock_repository";
+import { left, right, type Either } from "../../shared/either";
 import { ID } from "../../shared/id";
 
 export class ItemStockRepositoryStub implements ItemStockRepository {
@@ -18,6 +20,19 @@ export class ItemStockRepositoryStub implements ItemStockRepository {
 
     async save(itemStock: ItemStock): Promise<void> {
         this.#data[itemStock.itemStockId.toString()] = itemStock;
+    }
+
+    async getById(itemId: ID): Promise<Either<ItemStockNotFound, ItemStock>> {
+        const items = this.records;
+
+        for (const key in items) {
+            const item = items[key];
+            if (item.itemId.toString() === itemId.toString()) {
+                return right(item);
+            }
+        }
+
+        return left(new ItemStockNotFound());
     }
 
     async saveAll(itemStocks: ItemStock[]): Promise<void> {
@@ -60,7 +75,6 @@ const _data = [
         itemId: ID.fromString("1001"),
         goodQuantities: 10,
         badQuantities: 0,
-        status: "Interno",
     },
     {
         itemId: ID.fromString("1002"),

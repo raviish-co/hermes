@@ -317,6 +317,20 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
         expect(note1.noteId.toString()).toEqual("GS - 1000");
         expect(note2.noteId.toString()).toEqual("GS - 1001");
     });
+
+    it("Deve calcular o preço total das saídas de um artigo", async () => {
+        const { service, itemStockRepository } = makeService();
+
+        await service.new(goodsIssueData);
+        await service.new(goodsIssueData);
+
+        const itemStock = await itemStockRepository.findAll([ID.fromString("1001")]);
+
+        expect(itemStock.length).toBe(1);
+
+        const stock = itemStock[0];
+        expect(stock.totalCostOfDepartures).toBe(9000);
+    });
 });
 
 describe("GoodsIssueService - Recuperar as guias de saída de mercadorias", () => {

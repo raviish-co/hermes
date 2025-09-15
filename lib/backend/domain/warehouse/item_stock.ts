@@ -1,3 +1,4 @@
+import type { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
 
 export class ItemStock {
@@ -6,6 +7,7 @@ export class ItemStock {
     #goodQuantities: number;
     #badQuantities: number;
     #status: "Consignação" | "Interno" = "Consignação";
+    #totalCostOfDepartures: number = 0;
 
     constructor(itemId: ID, goodQuantities: number, badQuantities?: number) {
         this.#itemStockId = ID.random();
@@ -59,6 +61,18 @@ export class ItemStock {
         return true;
     }
 
+    updateStatusToInternal(): void {
+        this.#status = "Interno";
+    }
+
+    calculateTotalCostOfDepartures(value: Decimal): void {
+        this.#totalCostOfDepartures += value.value;
+    }
+
+    isTotalCostOfDeparturesGreaterThan(value: number): boolean {
+        return this.totalCostOfDepartures > value;
+    }
+
     get itemStockId(): ID {
         return this.#itemStockId;
     }
@@ -81,5 +95,9 @@ export class ItemStock {
 
     get status(): string {
         return this.#status;
+    }
+
+    get totalCostOfDepartures(): number {
+        return this.#totalCostOfDepartures;
     }
 }
