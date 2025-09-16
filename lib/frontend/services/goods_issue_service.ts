@@ -16,13 +16,10 @@ export class GoodsIssueService {
     }
 
     async getById(noteId: string): Promise<GoodsIssueNoteModel> {
-        const data = await $fetch<GoodsIssueNoteModel>(
-            `/api/goods-issue/${noteId}`,
-            {
-                method: "get",
-                headers: this.headers,
-            },
-        );
+        const data = await $fetch<GoodsIssueNoteModel>(`/api/goods-issue/${noteId}`, {
+            method: "get",
+            headers: this.headers,
+        });
 
         return this.#toGoodsIssueNoteModel(data);
     }

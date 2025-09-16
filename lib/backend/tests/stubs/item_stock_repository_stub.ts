@@ -116,7 +116,7 @@ const _data = [
         itemId: ID.fromString("1007"),
         goodQuantities: 10,
         badQuantities: 0,
-        consignmentPrice: 100,
+        consignmentPrice: -340900,
     },
     {
         itemId: ID.fromString("1008"),
@@ -140,7 +140,7 @@ const _data = [
         itemId: ID.fromString("1011"),
         goodQuantities: 3,
         badQuantities: 3,
-        consignmentPrice: 100,
+        consignmentPrice: 400000,
     },
     {
         itemId: ID.fromString("1012"),

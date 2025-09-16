@@ -13,7 +13,7 @@ export class ItemStock {
     #badQuantities: number;
     #status: string;
     #consignmentPrice: number;
-    #totalCostOfDepartures: number = 0;
+    #totalCostOfDepartures: number;
 
     constructor(
         itemId: ID,
@@ -28,6 +28,7 @@ export class ItemStock {
         this.#badQuantities = badQuantities ?? 0;
         this.#consignmentPrice = consignmentPrice;
         this.#status = status ?? ItemsStatus.CONSIGNACAO;
+        this.#totalCostOfDepartures = 0;
     }
 
     static create(itemId: ID): ItemStock {

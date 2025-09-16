@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { ConditionModel } from "@frontend/models/condition";
-import type { VDialog, ChooseCondition } from "#build/components";
+import type { VDialog, ChooseCondition } from "#components";
 import { Note } from "@frontend/domain/note";
 
 interface Emits {

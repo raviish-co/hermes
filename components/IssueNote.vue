@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { AddLineDialog, DescribeCondition } from "#build/components";
-import type { ConditionModel } from "~/lib/frontend/models/condition";
+import type { AddLineDialog, DescribeCondition } from "#components";
 const describeConditionRef = ref<typeof DescribeCondition>();
 const addLineDialogRef = ref<typeof AddLineDialog>();
 

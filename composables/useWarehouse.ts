@@ -14,8 +14,13 @@ export function useWarehouse() {
         return itemStocks.value.find((itemStock) => itemStock.itemId === id);
     };
 
+    const updateItemStockStatus = async (itemId: string) => {
+        await warehouseService.updateItemStockStatus(itemId);
+    };
+
     return {
         listItemsStock,
         findItemStock,
+        updateItemStockStatus,
     };
 }

@@ -2,9 +2,18 @@ import type { PrismaClient, Stock } from "@prisma/client";
 import { ItemStock } from "../../domain/warehouse/item_stock";
 import type { ItemStockRepository } from "../../domain/warehouse/item_stock_repository";
 import { ID } from "../../shared/id";
+import { ItemStockNotFound } from "../../domain/warehouse/item_stock_not_found";
+import { left, right, type Either } from "../../shared/either";
 
 function stockFactory(data: Stock): ItemStock {
-    return ItemStock.restore(data.stockId, data.productId, data.goodQuantities, data.badQuantities);
+    return ItemStock.restore(
+        data.stockId,
+        data.productId,
+        data.goodQuantities,
+        data.badQuantities,
+        data.consignmentPrice,
+        data.status
+    );
 }
 
 export class PostgresItemStockRepository implements ItemStockRepository {
@@ -19,8 +28,20 @@ export class PostgresItemStockRepository implements ItemStockRepository {
         return stocksData.map(stockFactory);
     }
 
-    async save(itemStock: ItemStock): Promise<void> {
+    async save(_itemStock: ItemStock): Promise<void> {
         throw new Error("Method not implemented.");
+    }
+
+    async getById(itemId: ID): Promise<Either<ItemStockNotFound, ItemStock>> {
+        const itemStock = await this.#prisma.stock.findFirst({
+            where: { productId: itemId.toString() },
+        });
+
+        if (!itemStock) {
+            return left(new ItemStockNotFound());
+        }
+
+        return right(stockFactory(itemStock));
     }
 
     async saveAll(itemStocks: ItemStock[]): Promise<void> {
@@ -111,6 +132,8 @@ export class PostgresItemStockRepository implements ItemStockRepository {
                 productId: itemStock.itemId.toString(),
                 goodQuantities: itemStock.goodQuantities,
                 badQuantities: itemStock.badQuantities,
+                consignmentPrice: itemStock.consignmentPrice,
+                status: itemStock.status,
             })),
         });
     }

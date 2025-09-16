@@ -6,6 +6,6 @@ import type { GoodsReceiptNoteNotFoundError } from "./goods_receipt_note_not_fou
 export interface GoodsReceiptNoteRepository {
     getAll(): Promise<GoodsReceiptNote[]>;
     save(note: GoodsReceiptNote): Promise<void>;
-    getById(itemId: ID): Promise<Either<GoodsReceiptNoteNotFoundError, GoodsReceiptNote>>;
+    getById(noteId: ID): Promise<Either<GoodsReceiptNoteNotFoundError, GoodsReceiptNote>>;
     last(): Promise<GoodsReceiptNote>;
 }
