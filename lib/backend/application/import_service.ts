@@ -140,6 +140,7 @@ export class ImportService {
             const line = new GoodsReceiptNoteLine(
                 itemStock.itemId,
                 itemStock.goodQuantities,
+                itemStock.consignmentPrice,
                 itemStock.badQuantities
             );
             lines.push(line);

@@ -152,7 +152,8 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
 
         const { service, noteRepository } = makeService();
 
-        await service.new(data);
+        const vo = await service.new(data);
+        console.log("Value: ", vo.value);
 
         const note = await noteRepository.last();
 

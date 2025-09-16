@@ -1,32 +1,54 @@
 import type { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
 
+export enum ItemsStatus {
+    CONSIGNACAO = "Consignação",
+    INTERNO = "Interno",
+}
+
 export class ItemStock {
     #itemStockId: ID;
     #itemId: ID;
     #goodQuantities: number;
     #badQuantities: number;
-    #status: "Consignação" | "Interno" = "Consignação";
+    #status: string;
+    #consignmentPrice: number;
     #totalCostOfDepartures: number = 0;
 
-    constructor(itemId: ID, goodQuantities: number, badQuantities?: number) {
+    constructor(
+        itemId: ID,
+        goodQuantities: number,
+        consignmentPrice: number,
+        badQuantities?: number,
+        status?: string
+    ) {
         this.#itemStockId = ID.random();
         this.#itemId = itemId;
         this.#goodQuantities = goodQuantities;
         this.#badQuantities = badQuantities ?? 0;
+        this.#consignmentPrice = consignmentPrice;
+        this.#status = status ?? ItemsStatus.CONSIGNACAO;
     }
 
     static create(itemId: ID): ItemStock {
-        return new ItemStock(itemId, 0, 0);
+        return new ItemStock(itemId, 0, 0, 0);
     }
 
     static restore(
         itemStockId: string,
         itemId: string,
         goodQuantities: number,
-        badQuantities: number
+        badQuantities: number,
+        status: string,
+        consignmentPrice: number
     ): ItemStock {
-        const itemStock = new ItemStock(ID.fromString(itemId), goodQuantities, badQuantities);
+        const itemStock = new ItemStock(
+            ID.fromString(itemId),
+            goodQuantities,
+            consignmentPrice,
+            badQuantities,
+            status
+        );
         itemStock.#itemStockId = ID.fromString(itemStockId);
         return itemStock;
     }
@@ -62,7 +84,7 @@ export class ItemStock {
     }
 
     updateStatusToInternal(): void {
-        this.#status = "Interno";
+        this.#status = ItemsStatus.INTERNO;
     }
 
     calculateTotalCostOfDepartures(value: Decimal): void {
@@ -95,6 +117,10 @@ export class ItemStock {
 
     get status(): string {
         return this.#status;
+    }
+
+    get consignmentPrice(): number {
+        return this.#consignmentPrice;
     }
 
     get totalCostOfDepartures(): number {

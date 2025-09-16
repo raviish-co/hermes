@@ -1,4 +1,4 @@
-import type { CsvReader } from "./csv_reader";
+import type { CsvReader } from "./reader";
 
 export const VALID_ITEM_STOCK_CSV_HEADER = ["id,boas,com_defeito"];
 

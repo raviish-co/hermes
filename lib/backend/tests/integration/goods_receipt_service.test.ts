@@ -337,6 +337,36 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
         expect(note.lines[0].status).toBe("Consignação");
         expect(note.lines[1].status).toBe("Consignação");
     });
+
+    it("Deve registar no stock os items com o status 'Consignação'", async () => {
+        const { service, itemStockRepository } = makeService();
+
+        const data = {
+            lines: [
+                {
+                    itemId: "1001",
+                    goodQuantities: 2,
+                    consignmentPrice: 100,
+                },
+                {
+                    itemId: "1002",
+                    goodQuantities: 3,
+                    consignmentPrice: 200,
+                },
+            ],
+            entryDate: "2025-09-01T11:00:00",
+            userId: "1000",
+        };
+
+        await service.new(data);
+
+        const itemsIds = [ID.fromString("1001"), ID.fromString("1002")];
+        const itemsStock = await itemStockRepository.findAll(itemsIds);
+
+        expect(itemsStock.length).toBe(2);
+        expect(itemsStock[0].status).toBe("Consignação");
+        expect(itemsStock[1].status).toBe("Consignação");
+    });
 });
 
 describe("GoodsReceiptService - Listar guias de entrada de mercadoria", () => {

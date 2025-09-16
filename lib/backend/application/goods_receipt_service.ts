@@ -74,6 +74,7 @@ export class GoodsReceiptService {
                 const newStock = new ItemStock(
                     ID.fromString(line.itemId),
                     line.goodQuantities,
+                    line.consignmentPrice,
                     line.badQuantities
                 );
 
