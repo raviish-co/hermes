@@ -331,10 +331,10 @@ describe("Import Service - Upload Items in Stock", async () => {
 
     it("Deve retornar **ItemNotFound** caso algum artigo não seja encontrado no repositório", async () => {
         const { service } = makeService();
-        const data = `id,boas,com_defeito 
-        1001,10,5
-        1002,8,5
-        1004,5,10`;
+        const data = `id,boas,com_defeito,preco_consignacao
+        1001,10,5,1000
+        1002,8,5,1000
+        1004,5,10,2000`;
         const file = new File([data], "filename.csv", { type: "text/csv" });
 
         const error = await service.uploadItemsInStock(file);
@@ -367,10 +367,10 @@ const emptyFile = new File(["nome,preco,estado,categoria,seccao,variacoes"], "fi
     type: "text/csv",
 });
 
-const itemsStockData = `id,boas,com_defeito 
-1001,10,5
-1002,8,5
-1003,5,10`;
+const itemsStockData = `id,boas,com_defeito,preco_consignacao 
+1001,10,5,1000
+1002,8,5,2000
+1003,5,10,3000`;
 
 interface Dependencies {
     categoryRepository?: CategoryRepository;

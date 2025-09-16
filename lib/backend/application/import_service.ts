@@ -20,7 +20,7 @@ import type { VariationRepository } from "../domain/catalog/variations/variation
 import { GoodsReceiptNoteBuilder } from "../domain/goods_receipt/goods_receipt_note_builder";
 import { GoodsReceiptNoteLine } from "../domain/goods_receipt/goods_receipt_note_line";
 import type { GoodsReceiptNoteRepository } from "../domain/goods_receipt/goods_receipt_note_repository";
-import type { ItemStock } from "../domain/warehouse/item_stock";
+import { ItemStock } from "../domain/warehouse/item_stock";
 import { ItemStockNotFound } from "../domain/warehouse/item_stock_not_found";
 import type { ItemStockRepository } from "../domain/warehouse/item_stock_repository";
 import { Decimal } from "../shared/decimal";
