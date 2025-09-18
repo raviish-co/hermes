@@ -10,14 +10,14 @@ const dialogRef = ref<HTMLDialogElement>();
 const selectedItemId = ref<string>("");
 
 function updateStatus() {
-    if (!selectedItemId) return;
+    if (!selectedItemId.value) return;
 
     warehouse
         .updateItemStockStatus(selectedItemId.value)
-        .then(() => {
+        .then(async () => {
             alert("Item actualizado com sucesso");
             close();
-            navigateTo("/items");
+            await warehouse.listItemsStock();
         })
         .catch((err) => {
             alert(err.statusMessage);
@@ -26,9 +26,11 @@ function updateStatus() {
 
 function checkItemsOnEnter() {
     for (const item of catalog.items.value) {
-        const stock = warehouse.findItemStock(item.itemId);
+        const itemStock = warehouse.findItemStock(item.itemId);
 
-        if (stock && stock.totalCostOfDepartures > stock.consignmentPrice) {
+        if (!itemStock) continue;
+
+        if (warehouse.isInternalItemStock(itemStock.itemId)) {
             selectedItemId.value = item.itemId;
             break;
         }
@@ -64,12 +66,8 @@ onMounted(async () => {
             />
         </div>
 
-        <button @click="show" class="btn-badge">Mostrar</button>
-
         <NuxtLink :to="{ path: '/items/register' }">
-            <button class="btn-add block ml-auto">
-                <span>Registar</span> <span class="text-base">+</span>
-            </button>
+            <button class="btn-add"><span>Registar</span> <span class="text-base">+</span></button>
         </NuxtLink>
 
         <div class="table-container overflow-y-auto mb-6">
@@ -81,6 +79,7 @@ onMounted(async () => {
                         <th class="min-w-40 w-40">Preço Kz</th>
                         <th class="min-w-40 w-40">Stock</th>
                         <th class="min-w-40 w-40">Status</th>
+                        <th></th>
                         <th></th>
                     </tr>
                 </thead>
@@ -126,33 +125,18 @@ onMounted(async () => {
                                 <span class="material-symbols-outlined"> edit </span>
                             </NuxtLink>
                         </td>
+                        <td>
+                            <button
+                                v-if="warehouse.isInternalItemStock(item.itemId)"
+                                @click="updateStatus()"
+                                class="btn-badge bg-secondary-600 text-white text-xs text-nowrap rounded-full px-4 py-1"
+                            >
+                                Marcar como Interno
+                            </button>
+                        </td>
                     </tr>
                 </tbody>
             </table>
-
-            <dialog
-                ref="dialogRef"
-                title="Marcar item como interno"
-                class="w-full m-auto bg-white px-6 py-8 max-w-[32rem]"
-            >
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h2 class="font-medium text-lg">Marcar como Interno</h2>
-                        <span class="material-symbols-outlined cursor-pointer" @click="close"
-                            >close</span
-                        >
-                    </div>
-                    <div>
-                        <p class="mb-4 text-base">Já é possível marcar o item X como interno</p>
-                        <button
-                            @click="updateStatus()"
-                            class="btn-badge bg-secondary-600 text-white text-sm px-4 py-1.5"
-                        >
-                            Marcar
-                        </button>
-                    </div>
-                </div>
-            </dialog>
 
             <p v-if="catalog.items.value.length === 0" class="pt-10 text-gray-500 text-center">
                 Não existem artigos no momento. Registe um novo

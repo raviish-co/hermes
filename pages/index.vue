@@ -21,7 +21,7 @@ onMounted(async () => {
 });
 </script>
 <template>
-    <div class="section-content">
+    <div class="section-content md:h-screen h-full max-h-full">
         <h1 class="page-title">Dashboard</h1>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div class="card">

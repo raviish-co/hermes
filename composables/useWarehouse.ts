@@ -18,9 +18,21 @@ export function useWarehouse() {
         await warehouseService.updateItemStockStatus(itemId);
     };
 
+    const isInternalItemStock = (itemId: string): boolean => {
+        const itemStock = findItemStock(itemId);
+
+        if (!itemStock) return false;
+
+        return (
+            itemStock?.status !== "Interno" &&
+            itemStock?.totalCostOfDepartures > itemStock?.consignmentPrice
+        );
+    };
+
     return {
         listItemsStock,
         findItemStock,
         updateItemStockStatus,
+        isInternalItemStock,
     };
 }
