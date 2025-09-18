@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_values";
 import { formatCurrency } from "~/lib/frontend/helpers/format_currency";
-import { type VDialog } from "#components";
 
 const criteria = ref<string>("");
 const catalog = useCatalog();
 const warehouse = useWarehouse();
 
-const innerRef = ref<InstanceType<typeof VDialog> | null>(null);
+const dialogRef = ref<HTMLDialogElement>();
 const selectedItemId = ref<string>("");
 
 function updateStatus() {
@@ -17,6 +16,8 @@ function updateStatus() {
         .updateItemStockStatus(selectedItemId.value)
         .then(() => {
             alert("Item actualizado com sucesso");
+            close();
+            navigateTo("/items");
         })
         .catch((err) => {
             alert(err.statusMessage);
@@ -34,9 +35,12 @@ function checkItemsOnEnter() {
     }
 }
 
-// TODO: Make dialog visible
-function showDialog() {
-    innerRef.value?.show();
+function close() {
+    dialogRef.value?.close();
+}
+
+function show() {
+    dialogRef.value?.showModal();
 }
 
 onMounted(async () => {
@@ -60,7 +64,7 @@ onMounted(async () => {
             />
         </div>
 
-        <button @click="showDialog" class="btn-badge">Mostrar</button>
+        <button @click="show" class="btn-badge">Mostrar</button>
 
         <NuxtLink :to="{ path: '/items/register' }">
             <button class="btn-add block ml-auto">
@@ -113,29 +117,42 @@ onMounted(async () => {
                                 v-if="warehouse.findItemStock(item.itemId)?.status === 'Interno'"
                                 class="badge bg-secondary-500 text-white"
                             >
-                                {{ warehouse.findItemStock(item.itemId)?.status }}
+                                Interno
                             </span>
-
-                            <span v-else class="badge badge-light">
-                                {{ warehouse.findItemStock(item.itemId)?.status }}</span
-                            >
+                            <span v-else class="badge badge-light"> Consignação</span>
                         </td>
                         <td>
                             <NuxtLink :to="`/items/${item.itemId}/`">
                                 <span class="material-symbols-outlined"> edit </span>
                             </NuxtLink>
                         </td>
-
-                        <VDialog
-                            ref="innerRef"
-                            title="Marcar Item como Interno"
-                            class="max-w-[36rem]"
-                        >
-                            <button @click="updateStatus()">Marcar Como Interno</button>
-                        </VDialog>
                     </tr>
                 </tbody>
             </table>
+
+            <dialog
+                ref="dialogRef"
+                title="Marcar item como interno"
+                class="w-full m-auto bg-white px-6 py-8 max-w-[32rem]"
+            >
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h2 class="font-medium text-lg">Marcar como Interno</h2>
+                        <span class="material-symbols-outlined cursor-pointer" @click="close"
+                            >close</span
+                        >
+                    </div>
+                    <div>
+                        <p class="mb-4 text-base">Já é possível marcar o item X como interno</p>
+                        <button
+                            @click="updateStatus()"
+                            class="btn-badge bg-secondary-600 text-white text-sm px-4 py-1.5"
+                        >
+                            Marcar
+                        </button>
+                    </div>
+                </div>
+            </dialog>
 
             <p v-if="catalog.items.value.length === 0" class="pt-10 text-gray-500 text-center">
                 Não existem artigos no momento. Registe um novo
