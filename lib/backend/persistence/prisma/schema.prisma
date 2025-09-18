@@ -162,7 +162,7 @@ model Stock {
   productId        String  @unique @map("product_id")
   goodQuantities   Int     @default(0) @map("good_quantities")
   badQuantities    Int     @default(0) @map("bad_quantities")
-  consignmentPrice Int     @default(0) @map("consignment_price")
+  consignmentPrice Float   @map("consignment_price")
   status           String
 
   @@map("stock_of_products")

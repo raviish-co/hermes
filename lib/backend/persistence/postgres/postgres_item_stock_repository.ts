@@ -11,8 +11,8 @@ function stockFactory(data: Stock): ItemStock {
         data.productId,
         data.goodQuantities,
         data.badQuantities,
-        data.consignmentPrice,
-        data.status
+        data.status,
+        data.consignmentPrice
     );
 }
 
