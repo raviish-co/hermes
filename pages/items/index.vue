@@ -6,7 +6,6 @@ const criteria = ref<string>("");
 const catalog = useCatalog();
 const warehouse = useWarehouse();
 
-const dialogRef = ref<HTMLDialogElement>();
 const selectedItemId = ref<string>("");
 
 function updateStatus() {
@@ -16,7 +15,6 @@ function updateStatus() {
         .updateItemStockStatus(selectedItemId.value)
         .then(async () => {
             alert("Item actualizado com sucesso");
-            close();
             await warehouse.listItemsStock();
         })
         .catch((err) => {
@@ -24,32 +22,9 @@ function updateStatus() {
         });
 }
 
-function checkItemsOnEnter() {
-    for (const item of catalog.items.value) {
-        const itemStock = warehouse.findItemStock(item.itemId);
-
-        if (!itemStock) continue;
-
-        if (warehouse.isInternalItemStock(itemStock.itemId)) {
-            selectedItemId.value = item.itemId;
-            break;
-        }
-    }
-}
-
-function close() {
-    dialogRef.value?.close();
-}
-
-function show() {
-    dialogRef.value?.showModal();
-}
-
 onMounted(async () => {
     catalog.listItems();
     await warehouse.listItemsStock();
-
-    checkItemsOnEnter();
 });
 </script>
 
@@ -78,8 +53,6 @@ onMounted(async () => {
                         <th class="min-w-80 w-80 text-left">Descrição</th>
                         <th class="min-w-40 w-40">Preço Kz</th>
                         <th class="min-w-40 w-40">Stock</th>
-                        <th class="min-w-40 w-40">Status</th>
-                        <th></th>
                         <th></th>
                     </tr>
                 </thead>
@@ -112,27 +85,9 @@ onMounted(async () => {
                             <span v-else>{{ warehouse.findItemStock(item.itemId)?.total }}</span>
                         </td>
                         <td>
-                            <span
-                                v-if="warehouse.findItemStock(item.itemId)?.status === 'Interno'"
-                                class="badge bg-secondary-500 text-white"
-                            >
-                                Interno
-                            </span>
-                            <span v-else class="badge badge-light"> Consignação</span>
-                        </td>
-                        <td>
                             <NuxtLink :to="`/items/${item.itemId}/`">
                                 <span class="material-symbols-outlined"> edit </span>
                             </NuxtLink>
-                        </td>
-                        <td>
-                            <button
-                                v-if="warehouse.isInternalItemStock(item.itemId)"
-                                @click="updateStatus()"
-                                class="btn-badge bg-secondary-600 text-white text-xs text-nowrap rounded-full px-4 py-1"
-                            >
-                                Marcar como Interno
-                            </button>
                         </td>
                     </tr>
                 </tbody>

@@ -8,7 +8,7 @@ const auth = useAuth();
 export class CatalogService {
     async listItems(
         pageToken: number = 1,
-        perPage: number = 8,
+        perPage: number = 8
     ): Promise<{ items: ItemModel[]; total: number }> {
         const response = await $fetch("/api/items", {
             method: "get",
@@ -49,7 +49,7 @@ export class CatalogService {
     async searchItems(
         query: string,
         pageToken: number = 1,
-        perPage: number = 8,
+        perPage: number = 8
     ): Promise<{ items: ItemModel[]; total: number }> {
         const response = await $fetch("/api/items/search", {
             method: "get",
@@ -88,11 +88,7 @@ export class CatalogService {
         });
     }
 
-    async registerCategory(
-        name: string,
-        variationsIds: string[],
-        description?: string,
-    ) {
+    async registerCategory(name: string, variationsIds: string[], description?: string) {
         const data = { name, variationsIds, description };
         return await $fetch("/api/categories", {
             method: "post",

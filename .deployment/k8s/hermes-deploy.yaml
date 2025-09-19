@@ -24,9 +24,9 @@ spec:
                   env:
                       - name: NUXT_DATABASE_URL
                         valueFrom:
-                            secretKeyRef:
-                                name: hermes-db-url
-                                key: hermes_db_url
+                        secretKeyRef:
+                            name: hermes-db-url
+                            key: hermes_db_url
 
 ---
 apiVersion: v1
