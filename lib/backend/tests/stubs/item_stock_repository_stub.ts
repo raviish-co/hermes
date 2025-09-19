@@ -9,12 +9,7 @@ export class ItemStockRepositoryStub implements ItemStockRepository {
 
     constructor() {
         _data.forEach((i) => {
-            const itemStock = new ItemStock(
-                i.itemId,
-                i.goodQuantities,
-                i.consignmentPrice,
-                i.badQuantities
-            );
+            const itemStock = new ItemStock(i.itemId, i.goodQuantities, i.badQuantities);
             this.save(itemStock);
         });
     }
@@ -80,72 +75,60 @@ const _data = [
         itemId: ID.fromString("1001"),
         goodQuantities: 10,
         badQuantities: 0,
-        consignmentPrice: 100,
     },
     {
         itemId: ID.fromString("1002"),
         goodQuantities: 10,
         badQuantities: 0,
-        consignmentPrice: 100,
     },
     {
         itemId: ID.fromString("1003"),
         goodQuantities: 7,
         badQuantities: 0,
-        consignmentPrice: 100,
     },
     {
         itemId: ID.fromString("1004"),
         goodQuantities: 7,
         badQuantities: 0,
-        consignmentPrice: 100,
     },
     {
         itemId: ID.fromString("1005"),
         goodQuantities: 8,
         badQuantities: 0,
-        consignmentPrice: 100,
     },
     {
         itemId: ID.fromString("1006"),
         goodQuantities: 8,
         badQuantities: 0,
-        consignmentPrice: 100,
     },
     {
         itemId: ID.fromString("1007"),
         goodQuantities: 10,
         badQuantities: 0,
-        consignmentPrice: -340900,
     },
     {
         itemId: ID.fromString("1008"),
         goodQuantities: 10,
         badQuantities: 5,
-        consignmentPrice: 100,
     },
     {
         itemId: ID.fromString("1009"),
         goodQuantities: 7,
         badQuantities: 0,
-        consignmentPrice: 100,
     },
     {
         itemId: ID.fromString("1010"),
         goodQuantities: 7,
         badQuantities: 0,
-        consignmentPrice: 100,
     },
     {
         itemId: ID.fromString("1011"),
         goodQuantities: 3,
         badQuantities: 3,
-        consignmentPrice: 400000,
     },
     {
         itemId: ID.fromString("1012"),
         goodQuantities: 3,
         badQuantities: 4,
-        consignmentPrice: -100,
     },
 ];

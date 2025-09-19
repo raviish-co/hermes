@@ -48,10 +48,7 @@ export class GoodsIssueService {
         const itemsOrErr = await this.#itemRepository.findAll(itemsIds);
         if (itemsOrErr.isLeft()) return left(itemsOrErr.value);
 
-        const voidOrErr = await this.#reduceStockAndCalculateTotalCostOfDepartures(
-            itemsOrErr.value,
-            data
-        );
+        const voidOrErr = await this.#reduceStock(itemsOrErr.value, data);
         if (voidOrErr.isLeft()) return left(voidOrErr.value);
 
         const lines = this.#buildNoteLines(itemsOrErr.value, data.lines);
@@ -124,10 +121,7 @@ export class GoodsIssueService {
         );
     }
 
-    async #reduceStockAndCalculateTotalCostOfDepartures(
-        items: Item[],
-        data: NoteDTO
-    ): Promise<Either<InsufficientStock, void>> {
+    async #reduceStock(items: Item[], data: NoteDTO): Promise<Either<InsufficientStock, void>> {
         const itemsIds = this.#buildItemsIds(data.lines);
 
         const itemsStock = await this.#itemStockRepository.findAll(itemsIds);
@@ -143,8 +137,6 @@ export class GoodsIssueService {
             }
 
             stock.reduce(line.goodQuantities, line.badQuantities);
-
-            stock.calculateTotalCostOfDepartures(item.price);
         }
 
         await this.#itemStockRepository.saveAll(itemsStock);

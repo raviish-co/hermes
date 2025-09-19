@@ -22,20 +22,6 @@ describe("WharehouseService - Artigos em Stock", async () => {
         expect(itemsStock.length).toEqual(12);
     });
 
-    it("Deve atualizar o estado do **itemStock** no repositório", async () => {
-        const itemStockRepository = new ItemStockRepositoryStub();
-        const service = new WarehouseService(itemStockRepository);
-        await makeGoodsIssueService(itemStockRepository);
-
-        const voidOrErr = await service.updateItemStockStatus("1001");
-        expect(voidOrErr.isRight()).toBeTruthy();
-
-        const itemStockOrErr = await itemStockRepository.getById(ID.fromString("1001"));
-
-        expect(itemStockOrErr.isRight()).toBeTruthy();
-        expect((itemStockOrErr.value as ItemStock).status).toBe("Interno");
-    });
-
     it("Deve retornar erro se o item não for encontrado no repositório", async () => {
         const itemStockRepository = new ItemStockRepositoryStub();
         const service = new WarehouseService(itemStockRepository);

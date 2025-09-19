@@ -74,7 +74,6 @@ export class GoodsReceiptService {
                 const newStock = new ItemStock(
                     ID.fromString(line.itemId),
                     line.goodQuantities,
-                    line.consignmentPrice,
                     line.badQuantities
                 );
 
@@ -97,7 +96,6 @@ export class GoodsReceiptService {
         return new GoodsReceiptNoteLine(
             ID.fromString(line.itemId),
             line.goodQuantities,
-            line.consignmentPrice,
             line.badQuantities,
             line.comment
         );
@@ -119,5 +117,4 @@ type NoteLineDTO = {
     goodQuantities: number;
     badQuantities?: number;
     comment?: string;
-    consignmentPrice: number;
 };

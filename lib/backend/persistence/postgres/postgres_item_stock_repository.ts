@@ -6,14 +6,7 @@ import { ItemStockNotFound } from "../../domain/warehouse/item_stock_not_found";
 import { left, right, type Either } from "../../shared/either";
 
 function stockFactory(data: Stock): ItemStock {
-    return ItemStock.restore(
-        data.stockId,
-        data.productId,
-        data.goodQuantities,
-        data.badQuantities,
-        data.status,
-        data.consignmentPrice
-    );
+    return ItemStock.restore(data.stockId, data.productId, data.goodQuantities, data.badQuantities);
 }
 
 export class PostgresItemStockRepository implements ItemStockRepository {
@@ -132,9 +125,6 @@ export class PostgresItemStockRepository implements ItemStockRepository {
                 productId: itemStock.itemId.toString(),
                 goodQuantities: itemStock.goodQuantities,
                 badQuantities: itemStock.badQuantities,
-                consignmentPrice: itemStock.consignmentPrice,
-                totalCostOfDepartures: itemStock.totalCostOfDepartures,
-                status: itemStock.status,
             })),
         });
     }

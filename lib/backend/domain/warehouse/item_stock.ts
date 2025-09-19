@@ -7,45 +7,25 @@ export class ItemStock {
     #itemId: ID;
     #goodQuantities: number;
     #badQuantities: number;
-    #status: string;
-    #consignmentPrice: number;
-    #totalCostOfDepartures: number;
 
-    constructor(
-        itemId: ID,
-        goodQuantities: number,
-        consignmentPrice: number,
-        badQuantities?: number,
-        status?: string
-    ) {
+    constructor(itemId: ID, goodQuantities: number, badQuantities?: number) {
         this.#itemStockId = ID.random();
         this.#itemId = itemId;
         this.#goodQuantities = goodQuantities;
         this.#badQuantities = badQuantities ?? 0;
-        this.#consignmentPrice = consignmentPrice;
-        this.#status = status ?? ItemStockStatus.CONSIGNACAO;
-        this.#totalCostOfDepartures = 0;
     }
 
     static create(itemId: ID): ItemStock {
-        return new ItemStock(itemId, 0, 0, 0);
+        return new ItemStock(itemId, 0, 0);
     }
 
     static restore(
         itemStockId: string,
         itemId: string,
         goodQuantities: number,
-        badQuantities: number,
-        status: string,
-        consignmentPrice: number
+        badQuantities: number
     ): ItemStock {
-        const itemStock = new ItemStock(
-            ID.fromString(itemId),
-            goodQuantities,
-            consignmentPrice,
-            badQuantities,
-            status
-        );
+        const itemStock = new ItemStock(ID.fromString(itemId), goodQuantities, badQuantities);
         itemStock.#itemStockId = ID.fromString(itemStockId);
         return itemStock;
     }
@@ -80,18 +60,6 @@ export class ItemStock {
         return true;
     }
 
-    updateStatusToInternal(): void {
-        this.#status = ItemStockStatus.INTERNO;
-    }
-
-    calculateTotalCostOfDepartures(value: Decimal): void {
-        this.#totalCostOfDepartures += value.value;
-    }
-
-    isTotalCostOfDeparturesGreaterThan(value: number): boolean {
-        return this.totalCostOfDepartures > value;
-    }
-
     get itemStockId(): ID {
         return this.#itemStockId;
     }
@@ -110,17 +78,5 @@ export class ItemStock {
 
     get badQuantities(): number {
         return this.#badQuantities;
-    }
-
-    get status(): string {
-        return this.#status;
-    }
-
-    get consignmentPrice(): number {
-        return this.#consignmentPrice;
-    }
-
-    get totalCostOfDepartures(): number {
-        return this.#totalCostOfDepartures;
     }
 }

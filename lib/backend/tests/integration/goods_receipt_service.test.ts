@@ -19,8 +19,8 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
     it("Deve retornar um erro **InvalidEntryDate** se a data de entrada de mercadoria não for definida", async () => {
         const data = {
             lines: [
-                { itemId: "1001", goodQuantities: 5, consignmentPrice: 100 },
-                { itemId: "1002", goodQuantities: 3, consignmentPrice: 100 },
+                { itemId: "1001", goodQuantities: 5 },
+                { itemId: "1002", goodQuantities: 3 },
             ],
             entryDate: "",
             userId: "1000",
@@ -50,7 +50,7 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
 
     it("Deve retornar um erro **ItemNotFound** se um item não existir", async () => {
         const data = {
-            lines: [{ itemId: "123", goodQuantities: 1, consignmentPrice: 100 }],
+            lines: [{ itemId: "123", goodQuantities: 1 }],
             entryDate: "2024-03-01T16:40:00",
             userId: "1000",
         };
@@ -75,8 +75,8 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
     it("Deve actualizar a quantidade em estoque dos artigos", async () => {
         const data = {
             lines: [
-                { itemId: "1001", goodQuantities: 50, consignmentPrice: 100 },
-                { itemId: "1002", goodQuantities: 20, consignmentPrice: 100 },
+                { itemId: "1001", goodQuantities: 50 },
+                { itemId: "1002", goodQuantities: 20 },
             ],
             entryDate: "2024-03-01T16:40:00",
             userId: "1000",
@@ -100,13 +100,11 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
                     itemId: "1002",
                     goodQuantities: 50,
                     badQuantities: 10,
-                    consignmentPrice: 100,
                 },
                 {
                     itemId: "1003",
                     goodQuantities: 20,
                     badQuantities: 15,
-                    consignmentPrice: 100,
                 },
             ],
             entryDate: "2024-03-01T16:40:00",
@@ -127,8 +125,8 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
     it("Deve salva a guia de entrada de mercadoria no repositório", async () => {
         const data = {
             lines: [
-                { itemId: "1001", goodQuantities: 50, consignmentPrice: 100 },
-                { itemId: "1002", goodQuantities: 20, consignmentPrice: 100 },
+                { itemId: "1001", goodQuantities: 50 },
+                { itemId: "1002", goodQuantities: 20 },
             ],
             entryDate: "2024-03-01T16:40:00",
             userId: "1000",
@@ -146,8 +144,8 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
     it("Deve registar na guia de entrada de mercadoria o número de itens em bom estado", async () => {
         const data = {
             lines: [
-                { itemId: "1001", goodQuantities: 50, consignmentPrice: 100 },
-                { itemId: "1002", goodQuantities: 20, consignmentPrice: 100 },
+                { itemId: "1001", goodQuantities: 50 },
+                { itemId: "1002", goodQuantities: 20 },
             ],
             entryDate: "2024-03-01T16:40:00",
             userId: "1000",
@@ -168,13 +166,11 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
                     itemId: "1001",
                     goodQuantities: 50,
                     badQuantities: 15,
-                    consignmentPrice: 100,
                 },
                 {
                     itemId: "1002",
                     goodQuantities: 20,
                     badQuantities: 15,
-                    consignmentPrice: 100,
                 },
             ],
             entryDate: "2024-03-01T16:40:00",
@@ -192,7 +188,7 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
     it("Deve gerar o ID para a nota de entrada de mercadoria", async () => {
         const THE_ID = "GS1001";
         const data = {
-            lines: [{ itemId: "1001", goodQuantities: 50, consignmentPrice: 100 }],
+            lines: [{ itemId: "1001", goodQuantities: 50 }],
             entryDate: "2024-03-01T16:40:00",
             userId: "1000",
         };
@@ -212,11 +208,10 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
     it("Deve registar a condição em que os artigos entraram em armazem", async () => {
         const data = {
             lines: [
-                { itemId: "1001", goodQuantities: 2, consignmentPrice: 100 },
+                { itemId: "1001", goodQuantities: 2 },
                 {
                     itemId: "1002",
                     goodQuantities: 2,
-                    consignmentPrice: 100,
                     comment: "Gola rasgada",
                 },
             ],
@@ -249,8 +244,8 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
 
         const data = {
             lines: [
-                { itemId: "2000", goodQuantities: 2, consignmentPrice: 100 },
-                { itemId: "2001", goodQuantities: 2, consignmentPrice: 100 },
+                { itemId: "2000", goodQuantities: 2 },
+                { itemId: "2001", goodQuantities: 2 },
             ],
             entryDate: "2024-03-01T16:40:00",
             userId: "1000",
@@ -271,8 +266,8 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
 
         const data = {
             lines: [
-                { itemId: "1001", goodQuantities: 2, consignmentPrice: 100 },
-                { itemId: "1002", goodQuantities: 2, consignmentPrice: 300 },
+                { itemId: "1001", goodQuantities: 2 },
+                { itemId: "1002", goodQuantities: 2 },
             ],
             entryDate: "2024-03-01T16:40:00",
             userId: "1000",
@@ -287,86 +282,6 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
         expect(itemsStock[0].total).toBe(12);
         expect(itemsStock[1].total).toBe(12);
     });
-
-    it("Deve registar na guia de entrada o preço de consignação dos artigos", async () => {
-        const { service, goodsReceiptNoteRepository } = makeService();
-
-        const data = {
-            lines: [
-                { itemId: "1001", goodQuantities: 2, consignmentPrice: 100 },
-                { itemId: "1002", goodQuantities: 3, consignmentPrice: 200 },
-            ],
-            entryDate: "2025-09-01T11:00:00",
-            userId: "1000",
-        };
-
-        await service.new(data);
-
-        const note = await goodsReceiptNoteRepository.last();
-
-        expect(note.lines.length).toBe(2);
-        expect(note.lines[0].consignmentPrice).toBe(100);
-        expect(note.lines[1].consignmentPrice).toBe(200);
-    });
-
-    it("Deve registar na guia de entrada o status 'Consignação' nos artigos por 'default'", async () => {
-        const { service, goodsReceiptNoteRepository } = makeService();
-
-        const data = {
-            lines: [
-                {
-                    itemId: "1001",
-                    goodQuantities: 2,
-                    consignmentPrice: 100,
-                },
-                {
-                    itemId: "1002",
-                    goodQuantities: 3,
-                    consignmentPrice: 200,
-                },
-            ],
-            entryDate: "2025-09-01T11:00:00",
-            userId: "1000",
-        };
-
-        await service.new(data);
-
-        const note = await goodsReceiptNoteRepository.last();
-
-        expect(note.lines.length).toBe(2);
-        expect(note.lines[0].itemStatus).toBe("Consignação");
-        expect(note.lines[1].itemStatus).toBe("Consignação");
-    });
-
-    it("Deve registar no stock os items com o status 'Consignação'", async () => {
-        const { service, itemStockRepository } = makeService();
-
-        const data = {
-            lines: [
-                {
-                    itemId: "1001",
-                    goodQuantities: 2,
-                    consignmentPrice: 100,
-                },
-                {
-                    itemId: "1002",
-                    goodQuantities: 3,
-                    consignmentPrice: 200,
-                },
-            ],
-            entryDate: "2025-09-01T11:00:00",
-            userId: "1000",
-        };
-
-        await service.new(data);
-
-        const itemsIds = [ID.fromString("1001"), ID.fromString("1002")];
-        const itemsStock = await itemStockRepository.findAll(itemsIds);
-
-        expect(itemsStock.length).toBe(2);
-        expect(itemsStock[0].status).toBe("Consignação");
-        expect(itemsStock[1].status).toBe("Consignação");
-    });
 });
 
 describe("GoodsReceiptService - Listar guias de entrada de mercadoria", () => {
@@ -374,8 +289,8 @@ describe("GoodsReceiptService - Listar guias de entrada de mercadoria", () => {
         const { service } = makeService();
         const data = {
             lines: [
-                { itemId: "1001", goodQuantities: 2, consignmentPrice: 100 },
-                { itemId: "1002", goodQuantities: 2, consignmentPrice: 100 },
+                { itemId: "1001", goodQuantities: 2 },
+                { itemId: "1002", goodQuantities: 2 },
             ],
             entryDate: "2024-03-01T16:40:00",
             userId: "1001",
