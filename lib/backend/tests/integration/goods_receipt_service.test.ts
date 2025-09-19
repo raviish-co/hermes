@@ -14,6 +14,8 @@ import { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
+import type { i } from "vitest/dist/reporters-yx5ZTtEV.js";
+import { InvalidQuantitiesError } from "../../application/invalid_quantities_error";
 
 describe("GoodsReceiptService - Entrada de mercadorias", () => {
     it("Deve retornar um erro **InvalidEntryDate** se a data de entrada de mercadoria não for definida", async () => {
@@ -281,6 +283,94 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
         expect(itemsStock.length).toBe(2);
         expect(itemsStock[0].total).toBe(12);
         expect(itemsStock[1].total).toBe(12);
+    });
+
+    it("Deve permitir dar entrada de um artigo em regime de consignação", async () => {
+        const item = new Item(ID.fromString("3000"), "Camisa", new Decimal(1000));
+
+        const itemRepository = new InmemItemRepository([item]);
+        const itemStockRepository = new ItemStockRepositoryStub();
+        const { service } = makeService({ itemRepository, itemStockRepository });
+
+        await itemRepository.saveAll([item]);
+
+        const data = {
+            lines: [{ itemId: "3000", goodQuantities: 1, isConsignment: true }],
+            entryDate: "2024-03-01T16:40:00",
+            userId: "1000",
+        };
+
+        await service.new(data);
+
+        const itemIds = [ID.fromString("3000")];
+        const itemsStock = await itemStockRepository.findAll(itemIds);
+
+        expect(itemsStock.length).toBe(1);
+        expect(itemsStock[0].total).toBe(1);
+        expect(itemsStock[0].isConsignment).toBe(true);
+    });
+
+    it("Deve retornar erro se o artigo em regime de consignação tiver mais de uma quantidade boa", async () => {
+        const item = new Item(ID.fromString("3000"), "Camisa", new Decimal(1000));
+
+        const itemRepository = new InmemItemRepository([item]);
+        const itemStockRepository = new ItemStockRepositoryStub();
+        const { service } = makeService({ itemRepository, itemStockRepository });
+
+        await itemRepository.saveAll([item]);
+
+        const data = {
+            lines: [{ itemId: "3000", goodQuantities: 2, isConsignment: true }],
+            entryDate: "2024-03-01T16:40:00",
+            userId: "1000",
+        };
+
+        const error = await service.new(data);
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(InvalidQuantitiesError);
+    });
+
+    it("Deve retornar erro se o artigo em regime de consignação tiver mais de uma quantidade em mau estado", async () => {
+        const item = new Item(ID.fromString("3000"), "Camisa", new Decimal(1000));
+
+        const itemRepository = new InmemItemRepository([item]);
+        const itemStockRepository = new ItemStockRepositoryStub();
+        const { service } = makeService({ itemRepository, itemStockRepository });
+
+        await itemRepository.saveAll([item]);
+
+        const data = {
+            lines: [{ itemId: "3000", goodQuantities: 1, badQuantities: 2, isConsignment: true }],
+            entryDate: "2024-03-01T16:40:00",
+            userId: "1000",
+        };
+
+        const error = await service.new(data);
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(InvalidQuantitiesError);
+    });
+
+    it("Deve retornar erro se o total de quantidades boas e más do artigo em regime de consignação for superior a 1", async () => {
+        const item = new Item(ID.fromString("3000"), "Camisa", new Decimal(1000));
+
+        const itemRepository = new InmemItemRepository([item]);
+        const itemStockRepository = new ItemStockRepositoryStub();
+        const { service } = makeService({ itemRepository, itemStockRepository });
+
+        await itemRepository.saveAll([item]);
+
+        const data = {
+            lines: [{ itemId: "3000", goodQuantities: 1, badQuantities: 1, isConsignment: true }],
+            entryDate: "2024-03-01T16:40:00",
+            userId: "1000",
+        };
+
+        const error = await service.new(data);
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(InvalidQuantitiesError);
     });
 });
 

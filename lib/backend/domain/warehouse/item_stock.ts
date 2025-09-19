@@ -1,18 +1,24 @@
 import type { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
-import { ItemStockStatus } from "./item_stock_status";
 
 export class ItemStock {
     #itemStockId: ID;
     #itemId: ID;
     #goodQuantities: number;
     #badQuantities: number;
+    #isconsignment?: boolean;
 
-    constructor(itemId: ID, goodQuantities: number, badQuantities?: number) {
+    constructor(
+        itemId: ID,
+        goodQuantities: number,
+        badQuantities?: number,
+        isConsignment?: boolean
+    ) {
         this.#itemStockId = ID.random();
         this.#itemId = itemId;
         this.#goodQuantities = goodQuantities;
         this.#badQuantities = badQuantities ?? 0;
+        this.#isconsignment = isConsignment;
     }
 
     static create(itemId: ID): ItemStock {
@@ -78,5 +84,9 @@ export class ItemStock {
 
     get badQuantities(): number {
         return this.#badQuantities;
+    }
+
+    get isConsignment(): boolean | undefined {
+        return this.#isconsignment;
     }
 }

@@ -1,6 +1,5 @@
 import { Condition } from "../../shared/condition";
 import { ID } from "../../shared/id";
-import { ItemStockStatus } from "../warehouse/item_stock_status";
 
 export class GoodsReceiptNoteLine {
     #lineId: ID;
@@ -8,12 +7,20 @@ export class GoodsReceiptNoteLine {
     #goodQuantities: number;
     #badQuantities?: number;
     condition: Condition;
+    isConsignment?: boolean;
 
-    constructor(itemId: ID, goodQuantities: number, badQuantities?: number, comments?: string) {
+    constructor(
+        itemId: ID,
+        goodQuantities: number,
+        badQuantities?: number,
+        comments?: string,
+        isConsignment?: boolean
+    ) {
         this.#lineId = ID.random();
         this.#itemId = itemId;
         this.#goodQuantities = goodQuantities;
         this.condition = new Condition(comments);
+        this.isConsignment = isConsignment;
 
         if (!badQuantities) return;
 

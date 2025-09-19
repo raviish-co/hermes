@@ -12,6 +12,7 @@ import type { ItemStockRepository } from "../domain/warehouse/item_stock_reposit
 import { left, right, type Either } from "../shared/either";
 import type { GoodsReceiptError } from "../shared/errors";
 import { ID } from "../shared/id";
+import { InvalidQuantitiesError } from "./invalid_quantities_error";
 
 export class GoodsReceiptService {
     #itemRepository: ItemRepository;
@@ -35,6 +36,10 @@ export class GoodsReceiptService {
         if (!data.entryDate) return left(new InvalidEntryDate(data.entryDate));
 
         if (this.#isValidLines(data)) return left(new InvalidLines());
+
+        if (!this.#isValidQuantities(data.lines)) {
+            return left(new InvalidQuantitiesError("GoodsReceiptService"));
+        }
 
         const itemsIds = data.lines.map(({ itemId }) => ID.fromString(itemId));
 
@@ -74,7 +79,8 @@ export class GoodsReceiptService {
                 const newStock = new ItemStock(
                     ID.fromString(line.itemId),
                     line.goodQuantities,
-                    line.badQuantities
+                    line.badQuantities,
+                    line.isConsignment
                 );
 
                 itemsStock.push(newStock);
@@ -97,12 +103,24 @@ export class GoodsReceiptService {
             ID.fromString(line.itemId),
             line.goodQuantities,
             line.badQuantities,
-            line.comment
+            line.comment,
+            line.isConsignment
         );
     }
 
     #isValidLines(data: NoteDTO) {
         return !data.lines || data.lines.length === 0;
+    }
+
+    #isValidQuantities(lines: NoteLineDTO[]): boolean {
+        for (const line of lines) {
+            if (line.isConsignment) {
+                const total = (line.goodQuantities ?? 0) + (line.badQuantities ?? 0);
+                if (total > 1) return false;
+            }
+        }
+
+        return true;
     }
 }
 
@@ -117,4 +135,5 @@ type NoteLineDTO = {
     goodQuantities: number;
     badQuantities?: number;
     comment?: string;
+    isConsignment?: boolean;
 };
