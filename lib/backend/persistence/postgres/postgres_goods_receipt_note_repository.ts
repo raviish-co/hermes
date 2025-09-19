@@ -13,6 +13,8 @@ function goodsReceiptNoteFactory(data: any) {
         goodQuantities: line.goodQuantities,
         badQuantities: line.badQuantities,
         condition: new Condition(line.comments),
+        consignmentPrice: line.consignmentPrice,
+        itemStatus: line.itemStatus,
     }));
     return new GoodsReceiptNote(data.noteId, data.entryDate, lines, data.userId);
 }
@@ -63,6 +65,8 @@ export class PostgresGoodsReceiptNoteRepository implements GoodsReceiptNoteRepos
                             goodQuantities: line.goodQuantities,
                             badQuantities: line.badQuantities,
                             comments: line.condition.comment,
+                            consignmentPrice: line.consignmentPrice,
+                            itemStatus: line.itemStatus,
                         })),
                     },
                 },

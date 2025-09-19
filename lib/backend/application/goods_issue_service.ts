@@ -1,4 +1,3 @@
-import type { GoodsReceiptNote } from "~/lib/frontend/domain/goods_receipt_note";
 import type { Generator } from "../adapters/sequences/generator";
 import { Sequence } from "../adapters/sequences/sequence";
 import { InsufficientStock } from "../domain/catalog/items/insufficient_stock_error";

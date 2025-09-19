@@ -56,6 +56,7 @@ describe("PostgresItemStockRepository - saveAll", () => {
                     goodQuantities: 0,
                     badQuantities: 0,
                     consignmentPrice: 0,
+                    totalCostOfDepartures: 0,
                     status: "Consignação",
                 },
                 {
@@ -64,6 +65,7 @@ describe("PostgresItemStockRepository - saveAll", () => {
                     goodQuantities: 0,
                     badQuantities: 0,
                     consignmentPrice: 0,
+                    totalCostOfDepartures: 0,
                     status: "Consignação",
                 },
             ],

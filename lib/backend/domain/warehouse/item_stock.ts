@@ -1,10 +1,6 @@
 import type { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
-
-export enum ItemsStatus {
-    CONSIGNACAO = "Consignação",
-    INTERNO = "Interno",
-}
+import { ItemStockStatus } from "./item_stock_status";
 
 export class ItemStock {
     #itemStockId: ID;
@@ -27,7 +23,7 @@ export class ItemStock {
         this.#goodQuantities = goodQuantities;
         this.#badQuantities = badQuantities ?? 0;
         this.#consignmentPrice = consignmentPrice;
-        this.#status = status ?? ItemsStatus.CONSIGNACAO;
+        this.#status = status ?? ItemStockStatus.CONSIGNACAO;
         this.#totalCostOfDepartures = 0;
     }
 
@@ -85,7 +81,7 @@ export class ItemStock {
     }
 
     updateStatusToInternal(): void {
-        this.#status = ItemsStatus.INTERNO;
+        this.#status = ItemStockStatus.INTERNO;
     }
 
     calculateTotalCostOfDepartures(value: Decimal): void {

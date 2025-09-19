@@ -334,8 +334,8 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
         const note = await goodsReceiptNoteRepository.last();
 
         expect(note.lines.length).toBe(2);
-        expect(note.lines[0].status).toBe("Consignação");
-        expect(note.lines[1].status).toBe("Consignação");
+        expect(note.lines[0].itemStatus).toBe("Consignação");
+        expect(note.lines[1].itemStatus).toBe("Consignação");
     });
 
     it("Deve registar no stock os items com o status 'Consignação'", async () => {

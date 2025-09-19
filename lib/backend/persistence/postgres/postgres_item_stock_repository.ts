@@ -133,6 +133,7 @@ export class PostgresItemStockRepository implements ItemStockRepository {
                 goodQuantities: itemStock.goodQuantities,
                 badQuantities: itemStock.badQuantities,
                 consignmentPrice: itemStock.consignmentPrice,
+                totalCostOfDepartures: itemStock.totalCostOfDepartures,
                 status: itemStock.status,
             })),
         });
