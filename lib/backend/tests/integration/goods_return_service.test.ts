@@ -167,8 +167,8 @@ describe("GoodsReturnService - Devolução dos artigos", () => {
         ]);
 
         expect(itemsStock.length).toBe(2);
-        expect(itemsStock[0].goodQuantities).toBe(6);
-        expect(itemsStock[0].badQuantities).toBe(5);
+        expect(itemsStock[0].goodQuantities).toBe(4);
+        expect(itemsStock[0].badQuantities).toBe(2);
 
         expect(itemsStock[1].goodQuantities).toBe(6);
         expect(itemsStock[1].badQuantities).toBe(6);

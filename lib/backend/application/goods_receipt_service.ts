@@ -8,6 +8,7 @@ import type { GoodsReceiptNoteRepository } from "../domain/goods_receipt/goods_r
 import { InvalidEntryDate } from "../domain/goods_receipt/invalid_entry_date_error";
 import { InvalidLines } from "../domain/goods_receipt/invalid_lines_error";
 import { ItemStock } from "../domain/warehouse/item_stock";
+import { ItemStockType } from "../domain/warehouse/item_stock_type";
 import type { ItemStockRepository } from "../domain/warehouse/item_stock_repository";
 import { left, right, type Either } from "../shared/either";
 import type { GoodsReceiptError } from "../shared/errors";
@@ -80,7 +81,8 @@ export class GoodsReceiptService {
                     ID.fromString(line.itemId),
                     line.goodQuantities,
                     line.badQuantities,
-                    line.isConsignment
+                    line.isConsignment ? ItemStockType.Consignacao : undefined,
+                    line.consignmentValue
                 );
 
                 itemsStock.push(newStock);
@@ -104,7 +106,8 @@ export class GoodsReceiptService {
             line.goodQuantities,
             line.badQuantities,
             line.comment,
-            line.isConsignment
+            line.isConsignment ? ItemStockType.Consignacao : undefined,
+            line.consignmentValue
         );
     }
 
@@ -136,4 +139,5 @@ type NoteLineDTO = {
     badQuantities?: number;
     comment?: string;
     isConsignment?: boolean;
+    consignmentValue?: number;
 };

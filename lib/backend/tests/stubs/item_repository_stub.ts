@@ -120,4 +120,20 @@ const _itemData = [
         sectionId: "1",
         variationsValues: { "1": "Cor: Castanho", "2": "Marca: Gucci" },
     },
+    {
+        itemId: "1015",
+        name: "Vestido de festa longo",
+        price: 25000,
+        categoryId: "4",
+        sectionId: "1",
+        variationsValues: { "1": "Cor: Castanho", "2": "Marca: Gucci" },
+    },
+    {
+        itemId: "1016",
+        name: "Saia lápis social",
+        price: 8500,
+        categoryId: "4",
+        sectionId: "1",
+        variationsValues: { "1": "Cor: Castanho", "2": "Marca: Gucci" },
+    },
 ];

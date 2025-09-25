@@ -1,9 +1,5 @@
 import jwt, { type JwtPayload } from "jsonwebtoken";
-
-import type {
-    TokenGenerator,
-    VerifyToken,
-} from "../../domain/auth/token_generator";
+import type { TokenGenerator, VerifyToken } from "../../domain/auth/token_generator";
 
 export class JSONWebToken implements TokenGenerator {
     constructor(private secretKey: string, private expiresIn: string) {}

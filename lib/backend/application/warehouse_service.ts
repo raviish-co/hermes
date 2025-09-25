@@ -13,7 +13,7 @@ export class WarehouseService {
         return await this.#itemStockRepository.getAll();
     }
 
-    async updateItemStockStatus(itemId: string): Promise<Either<Error, void>> {
+    async enableItemInStockToInternalUse(itemId: string): Promise<Either<Error, void>> {
         const itemStockOrErr = await this.#itemStockRepository.getById(ID.fromString(itemId));
         if (itemStockOrErr.isLeft()) {
             return left(itemStockOrErr.value);
@@ -21,8 +21,8 @@ export class WarehouseService {
 
         const itemStock = itemStockOrErr.value;
 
-        if (itemStock.isTotalCostOfDeparturesGreaterThan(itemStock.consignmentPrice)) {
-            itemStock.updateStatusToInternal();
+        if (itemStock.isTotalValueOfOutputsGreaterThan(itemStock.consignmentValue)) {
+            itemStock.enableItemInStockToInternal();
         }
 
         await this.#itemStockRepository.save(itemStock);

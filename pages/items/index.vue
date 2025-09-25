@@ -7,19 +7,36 @@ const catalog = useCatalog();
 const warehouse = useWarehouse();
 
 const selectedItemId = ref<string>("");
+const seletedItemName = ref<string>("");
+const dialogRef = ref<HTMLDialogElement>();
 
-function updateStatus() {
+function enableItemInStockToInternalUse() {
     if (!selectedItemId.value) return;
 
     warehouse
-        .updateItemStockStatus(selectedItemId.value)
+        .enableItemStockToInternalUse(selectedItemId.value)
         .then(async () => {
-            alert("Item actualizado com sucesso");
+            alert("Item habilitado para uso interno com sucesso");
+            close();
             await warehouse.listItemsStock();
         })
         .catch((err) => {
             alert(err.statusMessage);
         });
+}
+
+function setUserDataAndShowModal(itemId: string, itemName: string) {
+    selectedItemId.value = itemId;
+    seletedItemName.value = itemName;
+    show();
+}
+
+function close() {
+    dialogRef.value?.close();
+}
+
+function show() {
+    dialogRef.value?.showModal();
 }
 
 onMounted(async () => {
@@ -51,9 +68,11 @@ onMounted(async () => {
                     <tr>
                         <th class="min-w-20 w-20">ID</th>
                         <th class="min-w-80 w-80 text-left">Descrição</th>
-                        <th class="min-w-40 w-40">Preço Kz</th>
-                        <th class="min-w-40 w-40">Stock</th>
+                        <th class="min-w-40 w-40">Preço (Kz)</th>
+                        <th class="min-w-30 w-30">Stock</th>
+                        <th class="min-w-50 w-50 text-nowrap">valor das Saídas (Kz)</th>
                         <th></th>
+                        <th class="min-w-30 w-30"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -64,7 +83,26 @@ onMounted(async () => {
                     >
                         <td>{{ item.itemId }}</td>
                         <td class="text-left">
-                            {{ item.name }} <br />
+                            {{ item.name }}
+                            <span>
+                                <sup
+                                    v-if="
+                                        warehouse.findItemStock(item.itemId)?.itemStockType ===
+                                        'Consignação'
+                                    "
+                                    class="ml-2 bg-light-500 py-1 px-1.5 rounded-full text-white font-medium"
+                                    >{{ warehouse.findItemStock(item.itemId)?.itemStockType }}</sup
+                                >
+                                <sup
+                                    v-else-if="
+                                        warehouse.findItemStock(item.itemId)?.itemStockType ===
+                                        'Interno'
+                                    "
+                                    class="ml-2 bg-secondary-500 py-1 px-1.5 rounded-full text-white font-medium"
+                                    >{{ warehouse.findItemStock(item.itemId)?.itemStockType }}</sup
+                                >
+                            </span>
+                            <br />
                             <span class="text-light-600 break-words text-xs sm:text-sm">
                                 {{ formatVariationValues(item.variationsValues) }}
                             </span>
@@ -82,16 +120,78 @@ onMounted(async () => {
                                 Esgotado
                             </span>
 
-                            <span v-else>{{ warehouse.findItemStock(item.itemId)?.total }}</span>
+                            <span v-else class="text-gray-500">{{
+                                warehouse.findItemStock(item.itemId)?.total
+                            }}</span>
+                        </td>
+                        <td class="text-gray-500">
+                            <span v-if="!warehouse.findItemStock(item.itemId)"> 0 </span>
+
+                            <span
+                                v-else-if="
+                                    warehouse.findItemStock(item.itemId)?.totalValueOfOutputs === 0
+                                "
+                            >
+                                0
+                            </span>
+
+                            <span v-else>
+                                {{
+                                    formatCurrency(
+                                        warehouse.findItemStock(item.itemId)?.totalValueOfOutputs!
+                                    )
+                                }}
+                            </span>
                         </td>
                         <td>
                             <NuxtLink :to="`/items/${item.itemId}/`">
                                 <span class="material-symbols-outlined"> edit </span>
                             </NuxtLink>
                         </td>
+                        <td>
+                            <span
+                                v-if="warehouse.isInternalItemStock(item.itemId)"
+                                @click="setUserDataAndShowModal(item.itemId, item.name)"
+                                class="text-xs text-nowrap cursor-pointer badge bg-secondary-500 text-white"
+                                >Habilitar para uso interno</span
+                            >
+                        </td>
                     </tr>
                 </tbody>
             </table>
+
+            <dialog
+                ref="dialogRef"
+                title="Marcar item como interno"
+                class="w-full m-auto bg-white px-6 py-8 max-w-[32rem]"
+            >
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h2 class="font-medium text-lg">Habilitar para uso interno</h2>
+                        <span class="material-symbols-outlined cursor-pointer" @click="close"
+                            >close</span
+                        >
+                    </div>
+                    <div>
+                        <p class="mb-4 text-sm text-gray-500">
+                            Já é possível habilitar o item <b> {{ seletedItemName }} </b> para uso
+                            interno.
+                        </p>
+                        <button
+                            @click="enableItemInStockToInternalUse()"
+                            class="btn-badge bg-secondary-600 text-white text-sm px-4 py-1.5"
+                        >
+                            Habilitar
+                        </button>
+                        <button
+                            class="btn-badge bg-light-600 ml-2 text-white text-sm px-4 py-1.5"
+                            @click="close()"
+                        >
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </dialog>
 
             <p v-if="catalog.items.value.length === 0" class="pt-10 text-gray-500 text-center">
                 Não existem artigos no momento. Registe um novo

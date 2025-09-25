@@ -20,12 +20,12 @@ export class Note {
         this.lines = [];
     }
 
-    addLine(options: LineOptions, quantity: number, stock?: number) {
-        if (!quantity || !stock) return;
+    addLine(options: LineOptions, quantity: number, stock?: number, isConsignment?: boolean) {
+        if (!quantity || stock === undefined) return;
 
         if (this.isSameLine(options.itemId)) return;
 
-        const line = this.createLine(options, quantity, stock);
+        const line = this.createLine(options, quantity, stock, isConsignment);
 
         this.lines.push(line);
     }
@@ -80,12 +80,13 @@ export class Note {
         return this.lines.some((line) => line.goodQuantities !== 0);
     }
 
-    createLine(options: LineOptions, quantity: number, stock: number) {
+    createLine(options: LineOptions, quantity: number, stock: number, isConsignment?: boolean) {
         const line = new NoteLine(
             options.itemId,
             options.name,
             options.variationsValues,
-            options.condition
+            options.condition,
+            isConsignment
         );
 
         line.changeQuantity(quantity);

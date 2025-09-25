@@ -13,20 +13,48 @@ import { SequenceGenerator } from "../../adapters/sequences/sequence_generator";
 import { GoodsIssueService } from "../../application/goods_issue_service";
 
 describe("WharehouseService - Artigos em Stock", async () => {
-    it("Deve recuperar os artigos em stock", async () => {
+    it("listItemStock - Deve recuperar os artigos em stock", async () => {
         const itemStockRepositoy = new ItemStockRepositoryStub();
         const service = new WarehouseService(itemStockRepositoy);
 
         const itemsStock = await service.listItemStock();
 
-        expect(itemsStock.length).toEqual(12);
+        expect(itemsStock.length).toEqual(13);
     });
 
-    it("Deve retornar erro se o item não for encontrado no repositório", async () => {
+    it("enableItemInStockToInternalUse - Deve habilitar o artigo para uso interno", async () => {
+        const itemStockRepository = new ItemStockRepositoryStub();
+        const service = new WarehouseService(itemStockRepository);
+        const itemId = ID.fromString("1011");
+        await makeGoodsIssueService(itemStockRepository);
+
+        await service.enableItemInStockToInternalUse(itemId.toString());
+
+        const itemStockOrErr = await itemStockRepository.getById(itemId);
+
+        expect(itemStockOrErr.isRight()).toBeTruthy();
+        expect((itemStockOrErr.value as ItemStock).itemStockType).toBe("Interno");
+    });
+
+    it("enableItemInStockToInternalUse - Não deve habilitar o artigo para uso interno se o valor total das saídas for menor que o valor de consignação", async () => {
+        const itemStockRepository = new ItemStockRepositoryStub();
+        const service = new WarehouseService(itemStockRepository);
+        const itemId = ID.fromString("1013");
+        await makeGoodsIssueService(itemStockRepository);
+
+        await service.enableItemInStockToInternalUse(itemId.toString());
+
+        const itemStockOrErr = await itemStockRepository.getById(itemId);
+
+        expect(itemStockOrErr.isRight()).toBeTruthy();
+        expect((itemStockOrErr.value as ItemStock).itemStockType).toBe("Consignação");
+    });
+
+    it("enableItemInStockToInternalUse - Deve retornar erro se o item não for encontrado no repositório", async () => {
         const itemStockRepository = new ItemStockRepositoryStub();
         const service = new WarehouseService(itemStockRepository);
 
-        const voidOrErr = await service.updateItemStockStatus("invalid-item-id");
+        const voidOrErr = await service.enableItemInStockToInternalUse("invalid-item-id");
 
         expect(voidOrErr.isLeft()).toBeTruthy();
         expect(voidOrErr.value).toBeInstanceOf(ItemStockNotFound);
@@ -56,19 +84,14 @@ async function makeGoodsIssueService(itemStockRepo?: ItemStockRepository) {
         },
         lines: [
             {
-                itemId: "1001",
-                goodQuantities: 2,
-            },
-            {
-                itemId: "1002",
-                goodQuantities: 3,
+                itemId: "1011",
+                goodQuantities: 1,
             },
         ],
-        total: 55500,
+        total: 6500,
         returnDate: "2021-01-01T16:40:00",
         userId: "1000",
     };
 
-    await service.new(goodsIssueData);
     await service.new(goodsIssueData);
 }

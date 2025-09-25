@@ -7,7 +7,7 @@ export class NoteLine {
     name: string;
     goodQuantities: number = 0;
     badQuantities: number = 0;
-    consignmentPrice: number = 0;
+    consignmentValue: number = 0;
     goodQuantitiesReturned: number = 0;
     badQuantitiesReturned: number = 0;
     quantityReturned: number = 0;
@@ -15,17 +15,20 @@ export class NoteLine {
     stock: number = 0;
     variationsValues?: VariationValueModel[];
     condition?: ConditionModel;
+    isConsignment?: boolean = false;
 
     constructor(
         itemId: string,
         name: string,
         variationsValues?: VariationValueModel[],
-        condition?: ConditionModel
+        condition?: ConditionModel,
+        isConsignment?: boolean
     ) {
         this.itemId = itemId;
         this.name = name;
         this.variationsValues = variationsValues;
         this.condition = condition;
+        this.isConsignment = isConsignment;
 
         if (this.isFullyReturned()) {
             this.changeQuantity(0);
@@ -55,8 +58,8 @@ export class NoteLine {
         this.badQuantitiesReturned = bad;
     }
 
-    changeConsignmentPrice(value: number) {
-        this.consignmentPrice = value;
+    changeConsignmentValue(value: number) {
+        this.consignmentValue = value;
     }
 
     isFullyReturned() {

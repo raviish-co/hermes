@@ -1,5 +1,6 @@
 import { Condition } from "../../shared/condition";
 import { ID } from "../../shared/id";
+import { ItemStockType } from "../warehouse/item_stock_type";
 
 export class GoodsReceiptNoteLine {
     #lineId: ID;
@@ -7,20 +8,23 @@ export class GoodsReceiptNoteLine {
     #goodQuantities: number;
     #badQuantities?: number;
     condition: Condition;
-    isConsignment?: boolean;
+    #itemStockType?: string;
+    #consignmentValue?: number;
 
     constructor(
         itemId: ID,
         goodQuantities: number,
         badQuantities?: number,
         comments?: string,
-        isConsignment?: boolean
+        itemStockType?: string,
+        consignmentValue?: number
     ) {
         this.#lineId = ID.random();
         this.#itemId = itemId;
         this.#goodQuantities = goodQuantities;
         this.condition = new Condition(comments);
-        this.isConsignment = isConsignment;
+        this.#itemStockType = this.#getItemStockType(itemStockType);
+        this.#consignmentValue = consignmentValue ?? 0;
 
         if (!badQuantities) return;
 
@@ -43,8 +47,21 @@ export class GoodsReceiptNoteLine {
         return this.#badQuantities || 0;
     }
 
+    get itemStockType(): string | undefined {
+        return this.#itemStockType;
+    }
+
+    get consignmentValue(): number | undefined {
+        return this.#consignmentValue;
+    }
+
     get total(): number {
         if (!this.#badQuantities) return this.#goodQuantities;
         return this.#goodQuantities + this.#badQuantities;
+    }
+
+    #getItemStockType(itemStockType?: string): string | undefined {
+        if (itemStockType === ItemStockType.Consignacao) return ItemStockType.Consignacao;
+        return "";
     }
 }

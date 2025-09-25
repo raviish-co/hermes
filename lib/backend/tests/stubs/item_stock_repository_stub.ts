@@ -9,7 +9,13 @@ export class ItemStockRepositoryStub implements ItemStockRepository {
 
     constructor() {
         _data.forEach((i) => {
-            const itemStock = new ItemStock(i.itemId, i.goodQuantities, i.badQuantities);
+            const itemStock = new ItemStock(
+                i.itemId,
+                i.goodQuantities,
+                i.badQuantities,
+                i.itemStockType,
+                i.consignmentValue
+            );
             this.save(itemStock);
         });
     }
@@ -123,12 +129,21 @@ const _data = [
     },
     {
         itemId: ID.fromString("1011"),
-        goodQuantities: 3,
-        badQuantities: 3,
+        goodQuantities: 1,
+        badQuantities: 0,
+        consignmentValue: 500,
+        itemStockType: "Consignação",
     },
     {
         itemId: ID.fromString("1012"),
         goodQuantities: 3,
         badQuantities: 4,
+    },
+    {
+        itemId: ID.fromString("1013"),
+        goodQuantities: 1,
+        badQuantities: 0,
+        consignmentValue: 500,
+        itemStockType: "Consignação",
     },
 ];

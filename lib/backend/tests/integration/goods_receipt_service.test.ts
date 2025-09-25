@@ -307,7 +307,7 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
 
         expect(itemsStock.length).toBe(1);
         expect(itemsStock[0].total).toBe(1);
-        expect(itemsStock[0].isConsignment).toBe(true);
+        expect(itemsStock[0].itemStockType).toBe("Consignação");
     });
 
     it("Deve retornar erro se o artigo em regime de consignação tiver mais de uma quantidade boa", async () => {
@@ -371,6 +371,112 @@ describe("GoodsReceiptService - Entrada de mercadorias", () => {
 
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(InvalidQuantitiesError);
+    });
+
+    it("Ao dar entrada de um artigo em regime de consignação, o seu tipo deve ser 'Consignação' dentro da guia", async () => {
+        const item = new Item(ID.fromString("3000"), "Camisa", new Decimal(1000));
+
+        const itemRepository = new InmemItemRepository([item]);
+        const itemStockRepository = new ItemStockRepositoryStub();
+        const { service, goodsReceiptNoteRepository } = makeService({
+            itemRepository,
+            itemStockRepository,
+        });
+
+        await itemRepository.saveAll([item]);
+
+        const data = {
+            lines: [{ itemId: "3000", goodQuantities: 1, isConsignment: true }],
+            entryDate: "2024-03-01T16:40:00",
+            userId: "1000",
+        };
+
+        await service.new(data);
+
+        const note = await goodsReceiptNoteRepository.last();
+
+        expect(note.lines.length).toBe(1);
+        expect(note.lines[0].itemStockType).toBe("Consignação");
+    });
+
+    it("O artigo que não for em regime de consignação, deve ter o tipo de stock vazio dentro da guia", async () => {
+        const item = new Item(ID.fromString("3000"), "Camisa", new Decimal(1000));
+
+        const itemRepository = new InmemItemRepository([item]);
+        const itemStockRepository = new ItemStockRepositoryStub();
+        const { service, goodsReceiptNoteRepository } = makeService({
+            itemRepository,
+            itemStockRepository,
+        });
+
+        await itemRepository.saveAll([item]);
+
+        const data = {
+            lines: [{ itemId: "3000", goodQuantities: 1 }],
+            entryDate: "2024-03-01T16:40:00",
+            userId: "1000",
+        };
+
+        await service.new(data);
+
+        const note = await goodsReceiptNoteRepository.last();
+
+        expect(note.lines.length).toBe(1);
+        expect(note.lines[0].itemStockType).toBe("");
+    });
+
+    it("O artigo que não for em regime de consignação, deve ter o tipo de stock vazio no stock do artigo", async () => {
+        const item = new Item(ID.fromString("3000"), "Camisa", new Decimal(1000));
+
+        const itemRepository = new InmemItemRepository([item]);
+        const itemStockRepository = new ItemStockRepositoryStub();
+        const { service } = makeService({
+            itemRepository,
+            itemStockRepository,
+        });
+
+        await itemRepository.saveAll([item]);
+
+        const data = {
+            lines: [{ itemId: "3000", goodQuantities: 1 }],
+            entryDate: "2024-03-01T16:40:00",
+            userId: "1000",
+        };
+
+        await service.new(data);
+
+        const itemIds = [ID.fromString("3000")];
+        const itemsStock = await itemStockRepository.findAll(itemIds);
+
+        expect(itemsStock.length).toBe(1);
+        expect(itemsStock[0].itemStockType).toBe("");
+    });
+
+    it("Se o artigo for em regime de consignação, deve registar o valor de consignação na guia de entrada", async () => {
+        const item = new Item(ID.fromString("3000"), "Camisa", new Decimal(1000));
+
+        const itemRepository = new InmemItemRepository([item]);
+        const itemStockRepository = new ItemStockRepositoryStub();
+        const { service, goodsReceiptNoteRepository } = makeService({
+            itemRepository,
+            itemStockRepository,
+        });
+        await itemRepository.saveAll([item]);
+
+        const data = {
+            lines: [
+                { itemId: "3000", goodQuantities: 1, isConsignment: true, consignmentValue: 1000 },
+            ],
+            entryDate: "2024-03-01T16:40:00",
+            userId: "1000",
+        };
+
+        await service.new(data);
+
+        const note = await goodsReceiptNoteRepository.last();
+
+        expect(note.lines.length).toBe(1);
+        expect(note.lines[0].consignmentValue).toBe(1000);
     });
 });
 

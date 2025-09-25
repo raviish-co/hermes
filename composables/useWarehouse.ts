@@ -24,15 +24,15 @@ export function useWarehouse() {
         if (!itemStock) return false;
 
         return (
-            itemStock?.status !== "Interno" &&
-            itemStock?.totalCostOfDepartures > itemStock?.consignmentPrice
+            itemStock.itemStockType !== "Interno" &&
+            itemStock.totalValueOfOutputs > itemStock.consignmentValue
         );
     };
 
     return {
         listItemsStock,
         findItemStock,
-        updateItemStockStatus,
+        enableItemStockToInternalUse: updateItemStockStatus,
         isInternalItemStock,
     };
 }

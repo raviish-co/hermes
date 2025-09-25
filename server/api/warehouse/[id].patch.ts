@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    const voidOrErr = await service.updateItemStockStatus(itemId);
+    const voidOrErr = await service.enableItemInStockToInternalUse(itemId);
 
     if (voidOrErr.value instanceof ItemStockNotFound) {
         throw createError({
@@ -30,5 +30,5 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    return { message: "Item actualizado com sucesso" };
+    return { message: "Item habilitado para uso interno com sucesso" };
 });

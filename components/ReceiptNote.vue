@@ -5,6 +5,7 @@ import type { NoteLine } from "~/lib/frontend/domain/note_line";
 
 const describeConditionRef = ref<typeof DescribeCondition>();
 const addLineDialogRef = ref<typeof AddLineDialog>();
+const rootPath = useRoute().path;
 
 function showDecribeCondition(line: NoteLine) {
     describeConditionRef.value?.initializeCondition(line.itemId, line.condition);
@@ -26,8 +27,8 @@ defineProps<{ note: GoodsReceiptNote }>();
                     <tr class="text-left">
                         <th class="min-w-20 w-20">Id</th>
                         <th class="min-w-64 w-64">Artigo</th>
-                        <th class="min-w-64 w-64">Preço de Consignação</th>
                         <th class="min-w-20 w-20 text-center">Qtd</th>
+                        <th class="min-w-64 w-64">Valor de Consignação</th>
                         <th class="min-w-8 w-8"></th>
                     </tr>
                 </thead>
@@ -46,22 +47,24 @@ defineProps<{ note: GoodsReceiptNote }>();
                         </td>
 
                         <td>
-                            <input
-                                type="number"
-                                class="input-number text-center"
-                                placeholder="Preço de Consignação"
-                                min="1000"
-                                :value="line.consignmentPrice"
-                                @input="line.changeConsignmentPrice(line.consignmentPrice)"
-                                :required="true"
+                            <ChooseQuantity
+                                :disabled="line.isConsignment"
+                                :initital="1"
+                                :model-value="line.quantity"
+                                @update-quantity="note.changeQuantity(line.itemId, $event)"
                             />
                         </td>
 
                         <td>
-                            <ChooseQuantity
-                                :initital="1"
-                                :model-value="line.quantity"
-                                @update-quantity="note.changeQuantity(line.itemId, $event)"
+                            <input
+                                type="number"
+                                class="input-number text-center"
+                                placeholder="Preço de Consignação"
+                                :disabled="!line.isConsignment"
+                                min="0"
+                                :value="line.consignmentValue"
+                                @input="line.changeConsignmentValue(line.consignmentValue)"
+                                :required="true"
                             />
                         </td>
 
@@ -77,7 +80,7 @@ defineProps<{ note: GoodsReceiptNote }>();
         </div>
     </VNote>
 
-    <AddLineDialog ref="addLineDialogRef" :note="note" :has-limit="false" />
+    <AddLineDialog ref="addLineDialogRef" :note="note" :has-limit="false" :rootPath="rootPath" />
 
     <DescribeCondition ref="describeConditionRef" :note="note" />
 </template>

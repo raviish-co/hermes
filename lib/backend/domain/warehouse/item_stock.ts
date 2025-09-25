@@ -1,24 +1,30 @@
 import type { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
+import { ItemStockType } from "./item_stock_type";
 
 export class ItemStock {
     #itemStockId: ID;
     #itemId: ID;
     #goodQuantities: number;
     #badQuantities: number;
-    #isconsignment?: boolean;
+    #itemStockType: string;
+    #consignmentValue: number;
+    #totalValueOfOutputs: number = 0;
 
     constructor(
         itemId: ID,
         goodQuantities: number,
         badQuantities?: number,
-        isConsignment?: boolean
+        itemStockType?: string,
+        consignmentValue?: number
     ) {
         this.#itemStockId = ID.random();
         this.#itemId = itemId;
         this.#goodQuantities = goodQuantities;
         this.#badQuantities = badQuantities ?? 0;
-        this.#isconsignment = isConsignment;
+        this.#itemStockType = this.#getItemStockType(itemStockType);
+        this.#consignmentValue = consignmentValue ?? 0;
+        this.#totalValueOfOutputs = 0;
     }
 
     static create(itemId: ID): ItemStock {
@@ -66,6 +72,28 @@ export class ItemStock {
         return true;
     }
 
+    calculateTotalValueOfOutputs(itemPrice: Decimal): void {
+        this.#totalValueOfOutputs += itemPrice.value;
+    }
+
+    #getItemStockType(itemStockType?: string): string {
+        if (itemStockType === ItemStockType.Consignacao) {
+            return ItemStockType.Consignacao;
+        }
+
+        return "";
+    }
+
+    isTotalValueOfOutputsGreaterThan(consignmentValue?: number): boolean {
+        if (!consignmentValue) return false;
+
+        return this.#totalValueOfOutputs > consignmentValue;
+    }
+
+    enableItemInStockToInternal(): void {
+        this.#itemStockType = ItemStockType.Interno;
+    }
+
     get itemStockId(): ID {
         return this.#itemStockId;
     }
@@ -86,7 +114,15 @@ export class ItemStock {
         return this.#badQuantities;
     }
 
-    get isConsignment(): boolean | undefined {
-        return this.#isconsignment;
+    get itemStockType(): string {
+        return this.#itemStockType;
+    }
+
+    get consignmentValue(): number {
+        return this.#consignmentValue;
+    }
+
+    get totalValueOfOutputs(): number {
+        return this.#totalValueOfOutputs;
     }
 }

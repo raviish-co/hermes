@@ -9,7 +9,10 @@ import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_v
 interface Props {
     note: Note;
     hasLimit?: boolean;
+    rootPath?: string;
 }
+
+const consignmentItemsSelected = ref<boolean[]>([]);
 
 const dialogRef = ref<typeof VDialog>();
 const searchText = ref<string>("");
@@ -34,6 +37,7 @@ function listItems(pageToken: number = 1) {
         items.value = i;
         pages.value = total;
         quantities.value = initializeQuantities(items.value.length);
+        consignmentItemsSelected.value = i.map(() => false);
     });
 }
 
@@ -49,6 +53,7 @@ function searchItems(pageToken: number = 1) {
         items.value = i;
         pages.value = total;
         quantities.value = initializeQuantities(items.value.length);
+        consignmentItemsSelected.value = i.map(() => false);
     });
 }
 
@@ -83,6 +88,12 @@ onMounted(() => warehouse.listItemsStock());
                         <th class="min-w-36 w-36">Nome</th>
                         <th class="min-w-16 w-16 text-center">Stock</th>
                         <th class="min-w-12 w-12 md:w-16 text-center">QTD</th>
+                        <th
+                            v-if="rootPath === '/goods-receipts/register'"
+                            class="min-w-12 w-12 md:w-16 text-center"
+                        >
+                            Consignação
+                        </th>
                     </tr>
                 </thead>
 
@@ -99,11 +110,12 @@ onMounted(() => warehouse.listItemsStock());
                                 note.addLine(
                                     item,
                                     quantities[idx],
-                                    warehouse.findItemStock(item.itemId)?.total
+                                    warehouse.findItemStock(item.itemId)?.total,
+                                    consignmentItemsSelected[idx]
                                 )
                             "
                         >
-                            <span>{{ item.name }}</span>
+                            <span>{{ item.name }} </span>
                             <br />
                             <span class="text-light-600 text-xs sm:text-sm">
                                 {{ formatVariationValues(item?.variationsValues) }}
@@ -131,6 +143,7 @@ onMounted(() => warehouse.listItemsStock());
                                 type="number"
                                 placeholder="QTD"
                                 min="0"
+                                :disabled="consignmentItemsSelected[idx]"
                                 class="input-number text-center"
                                 :max="
                                     hasLimit
@@ -153,9 +166,20 @@ onMounted(() => warehouse.listItemsStock());
                                 "
                             />
                         </td>
+                        <td class="text-center" v-if="rootPath === '/goods-receipts/register'">
+                            <input
+                                v-if="
+                                    !warehouse.findItemStock(item.itemId) ||
+                                    warehouse.findItemStock(item.itemId)?.total === 0
+                                "
+                                type="checkbox"
+                                v-model="consignmentItemsSelected[idx]"
+                                class="w-4 h-4"
+                            />
+                        </td>
                     </tr>
                     <tr v-if="items.length === 0">
-                        <td colspan="3">Nenhum artigo encontrado</td>
+                        <td colspan="4">Nenhum artigo encontrado</td>
                     </tr>
                 </tbody>
             </table>

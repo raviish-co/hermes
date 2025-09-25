@@ -3,6 +3,7 @@ interface Props {
     modelValue?: number;
     initital?: number;
     limit?: number;
+    disabled?: boolean;
 }
 
 interface Emits {
@@ -36,6 +37,7 @@ function updateQuantity(e: Event) {
         type="number"
         class="input-number text-center"
         placeholder="QTD"
+        :disabled="disabled"
         min="1"
         :value="modelValue ? modelValue : 1"
         :max="limit"
