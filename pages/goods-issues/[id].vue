@@ -51,6 +51,11 @@ function newGoodsReturn() {
         .then((res) => alert(res.message))
         .catch((err) => alert(err.statusMessage));
 }
+
+const userAuthenticatedName = ref<string>("");
+onMounted(async () => {
+    userAuthenticatedName.value = await auth.getName();
+});
 </script>
 
 <template>
@@ -70,7 +75,7 @@ function newGoodsReturn() {
 
         <section class="space-y-4 mb-4">
             <div class="input-container">
-                <div class="input-disabled">{{ auth.getName() }}</div>
+                <div class="input-disabled">{{ userAuthenticatedName }}</div>
                 <div class="input-disabled">
                     {{ goodsIssueNote.returnDate ? formatDate(goodsIssueNote.returnDate) : "" }}
                 </div>

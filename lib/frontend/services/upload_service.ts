@@ -4,7 +4,7 @@ export class ImportService {
     async importItems(formData: FormData) {
         return await $fetch("/api/items/upload", {
             method: "POST",
-            headers: this.headers,
+            headers: await this.#headers(),
             body: formData,
         });
     }
@@ -12,14 +12,14 @@ export class ImportService {
     async importItemsStock(formData: FormData) {
         return await $fetch("/api/goods-receipt/upload", {
             method: "POST",
-            headers: this.headers,
+            headers: await this.#headers(),
             body: formData,
         });
     }
 
-    get headers() {
+    async #headers() {
         return {
-            "X-Access-Token": auth.getToken(),
+            "X-Access-Token": await auth.getAccessToken(),
             "Context-Type": "multipart/form-data",
         };
     }

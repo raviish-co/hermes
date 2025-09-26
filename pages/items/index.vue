@@ -5,6 +5,7 @@ import { formatCurrency } from "~/lib/frontend/helpers/format_currency";
 const criteria = ref<string>("");
 const catalog = useCatalog();
 const warehouse = useWarehouse();
+const auth = useAuth();
 
 const selectedItemId = ref<string>("");
 const seletedItemName = ref<string>("");
@@ -40,6 +41,8 @@ function show() {
 }
 
 onMounted(async () => {
+    await auth.checkAuth();
+
     catalog.listItems();
     await warehouse.listItemsStock();
 });

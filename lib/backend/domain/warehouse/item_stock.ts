@@ -35,9 +35,17 @@ export class ItemStock {
         itemStockId: string,
         itemId: string,
         goodQuantities: number,
-        badQuantities: number
+        badQuantities: number,
+        itemStockType: string,
+        consignmentValue: number
     ): ItemStock {
-        const itemStock = new ItemStock(ID.fromString(itemId), goodQuantities, badQuantities);
+        const itemStock = new ItemStock(
+            ID.fromString(itemId),
+            goodQuantities,
+            badQuantities,
+            itemStockType,
+            consignmentValue
+        );
         itemStock.#itemStockId = ID.fromString(itemStockId);
         return itemStock;
     }

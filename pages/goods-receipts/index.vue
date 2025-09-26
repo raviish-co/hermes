@@ -6,7 +6,10 @@ import { formatDate } from "~/lib/frontend/helpers/format_date";
 const goodsReceiptService = new GoodsReceiptService();
 const notes = ref<GoodsReceiptNoteModel[]>([]);
 
+const auth = useAuth();
+
 onMounted(async () => {
+    await auth.checkAuth();
     notes.value = await goodsReceiptService.getAll();
 });
 </script>

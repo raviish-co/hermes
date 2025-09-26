@@ -22,6 +22,11 @@ function clear() {
     note.clear();
     wasSubmitted.value = false;
 }
+
+const userAuthenticatedName = ref<string>("");
+onMounted(async () => {
+    userAuthenticatedName.value = await auth.getName();
+});
 </script>
 
 <template>
@@ -30,7 +35,7 @@ function clear() {
 
         <section class="space-y-4 mb-4">
             <div class="input-container">
-                <div class="input-disabled">{{ auth.getName() }}</div>
+                <div class="input-disabled">{{ userAuthenticatedName }}</div>
                 <input v-model="note.returnDate" type="datetime-local" class="input-field" />
             </div>
 

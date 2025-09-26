@@ -1,3 +1,4 @@
+import { a } from "vitest/dist/suite-IbNSsUWN.js";
 import type { GoodsIssueNote } from "../domain/goods_issue_note";
 import type { GoodsIssueNoteLine } from "../domain/goods_issue_note_line";
 import type { GoodsIssueNoteModel } from "../models/goods_issue_note";
@@ -6,11 +7,11 @@ const auth = useAuth();
 
 export class GoodsIssueService {
     async new(note: GoodsIssueNote) {
-        const data = this.#toNoteDTO(note);
+        const data = await this.#toNoteDTO(note);
 
         return await $fetch("/api/goods-issue", {
             method: "post",
-            headers: this.headers,
+            headers: await this.#headers(),
             body: { data },
         });
     }
@@ -18,7 +19,7 @@ export class GoodsIssueService {
     async getById(noteId: string): Promise<GoodsIssueNoteModel> {
         const data = await $fetch<GoodsIssueNoteModel>(`/api/goods-issue/${noteId}`, {
             method: "get",
-            headers: this.headers,
+            headers: await this.#headers(),
         });
 
         return this.#toGoodsIssueNoteModel(data);
@@ -27,7 +28,7 @@ export class GoodsIssueService {
     async list(): Promise<GoodsIssueNoteModel[]> {
         const notes = await $fetch("/api/goods-issue/", {
             method: "get",
-            headers: this.headers,
+            headers: await this.#headers(),
         });
         return notes.map(this.#toGoodsIssueNoteModel);
     }
@@ -36,7 +37,7 @@ export class GoodsIssueService {
         const notes = await $fetch("/api/goods-issue/search/", {
             method: "get",
             query: { query },
-            headers: this.headers,
+            headers: await this.#headers(),
         });
         return notes.map(this.#toGoodsIssueNoteModel);
     }
@@ -50,13 +51,13 @@ export class GoodsIssueService {
         };
     }
 
-    #toNoteDTO(note: GoodsIssueNote): NoteDTO {
+    async #toNoteDTO(note: GoodsIssueNote): Promise<NoteDTO> {
         return {
             total: note.grossTotal,
             returnDate: note.returnDate,
             purpose: note.purpose,
             lines: note.lines.map(this.#toNoteLine),
-            userId: auth.getUsername(),
+            userId: await auth.getUsername(),
         };
     }
 
@@ -76,9 +77,9 @@ export class GoodsIssueService {
         };
     }
 
-    get headers() {
+    async #headers() {
         return {
-            "X-Access-Token": auth.getToken(),
+            "X-Access-Token": await auth.getAccessToken(),
         };
     }
 }

@@ -1,8 +1,7 @@
 import type { UserModel } from "~/lib/frontend/models/user";
 
-const USERNAME_KEY = "raviish::username";
-const TOKEN_KEY = "raviiish::token";
 const NAME_KEY = "raviish::name";
+const USERNAME_KEY = "raviish::username";
 
 export function useAuth() {
     const isAuthenticated = ref<boolean>(false);
@@ -17,8 +16,8 @@ export function useAuth() {
         window.location.assign("/auth/login");
     };
 
-    const checkAuth = () => {
-        const user = getUser();
+    const checkAuth = async () => {
+        const user = await getUser();
         if (!user) {
             isAuthenticated.value = false;
             return;
@@ -28,17 +27,12 @@ export function useAuth() {
         return;
     };
 
-    const getToken = () => {
-        const user = getUser();
-        if (!user) {
-            return "";
-        }
-
-        return user.token;
+    const getAccessToken = () => {
+        return getAccessTokenWithFetch();
     };
 
-    const getName = () => {
-        const user = getUser();
+    const getName = async () => {
+        const user = await getUser();
         if (!user) {
             return "";
         }
@@ -46,8 +40,8 @@ export function useAuth() {
         return user.name;
     };
 
-    const getUsername = () => {
-        const user = getUser();
+    const getUsername = async () => {
+        const user = await getUser();
         if (!user) {
             return "";
         }
@@ -60,25 +54,43 @@ export function useAuth() {
         login,
         logout,
         checkAuth,
-        getToken,
+        getAccessToken,
         getName,
         getUsername,
     };
 }
 
-function getUser() {
+const getAccessTokenWithFetch = async () => {
+    const data = await $fetch("/api/auth/access-token", {
+        method: "GET",
+    });
+
+    if (!data) {
+        return "";
+    }
+
+    return data.accessToken as string;
+};
+
+const deleteAccessToken = () => {
+    $fetch("/api/auth/access-token", {
+        method: "POST",
+    });
+};
+
+async function getUser() {
     if (!import.meta.client) {
         return;
     }
 
-    const username = localStorage.getItem(USERNAME_KEY);
-    const token = localStorage.getItem(TOKEN_KEY);
     const name = localStorage.getItem(NAME_KEY);
+    const username = localStorage.getItem(USERNAME_KEY);
+    const accessToken = await getAccessTokenWithFetch();
 
-    if (username && token && name) {
+    if (username && accessToken && name) {
         return {
             username,
-            token,
+            accessToken,
             name,
         };
     }
@@ -86,12 +98,11 @@ function getUser() {
 
 function save(user: UserModel) {
     localStorage.setItem(USERNAME_KEY, user.username);
-    localStorage.setItem(TOKEN_KEY, user.token);
     localStorage.setItem(NAME_KEY, user.name);
 }
 
 function remove() {
     localStorage.removeItem(USERNAME_KEY);
-    localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(NAME_KEY);
+    deleteAccessToken();
 }

@@ -14,14 +14,14 @@ export class GoodsReturnService {
         return await $fetch("/api/goods-return", {
             method: "post",
             body: data,
-            headers: this.headers,
+            headers: await this.#headers(),
         });
     }
 
     async getById(noteId: string): Promise<GoodsReturnNoteModel> {
         const response = await $fetch<GoodsReturnNoteModel>(`/api/goods-return/${noteId}`, {
             method: "get",
-            headers: this.headers,
+            headers: await this.#headers(),
         });
 
         return {
@@ -36,7 +36,7 @@ export class GoodsReturnService {
     async list(): Promise<GoodsReturnNoteModel[]> {
         const response = await $fetch<GoodsReturnNoteModel[]>(`/api/goods-return`, {
             method: "get",
-            headers: this.headers,
+            headers: await this.#headers(),
         });
 
         return response.map((data) => ({
@@ -57,9 +57,9 @@ export class GoodsReturnService {
         };
     }
 
-    get headers() {
+    async #headers() {
         return {
-            "X-Access-Token": auth.getToken(),
+            "X-Access-Token": await auth.getAccessToken(),
         };
     }
 }

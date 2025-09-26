@@ -15,8 +15,8 @@ function toggleMenu() {
     visibility.value = !visibility.value;
 }
 
-onMounted(() => {
-    auth.checkAuth();
+onMounted(async () => {
+    await auth.checkAuth();
 });
 </script>
 

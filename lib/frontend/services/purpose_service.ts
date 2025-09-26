@@ -6,7 +6,7 @@ export class PurposeService {
     async listPurposes(): Promise<PurposeSpecificationModel[]> {
         const purposes = await $fetch("/api/purpose-specifications", {
             method: "get",
-            headers: this.headers,
+            headers: await this.#headers(),
         });
         return purposes.map(this.#toPurposeSpecificationModel);
     }
@@ -19,9 +19,9 @@ export class PurposeService {
         };
     }
 
-    get headers() {
+    async #headers() {
         return {
-            "X-Access-Token": auth.getToken(),
+            "X-Access-Token": await auth.getAccessToken(),
         };
     }
 }

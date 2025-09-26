@@ -10,11 +10,13 @@ const auth = useAuth();
 
 const noteId = route.params.id as string;
 const note = ref<GoodsReturnNoteModel>();
+const userAuthenticatedName = ref<string>("");
 
 const service = new GoodsReturnService();
 
 onMounted(async () => {
     note.value = await service.getById(noteId);
+    userAuthenticatedName.value = await auth.getName();
 });
 </script>
 <template>
@@ -23,7 +25,7 @@ onMounted(async () => {
             <h1 class="page-title">Guia de Devolução de Artigos #{{ note?.goodsReturnNoteId }}</h1>
             <section class="space-y-4 mb-4">
                 <div class="input-container">
-                    <div class="input-disabled">{{ auth.getName() }}</div>
+                    <div class="input-disabled">{{ userAuthenticatedName }}</div>
                     <div class="input-disabled">{{ note ? formatDate(note.issuedAt) : "" }}</div>
                 </div>
 

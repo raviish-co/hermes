@@ -1,7 +1,9 @@
 <script setup lang="ts">
 const catalog = useCatalog();
+const auth = useAuth();
 
 onMounted(async () => {
+    await auth.checkAuth();
     catalog.listCategories();
     catalog.listVariations();
 });

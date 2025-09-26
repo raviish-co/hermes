@@ -7,6 +7,7 @@ import { GoodsIssueService } from "~/lib/frontend/services/goods_issue_service";
 const criteria = ref<string>("");
 const notes = ref<GoodsIssueNoteModel[]>([]);
 const service = new GoodsIssueService();
+const auth = useAuth();
 
 function formatPurpose(purpose: PurposeModel) {
     return Object.values(purpose)
@@ -25,6 +26,7 @@ async function search() {
 }
 
 onMounted(async () => {
+    await auth.checkAuth();
     notes.value = await service.list();
 });
 </script>

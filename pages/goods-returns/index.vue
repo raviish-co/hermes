@@ -5,11 +5,13 @@ import { formatCurrency } from "~/lib/frontend/helpers/format_currency";
 import { formatDate } from "~/lib/frontend/helpers/format_date";
 
 const route = useRoute();
+const auth = useAuth();
 const noteId = route.query.q as string;
 const notes = ref<GoodsReturnNoteModel[]>([]);
 const service = new GoodsReturnService();
 
 onMounted(async () => {
+    await auth.checkAuth();
     notes.value = await service.list();
 
     if (!noteId) return notes;

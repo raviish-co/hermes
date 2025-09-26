@@ -6,14 +6,14 @@ export class DashboardService {
     async getStatistics(): Promise<DashboardModel> {
         const result = await $fetch("/api/dashboard", {
             method: "get",
-            headers: this.headers,
+            headers: await this.#headers(),
         });
         return result;
     }
 
-    get headers() {
+    async #headers() {
         return {
-            "X-Access-Token": auth.getToken(),
+            "X-Access-Token": await auth.getAccessToken(),
         };
     }
 }

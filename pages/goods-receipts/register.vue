@@ -4,9 +4,11 @@ import { GoodsReceiptService } from "~/lib/frontend/services/goods_receipt_servi
 import { GoodsReceiptNote } from "~/lib/frontend/domain/goods_receipt_note";
 
 const entryDate = getCurrentLocalDateTime();
+const userAuthenticatedName = ref<string>("");
+const auth = useAuth();
+
 const note = reactive(new GoodsReceiptNote(entryDate));
 const service = new GoodsReceiptService();
-const auth = useAuth();
 
 function newGoodsReceipt() {
     service
@@ -17,6 +19,10 @@ function newGoodsReceipt() {
         })
         .catch((err) => alert(err.statusMessage));
 }
+
+onMounted(async () => {
+    userAuthenticatedName.value = await auth.getName();
+});
 </script>
 
 <template>
@@ -25,7 +31,7 @@ function newGoodsReceipt() {
 
         <section class="space-y-4 mb-4">
             <div class="input-container">
-                <div class="input-disabled">{{ auth.getName() }}</div>
+                <div class="input-disabled">{{ userAuthenticatedName }}</div>
                 <input v-model="note.entryDate" type="datetime-local" class="input-field" />
             </div>
         </section>

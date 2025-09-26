@@ -2,9 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { AuthService } from "../../application/auth_service";
 import { AuthenticationFailed } from "../../domain/auth/authentication_failed_error";
 import { InvalidTokenError } from "../../domain/auth/invalid_token_error";
-import type {
-    TokenGenerator,
-} from "../../domain/auth/token_generator";
+import type { TokenGenerator } from "../../domain/auth/token_generator";
 import { User } from "../../domain/auth/user";
 import { UserNotFound } from "../../domain/auth/user_not_found";
 import type { UserRepository } from "../../domain/auth/user_repository";
@@ -21,7 +19,7 @@ describe("Auth Service - Login", async () => {
 
         expect(output.isRight()).toBeTruthy();
         expect(output.value).toEqual({
-            token: "token",
+            accessToken: "token",
             username: "johndoe123",
             name: "John Doe",
         });
@@ -67,19 +65,19 @@ describe("Auth Service - Login", async () => {
         expect(output.value).toEqual({
             username: "johndoe123",
             name: "John Doe",
-            token: "token",
+            accessToken: "token",
         });
     });
 
     it("Deve fazer login com o OTP password", async () => {
         const { service } = makeService();
 
-        const output = await service.login("johndoe123", "0000")
+        const output = await service.login("johndoe123", "0000");
 
         expect(output.isRight()).toBeTruthy();
-    })
+    });
 
-    it("Deve remover o OTP depois do autenticação ser efectuada com sucesso", async() => {
+    it("Deve remover o OTP depois do autenticação ser efectuada com sucesso", async () => {
         const { service, otpStorage } = makeService();
 
         await service.login("johndoe123", "0000");
@@ -87,7 +85,7 @@ describe("Auth Service - Login", async () => {
         const otp = otpStorage.get("johndoe123");
 
         expect(otp).toBeUndefined();
-    })
+    });
 
     it("Deve retornar **AuthenticationFailed** quando não encontrar o OTP", async () => {
         const { service, otpStorage } = makeService();
@@ -97,7 +95,7 @@ describe("Auth Service - Login", async () => {
 
         expect(output.isLeft()).toBeTruthy();
         expect(output.value).toBeInstanceOf(AuthenticationFailed);
-    })
+    });
 
     it("Deve retornar **AuthenticationFailed** quando o OTP for inválido", async () => {
         const { service } = makeService();
@@ -106,7 +104,7 @@ describe("Auth Service - Login", async () => {
 
         expect(output.isLeft()).toBeTruthy();
         expect(output.value).toBeInstanceOf(AuthenticationFailed);
-    })
+    });
 });
 
 describe("Auth Service - VerifyToken", async () => {
@@ -125,7 +123,7 @@ describe("Auth Service - VerifyToken", async () => {
     it("Deve retornar **InvalidToken** quando o token não for válido", async () => {
         const tokenGenerator = new TokenGeneratorStub();
         vi.spyOn(tokenGenerator, "verify").mockReturnValue(
-            Promise.resolve({ username: "--empty--", isValid: false }),
+            Promise.resolve({ username: "--empty--", isValid: false })
         );
         const { service } = makeService(tokenGenerator);
 
@@ -138,7 +136,7 @@ describe("Auth Service - VerifyToken", async () => {
     it("Deve retornar o username com base no token a ser verificado", async () => {
         const tokenGenerator = new TokenGeneratorStub();
         vi.spyOn(tokenGenerator, "verify").mockReturnValue(
-            Promise.resolve({ username: "john.doe", isValid: true }),
+            Promise.resolve({ username: "john.doe", isValid: true })
         );
         const { service } = makeService();
 
@@ -161,7 +159,7 @@ describe("Auth Service - Generate OTP", async () => {
         const otp = otpStorage.get("johndoe123");
 
         expect(otp).toHaveLength(4);
-    })
+    });
 
     it("Deve enviar o OTP para o Utilizador", async () => {
         const { service, otpSender, otpStorage } = makeService();
@@ -175,7 +173,7 @@ describe("Auth Service - Generate OTP", async () => {
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledOnce();
         expect(spy).toHaveBeenCalledWith("911000011", otp);
-    })
+    });
 
     it("Deve retornar o erro **UserNotFound** caso o utilizador não for encontrado", async () => {
         const { service } = makeService();
@@ -184,7 +182,7 @@ describe("Auth Service - Generate OTP", async () => {
 
         expect(err.isLeft()).toBeTruthy();
         expect(err.value).toBeInstanceOf(UserNotFound);
-    })
+    });
 });
 
 function makeService(tokenGenerator?: TokenGenerator) {
@@ -195,20 +193,20 @@ function makeService(tokenGenerator?: TokenGenerator) {
 
     const otpSender = new ConsoleOtpSender();
 
-    const otpStorage = new InmemOtpStorage()
+    const otpStorage = new InmemOtpStorage();
     otpStorage.save("johndoe123", "0000");
 
     const service = new AuthService(
         userRepository,
         tokenGenerator ?? new TokenGeneratorStub(),
         otpStorage,
-        otpSender,
+        otpSender
     );
 
     return {
         service,
         userRepository,
         otpStorage,
-        otpSender
+        otpSender,
     };
 }

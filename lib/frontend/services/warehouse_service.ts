@@ -6,20 +6,20 @@ export class WarehouseService {
     async updateItemStockStatus(itemId: string) {
         return await $fetch(`/api/warehouse/${itemId}`, {
             method: "patch",
-            headers: this.headers,
+            headers: await this.#headers(),
         });
     }
 
     async listItemStock(): Promise<ItemStockModel[]> {
         return await $fetch("/api/warehouse/items-stock", {
             method: "get",
-            headers: this.headers,
+            headers: await this.#headers(),
         });
     }
 
-    get headers() {
+    async #headers() {
         return {
-            "X-Access-Token": auth.getToken(),
+            "X-Access-Token": await auth.getAccessToken(),
         };
     }
 }

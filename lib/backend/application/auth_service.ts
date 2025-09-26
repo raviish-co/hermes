@@ -43,9 +43,9 @@ export class AuthService {
 
         if (!isValid) return left(new AuthenticationFailed());
 
-        const token = await this.#tokenGenerator.generate(username);
+        const accessToken = await this.#tokenGenerator.generate(username);
 
-        return right({ username, token, name: userOrErr.value.name });
+        return right({ username, accessToken, name: userOrErr.value.name });
     }
 
     async generateOtp(username: string): Promise<Either<UserNotFound, void>> {
@@ -77,5 +77,5 @@ function generateCode() {
 export type UserDTO = {
     username: string;
     name: string;
-    token: string;
+    accessToken: string;
 };

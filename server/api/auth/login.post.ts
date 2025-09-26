@@ -7,15 +7,23 @@ const service = useAuthService();
 export default defineEventHandler(async (event) => {
     const data = await readBody(event);
 
-    const tokenOrErr = await service.login(data.username, data.password);
+    const userOrErr = await service.login(data.username, data.password);
 
-    if (tokenOrErr.value instanceof AuthenticationFailed) {
+    if (userOrErr.value instanceof AuthenticationFailed) {
         throw createError({ statusCode: HttpStatus.Unauthorized });
     }
 
-    if (tokenOrErr.value instanceof Error) {
+    if (userOrErr.value instanceof Error) {
         throw createError({ statusCode: HttpStatus.ServerError });
     }
 
-    return tokenOrErr.value;
+    setCookie(event, "raviish::access-token", userOrErr.value.accessToken, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: true,
+        maxAge: 60 * 60,
+        path: "/",
+    });
+
+    return { name: userOrErr.value.name, username: userOrErr.value.username };
 });

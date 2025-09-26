@@ -7,19 +7,19 @@ const auth = useAuth();
 
 export class GoodsReceiptService {
     async new(note: GoodsReceiptNote) {
-        const data = this.#toGoodsReceiptDTO(note);
+        const data = await this.#toGoodsReceiptDTO(note);
 
         return await $fetch("/api/goods-receipt", {
             method: "post",
             body: { data },
-            headers: this.headers,
+            headers: await this.#headers(),
         });
     }
 
     async getAll(): Promise<GoodsReceiptNoteModel[]> {
         const notes = await $fetch("/api/goods-receipt", {
             method: "get",
-            headers: this.headers,
+            headers: await this.#headers(),
         });
         return notes.map(this.#toGoodsReceiptModel);
     }
@@ -43,17 +43,17 @@ export class GoodsReceiptService {
         };
     }
 
-    #toGoodsReceiptDTO(note: GoodsReceiptNote): NoteDTO {
+    async #toGoodsReceiptDTO(note: GoodsReceiptNote): Promise<NoteDTO> {
         return {
+            userId: await auth.getUsername(),
             entryDate: note.entryDate,
-            userId: auth.getUsername(),
             lines: note.lines.map(this.#toGoodsReceiptLineDTO),
         };
     }
 
-    get headers() {
+    async #headers() {
         return {
-            "X-Access-Token": auth.getToken(),
+            "X-Access-Token": await auth.getAccessToken(),
         };
     }
 }

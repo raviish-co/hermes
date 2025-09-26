@@ -16,7 +16,7 @@ export class CatalogService {
                 pageToken,
                 perPage,
             },
-            headers: this.headers,
+            headers: await this.#headers(),
         });
 
         return { items: response.items, total: response.total };
@@ -25,7 +25,7 @@ export class CatalogService {
     async listVariations(): Promise<VariationModel[]> {
         const variations = await $fetch("/api/variations", {
             method: "get",
-            headers: this.headers,
+            headers: await this.#headers(),
         });
         return variations;
     }
@@ -33,7 +33,7 @@ export class CatalogService {
     async listCategories(): Promise<CategoryModel[]> {
         const categories = await $fetch("/api/categories", {
             method: "get",
-            headers: this.headers,
+            headers: await this.#headers(),
         });
         return categories;
     }
@@ -41,7 +41,7 @@ export class CatalogService {
     async listSections(): Promise<SectionModel[]> {
         const sections = await $fetch("/api/sections", {
             method: "get",
-            headers: this.headers,
+            headers: await this.#headers(),
         });
         return sections;
     }
@@ -58,7 +58,7 @@ export class CatalogService {
                 pageToken,
                 perPage,
             },
-            headers: this.headers,
+            headers: await this.#headers(),
         });
 
         return { items: response.items, total: response.total };
@@ -67,7 +67,7 @@ export class CatalogService {
     async getItem(itemId: string): Promise<ItemModel> {
         const item = await $fetch(`/api/items/${itemId}`, {
             method: "get",
-            headers: this.headers,
+            headers: await this.#headers(),
         });
         return this.#toItemModel(item);
     }
@@ -76,7 +76,7 @@ export class CatalogService {
         return await $fetch("/api/items", {
             method: "post",
             body: data,
-            headers: this.headers,
+            headers: await this.#headers(),
         });
     }
 
@@ -84,7 +84,7 @@ export class CatalogService {
         return await $fetch(`/api/items/${itemId}`, {
             method: "post",
             body: data,
-            headers: this.headers,
+            headers: await this.#headers(),
         });
     }
 
@@ -93,13 +93,13 @@ export class CatalogService {
         return await $fetch("/api/categories", {
             method: "post",
             body: data,
-            headers: this.headers,
+            headers: await this.#headers(),
         });
     }
 
-    get headers() {
+    async #headers() {
         return {
-            "X-Access-Token": auth.getToken(),
+            "X-Access-Token": await auth.getAccessToken(),
         };
     }
 

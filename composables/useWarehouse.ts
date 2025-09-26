@@ -24,7 +24,7 @@ export function useWarehouse() {
         if (!itemStock) return false;
 
         return (
-            itemStock.itemStockType !== "Interno" &&
+            itemStock.itemStockType === "Consignação" &&
             itemStock.totalValueOfOutputs > itemStock.consignmentValue
         );
     };
