@@ -79,8 +79,8 @@ model GoodsReceiptNoteLine {
   goodQuantities   Int              @default(0) @map("good_quantities")
   badQuantities    Int              @default(0) @map("bad_quantities")
   comments         String?
-  consignmentPrice Float            @map("consignment_price")
-  itemStatus       String           @map("item_status")       
+  consignmentValue Float            @default(0) @map("consignment_value")
+  itemStockType    String           @default("") @map("item_stock_type")       
 
   @@map("goods_receipt_note_lines")
 }
@@ -158,22 +158,15 @@ model GoodsReturnNoteLine {
   @@map("goods_return_lines")
 }
 
-enum ProductStatus {
-  INTERNO     @map("Interno")
-  CONSIGNACAO @map("Consignação")
-  
-  @@map("product_status")
-}
-
 model Stock {
   stockId               String        @id @unique @map("stock_id")
   product               Product       @relation(fields: [productId], references: [productId])
   productId             String        @unique @map("product_id")
   goodQuantities        Int           @default(0) @map("good_quantities")
   badQuantities         Int           @default(0) @map("bad_quantities")
-  consignmentPrice      Float         @map("consignment_price")
-  totalCostOfDepartures Float         @default(0) @map("total_cost_of_departures")  
-  status                ProductStatus @default(CONSIGNACAO)
+  consignmentValue      Float         @map("consignment_value")
+  totalValueOfOutputs   Float         @default(0) @map("total_value_of_outputs")  
+  itemStockType         String        @default("") @map("item_stock_type")
 
   @@map("stock_of_products")
 }
