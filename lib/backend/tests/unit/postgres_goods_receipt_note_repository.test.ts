@@ -27,6 +27,8 @@ describe("PostgresGoodsReceiptNoteRepository - save", () => {
                             goodQuantities: line.goodQuantities,
                             badQuantities: line.badQuantities,
                             comments: line.condition.comment,
+                            consignmentValue: line.consignmentValue,
+                            itemStockType: line.itemStockType,
                         })),
                     },
                 },
@@ -39,8 +41,6 @@ describe("PostgresGoodsReceiptNoteRepository - save", () => {
         const spy = vi.spyOn(prisma.goodsReceiptNote, "create");
 
         await noteRepository.save(note);
-
-        console.log(spy.mock.calls[0][0].data.lines?.createMany?.data);
 
         expect(spy).toHaveBeenCalledWith({
             data: {
@@ -55,6 +55,8 @@ describe("PostgresGoodsReceiptNoteRepository - save", () => {
                             goodQuantities: line.goodQuantities,
                             badQuantities: line.badQuantities,
                             comments: line.condition.comment,
+                            consignmentValue: line.consignmentValue,
+                            itemStockType: line.itemStockType,
                         })),
                     },
                 },
@@ -81,6 +83,8 @@ describe("PostgresGoodsReceiptNoteRepository - save", () => {
                             goodQuantities: line.goodQuantities,
                             badQuantities: line.badQuantities,
                             comments: line.condition.comment,
+                            consignmentValue: line.consignmentValue,
+                            itemStockType: line.itemStockType,
                         })),
                     },
                 },
@@ -107,6 +111,8 @@ describe("PostgresGoodsReceiptNoteRepository - save", () => {
                             goodQuantities: line.goodQuantities,
                             badQuantities: line.badQuantities,
                             comments: line.condition.comment,
+                            consignmentValue: line.consignmentValue,
+                            itemStockType: line.itemStockType,
                         })),
                     },
                 },
@@ -133,6 +139,8 @@ describe("PostgresGoodsReceiptNoteRepository - save", () => {
                             goodQuantities: line.goodQuantities,
                             badQuantities: line.badQuantities,
                             comments: line.condition.comment,
+                            consignmentValue: line.consignmentValue,
+                            itemStockType: line.itemStockType,
                         })),
                     },
                 },
@@ -169,7 +177,7 @@ describe("PostgresGoodsReceiptNoteRepository - getAll", () => {
 const noteLines: GoodsReceiptNoteLine[] = [
     new GoodsReceiptNoteLine(ID.random(), 1, 100),
     new GoodsReceiptNoteLine(ID.random(), 10, 100),
-    new GoodsReceiptNoteLine(ID.random(), 10, 100, 5, "Comentário"),
+    new GoodsReceiptNoteLine(ID.random(), 10, 5, "Comentário"),
 ];
 const note = new GoodsReceiptNote(ID.random(), new Date(), noteLines, ID.fromString("userId"));
 const _notes = [

@@ -55,12 +55,16 @@ describe("PostgresItemStockRepository - saveAll", () => {
                     productId: "1",
                     goodQuantities: 0,
                     badQuantities: 0,
+                    consignmentValue: 0,
+                    itemStockType: "",
                 },
                 {
                     stockId: itemStocks[1].itemStockId.toString(),
                     productId: "2",
                     goodQuantities: 0,
                     badQuantities: 0,
+                    consignmentValue: 0,
+                    itemStockType: "",
                 },
             ],
         });
