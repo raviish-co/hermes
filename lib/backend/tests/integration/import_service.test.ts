@@ -24,6 +24,7 @@ import { InmemVariationRepository } from "../../persistence/inmem/inmem_variatio
 import { ID } from "../../shared/id";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
 import { VariationRepositoryStub } from "../stubs/variation_repository_stub";
+import { InvalidQuantitiesError } from "../../application/invalid_quantities_error";
 
 describe("Test Upload Items", async () => {
     it("Deve retornar **FileNotSupported** caso o ficheiro não seja .csv", async () => {
@@ -35,7 +36,7 @@ describe("Test Upload Items", async () => {
         expect(error.value).toBeInstanceOf(FileNotSupported);
     });
 
-    it("Deve retonar **EmptyFile** caso o ficheiro seja válido e esteja vazio", async () => {
+    it("Deve retornar **EmptyFile** caso o ficheiro seja válido e esteja vazio", async () => {
         const { service } = makeService();
 
         const error = await service.uploadItems(emptyFile);
@@ -331,16 +332,26 @@ describe("Import Service - Upload Items in Stock", async () => {
 
     it("Deve retornar **ItemNotFound** caso algum artigo não seja encontrado no repositório", async () => {
         const { service } = makeService();
-        const data = `id,boas,com_defeito,preco_consignacao
-        1001,10,5,1000
-        1002,8,5,1000
-        1004,5,10,2000`;
+        const data = `id,boas,com_defeito
+        1001,10,5
+        1002,8,5
+        1004,5,10`;
         const file = new File([data], "filename.csv", { type: "text/csv" });
 
         const error = await service.uploadItemsInStock(file);
 
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(ItemStockNotFound);
+    });
+
+    it("Deve retornar **InvalidQuantitiesError** caso o total das quantidades boas e com defeito de um artigo em consignação for superior a 1", async () => {
+        const { service } = makeService();
+        const file = new File([invalidItemsStockData], "filename.csv", { type: "text/csv" });
+
+        const error = await service.uploadItemsInStock(file);
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(InvalidQuantitiesError);
     });
 });
 
@@ -367,10 +378,13 @@ const emptyFile = new File(["nome,preco,estado,categoria,seccao,variacoes"], "fi
     type: "text/csv",
 });
 
-const itemsStockData = `id,boas,com_defeito,preco_consignacao 
-1001,10,5,1000
-1002,8,5,2000
-1003,5,10,3000`;
+const itemsStockData = `id,boas,com_defeito
+1001,10,5
+1002,8,5
+1003,5,10`;
+
+const invalidItemsStockData = `id,boas,com_defeito
+1011,10,5`;
 
 interface Dependencies {
     categoryRepository?: CategoryRepository;

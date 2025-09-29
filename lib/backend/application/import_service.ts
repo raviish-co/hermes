@@ -27,6 +27,7 @@ import { Decimal } from "../shared/decimal";
 import { left, right, type Either } from "../shared/either";
 import type { FileError } from "../shared/errors";
 import { ID } from "../shared/id";
+import { InvalidQuantitiesError } from "./invalid_quantities_error";
 
 export class ImportService {
     #itemRepository: ItemRepository;
@@ -89,6 +90,10 @@ export class ImportService {
             return left(new ItemStockNotFound());
         }
 
+        if (this.#hasValidQuantities(itemsStock, lines)) {
+            return left(new InvalidQuantitiesError("ImportService"));
+        }
+
         const noteId = await this.#generator.generate(Sequence.GoodsReceiptNote);
         const entryDate = new Date();
         const noteOrErr = new GoodsReceiptNoteBuilder()
@@ -140,7 +145,6 @@ export class ImportService {
             const line = new GoodsReceiptNoteLine(
                 itemStock.itemId,
                 itemStock.goodQuantities,
-                itemStock.consignmentPrice,
                 itemStock.badQuantities
             );
             lines.push(line);
@@ -195,6 +199,25 @@ export class ImportService {
 
             itemStock.increase(Number(goodQuantities), Number(badQuantities));
         }
+    }
+
+    #hasValidQuantities(itemsStock: ItemStock[], lines: string[]): boolean {
+        for (const line of lines.slice(1)) {
+            const [itemId, goodQuantities, badQuantities] = line.split(",");
+            const itemStock = itemsStock.find((i) => i.itemId.toString() === itemId);
+
+            if (!itemStock) break;
+
+            if (Number.isNaN(goodQuantities)) break;
+
+            if (badQuantities !== undefined && Number.isNaN(badQuantities)) break;
+
+            const total = Number(goodQuantities) + (Number(badQuantities) ?? 0);
+            if (itemStock.itemStockType === "Consignação" && total > 1) {
+                return true;
+            }
+        }
+        return false;
     }
 
     async #buildCategory(csvRow: CsvRow): Promise<Either<Error, CategorRow>> {

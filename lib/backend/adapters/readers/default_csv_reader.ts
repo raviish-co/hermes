@@ -1,6 +1,6 @@
 import type { CsvReader } from "./reader";
 
-export const VALID_ITEM_STOCK_CSV_HEADER = ["id,boas,com_defeito,preco_consignacao"];
+export const VALID_ITEM_STOCK_CSV_HEADER = ["id,boas,com_defeito"];
 
 export interface CsvRow {
     name: string;

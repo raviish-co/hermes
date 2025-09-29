@@ -5,6 +5,7 @@ import { InvalidFileHeader } from "~/lib/backend/adapters/readers/invalid_file_h
 import { ItemStockNotFound } from "~/lib/backend/domain/warehouse/item_stock_not_found";
 import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
+import { InvalidQuantitiesError } from "~/lib/backend/application/invalid_quantities_error";
 
 const service = useImportService();
 
@@ -35,6 +36,13 @@ export default defineEventHandler(async (event) => {
         throw createError({
             statusCode: HttpStatus.BadRequest,
             statusMessage: "Tipo de arquivo nao suportado.",
+        });
+    }
+
+    if (voidOrErr.value instanceof InvalidQuantitiesError) {
+        throw createError({
+            statusCode: HttpStatus.BadRequest,
+            statusMessage: "O total de quantidades boas e com defeito não deve superior a 1.",
         });
     }
 

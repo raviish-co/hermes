@@ -118,7 +118,7 @@ export class GoodsReceiptService {
     #isValidQuantities(lines: NoteLineDTO[]): boolean {
         for (const line of lines) {
             if (line.isConsignment) {
-                const total = (line.goodQuantities ?? 0) + (line.badQuantities ?? 0);
+                const total = line.goodQuantities + (line.badQuantities ?? 0);
                 if (total > 1) return false;
             }
         }

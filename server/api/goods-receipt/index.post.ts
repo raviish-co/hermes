@@ -4,6 +4,7 @@ import { InvalidEntryDate } from "~/lib/backend/domain/goods_receipt/invalid_ent
 import { InvalidLines } from "~/lib/backend/domain/goods_receipt/invalid_lines_error";
 import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
+import { InvalidQuantitiesError } from "~/lib/backend/application/invalid_quantities_error";
 
 const service = useGoodsReceiptService();
 
@@ -25,6 +26,13 @@ export default defineEventHandler(async (event) => {
         throw createError({
             statusCode: HttpStatus.BadRequest,
             statusMessage: "Linhas invalidas",
+        });
+    }
+
+    if (voidOrErr.value instanceof InvalidQuantitiesError) {
+        throw createError({
+            statusCode: HttpStatus.BadRequest,
+            statusMessage: "O total de quantidades boas e com defeito não deve superior a 1",
         });
     }
 
