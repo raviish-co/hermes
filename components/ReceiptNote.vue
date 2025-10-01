@@ -59,11 +59,11 @@ defineProps<{ note: GoodsReceiptNote }>();
                             <input
                                 type="number"
                                 class="input-number text-center"
-                                placeholder="Preço de Consignação"
+                                placeholder="Valor de Consignação"
                                 :disabled="!line.isConsignment"
                                 min="0"
-                                :value="line.consignmentValue"
-                                @input="line.changeConsignmentValue(line.consignmentValue)"
+                                v-model.number="line.consignmentValue"
+                                @change="line.changeConsignmentValue(line.consignmentValue)"
                                 :required="true"
                             />
                         </td>
