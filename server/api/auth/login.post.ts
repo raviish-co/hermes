@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
         httpOnly: true,
         sameSite: "lax",
         secure: true,
-        maxAge: 60 * 60,
+        maxAge: 60 * 60 * 24,
         path: "/",
     });
 
