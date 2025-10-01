@@ -42,7 +42,8 @@ export default defineEventHandler(async (event) => {
     if (voidOrErr.value instanceof InvalidQuantitiesError) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "O total de quantidades boas e com defeito não deve superior a 1.",
+            statusMessage:
+                "O total de quantidades boas e com defeito de um artigo em consignação não deve superior a 1.",
         });
     }
 
