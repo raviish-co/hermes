@@ -17,7 +17,7 @@ function enableItemInStockToInternalUse() {
     warehouse
         .enableItemStockToInternalUse(selectedItemId.value)
         .then(async () => {
-            alert("Item habilitado para uso interno com sucesso");
+            alert("Artigo marcado como interno com sucesso");
             close();
             await warehouse.listItemsStock();
         })
@@ -72,8 +72,8 @@ onMounted(async () => {
                         <th class="min-w-20 w-20">ID</th>
                         <th class="min-w-80 w-80 text-left">Descrição</th>
                         <th class="min-w-40 w-40">Preço (Kz)</th>
-                        <th class="min-w-30 w-30">Stock</th>
-                        <th class="min-w-50 w-50 text-nowrap">valor das Saídas (Kz)</th>
+                        <th class="min-w-32 w-32">Stock</th>
+                        <th class="min-w-50 w-50 text-nowrap">Acumulado (Kz)</th>
                         <th></th>
                         <th class="min-w-30 w-30"></th>
                     </tr>
@@ -94,14 +94,6 @@ onMounted(async () => {
                                         'Consignação'
                                     "
                                     class="ml-2 bg-light-500 py-1 px-1.5 rounded-full text-white font-medium"
-                                    >{{ warehouse.findItemStock(item.itemId)?.itemStockType }}</sup
-                                >
-                                <sup
-                                    v-else-if="
-                                        warehouse.findItemStock(item.itemId)?.itemStockType ===
-                                        'Interno'
-                                    "
-                                    class="ml-2 bg-secondary-500 py-1 px-1.5 rounded-full text-white font-medium"
                                     >{{ warehouse.findItemStock(item.itemId)?.itemStockType }}</sup
                                 >
                             </span>
@@ -141,7 +133,7 @@ onMounted(async () => {
                             <span v-else>
                                 {{
                                     formatCurrency(
-                                        warehouse.findItemStock(item.itemId)?.totalValueOfOutputs!
+                                        warehouse.findItemStock(item.itemId)?.totalValueOfOutputs!,
                                     )
                                 }}
                             </span>
@@ -153,10 +145,15 @@ onMounted(async () => {
                         </td>
                         <td>
                             <span
-                                v-if="warehouse.isInternalItemStock(item.itemId)"
+                                v-if="warehouse.isConsignmentItemStock(item.itemId)"
                                 @click="setUserDataAndShowModal(item.itemId, item.name)"
-                                class="text-xs text-nowrap cursor-pointer badge bg-secondary-500 text-white"
-                                >Habilitar para uso interno</span
+                                class="text-xs text-nowrap cursor-pointer"
+                                :class="
+                                    warehouse.isInternalItemStock(item.itemId)
+                                        ? 'badge-success'
+                                        : 'badge-warning'
+                                "
+                                >Marcar como interno</span
                             >
                         </td>
                     </tr>
@@ -170,24 +167,23 @@ onMounted(async () => {
             >
                 <div class="space-y-4">
                     <div class="flex justify-between items-center">
-                        <h2 class="font-medium text-lg">Habilitar para uso interno</h2>
+                        <h2 class="font-medium text-lg">Marcar como interno</h2>
                         <span class="material-symbols-outlined cursor-pointer" @click="close"
                             >close</span
                         >
                     </div>
                     <div>
                         <p class="mb-4 text-sm text-gray-500">
-                            Já é possível habilitar o item <b> {{ seletedItemName }} </b> para uso
-                            interno.
+                            Está a Marcar o artigo <b> {{ seletedItemName }} </b> como interno.
                         </p>
                         <button
                             @click="enableItemInStockToInternalUse()"
-                            class="btn-badge bg-secondary-600 text-white text-sm px-4 py-1.5"
+                            class="btn-badge bg-yellow-500 text-white text-sm px-4 py-1.5"
                         >
-                            Habilitar
+                            Marcar
                         </button>
                         <button
-                            class="btn-badge bg-light-600 ml-2 text-white text-sm px-4 py-1.5"
+                            class="btn-badge bg-red-800/80 ml-2 text-white text-sm px-4 py-1.5"
                             @click="close()"
                         >
                             Cancelar

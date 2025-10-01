@@ -1,3 +1,4 @@
+import { ItemStockType } from "~/lib/backend/domain/warehouse/item_stock_type";
 import type { ItemStockModel } from "~/lib/frontend/models/item_stock";
 import { WarehouseService } from "~/lib/frontend/services/warehouse_service";
 
@@ -24,9 +25,17 @@ export function useWarehouse() {
         if (!itemStock) return false;
 
         return (
-            itemStock.itemStockType === "Consignação" &&
-            itemStock.totalValueOfOutputs > itemStock.consignmentValue
+            itemStock.itemStockType === ItemStockType.Consignacao &&
+            itemStock.totalValueOfOutputs >= itemStock.consignmentValue
         );
+    };
+
+    const isConsignmentItemStock = (itemId: string): boolean => {
+        const itemStock = findItemStock(itemId);
+
+        if (!itemStock) return false;
+
+        return itemStock.itemStockType === ItemStockType.Consignacao;
     };
 
     return {
@@ -34,5 +43,6 @@ export function useWarehouse() {
         findItemStock,
         enableItemStockToInternalUse: updateItemStockStatus,
         isInternalItemStock,
+        isConsignmentItemStock,
     };
 }

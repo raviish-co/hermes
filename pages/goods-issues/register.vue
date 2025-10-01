@@ -55,7 +55,7 @@ onMounted(async () => {
                 >
                     Solicitar
                 </button>
-                <button class="btn-light" @click="clear()">Cancelar</button>
+                <button class="btn-danger" @click="clear()">Cancelar</button>
             </div>
 
             <div

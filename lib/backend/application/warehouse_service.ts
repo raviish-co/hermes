@@ -21,9 +21,7 @@ export class WarehouseService {
 
         const itemStock = itemStockOrErr.value;
 
-        if (itemStock.isTotalValueOfOutputsGreaterThan(itemStock.consignmentValue)) {
-            itemStock.enableItemInStockToInternal();
-        }
+        itemStock.enableItemInStockToInternal();
 
         await this.#itemStockRepository.save(itemStock);
 

@@ -5,7 +5,11 @@
 @tailwind utilities;
 
 .material-symbols-outlined {
-    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+    font-variation-settings:
+        "FILL" 0,
+        "wght" 400,
+        "GRAD" 0,
+        "opsz" 24;
 }
 
 * {
@@ -89,8 +93,12 @@ h1 {
     @apply w-full py-2 px-9 text-white font-medium disabled:cursor-not-allowed disabled:bg-opacity-50;
 }
 
+.btn-danger {
+    @apply btn bg-red-800/80;
+}
+
 .btn-secondary {
-    @apply btn bg-secondary-500;
+    @apply btn bg-yellow-500;
 }
 
 .btn-light {
@@ -125,12 +133,16 @@ h1 {
     @apply badge text-green-500 bg-green-100;
 }
 
+.badge-warning {
+    @apply badge text-white bg-yellow-500;
+}
+
 .link {
     @apply text-secondary-600 underline;
 }
 
 .nuxt-link {
-    @apply flex gap-3 items-center px-2 py-3 hover:bg-black hover:text-white w-full border-b;
+    @apply flex gap-3 items-center pl-8 py-3 hover:bg-black hover:text-white w-full border-b;
 }
 
 .card {

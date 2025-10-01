@@ -48,7 +48,7 @@ onMounted(async () => {
                 >
                     Dar entrada
                 </button>
-                <button class="btn-light" @click="$router.push('/goods-receipts/')">
+                <button class="btn-danger" @click="$router.push('/goods-receipts/')">
                     Cancelar
                 </button>
             </div>

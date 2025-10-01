@@ -46,9 +46,12 @@ function newGoodsReturn() {
         .new(
             goodsIssueNote.value.goodsIssueNoteId,
             securityDepositWithHeld.value,
-            goodsReturnNote.value.returnLines
+            goodsReturnNote.value.returnLines,
         )
-        .then((res) => alert(res.message))
+        .then((res) => {
+            alert(res.message);
+            navigateTo("/goods-issues/");
+        })
         .catch((err) => alert(err.statusMessage));
 }
 
@@ -108,7 +111,7 @@ onMounted(async () => {
                 >
                     Devolver
                 </button>
-                <NuxtLink class="btn-light" to="/goods-issues/">Cancelar</NuxtLink>
+                <NuxtLink class="btn-danger" to="/goods-issues/">Cancelar</NuxtLink>
             </div>
 
             <div
