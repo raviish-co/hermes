@@ -36,7 +36,12 @@ onMounted(async () => {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="note in notes" :key="note.goodsReturnNoteId">
+                    <tr
+                        v-for="note in notes.sort((v1, v2) =>
+                            v2.goodsIssueNoteId.localeCompare(v1.goodsIssueNoteId)
+                        )"
+                        :key="note.goodsReturnNoteId"
+                    >
                         <td class="link">
                             <NuxtLink :to="`/goods-returns/${note.goodsReturnNoteId}`">
                                 {{ note.goodsReturnNoteId }}

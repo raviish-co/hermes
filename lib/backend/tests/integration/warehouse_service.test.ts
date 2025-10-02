@@ -22,13 +22,13 @@ describe("WharehouseService - Artigos em Stock", async () => {
         expect(itemsStock.length).toEqual(13);
     });
 
-    it("enableItemInStockToInternalUse - Deve habilitar o artigo para uso interno", async () => {
+    it("markItemInStockAsIntern - Deve marcar o artigo como interno", async () => {
         const itemStockRepository = new ItemStockRepositoryStub();
         const service = new WarehouseService(itemStockRepository);
         const itemId = ID.fromString("1011");
         await makeGoodsIssueService(itemStockRepository);
 
-        await service.enableItemInStockToInternalUse(itemId.toString());
+        await service.markItemInStockAsIntern(itemId.toString());
 
         const itemStockOrErr = await itemStockRepository.getById(itemId);
 
@@ -36,25 +36,11 @@ describe("WharehouseService - Artigos em Stock", async () => {
         expect((itemStockOrErr.value as ItemStock).itemStockType).toBe("Interno");
     });
 
-    it("enableItemInStockToInternalUse - Não deve habilitar o artigo para uso interno se o valor total das saídas for menor que o valor de consignação", async () => {
-        const itemStockRepository = new ItemStockRepositoryStub();
-        const service = new WarehouseService(itemStockRepository);
-        const itemId = ID.fromString("1013");
-        await makeGoodsIssueService(itemStockRepository);
-
-        await service.enableItemInStockToInternalUse(itemId.toString());
-
-        const itemStockOrErr = await itemStockRepository.getById(itemId);
-
-        expect(itemStockOrErr.isRight()).toBeTruthy();
-        expect((itemStockOrErr.value as ItemStock).itemStockType).toBe("Consignação");
-    });
-
-    it("enableItemInStockToInternalUse - Deve retornar erro se o item não for encontrado no repositório", async () => {
+    it("markItemInStockAsIntern - Deve retornar erro se o item não for encontrado no repositório", async () => {
         const itemStockRepository = new ItemStockRepositoryStub();
         const service = new WarehouseService(itemStockRepository);
 
-        const voidOrErr = await service.enableItemInStockToInternalUse("invalid-item-id");
+        const voidOrErr = await service.markItemInStockAsIntern("invalid-item-id");
 
         expect(voidOrErr.isLeft()).toBeTruthy();
         expect(voidOrErr.value).toBeInstanceOf(ItemStockNotFound);

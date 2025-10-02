@@ -15,8 +15,8 @@ export function useWarehouse() {
         return itemStocks.value.find((itemStock) => itemStock.itemId === id);
     };
 
-    const updateItemStockStatus = async (itemId: string) => {
-        await warehouseService.updateItemStockStatus(itemId);
+    const markItemInStockAsIntern = async (itemId: string) => {
+        await warehouseService.markItemInStockAsIntern(itemId);
     };
 
     const isInternalItemStock = (itemId: string): boolean => {
@@ -41,7 +41,7 @@ export function useWarehouse() {
     return {
         listItemsStock,
         findItemStock,
-        enableItemStockToInternalUse: updateItemStockStatus,
+        markItemInStockAsIntern,
         isInternalItemStock,
         isConsignmentItemStock,
     };
