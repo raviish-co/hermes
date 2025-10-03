@@ -37,8 +37,8 @@ onMounted(async () => {
                 </thead>
                 <tbody>
                     <tr
-                        v-for="note in notes.sort((v1, v2) =>
-                            v2.goodsIssueNoteId.localeCompare(v1.goodsIssueNoteId)
+                        v-for="note in notes.sort((a, b) =>
+                            b.goodsIssueNoteId.localeCompare(a.goodsIssueNoteId)
                         )"
                         :key="note.goodsReturnNoteId"
                     >

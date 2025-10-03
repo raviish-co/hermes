@@ -34,9 +34,7 @@ onMounted(async () => {
                     </thead>
                     <tbody>
                         <tr
-                            v-for="note in notes.sort((v1, v2) =>
-                                v2.noteId.localeCompare(v1.noteId)
-                            )"
+                            v-for="note in notes.sort((a, b) => b.noteId.localeCompare(a.noteId))"
                             :key="note.noteId"
                         >
                             <td class="link">

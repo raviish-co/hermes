@@ -5,6 +5,7 @@ import type { NoteOptions } from "../../domain/goods_issue/goods_issue_note_opti
 import type { GoodsIssueNoteRepository } from "../../domain/goods_issue/goods_issue_note_repository";
 import { type Either, left, right } from "../../shared/either";
 import type { ID } from "../../shared/id";
+import type { Pagination, PaginatorOptions } from "../../shared/pagination";
 
 export class PostgresGoodsIssueNoteRepository implements GoodsIssueNoteRepository {
     #prisma: PrismaClient;
@@ -24,12 +25,36 @@ export class PostgresGoodsIssueNoteRepository implements GoodsIssueNoteRepositor
         return right(GoodsIssueNote.restore(noteData as NoteOptions));
     }
 
-    async getAll(): Promise<GoodsIssueNote[]> {
+    async getAll(opts?: PaginatorOptions): Promise<Pagination<GoodsIssueNote>> {
+        if (!opts) {
+            const notesData = await this.#prisma.goodsIssueNote.findMany({
+                include: { purpose: true, lines: true },
+            });
+
+            return {
+                result: notesData.map((note) => GoodsIssueNote.restore(note as NoteOptions)),
+                pageToken: 0,
+                perPage: 0,
+                total: notesData.length,
+            };
+        }
+
         const notesData = await this.#prisma.goodsIssueNote.findMany({
             include: { purpose: true, lines: true },
+            skip: (opts.pageToken - 1) * opts.perPage,
+            take: opts.perPage,
         });
 
-        return notesData.map((note) => GoodsIssueNote.restore(note as NoteOptions));
+        const total = await this.#prisma.goodsIssueNote.count();
+
+        const notes = notesData.map((note) => GoodsIssueNote.restore(note as NoteOptions));
+
+        return {
+            result: notes,
+            pageToken: opts.pageToken,
+            perPage: opts.perPage,
+            total: Math.ceil(total / opts.perPage),
+        };
     }
 
     async save(note: GoodsIssueNote): Promise<void> {

@@ -133,7 +133,6 @@ const _goodsIssueData = [
                 _item2.price,
                 15,
                 0,
-
                 _item2.variations!
             ),
         ],
