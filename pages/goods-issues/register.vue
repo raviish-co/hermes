@@ -12,7 +12,10 @@ const wasSubmitted = ref<boolean>(false);
 function newGoodsIssue() {
     service
         .new(note as GoodsIssueNote)
-        .then((res) => alert(res.message))
+        .then((res) => {
+            alert(res.message);
+            navigateTo("/goods-issues/");
+        })
         .catch((err) => alert(err.statusMessage));
 
     wasSubmitted.value = true;

@@ -11,11 +11,11 @@ const selectedItemId = ref<string>("");
 const seletedItemName = ref<string>("");
 const dialogRef = ref<HTMLDialogElement>();
 
-function enableItemInStockToInternalUse() {
+function markItemInStockAsIntern() {
     if (!selectedItemId.value) return;
 
     warehouse
-        .enableItemStockToInternalUse(selectedItemId.value)
+        .markItemInStockAsIntern(selectedItemId.value)
         .then(async () => {
             alert("Artigo marcado como interno com sucesso");
             close();
@@ -133,7 +133,7 @@ onMounted(async () => {
                             <span v-else>
                                 {{
                                     formatCurrency(
-                                        warehouse.findItemStock(item.itemId)?.totalValueOfOutputs!,
+                                        warehouse.findItemStock(item.itemId)?.totalValueOfOutputs!
                                     )
                                 }}
                             </span>
@@ -177,8 +177,8 @@ onMounted(async () => {
                             Está a Marcar o artigo <b> {{ seletedItemName }} </b> como interno.
                         </p>
                         <button
-                            @click="enableItemInStockToInternalUse()"
-                            class="btn-badge bg-yellow-500 text-white text-sm px-4 py-1.5"
+                            @click="markItemInStockAsIntern()"
+                            class="btn-badge bg-secondary-600 text-white text-sm px-4 py-1.5"
                         >
                             Marcar
                         </button>

@@ -25,12 +25,22 @@ export class GoodsIssueService {
         return this.#toGoodsIssueNoteModel(data);
     }
 
-    async list(): Promise<GoodsIssueNoteModel[]> {
-        const notes = await $fetch("/api/goods-issue/", {
+    async list(
+        pageToken = 1,
+        perPage = 12
+    ): Promise<{ notes: GoodsIssueNoteModel[]; total: number }> {
+        const response = await $fetch("/api/goods-issue/", {
             method: "get",
+            query: {
+                pageToken,
+                perPage,
+            },
             headers: await this.#headers(),
         });
-        return notes.map(this.#toGoodsIssueNoteModel);
+
+        const notes = response.notes.map(this.#toGoodsIssueNoteModel);
+
+        return { notes, total: response.total };
     }
 
     async search(query: string): Promise<GoodsIssueNoteModel[]> {

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { formatDate } from "@frontend/helpers/format_date";
+import ThePagination from "~/components/ThePagination.vue";
 import type { GoodsIssueNoteModel } from "~/lib/frontend/models/goods_issue_note";
 import type { PurposeModel } from "~/lib/frontend/models/purpose";
 import { GoodsIssueService } from "~/lib/frontend/services/goods_issue_service";
 
 const criteria = ref<string>("");
 const notes = ref<GoodsIssueNoteModel[]>([]);
+const pages = ref<number>(1);
 const service = new GoodsIssueService();
 const auth = useAuth();
 
@@ -17,7 +19,9 @@ function formatPurpose(purpose: PurposeModel) {
 
 async function search() {
     if (!criteria.value) {
-        notes.value = await service.list();
+        const response = await service.list();
+        notes.value = response.notes;
+        pages.value = response.total;
         return;
     }
 
@@ -25,9 +29,20 @@ async function search() {
     notes.value = await service.search(criteria.value);
 }
 
+function changePageToken(value: number) {
+    service.list(value).then((res) => {
+        notes.value = res.notes;
+        pages.value = res.total;
+    });
+}
+
 onMounted(async () => {
     await auth.checkAuth();
-    notes.value = await service.list();
+
+    const response = await service.list();
+
+    notes.value = response.notes;
+    pages.value = response.total;
 });
 </script>
 
@@ -85,6 +100,9 @@ onMounted(async () => {
             <p v-if="notes.length === 0" class="pt-10 text-gray-500 text-center">
                 Não existem guias de saída no momento. Crie uma nova
             </p>
+        </div>
+        <div class="py-8">
+            <ThePagination :total="pages" @changed="changePageToken" />
         </div>
     </div>
 </template>

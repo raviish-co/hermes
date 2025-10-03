@@ -3,6 +3,7 @@ import { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { ID } from "../../shared/id";
 import { left, right, type Either } from "../../shared/either";
 import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";
+import type { Pagination, PaginatorOptions } from "../../shared/pagination";
 
 export class InmemGoodsIssueNoteRepository implements GoodsIssueNoteRepository {
     #notes: Record<string, GoodsIssueNote> = {};
@@ -19,8 +20,32 @@ export class InmemGoodsIssueNoteRepository implements GoodsIssueNoteRepository {
         return right(note);
     }
 
-    async getAll(): Promise<GoodsIssueNote[]> {
-        return this.records;
+    async getAll(opts?: PaginatorOptions): Promise<Pagination<GoodsIssueNote>> {
+        if (!opts) {
+            return {
+                result: this.records,
+                perPage: 0,
+                pageToken: 0,
+                total: 0,
+            };
+        }
+
+        const startIndex = (opts.pageToken - 1) * opts.perPage;
+
+        const endIndex = startIndex + opts.perPage;
+
+        const result = this.records
+            .sort((a, b) => b.noteId.localeCompare(a.noteId.toString()))
+            .slice(startIndex, endIndex);
+
+        const total = Math.ceil(this.records.length / opts.perPage);
+
+        return {
+            pageToken: opts.pageToken,
+            perPage: opts.perPage,
+            total,
+            result,
+        };
     }
 
     async search(query: string): Promise<GoodsIssueNote[]> {

@@ -336,22 +336,21 @@ describe("GoodsIssueService - Recuperar as guias de saída de mercadorias", () =
     it("Deve retornar uma lista vazia se não houver guias de saídas no repositório", async () => {
         const { service } = makeService();
 
-        const notes = await service.list();
+        const result = await service.list();
 
-        expect(notes.length).toBe(0);
+        expect(result.result.length).toBe(0);
     });
 
     it("Deve recuperar as guias de saídas presentes no repositório", async () => {
         const goodsIssueRepository = new GoodsIssueNoteRepositoryStub();
         const { service } = makeService({ goodsIssueRepository });
 
-        const notes = await service.list();
+        const result = await service.list();
 
-        expect(notes.length).toBeGreaterThanOrEqual(1);
+        expect(result.result.length).toBeGreaterThanOrEqual(1);
 
-        const note = notes[0];
-
-        expect(note.noteId.toString()).toEqual("GS - 1000");
+        const note = result.result[0];
+        expect(note.noteId.toString()).toEqual("GS - 1006");
     });
 });
 

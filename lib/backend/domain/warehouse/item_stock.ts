@@ -16,7 +16,7 @@ export class ItemStock {
         goodQuantities: number,
         badQuantities?: number,
         itemStockType?: string,
-        consignmentValue?: number,
+        consignmentValue?: number
     ) {
         this.#itemStockId = ID.random();
         this.#itemId = itemId;
@@ -37,14 +37,14 @@ export class ItemStock {
         goodQuantities: number,
         badQuantities: number,
         itemStockType: string,
-        consignmentValue: number,
+        consignmentValue: number
     ): ItemStock {
         const itemStock = new ItemStock(
             ID.fromString(itemId),
             goodQuantities,
             badQuantities,
             itemStockType,
-            consignmentValue,
+            consignmentValue
         );
         itemStock.#itemStockId = ID.fromString(itemStockId);
         return itemStock;
@@ -92,7 +92,7 @@ export class ItemStock {
         return "";
     }
 
-    enableItemInStockToInternal(): void {
+    markItemInStockAsIntern(): void {
         this.#itemStockType = ItemStockType.Interno;
     }
 
