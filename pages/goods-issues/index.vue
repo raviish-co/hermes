@@ -101,7 +101,7 @@ onMounted(async () => {
                 Não existem guias de saída no momento. Crie uma nova
             </p>
         </div>
-        <div class="pt-6">
+        <div class="py-8">
             <ThePagination :total="pages" @changed="changePageToken" />
         </div>
     </div>
