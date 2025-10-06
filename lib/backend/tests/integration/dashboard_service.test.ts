@@ -7,6 +7,8 @@ import { ID } from "../../shared/id";
 import { GoodsIssueNoteRepositoryStub } from "../stubs/goods_issue_note_repository_stub";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
+import { right, type Either } from "../../shared/either";
+import type { ItemNotFound } from "../../domain/catalog/items/item_not_found_error";
 
 describe("Dashboard Service - Total de guias de saída vencidas", async () => {
     it("Deve retornar 0 se não houver guias de saída vencidas", async () => {
@@ -216,6 +218,7 @@ describe("DashboardService - Percentagem do estado das mercadorias em stock", as
 const itemStockRepositoryMock = {
     getAll: async () => [],
     save: async (_itemStock: ItemStock) => undefined,
+    getById: async (_id: ID): Promise<Either<ItemNotFound, ItemStock>> => right({} as ItemStock),
     saveAll: async (_itemStocks: ItemStock[]) => undefined,
     updateAll: async (_itemStocks: ItemStock[]) => undefined,
     findAll: async (_itemIds: ID[]): Promise<ItemStock[]> => [],

@@ -19,14 +19,7 @@ const auth = useAuth();
 const route = useRoute();
 const noteId = route.params.id as string;
 
-goodsIssueService
-    .getById(noteId)
-    .then((result) => {
-        goodsIssueNote.value = GoodsIssueNote.build(result);
-        goodsReturnNote.value = new GoodsReturnNote(goodsIssueNote.value.lines);
-        quantities.value = goodsIssueNote.value.lines?.map((l) => l.totalToReturn);
-    })
-    .catch((err) => alert(err.statusMessage));
+getGoodsIssueById(noteId);
 
 function toggleEdit() {
     editSecurityDeposit.value = !editSecurityDeposit.value;
@@ -34,6 +27,17 @@ function toggleEdit() {
 
 function isReturned() {
     return goodsIssueNote.value.status === "Devolvido";
+}
+
+function getGoodsIssueById(noteId: string) {
+    goodsIssueService
+        .getById(noteId)
+        .then((result) => {
+            goodsIssueNote.value = GoodsIssueNote.build(result);
+            goodsReturnNote.value = new GoodsReturnNote(goodsIssueNote.value.lines);
+            quantities.value = goodsIssueNote.value.lines?.map((l) => l.totalToReturn);
+        })
+        .catch((err) => alert(err.statusMessage));
 }
 
 function newGoodsReturn() {
@@ -46,11 +50,11 @@ function newGoodsReturn() {
         .new(
             goodsIssueNote.value.goodsIssueNoteId,
             securityDepositWithHeld.value,
-            goodsReturnNote.value.returnLines,
+            goodsReturnNote.value.returnLines
         )
         .then((res) => {
             alert(res.message);
-            navigateTo("/goods-issues/");
+            getGoodsIssueById(goodsIssueNote.value.goodsIssueNoteId);
         })
         .catch((err) => alert(err.statusMessage));
 }

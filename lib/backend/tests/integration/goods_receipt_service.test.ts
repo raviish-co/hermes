@@ -14,7 +14,6 @@ import { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
-import type { i } from "vitest/dist/reporters-yx5ZTtEV.js";
 import { InvalidQuantitiesError } from "../../application/invalid_quantities_error";
 
 describe("GoodsReceiptService - Entrada de mercadorias", () => {
@@ -494,16 +493,18 @@ describe("GoodsReceiptService - Listar guias de entrada de mercadoria", () => {
 
         await service.new(data);
 
-        const notes = await service.list();
+        const result = await service.list();
 
+        const notes = result.result;
         expect(notes.length).toBe(1);
     });
 
     it("Deve retornar uma lista vazia se não houver guias de entrada de mercadoria", async () => {
         const { service } = makeService();
 
-        const notes = await service.list();
+        const result = await service.list();
 
+        const notes = result.result;
         expect(notes.length).toBe(0);
     });
 });

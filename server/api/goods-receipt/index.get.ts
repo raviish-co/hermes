@@ -19,9 +19,7 @@ interface GoodsReceiptNoteDTO {
     lines: GoodsReceiptNoteLineDTO[];
 }
 
-function toGoodsReceiptNoteLineDTO(
-    line: GoodsReceiptNoteLine,
-): GoodsReceiptNoteLineDTO {
+function toGoodsReceiptNoteLineDTO(line: GoodsReceiptNoteLine): GoodsReceiptNoteLineDTO {
     return {
         lineId: line.lineId.toString(),
         itemId: line.itemId.toString(),
@@ -42,6 +40,13 @@ function toGoodsReceiptNoteDTO(note: GoodsReceiptNote): GoodsReceiptNoteDTO {
 export default defineEventHandler(async (event) => {
     checkAnonymousUser(event);
 
-    const notes = await service.list();
-    return notes.map(toGoodsReceiptNoteDTO);
+    const query = getQuery(event);
+
+    const pageToken = Number(query.pageToken);
+    const perPage = Number(query.perPage);
+
+    const response = await service.list(pageToken, perPage);
+
+    const notes = response.result.map(toGoodsReceiptNoteDTO);
+    return { notes, total: response.total };
 });

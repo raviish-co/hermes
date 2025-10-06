@@ -147,7 +147,7 @@ describe("Test Upload Items", async () => {
         expect(item.variations!["2"]).toEqual("Marca: Rebock");
     });
 
-    it("Deve gerar o ID para os items ao serem carragados na base de dados", async () => {
+    it("Deve gerar o ID para os items ao serem carregados na base de dados", async () => {
         const { service, itemRepository, categoryRepository, sectionRepository } = makeService();
         await categoryRepository.save(category);
         await sectionRepository.save(section);
@@ -159,11 +159,11 @@ describe("Test Upload Items", async () => {
             perPage: 12,
         });
 
-        expect(items[0].itemId.toString()).toEqual("RVS - 0001");
-        expect(items[1].itemId.toString()).toEqual("RVS - 0002");
+        expect(items[0].itemId.toString()).toEqual("RVS - 0005");
+        expect(items[1].itemId.toString()).toEqual("RVS - 0004");
         expect(items[2].itemId.toString()).toEqual("RVS - 0003");
-        expect(items[3].itemId.toString()).toEqual("RVS - 0004");
-        expect(items[4].itemId.toString()).toEqual("RVS - 0005");
+        expect(items[3].itemId.toString()).toEqual("RVS - 0002");
+        expect(items[4].itemId.toString()).toEqual("RVS - 0001");
     });
 
     it("Deve retornar **VariationNotFound** caso os valores da variação não sejam encontrada no repositório", async () => {

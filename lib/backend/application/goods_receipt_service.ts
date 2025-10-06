@@ -14,6 +14,7 @@ import { left, right, type Either } from "../shared/either";
 import type { GoodsReceiptError } from "../shared/errors";
 import { ID } from "../shared/id";
 import { InvalidQuantitiesError } from "./invalid_quantities_error";
+import type { Pagination } from "../shared/pagination";
 
 export class GoodsReceiptService {
     #itemRepository: ItemRepository;
@@ -67,8 +68,8 @@ export class GoodsReceiptService {
         return right(undefined);
     }
 
-    async list(): Promise<GoodsReceiptNote[]> {
-        return this.#noteRepository.getAll();
+    async list(pageToken = 1, perPage = 12): Promise<Pagination<GoodsReceiptNote>> {
+        return this.#noteRepository.getAll({ pageToken, perPage });
     }
 
     async #adjustStockLevels(itemIds: ID[], lines: NoteLineDTO[]) {

@@ -16,6 +16,7 @@ import type { ItemStockRepository } from "../domain/warehouse/item_stock_reposit
 import { type Either, left, right } from "../shared/either";
 import type { GoodsIssueNoteError } from "../shared/errors";
 import { ID } from "../shared/id";
+import type { Pagination } from "../shared/pagination";
 
 export class GoodsIssueService {
     #itemRepository: ItemRepository;
@@ -75,8 +76,8 @@ export class GoodsIssueService {
         return right(undefined);
     }
 
-    async list(): Promise<GoodsIssueNote[]> {
-        return await this.#noteRepository.getAll();
+    async list(pageToken = 1, perPage = 12): Promise<Pagination<GoodsIssueNote>> {
+        return await this.#noteRepository.getAll({ pageToken, perPage });
     }
 
     async get(noteId: string): Promise<Either<GoodsIssueNoteNotFound, GoodsIssueNote>> {

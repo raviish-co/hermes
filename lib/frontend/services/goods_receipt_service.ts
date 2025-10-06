@@ -16,12 +16,21 @@ export class GoodsReceiptService {
         });
     }
 
-    async getAll(): Promise<GoodsReceiptNoteModel[]> {
-        const notes = await $fetch("/api/goods-receipt", {
+    async getAll(
+        pageToken = 1,
+        perPage = 12
+    ): Promise<{ notes: GoodsReceiptNoteModel[]; total: number }> {
+        const response = await $fetch("/api/goods-receipt", {
             method: "get",
+            query: {
+                pageToken: pageToken,
+                perPage: perPage,
+            },
             headers: await this.#headers(),
         });
-        return notes.map(this.#toGoodsReceiptModel);
+
+        const notes = response.notes.map(this.#toGoodsReceiptModel);
+        return { notes, total: response.total };
     }
 
     #toGoodsReceiptModel(data: any) {

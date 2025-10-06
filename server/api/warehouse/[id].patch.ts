@@ -14,21 +14,21 @@ export default defineEventHandler(async (event) => {
         });
     }
 
-    const voidOrErr = await service.enableItemInStockToInternalUse(itemId);
+    const voidOrErr = await service.markItemInStockAsIntern(itemId);
 
     if (voidOrErr.value instanceof ItemStockNotFound) {
         throw createError({
             statusCode: HttpStatus.NotFound,
-            statusMessage: "Item não encontrado no stock",
+            statusMessage: "Item nao encontrado no stock",
         });
     }
 
     if (voidOrErr.isLeft()) {
         throw createError({
             statusCode: HttpStatus.ServerError,
-            statusMessage: "Não foi possível actualizar o estado do item no stock",
+            statusMessage: "Nao foi possivel actualizar o estado do item no stock",
         });
     }
 
-    return { message: "Item habilitado para uso interno com sucesso" };
+    return { message: "Item marcado como interno com sucesso" };
 });

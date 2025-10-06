@@ -7,6 +7,15 @@ const service = useGoodsIssueService();
 export default defineEventHandler(async (event) => {
     checkAnonymousUser(event);
 
-    const result = await service.list();
-    return result.map(toGoodsIssueNoteDTO);
+    const query = getQuery(event);
+
+    const pageToken = Number(query.pageToken);
+    const perPage = Number(query.perPage);
+
+    const result = await service.list(pageToken, perPage);
+
+    const notes = result.result.map(toGoodsIssueNoteDTO);
+    const total = result.total;
+
+    return { notes, total };
 });

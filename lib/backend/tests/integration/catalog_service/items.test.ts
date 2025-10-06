@@ -24,7 +24,7 @@ describe("CatalogService - Recuperar artigos", () => {
         const { result: items } = await service.listItems();
 
         expect(items.length).toBeGreaterThanOrEqual(2);
-        expect(items[0].itemId.toString()).toEqual("1001");
+        expect(items[0].itemId.toString()).toEqual("1016");
     });
 
     it("Deve retornar um array vazio se não existir artigos", async () => {

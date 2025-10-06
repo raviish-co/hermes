@@ -28,7 +28,9 @@ export class InmemItemRepository implements ItemRepository {
 
         const endIndex = startIndex + opts.perPage;
 
-        const result = this.records.slice(startIndex, endIndex);
+        const result = this.records
+            .sort((a, b) => b.itemId.localeCompare(a.itemId.toString()))
+            .slice(startIndex, endIndex);
 
         const total = Math.ceil(this.records.length / opts.perPage);
 

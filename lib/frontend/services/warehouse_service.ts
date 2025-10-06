@@ -3,7 +3,7 @@ import type { ItemStockModel } from "../models/item_stock";
 const auth = useAuth();
 
 export class WarehouseService {
-    async updateItemStockStatus(itemId: string) {
+    async markItemInStockAsIntern(itemId: string) {
         return await $fetch(`/api/warehouse/${itemId}`, {
             method: "patch",
             headers: await this.#headers(),

@@ -23,4 +23,8 @@ export class ID {
     equals(id: ID): boolean {
         return this.#value === id.#value;
     }
+
+    localeCompare(value: string): number {
+        return this.#value.localeCompare(value);
+    }
 }

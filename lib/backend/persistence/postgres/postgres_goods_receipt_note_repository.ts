@@ -5,6 +5,7 @@ import { Condition } from "../../shared/condition";
 import { GoodsReceiptNoteNotFoundError } from "../../domain/goods_receipt/goods_receipt_note_not_found_error";
 import { left, right, type Either } from "../../shared/either";
 import type { ID } from "../../shared/id";
+import type { Pagination, PaginatorOptions } from "../../shared/pagination";
 
 function goodsReceiptNoteFactory(data: any) {
     const lines = data.lines.map((line: any) => ({
@@ -26,12 +27,38 @@ export class PostgresGoodsReceiptNoteRepository implements GoodsReceiptNoteRepos
         this.#prisma = prisma;
     }
 
-    async getAll(): Promise<GoodsReceiptNote[]> {
+    async getAll(opts?: PaginatorOptions): Promise<Pagination<GoodsReceiptNote>> {
+        if (!opts) {
+            const notesData = await this.#prisma.goodsReceiptNote.findMany({
+                include: { lines: true },
+            });
+
+            const notes = notesData.map(goodsReceiptNoteFactory);
+
+            return {
+                result: notes,
+                pageToken: 0,
+                perPage: 0,
+                total: notes.length,
+            };
+        }
+
         const notesData = await this.#prisma.goodsReceiptNote.findMany({
             include: { lines: true },
+            skip: (opts.pageToken - 1) * opts.perPage,
+            take: opts.perPage,
         });
 
-        return notesData.map(goodsReceiptNoteFactory);
+        const total = await this.#prisma.goodsReceiptNote.count();
+
+        const notes = notesData.map(goodsReceiptNoteFactory);
+
+        return {
+            result: notes,
+            pageToken: opts.pageToken,
+            perPage: opts.perPage,
+            total: Math.ceil(total / opts.perPage),
+        };
     }
 
     async getById(noteId: ID): Promise<Either<GoodsReceiptNoteNotFoundError, GoodsReceiptNote>> {

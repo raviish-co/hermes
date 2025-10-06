@@ -19,7 +19,9 @@ export class DashboardService {
     }
 
     async totalExpiredGoodsIssueNotes(): Promise<number> {
-        const notes = await this.#goodsIssueNoteRepository.getAll();
+        const result = await this.#goodsIssueNoteRepository.getAll();
+
+        const notes = result.result;
 
         if (notes.length === 0) return 0;
 

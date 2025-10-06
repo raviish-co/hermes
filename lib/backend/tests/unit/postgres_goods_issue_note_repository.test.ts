@@ -85,7 +85,9 @@ describe("PostgresGoodsIssueNoteRepository - getAll", () => {
     it("Deve recuperar as linhas das guias de saída", async () => {
         const noteRepository = new PostgresGoodsIssueNoteRepository(prisma);
 
-        const notes = await noteRepository.getAll();
+        const result = await noteRepository.getAll();
+
+        const notes = result.result;
 
         expect(notes.length).toEqual(2);
         expect(notes[0].lines.length).toEqual(1);

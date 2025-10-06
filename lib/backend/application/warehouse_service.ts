@@ -13,7 +13,7 @@ export class WarehouseService {
         return await this.#itemStockRepository.getAll();
     }
 
-    async enableItemInStockToInternalUse(itemId: string): Promise<Either<Error, void>> {
+    async markItemInStockAsIntern(itemId: string): Promise<Either<Error, void>> {
         const itemStockOrErr = await this.#itemStockRepository.getById(ID.fromString(itemId));
         if (itemStockOrErr.isLeft()) {
             return left(itemStockOrErr.value);
@@ -21,7 +21,7 @@ export class WarehouseService {
 
         const itemStock = itemStockOrErr.value;
 
-        itemStock.enableItemInStockToInternal();
+        itemStock.markItemInStockAsIntern();
 
         await this.#itemStockRepository.save(itemStock);
 
