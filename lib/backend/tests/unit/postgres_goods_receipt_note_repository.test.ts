@@ -168,9 +168,9 @@ describe("PostgresGoodsReceiptNoteRepository - getAll", () => {
     it("Deve retornar as guias de entrada encontradas no repositório", async () => {
         const noteRepository = new PostgresGoodsReceiptNoteRepository(prisma);
 
-        const notes = await noteRepository.getAll();
+        const result = await noteRepository.getAll();
 
-        expect(notes.length).toBe(2);
+        expect(result.result.length).toBe(2);
     });
 });
 

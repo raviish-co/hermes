@@ -2,15 +2,28 @@
 import type { GoodsReceiptNoteModel } from "~/lib/frontend/models/goods_receipt_note";
 import { GoodsReceiptService } from "~/lib/frontend/services/goods_receipt_service";
 import { formatDate } from "~/lib/frontend/helpers/format_date";
+import ThePagination from "~/components/ThePagination.vue";
 
 const goodsReceiptService = new GoodsReceiptService();
 const notes = ref<GoodsReceiptNoteModel[]>([]);
+const pages = ref<number>(1);
+
+function changePageToken(pageToken: number) {
+    goodsReceiptService.getAll(pageToken).then((res) => {
+        notes.value = res.notes;
+        pages.value = res.total;
+    });
+}
 
 const auth = useAuth();
 
 onMounted(async () => {
     await auth.checkAuth();
-    notes.value = await goodsReceiptService.getAll();
+
+    const result = await goodsReceiptService.getAll();
+
+    notes.value = result.notes;
+    pages.value = result.total;
 });
 </script>
 <template>
@@ -51,6 +64,10 @@ onMounted(async () => {
             <p v-if="notes.length === 0" class="pt-10 text-gray-500 text-center">
                 Não existem guias de entrada no momento. Crie uma nova
             </p>
+
+            <div class="py-6">
+                <ThePagination :total="pages" @changed="changePageToken" />
+            </div>
         </div>
     </div>
 </template>
