@@ -1,4 +1,3 @@
-import { a } from "vitest/dist/suite-IbNSsUWN.js";
 import type { GoodsIssueNote } from "../domain/goods_issue_note";
 import type { GoodsIssueNoteLine } from "../domain/goods_issue_note_line";
 import type { GoodsIssueNoteModel } from "../models/goods_issue_note";
