@@ -6,6 +6,7 @@
 .cache
 dist
 coverage
+generated
 
 # Node dependencies
 node_modules
@@ -13,6 +14,7 @@ package-lock.json
 
 # Bun dependecies
 bun.lockb
+bun.lock
 
 # Logs
 logs

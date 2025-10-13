@@ -10,10 +10,10 @@
         "schema": "./lib/backend/persistence/prisma/schema.prisma"
     },
     "scripts": {
-        "build": "nuxt build",
+        "build": "npm run generate:prisma && nuxt build",
         "dev": "nuxt dev",
-        "generate": "nuxt generate",
-        "generate:prisma": "prisma generate && cp -r node_modules/.prisma __prisma__",
+        "generate:prisma": "npx prisma generate",
+        "generate": "npm run generate:prisma && nuxt generate",
         "preview": "nuxt preview",
         "postinstall": "nuxt prepare",
         "clean": "rm -rf .nuxt dist node_modules"

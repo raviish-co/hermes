@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "~/generated/primsa";
 import { GoodsReturnNote } from "../../domain/goods_return/goods_return_note";
 import { GoodsReturnNoteLine } from "../../domain/goods_return/goods_return_note_line";
 import { GoodsReturnNoteNotFound } from "../../domain/goods_return/goods_return_note_not_found_error";
@@ -14,7 +14,7 @@ function goodsReturnNoteFactory(data: any) {
             line.goodQuantities,
             line.badQuantities,
             JSON.parse(line.variations),
-            line.comment,
+            line.comment
         );
     });
 
@@ -23,21 +23,18 @@ function goodsReturnNoteFactory(data: any) {
         ID.fromString(data.goodsIssueNoteId),
         lines,
         data.securityDepositWithheld,
-        data.issuedAt,
+        data.issuedAt
     );
 }
 
-export class PostgresGoodsReturnNoteRepository
-    implements GoodsReturnNoteRepository {
+export class PostgresGoodsReturnNoteRepository implements GoodsReturnNoteRepository {
     #prisma: PrismaClient;
 
     constructor(prisma: PrismaClient) {
         this.#prisma = prisma;
     }
 
-    async getById(
-        noteId: ID,
-    ): Promise<Either<GoodsReturnNoteNotFound, GoodsReturnNote>> {
+    async getById(noteId: ID): Promise<Either<GoodsReturnNoteNotFound, GoodsReturnNote>> {
         const noteData = await this.#prisma.goodsReturnNote.findUnique({
             where: { noteId: noteId.toString() },
             include: { lines: true },

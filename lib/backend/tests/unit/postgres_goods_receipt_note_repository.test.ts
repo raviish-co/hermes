@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "~/generated/primsa";
 import { describe, expect, it, vi } from "vitest";
 import { GoodsReceiptNote } from "../../domain/goods_receipt/goods_receipt_note";
 import { GoodsReceiptNoteLine } from "../../domain/goods_receipt/goods_receipt_note_line";

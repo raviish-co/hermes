@@ -1,4 +1,4 @@
-import type { PrismaClient, Stock } from "@prisma/client";
+import type { PrismaClient, Stock } from "~/generated/primsa";
 import { ItemStock } from "../../domain/warehouse/item_stock";
 import type { ItemStockRepository } from "../../domain/warehouse/item_stock_repository";
 import { ID } from "../../shared/id";

@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "~/generated/primsa";
 import { Category } from "../../domain/catalog/categories/category";
 import { CategoryNotFound } from "../../domain/catalog/categories/category_not_found_error";
 import type { CategoryRepository } from "../../domain/catalog/categories/category_repository";

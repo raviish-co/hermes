@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "~/generated/primsa";
 import { describe, expect, it, vi } from "vitest";
 import { Category } from "../../domain/catalog/categories/category";
 import { CategoryNotFound } from "../../domain/catalog/categories/category_not_found_error";

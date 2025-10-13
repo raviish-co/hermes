@@ -1,4 +1,4 @@
-import type { PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "~/generated/primsa";
 import { describe, expect, it, vi } from "vitest";
 import { ItemStock } from "../../domain/warehouse/item_stock";
 import { PostgresItemStockRepository } from "../../persistence/postgres/postgres_item_stock_repository";
