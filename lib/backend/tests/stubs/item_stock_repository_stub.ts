@@ -8,7 +8,7 @@ export class ItemStockRepositoryStub implements ItemStockRepository {
     #data: Record<string, ItemStock> = {};
 
     constructor() {
-        _data.forEach((i) => {
+        _itemStockData.forEach((i) => {
             const itemStock = new ItemStock(
                 i.itemId,
                 i.goodQuantities,
@@ -76,7 +76,7 @@ export class ItemStockRepositoryStub implements ItemStockRepository {
     }
 }
 
-const _data = [
+export const _itemStockData = [
     {
         itemId: ID.fromString("1001"),
         goodQuantities: 10,

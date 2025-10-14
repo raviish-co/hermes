@@ -1,4 +1,4 @@
-import type { PrismaClient } from "~/generated/primsa";
+import type { PrismaClient } from "~/lib/backend/persistence/postgres/generated/prisma";
 import { describe, expect, it, vi } from "vitest";
 import { PostgresSequenceGenerator } from "../../persistence/postgres/postgres_sequence_generator";
 

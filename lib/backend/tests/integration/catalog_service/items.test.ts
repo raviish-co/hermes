@@ -105,7 +105,7 @@ describe("CatalogService - Pesquisar artigos", () => {
 
         const items = await service.listItems(pageToken);
 
-        expect(items.result.length).toEqual(2);
+        expect(items.result.length).toEqual(3);
         expect(items.pageToken).toEqual(2);
         expect(items.perPage).toEqual(12);
     });

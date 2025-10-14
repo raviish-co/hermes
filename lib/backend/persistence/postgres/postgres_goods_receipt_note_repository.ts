@@ -1,4 +1,4 @@
-import type { PrismaClient } from "~/generated/primsa";
+import type { PrismaClient } from "~/lib/backend/persistence/postgres/generated/prisma";
 import { GoodsReceiptNote } from "../../domain/goods_receipt/goods_receipt_note";
 import type { GoodsReceiptNoteRepository } from "../../domain/goods_receipt/goods_receipt_note_repository";
 import { Condition } from "../../shared/condition";

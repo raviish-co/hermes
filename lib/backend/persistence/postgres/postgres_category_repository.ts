@@ -1,4 +1,4 @@
-import type { PrismaClient } from "~/generated/primsa";
+import type { PrismaClient } from "~/lib/backend/persistence/postgres/generated/prisma";
 import { Category } from "../../domain/catalog/categories/category";
 import { CategoryNotFound } from "../../domain/catalog/categories/category_not_found_error";
 import type { CategoryRepository } from "../../domain/catalog/categories/category_repository";

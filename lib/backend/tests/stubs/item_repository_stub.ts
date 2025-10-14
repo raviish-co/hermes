@@ -22,7 +22,7 @@ export class ItemRepositoryStub extends InmemItemRepository {
     }
 }
 
-const _itemData = [
+export const _itemData = [
     {
         itemId: "1001",
         name: "T-shirt desportiva gola redonda",
@@ -119,6 +119,14 @@ const _itemData = [
         categoryId: "4",
         sectionId: "1",
         variationsValues: { "1": "Cor: Castanho", "2": "Marca: Gucci" },
+    },
+    {
+        itemId: "1013",
+        name: "Jaqueta de Napa",
+        price: 25300,
+        categoryId: "4",
+        sectionId: "1",
+        variationsValues: { "1": "Cor: Preto", "2": "Marca: LS2" },
     },
     {
         itemId: "1015",

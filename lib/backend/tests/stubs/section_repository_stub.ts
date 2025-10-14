@@ -8,7 +8,7 @@ export class SectionRepositoryStub extends InmemSectionRepository {
     }
 }
 
-const _sectionsData = [
+export const _sectionsData = [
     {
         id: ID.fromString("1"),
         name: "T-shirts",

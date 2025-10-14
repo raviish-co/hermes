@@ -8,7 +8,7 @@ export class CategoryRepositoryStub extends InmemCategoryRepository {
     }
 }
 
-const _categoriesData = [
+export const _categoriesData = [
     {
         id: ID.fromString("1"),
         name: "Camisas",

@@ -5,12 +5,11 @@ import { PasswordAuthenticator } from "./password_authenticator";
 
 enum Mode {
     Otp = "Otp",
-    Default = "Default"
+    Default = "Default",
 }
 
 export class AuthFactory {
-
-    constructor(private otpStorage: OtpStorage) { }
+    constructor(private otpStorage: OtpStorage) {}
 
     create(mode: string): Authenticator {
         if (mode === Mode.Otp) {
@@ -21,6 +20,6 @@ export class AuthFactory {
             return new PasswordAuthenticator();
         }
 
-        throw new Error("Authentication strategy failed to load")
+        throw new Error("Authentication strategy failed to load");
     }
 }

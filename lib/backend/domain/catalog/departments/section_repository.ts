@@ -1,7 +1,7 @@
-import { SectionNotFound } from "./section_not_found_error";
+import type { ID } from "~/lib/backend/shared/id";
 import { type Either } from "../../../shared/either";
 import { Section } from "./section";
-import type { ID } from "~/lib/backend/shared/id";
+import { SectionNotFound } from "./section_not_found_error";
 
 export interface SectionRepository {
     getAll(): Promise<Section[]>;

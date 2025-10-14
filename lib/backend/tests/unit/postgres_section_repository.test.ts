@@ -1,4 +1,4 @@
-import { PrismaClient } from "~/generated/primsa";
+import { PrismaClient } from "~/lib/backend/persistence/postgres/generated/prisma";
 import { describe, expect, it, vi } from "vitest";
 import { Section } from "../../domain/catalog/departments/section";
 import { SectionNotFound } from "../../domain/catalog/departments/section_not_found_error";
