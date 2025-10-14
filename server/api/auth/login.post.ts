@@ -7,7 +7,7 @@ const service = useAuthService();
 export default defineEventHandler(async (event) => {
     const data = await readBody(event);
 
-    const userOrErr = await service.login(data.username, data.password);
+    const userOrErr = await service.login(data.username, data.password, data.mode);
 
     if (userOrErr.value instanceof AuthenticationFailed) {
         throw createError({ statusCode: HttpStatus.Unauthorized });

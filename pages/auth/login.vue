@@ -11,6 +11,7 @@ const username = ref<string>("");
 const password = ref<string>("");
 const error = ref<LoginError>({});
 const sentStatus = ref<boolean>(false);
+const authMode = ref<"Otp" | "Default">("Otp");
 
 const service = new AuthService();
 
@@ -19,7 +20,7 @@ async function authenticate() {
         return;
     }
 
-    const voidOrErr = await service.authenticate(username.value, password.value);
+    const voidOrErr = await service.authenticate(username.value, password.value, authMode.value);
 
     if (voidOrErr) {
         error.value.message = voidOrErr.message;
@@ -40,6 +41,18 @@ async function sendOTP() {
 
     error.value = {};
     sentStatus.value = true;
+}
+
+function login() {
+    if (authMode.value === "Default") {
+        return authenticate();
+    }
+    return sendOTP();
+}
+
+function changeAuthMode() {
+    password.value = "";
+    authMode.value = authMode.value === "Otp" ? "Default" : "Otp";
 }
 
 function cancel() {
@@ -88,9 +101,28 @@ function validateForm(username: string, password: string) {
                     <div class="text-red-500 text-sm mt-1" v-if="error.username">
                         {{ error.username }}
                     </div>
-                    <button type="button" class="btn btn-secondary" @click="sendOTP()">
-                        Entrar
-                    </button>
+
+                    <div v-if="authMode === 'Default'">
+                        <input
+                            :type="authMode === 'Default' ? 'password' : 'text'"
+                            placeholder="Palavra-passe"
+                            class="input-field"
+                            v-model="password"
+                        />
+                    </div>
+                    <div
+                        class="text-red-500 text-sm mt-1"
+                        v-if="error.password && authMode === 'Default'"
+                    >
+                        {{ error.password }}
+                    </div>
+                    <div>
+                        <p class="text-base text-gray-500">
+                            Iniciar sessão com o nome de utilizador e palavra-passe
+                            <input type="checkbox" class="w-4 h-4 ml-1" @change="changeAuthMode" />
+                        </p>
+                    </div>
+                    <button type="button" class="btn btn-secondary" @click="login()">Entrar</button>
                 </form>
             </div>
             <div v-else class="space-y-6">
