@@ -7,13 +7,14 @@
         "npm": ">=9.6.3"
     },
     "prisma": {
-        "schema": "./lib/backend/persistence/prisma/schema.prisma"
+        "schema": "./lib/backend/persistence/postgres/prisma/schema.prisma"
     },
     "scripts": {
-        "build": "npm run generate:prisma && nuxt build",
+        "build": "nuxt build",
         "dev": "nuxt dev",
-        "generate:prisma": "npx prisma generate",
-        "generate": "npm run generate:prisma && nuxt generate",
+        "prisma:generate": "npx prisma generate",
+        "prisma:migrate": "npx prisma migrate dev",
+        "prisma:migrate:deploy": "npx prisma migrate deploy",
         "preview": "nuxt preview",
         "postinstall": "nuxt prepare",
         "clean": "rm -rf .nuxt dist node_modules"
