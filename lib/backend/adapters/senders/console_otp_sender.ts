@@ -1,5 +1,4 @@
-import type { Sender } from "./Sender";
-
+import type { Sender } from "../../domain/auth/sender";
 
 export class ConsoleOtpSender implements Sender {
     async send(to: string, message: string): Promise<void> {
