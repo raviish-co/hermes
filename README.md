@@ -66,6 +66,14 @@ Para executar a aplicação no ambiente de desenvolvimento siga os seguintes pas
 bun install
 ```
 
+-   Configuração da base de dados
+
+Para gerar cliente prisma execute o seguinte comando:
+
+```bash
+bun run prisma:generate
+```
+
 -   Executar servidor de desenvolvimente
 
 ```bash

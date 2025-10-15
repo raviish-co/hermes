@@ -117,7 +117,7 @@ function validateForm(username: string, password: string) {
                         {{ error.password }}
                     </div>
                     <div>
-                        <p class="text-base text-gray-500">
+                        <p class="text-sm text-gray-500">
                             Iniciar sessão com o nome de utilizador e palavra-passe
                             <input type="checkbox" class="w-4 h-4 ml-1" @change="changeAuthMode" />
                         </p>
