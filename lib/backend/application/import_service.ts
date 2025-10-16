@@ -10,6 +10,8 @@ import { InvalidFileHeader } from "../adapters/readers/invalid_file_header_error
 import type { CsvReader } from "../adapters/readers/reader";
 import type { Generator } from "../adapters/sequences/generator";
 import { Sequence } from "../adapters/sequences/sequence";
+import type { UserRepository } from "../domain/auth/user_repository";
+import { Username } from "../domain/auth/username";
 import type { CategoryRepository } from "../domain/catalog/categories/category_repository";
 import type { SectionRepository } from "../domain/catalog/departments/section_repository";
 import type { Item } from "../domain/catalog/items/item";
@@ -38,6 +40,7 @@ export class ImportService {
     #noteRepository: GoodsReceiptNoteRepository;
     #generator: Generator;
     #reader: CsvReader;
+    #userRepository: UserRepository;
 
     constructor(
         itemRepository: ItemRepository,
@@ -47,7 +50,8 @@ export class ImportService {
         variationRepository: VariationRepository,
         noteRepository: GoodsReceiptNoteRepository,
         generator: Generator,
-        reader: CsvReader
+        reader: CsvReader,
+        userRepository: UserRepository
     ) {
         this.#itemRepository = itemRepository;
         this.#itemStockRepository = itemStockRepository;
@@ -57,6 +61,7 @@ export class ImportService {
         this.#noteRepository = noteRepository;
         this.#generator = generator;
         this.#reader = reader;
+        this.#userRepository = userRepository;
     }
 
     async uploadItems(file: File): Promise<Either<FileError, void>> {
@@ -73,8 +78,13 @@ export class ImportService {
         return right(undefined);
     }
 
-    async uploadItemsInStock(file: File): Promise<Either<FileError, void>> {
+    async uploadItemsInStock(username: string, file: File): Promise<Either<FileError, void>> {
         if (!this.#isCsvFile(file)) return left(new FileNotSupported());
+
+        const userOrErr = await this.#userRepository.getByUsername(Username.fromString(username));
+        if (userOrErr.isLeft()) {
+            return left(userOrErr.value);
+        }
 
         const lines = await this.#reader.read(file);
         if (lines.length <= 1) return left(new FileEmpty());
@@ -98,6 +108,7 @@ export class ImportService {
         const entryDate = new Date();
         const noteOrErr = new GoodsReceiptNoteBuilder()
             .withNoteId(noteId)
+            .withUser(username)
             .withLines(this.#buildNoteLines(itemsStock))
             .withEntryDate(entryDate.toISOString())
             .build();

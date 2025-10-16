@@ -1,4 +1,5 @@
 import { useImportService } from "~/composables/useImportService";
+import { useAuth } from "~/composables/useAuth";
 import { FileEmpty } from "~/lib/backend/adapters/readers/file_empty_error";
 import { FileNotSupported } from "~/lib/backend/adapters/readers/file_not_supported_error";
 import { InvalidFileHeader } from "~/lib/backend/adapters/readers/invalid_file_header_error";
@@ -6,6 +7,7 @@ import { ItemStockNotFound } from "~/lib/backend/domain/warehouse/item_stock_not
 import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
 import { InvalidQuantitiesError } from "~/lib/backend/application/invalid_quantities_error";
+import { UserNotFound } from "~/lib/backend/domain/auth/user_not_found";
 
 const service = useImportService();
 
@@ -15,8 +17,9 @@ export default defineEventHandler(async (event) => {
     const formData = await readFormData(event);
 
     const file = formData.get("file") as File;
+    const username = formData.get("username") as string;
 
-    const voidOrErr = await service.uploadItemsInStock(file);
+    const voidOrErr = await service.uploadItemsInStock(username, file);
 
     if (voidOrErr.value instanceof InvalidFileHeader) {
         throw createError({
@@ -29,6 +32,13 @@ export default defineEventHandler(async (event) => {
         throw createError({
             statusCode: HttpStatus.BadRequest,
             statusMessage: "Arquivo vazio.",
+        });
+    }
+
+    if (voidOrErr.value instanceof UserNotFound) {
+        throw createError({
+            statusCode: HttpStatus.BadRequest,
+            statusMessage: "Utilizador não encontrado.",
         });
     }
 
