@@ -1,0 +1,180 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("NUXT_DATABASE_URL")
+}
+
+model Category {
+  categoryId  String    @id @unique @map("category_id")
+  name        String
+  description String?
+  variations  String?
+  products    Product[]
+
+  @@map("categories")
+}
+
+model Department {
+  departmentId String @id @unique @map("department_id")
+  name         String
+
+  @@map("departments")
+}
+
+model Section {
+  sectionId String    @id @unique @map("section_id")
+  name      String
+  products  Product[]
+
+  @@map("sections")
+}
+
+model Product {
+  productId        String                 @id @unique @map("product_id")
+  name             String
+  price            Float
+  categoryId       String?                @map("category_id")
+  sectionId        String?                @map("section_id")
+  category         Category?              @relation(fields: [categoryId], references: [categoryId])
+  section          Section?               @relation(fields: [sectionId], references: [sectionId])
+  tags             String?
+  variations       ProductVariations[]
+  receiptNoteLines GoodsReceiptNoteLine[]
+  issueNoteLines   GoodsIssueNoteLine[]
+  returnLines      GoodsReturnNoteLine[]
+  stock            Stock?
+  fulltext         String
+
+  @@map("products")
+}
+
+model ProductVariations {
+  id          Int     @id @default(autoincrement())
+  variationId String  @map("variation_id")
+  value       String
+  product     Product @relation(fields: [productId], references: [productId])
+  productId   String  @map("product_id")
+
+  @@map("product_variations")
+}
+
+model GoodsReceiptNote {
+  noteId    String                 @id @unique @map("note_id")
+  entryDate DateTime               @map("entry_date")
+  lines     GoodsReceiptNoteLine[]
+  userId    String                 @map("user_id")
+
+  @@map("goods_receipt_notes")
+}
+
+model GoodsReceiptNoteLine {
+  note             GoodsReceiptNote @relation(fields: [noteId], references: [noteId])
+  noteId           String           @map("note_id")
+  lineId           String           @id @unique @map("line_id")
+  product          Product          @relation(fields: [productId], references: [productId])
+  productId        String           @map("product_id")
+  goodQuantities   Int              @default(0) @map("good_quantities")
+  badQuantities    Int              @default(0) @map("bad_quantities")
+  comments         String?
+  consignmentValue Float            @default(0) @map("consignment_value")
+  itemStockType    String           @default("") @map("item_stock_type")
+
+  @@map("goods_receipt_note_lines")
+}
+
+model GoodsIssueNote {
+  noteId           String               @id @unique @map("note_id")
+  issuedAt         DateTime             @map("issued_at")
+  returnDate       DateTime             @map("return_date")
+  status           String
+  total            Float
+  securityDeposit  Float                @map("security_deposit")
+  fulltext         String
+  purpose          Purpose?
+  userId           String               @map("user_id")
+  lines            GoodsIssueNoteLine[]
+  goodsReturnNotes GoodsReturnNote[]
+
+  @@map("goods_issue_notes")
+}
+
+model GoodsIssueNoteLine {
+  note                   GoodsIssueNote @relation(fields: [noteId], references: [noteId])
+  noteId                 String         @map("note_id")
+  lineId                 String         @id @unique @map("line_id")
+  product                Product        @relation(fields: [productId], references: [productId])
+  productId              String         @map("product_id")
+  name                   String
+  price                  Float
+  goodQuantities         Int            @default(0) @map("good_quantities")
+  badQuantities          Int            @default(0) @map("bad_quantities")
+  goodQuantitiesReturned Int            @default(0) @map("good_quantities_returned")
+  badQuantitiesReturned  Int            @default(0) @map("bad_quantities_returned")
+  netTotal               Float          @map("net_total")
+  comments               String?
+  variations             Json?
+
+  @@map("goods_issue_note_lines")
+}
+
+model Purpose {
+  id          Int            @id @default(autoincrement())
+  description String
+  notes       String
+  details     String?
+  note        GoodsIssueNote @relation(fields: [noteId], references: [noteId])
+  noteId      String         @unique @map("note_id")
+
+  @@map("purposes")
+}
+
+model GoodsReturnNote {
+  noteId                  String                @id @unique
+  goodsIssueNote          GoodsIssueNote        @relation(fields: [goodsIssueNoteId], references: [noteId])
+  goodsIssueNoteId        String                @map("goods_issue_note_id")
+  securityDepositWithheld Int                   @map("security_deposity_with_held")
+  issuedAt                DateTime              @map("issued_at")
+  lines                   GoodsReturnNoteLine[]
+  userId                  String                @map("user_id")
+
+  @@map("goods_return_note")
+}
+
+model GoodsReturnNoteLine {
+  note           GoodsReturnNote @relation(fields: [noteId], references: [noteId])
+  noteId         String          @map("note_id")
+  lineId         String          @id @unique @map("line_id")
+  description    String
+  product        Product         @relation(fields: [productId], references: [productId])
+  productId      String          @map("product_id")
+  goodQuantities Int             @default(0) @map("good_quantities")
+  badQuantities  Int             @default(0) @map("bad_quantities")
+  variations     Json?
+  comments       String?
+
+  @@map("goods_return_lines")
+}
+
+model Stock {
+  stockId             String  @id @unique @map("stock_id")
+  product             Product @relation(fields: [productId], references: [productId])
+  productId           String  @unique @map("product_id")
+  goodQuantities      Int     @default(0) @map("good_quantities")
+  badQuantities       Int     @default(0) @map("bad_quantities")
+  consignmentValue    Float   @map("consignment_value")
+  totalValueOfOutputs Float   @default(0) @map("total_value_of_outputs")
+  itemStockType       String  @default("") @map("item_stock_type")
+
+  @@map("stock_of_products")
+}
+
+model Sequence {
+  name  String @id @unique
+  value Int
+
+  @@map("sequences")
+}
