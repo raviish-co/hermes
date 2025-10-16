@@ -7,7 +7,7 @@ import { User } from "../../domain/auth/user";
 import { UserNotFound } from "../../domain/auth/user_not_found";
 import type { UserRepository } from "../../domain/auth/user_repository";
 import { InmemUserRepository } from "../../persistence/inmem/inmem_user_repository";
-import { ConsoleOtpSender } from "./../../adapters/console/console_otp_sender";
+import { ConsoleOtpSender } from "./../../adapters/senders/console_otp_sender";
 import { InmemOtpStorage } from "./../../persistence/inmem/inmem_otp_storage";
 import { TokenGeneratorStub } from "./../stubs/token_generator_stub";
 

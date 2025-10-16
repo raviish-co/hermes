@@ -29,7 +29,7 @@ cd hermes
 
 ## Ambiente de Produção
 
-Para executar a aplicação atráves da sua imagem em Docker siga os seguintes passos:
+#### Para executar a aplicação atráves da sua imagem em Docker siga os seguintes passos:
 
 -   Configuração da Base de Dados
 
@@ -55,6 +55,28 @@ docker run -d -e NUXT_DATABASE_URL="database-url" -p 3000:8080 hermes
 > NOTA: `hermes` é o nome que deu a imagem no passo acima, opcionalmente, também pode definir o nome do container na flag --name="container-name"
 
 Depois de executar o comando acima a aplicação estará disponível no seguinte endereço: <http://localhost:3000>
+
+#### Para realizar o deploy da aplicação através do github workflow siga os seguintes passos:
+
+-   Configuração da base de dados
+
+```bash
+bun run prisma:migrate:deploy
+```
+
+> NOTA: defina o valor de `DATABASE-URL` no seu ficheiro `.env`.
+
+-   Criação da tag no github
+
+```bash
+git tag v*.*.*
+```
+
+-   Publicação da tag
+
+```bash
+git push origin v*.*.*
+```
 
 ## Ambiente de desenvolvimento
 
