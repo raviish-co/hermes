@@ -44,8 +44,12 @@ export class PostgresItemRepository implements ItemRepository {
                 include: { variations: true },
             });
 
+            const items = itemsData
+                .map(itemFactory)
+                .sort((a, b) => b.itemId.localeCompare(a.itemId.toString()));
+
             return {
-                result: itemsData.map(itemFactory),
+                result: items,
                 pageToken: 0,
                 perPage: 0,
                 total: itemsData.length,
@@ -54,19 +58,22 @@ export class PostgresItemRepository implements ItemRepository {
 
         const itemsData = await this.#prisma.product.findMany({
             include: { variations: true },
-            skip: (opts.pageToken - 1) * opts.perPage,
-            take: opts.perPage,
         });
 
-        const total = await this.#prisma.product.count();
+        const productCount = await this.#prisma.product.count();
+        const startIndex = (opts.pageToken - 1) * opts.perPage;
+        const endIndex = startIndex + opts.perPage;
 
-        const items = itemsData.map(itemFactory);
+        const items = itemsData
+            .map(itemFactory)
+            .sort((a, b) => b.itemId.localeCompare(a.itemId.toString()))
+            .slice(startIndex, endIndex);
 
         return {
             result: items,
             pageToken: opts.pageToken,
             perPage: opts.perPage,
-            total: Math.ceil(total / opts.perPage),
+            total: Math.ceil(productCount / opts.perPage),
         };
     }
 

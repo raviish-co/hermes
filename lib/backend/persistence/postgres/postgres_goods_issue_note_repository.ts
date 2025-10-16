@@ -31,23 +31,31 @@ export class PostgresGoodsIssueNoteRepository implements GoodsIssueNoteRepositor
                 include: { purpose: true, lines: true },
             });
 
+            const notes = notesData
+                .map((note) => GoodsIssueNote.restore(note as NoteOptions))
+                .sort((a, b) => b.noteId.localeCompare(a.noteId.toString()));
+
             return {
-                result: notesData.map((note) => GoodsIssueNote.restore(note as NoteOptions)),
+                result: notes,
                 pageToken: 0,
                 perPage: 0,
-                total: notesData.length,
+                total: notes.length,
             };
         }
 
         const notesData = await this.#prisma.goodsIssueNote.findMany({
             include: { purpose: true, lines: true },
-            skip: (opts.pageToken - 1) * opts.perPage,
-            take: opts.perPage,
         });
 
         const total = await this.#prisma.goodsIssueNote.count();
 
-        const notes = notesData.map((note) => GoodsIssueNote.restore(note as NoteOptions));
+        const startIndex = (opts.pageToken - 1) * opts.perPage;
+        const endIndex = startIndex + opts.perPage;
+
+        const notes = notesData
+            .map((note) => GoodsIssueNote.restore(note as NoteOptions))
+            .sort((a, b) => b.noteId.localeCompare(a.noteId.toString()))
+            .slice(startIndex, endIndex);
 
         return {
             result: notes,

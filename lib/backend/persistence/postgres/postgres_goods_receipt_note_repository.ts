@@ -33,7 +33,9 @@ export class PostgresGoodsReceiptNoteRepository implements GoodsReceiptNoteRepos
                 include: { lines: true },
             });
 
-            const notes = notesData.map(goodsReceiptNoteFactory);
+            const notes = notesData
+                .map(goodsReceiptNoteFactory)
+                .sort((a, b) => b.noteId.localeCompare(a.noteId.toString()));
 
             return {
                 result: notes,

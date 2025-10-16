@@ -7,6 +7,7 @@ import { useItemStockRepository } from "~/composables/useItemStockRepository";
 import { useSectionRepository } from "~/composables/useSectionRepository";
 import { useSequenceGenerator } from "~/composables/useSequenceGenerator";
 import { useVariationRepository } from "~/composables/useVariationRepository";
+import { useUserRepository } from "~/composables/useUserRepository";
 
 const srv = new ImportService(
     useItemRepository(),
@@ -16,7 +17,8 @@ const srv = new ImportService(
     useVariationRepository(),
     useGoodsReceiptRepository(),
     useSequenceGenerator(),
-    useCsvReader()
+    useCsvReader(),
+    useUserRepository()
 );
 
 export const useImportService = () => srv;

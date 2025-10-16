@@ -25,6 +25,8 @@ import { ID } from "../../shared/id";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
 import { VariationRepositoryStub } from "../stubs/variation_repository_stub";
 import { InvalidQuantitiesError } from "../../application/invalid_quantities_error";
+import { InmemUserRepository } from "../../persistence/inmem/inmem_user_repository";
+import { User } from "../../domain/auth/user";
 
 describe("Test Upload Items", async () => {
     it("Deve retornar **FileNotSupported** caso o ficheiro não seja .csv", async () => {
@@ -252,10 +254,10 @@ describe("Test Upload Items", async () => {
 
 describe("Import Service - Upload Items in Stock", async () => {
     it("Deve actualizar as quantidades em stock dos artigos a partir do ficheiro .csv", async () => {
-        const { service, itemStockRepository } = makeService();
+        const { service, itemStockRepository, user } = makeService();
         const file = new File([itemsStockData], "filename.csv", { type: "text/csv" });
 
-        await service.uploadItemsInStock(file);
+        await service.uploadItemsInStock(user.username.value, file);
 
         const itemsStock = await itemStockRepository.findAll([
             ID.fromString("1001"),
@@ -270,10 +272,10 @@ describe("Import Service - Upload Items in Stock", async () => {
     });
 
     it("Deve actualizar as quantidades em mau estado dos artigos em stock a partir do ficheiro .csv", async () => {
-        const { service, itemStockRepository } = makeService();
+        const { service, itemStockRepository, user } = makeService();
         const file = new File([itemsStockData], "filename.csv", { type: "text/csv" });
 
-        await service.uploadItemsInStock(file);
+        await service.uploadItemsInStock(user.username.value, file);
 
         const itemsStock = await itemStockRepository.findAll([
             ID.fromString("1001"),
@@ -289,10 +291,10 @@ describe("Import Service - Upload Items in Stock", async () => {
     });
 
     it("Deve criar a guia de entrada de mercadorias em stock", async () => {
-        const { service, goodsReceiptNoteRepository } = makeService();
+        const { service, goodsReceiptNoteRepository, user } = makeService();
         const file = new File([itemsStockData], "filename.csv", { type: "text/csv" });
 
-        await service.uploadItemsInStock(file);
+        await service.uploadItemsInStock(user.username.value, file);
 
         const note = await goodsReceiptNoteRepository.last();
 
@@ -301,54 +303,54 @@ describe("Import Service - Upload Items in Stock", async () => {
     });
 
     it("Deve retornar **FileNotSupported** caso o ficheiro não seja .csv", async () => {
-        const { service } = makeService();
+        const { service, user } = makeService();
 
-        const error = await service.uploadItemsInStock(fileTxt);
+        const error = await service.uploadItemsInStock(user.username.value, fileTxt);
 
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(FileNotSupported);
     });
 
     it("Deve retornar **EmptyFile** caso o ficheiro seja válido e esteja vazio", async () => {
-        const { service } = makeService();
+        const { service, user } = makeService();
 
-        const error = await service.uploadItemsInStock(emptyFile);
+        const error = await service.uploadItemsInStock(user.username.value, emptyFile);
 
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(FileEmpty);
     });
 
     it("Deve retornar **InvalidFileHeader** caso o cabeçalho não esteja completo", async () => {
-        const { service } = makeService();
+        const { service, user } = makeService();
         const data = `id,nome,description
         1001,10,5`;
         const file = new File([data], "filename.csv", { type: "text/csv" });
 
-        const error = await service.uploadItemsInStock(file);
+        const error = await service.uploadItemsInStock(user.username.value, file);
 
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(InvalidFileHeader);
     });
 
     it("Deve retornar **ItemNotFound** caso algum artigo não seja encontrado no repositório", async () => {
-        const { service } = makeService();
+        const { service, user } = makeService();
         const data = `id,boas,com_defeito
         1001,10,5
         1002,8,5
         1004,5,10`;
         const file = new File([data], "filename.csv", { type: "text/csv" });
 
-        const error = await service.uploadItemsInStock(file);
+        const error = await service.uploadItemsInStock(user.username.value, file);
 
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(ItemStockNotFound);
     });
 
     it("Deve retornar **InvalidQuantitiesError** caso o total das quantidades boas e com defeito de um artigo em consignação for superior a 1", async () => {
-        const { service } = makeService();
+        const { service, user } = makeService();
         const file = new File([invalidItemsStockData], "filename.csv", { type: "text/csv" });
 
-        const error = await service.uploadItemsInStock(file);
+        const error = await service.uploadItemsInStock(user.username.value, file);
 
         expect(error.isLeft()).toBeTruthy();
         expect(error.value).toBeInstanceOf(InvalidQuantitiesError);
@@ -403,6 +405,9 @@ function makeService(deps?: Dependencies) {
     const goodsReceiptNoteRepository = new InmemGoodsReceiptNoteRepository();
     const csvReader = new DefaultCsvReader();
 
+    const user = new User("john.doe", "password", "John Doe", "99999999");
+    const userRepository = new InmemUserRepository([user]);
+
     const service = new ImportService(
         itemRepository,
         itemStockRepository,
@@ -411,10 +416,12 @@ function makeService(deps?: Dependencies) {
         variationRepository,
         goodsReceiptNoteRepository,
         sequenceGenerator,
-        csvReader
+        csvReader,
+        userRepository
     );
 
     return {
+        user,
         service,
         itemRepository,
         categoryRepository,

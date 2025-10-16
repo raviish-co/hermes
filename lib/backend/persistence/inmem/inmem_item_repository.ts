@@ -16,8 +16,10 @@ export class InmemItemRepository implements ItemRepository {
 
     async getAll(opts?: PaginatorOptions): Promise<Pagination<Item>> {
         if (!opts) {
+            const items = this.records.sort((a, b) => b.itemId.localeCompare(a.itemId.toString()));
+
             return {
-                result: this.records,
+                result: items,
                 perPage: 0,
                 pageToken: 0,
                 total: 0,

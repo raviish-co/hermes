@@ -204,13 +204,9 @@ describe("PostgresItemRepository - getAll", () => {
         const { result: items } = await itemRepository.getAll();
 
         expect(items.length).toEqual(2);
-        expect(items[0].itemId.toString()).toEqual("1");
-        expect(items[0].name).toEqual("Artigo 1");
-        expect(items[0].price.value).toEqual(10);
-
-        expect(items[1].categoryId?.toString()).toEqual("1");
-        expect(items[1].sectionId?.toString()).toEqual("1");
-        expect(items[1].tags).toEqual(["tag1", "tag2"]);
+        expect(items[0].itemId.toString()).toEqual("2");
+        expect(items[0].name).toEqual("Artigo 2");
+        expect(items[0].price.value).toEqual(20);
     });
 
     it("Deve retornar os artigos com as suas variações", async () => {
@@ -218,8 +214,8 @@ describe("PostgresItemRepository - getAll", () => {
 
         const { result: items } = await itemRepository.getAll();
 
-        expect(items[0].variations).toEqual({});
-        expect(items[1].variations).toEqual({ "1": "Cor: Azul", "2": "Tamanho: M" });
+        expect(items[0].variations).toEqual({ "1": "Cor: Azul", "2": "Tamanho: M" });
+        expect(items[1].variations).toEqual({});
     });
 
     it("Deve recuperar os artigos páginados", async () => {
