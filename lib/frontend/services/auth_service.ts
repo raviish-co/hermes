@@ -3,13 +3,12 @@ const auth = useAuth();
 export class AuthService {
     async authenticate(
         username: string,
-        password: string,
-        mode?: "Otp" | "Default"
+        password: string
     ): Promise<{ message: string } | undefined> {
         try {
             const user = await $fetch("/api/auth/login/", {
                 method: "post",
-                body: { username, password, mode },
+                body: { username, password },
             });
 
             auth.login(user);
