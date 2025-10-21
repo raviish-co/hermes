@@ -1,4 +1,4 @@
-import type { PrismaClient, Sequence } from "~/lib/backend/persistence/postgres/generated/prisma";
+import type { PrismaClient, Sequence } from "@prisma/client";
 import type { Generator } from "../../adapters/sequences/generator";
 
 export class PostgresSequenceGenerator implements Generator {
@@ -29,6 +29,6 @@ export class PostgresSequenceGenerator implements Generator {
     }
 
     #formatSequence(code: string, value: number): string {
-        return `${code} - ${value.toString().padStart(4, "0")}`;
+        return `${code}-${value.toString().padStart(4, "0")}`;
     }
 }

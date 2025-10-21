@@ -1,5 +1,5 @@
-import type { Product } from "~/lib/backend/persistence/postgres/generated/prisma";
-import { PrismaClient } from "~/lib/backend/persistence/postgres/generated/prisma";
+import type { Product } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { Item } from "../../domain/catalog/items/item";
 import { ItemNotFound } from "../../domain/catalog/items/item_not_found_error";
 import type { ItemRepository } from "../../domain/catalog/items/item_repository";

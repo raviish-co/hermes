@@ -1,4 +1,4 @@
-import type { PrismaClient, Stock } from "~/lib/backend/persistence/postgres/generated/prisma";
+import type { PrismaClient, Stock } from "@prisma/client";
 import { ItemStock } from "../../domain/warehouse/item_stock";
 import type { ItemStockRepository } from "../../domain/warehouse/item_stock_repository";
 import { ID } from "../../shared/id";
@@ -28,8 +28,25 @@ export class PostgresItemStockRepository implements ItemStockRepository {
         return stocksData.map(stockFactory);
     }
 
-    async save(_itemStock: ItemStock): Promise<void> {
-        throw new Error("Method not implemented.");
+    async save(itemStock: ItemStock): Promise<void> {
+        await this.#prisma.stock.upsert({
+            where: { productId: itemStock.itemId.toString() },
+            update: {
+                goodQuantities: itemStock.goodQuantities,
+                badQuantities: itemStock.badQuantities,
+                itemStockType: itemStock.itemStockType,
+                totalValueOfOutputs: itemStock.totalValueOfOutputs,
+            },
+            create: {
+                stockId: itemStock.itemStockId.toString(),
+                productId: itemStock.itemId.toString(),
+                goodQuantities: itemStock.goodQuantities,
+                badQuantities: itemStock.badQuantities,
+                itemStockType: itemStock.itemStockType,
+                consignmentValue: itemStock.consignmentValue,
+                totalValueOfOutputs: itemStock.totalValueOfOutputs,
+            },
+        });
     }
 
     async getById(itemId: ID): Promise<Either<ItemStockNotFound, ItemStock>> {

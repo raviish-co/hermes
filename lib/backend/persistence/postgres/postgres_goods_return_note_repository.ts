@@ -1,4 +1,4 @@
-import type { PrismaClient } from "~/lib/backend/persistence/postgres/generated/prisma";
+import type { PrismaClient } from "@prisma/client";
 import { GoodsReturnNote } from "../../domain/goods_return/goods_return_note";
 import { GoodsReturnNoteLine } from "../../domain/goods_return/goods_return_note_line";
 import { GoodsReturnNoteNotFound } from "../../domain/goods_return/goods_return_note_not_found_error";
