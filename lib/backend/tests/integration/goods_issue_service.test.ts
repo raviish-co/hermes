@@ -328,7 +328,7 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
         const itemStock = await itemStockRepository.findAll([ID.fromString("1001")]);
 
         expect(itemStock.length).toEqual(1);
-        expect(itemStock[0].totalValueOfOutputs).toEqual(9000);
+        expect(itemStock[0].totalValueOfOutputs).toEqual(18000);
     });
 });
 

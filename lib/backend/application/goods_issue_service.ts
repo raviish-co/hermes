@@ -145,7 +145,10 @@ export class GoodsIssueService {
 
             stock.reduce(line.goodQuantities, line.badQuantities);
 
-            stock.calculateTotalValueOfOutputs(item.price);
+            const totalItemQuantities = line.goodQuantities + (line.badQuantities ?? 0);
+            const itemTotalPrice = item.price.value * totalItemQuantities;
+
+            stock.calculateTotalValueOfOutputs(itemTotalPrice);
         }
 
         await this.#itemStockRepository.saveAll(itemsStock);

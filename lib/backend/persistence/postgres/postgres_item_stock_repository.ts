@@ -12,7 +12,8 @@ function stockFactory(data: Stock): ItemStock {
         data.goodQuantities,
         data.badQuantities,
         data.itemStockType,
-        data.consignmentValue
+        data.consignmentValue,
+        data.totalValueOfOutputs
     );
 }
 
@@ -151,6 +152,7 @@ export class PostgresItemStockRepository implements ItemStockRepository {
                 badQuantities: itemStock.badQuantities,
                 itemStockType: itemStock.itemStockType,
                 consignmentValue: itemStock.consignmentValue,
+                totalValueOfOutputs: itemStock.totalValueOfOutputs,
             })),
         });
     }
@@ -168,6 +170,7 @@ export class PostgresItemStockRepository implements ItemStockRepository {
                 data: {
                     goodQuantities: itemStock.goodQuantities,
                     badQuantities: itemStock.badQuantities,
+                    totalValueOfOutputs: itemStock.totalValueOfOutputs,
                 },
             });
         });

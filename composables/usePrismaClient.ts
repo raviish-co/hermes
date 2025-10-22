@@ -1,4 +1,4 @@
-import { PrismaClient } from "~/lib/backend/persistence/postgres/generated/prisma";
+import { PrismaClient } from "@prisma/client";
 
 const prismaClient = new PrismaClient({ datasourceUrl: useRuntimeConfig().databaseUrl });
 

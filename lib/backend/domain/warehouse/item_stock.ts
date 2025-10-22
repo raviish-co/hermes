@@ -1,4 +1,3 @@
-import type { Decimal } from "../../shared/decimal";
 import { ID } from "../../shared/id";
 import { ItemStockType } from "./item_stock_type";
 
@@ -9,14 +8,15 @@ export class ItemStock {
     #badQuantities: number;
     #itemStockType: string;
     #consignmentValue: number;
-    #totalValueOfOutputs: number = 0;
+    #totalValueOfOutputs: number;
 
     constructor(
         itemId: ID,
         goodQuantities: number,
         badQuantities?: number,
         itemStockType?: string,
-        consignmentValue?: number
+        consignmentValue?: number,
+        totalValueOfOutputs?: number
     ) {
         this.#itemStockId = ID.random();
         this.#itemId = itemId;
@@ -24,7 +24,7 @@ export class ItemStock {
         this.#badQuantities = badQuantities ?? 0;
         this.#itemStockType = this.#getItemStockType(itemStockType);
         this.#consignmentValue = consignmentValue ?? 0;
-        this.#totalValueOfOutputs = 0;
+        this.#totalValueOfOutputs = totalValueOfOutputs ?? 0;
     }
 
     static create(itemId: ID): ItemStock {
@@ -37,14 +37,16 @@ export class ItemStock {
         goodQuantities: number,
         badQuantities: number,
         itemStockType: string,
-        consignmentValue: number
+        consignmentValue: number,
+        totalValueOfOutputs: number
     ): ItemStock {
         const itemStock = new ItemStock(
             ID.fromString(itemId),
             goodQuantities,
             badQuantities,
             itemStockType,
-            consignmentValue
+            consignmentValue,
+            totalValueOfOutputs
         );
         itemStock.#itemStockId = ID.fromString(itemStockId);
         return itemStock;
@@ -80,8 +82,8 @@ export class ItemStock {
         return true;
     }
 
-    calculateTotalValueOfOutputs(itemPrice: Decimal): void {
-        this.#totalValueOfOutputs += itemPrice.value;
+    calculateTotalValueOfOutputs(itemPrice: number): void {
+        this.#totalValueOfOutputs += itemPrice;
     }
 
     #getItemStockType(itemStockType?: string): string {

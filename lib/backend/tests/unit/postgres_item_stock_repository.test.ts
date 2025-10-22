@@ -57,6 +57,7 @@ describe("PostgresItemStockRepository - saveAll", () => {
                     badQuantities: 0,
                     consignmentValue: 0,
                     itemStockType: "",
+                    totalValueOfOutputs: 0,
                 },
                 {
                     stockId: itemStocks[1].itemStockId.toString(),
@@ -65,6 +66,7 @@ describe("PostgresItemStockRepository - saveAll", () => {
                     badQuantities: 0,
                     consignmentValue: 0,
                     itemStockType: "",
+                    totalValueOfOutputs: 0,
                 },
             ],
         });
@@ -90,6 +92,7 @@ describe("PostgresItemStockRepository - saveAll", () => {
             data: {
                 goodQuantities: 0,
                 badQuantities: 0,
+                totalValueOfOutputs: 0,
             },
         });
     });
