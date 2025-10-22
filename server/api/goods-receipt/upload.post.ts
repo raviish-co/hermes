@@ -53,7 +53,7 @@ export default defineEventHandler(async (event) => {
         throw createError({
             statusCode: HttpStatus.BadRequest,
             statusMessage:
-                "O total de quantidades boas e com defeito de um artigo em consignação não deve superior a 1.",
+                "O total de quantidades boas e com defeito de um artigo em consignacao nao deve ser superior a 1.",
         });
     }
 
