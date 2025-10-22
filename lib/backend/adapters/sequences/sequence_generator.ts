@@ -18,7 +18,7 @@ export class SequenceGenerator implements Generator {
     }
 
     #format(code: string, value: number): string {
-        return `${code} - ${value.toString().padStart(4, "0")}`;
+        return `${code}-${value.toString().padStart(4, "0")}`;
     }
 
     #nextValue(code: string): number {
