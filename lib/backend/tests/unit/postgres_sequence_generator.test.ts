@@ -1,4 +1,4 @@
-import type { PrismaClient } from "~/lib/backend/persistence/postgres/generated/prisma";
+import type { PrismaClient } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { PostgresSequenceGenerator } from "../../persistence/postgres/postgres_sequence_generator";
 
@@ -14,7 +14,7 @@ describe("PostgresSequenceGenerator - generate", () => {
 
         const sequence = await sequenceGenerator.generate("XPTO");
 
-        expect(sequence).toBe("XPTO - 0001");
+        expect(sequence).toBe("XPTO-0001");
     });
 
     it("Deve encontrar a ultima sequência gerada", async () => {
@@ -33,7 +33,7 @@ describe("PostgresSequenceGenerator - generate", () => {
 
         const sequence = await sequenceGenerator.generate("XPTO");
 
-        expect(sequence).toBe("XPTO - 0002");
+        expect(sequence).toBe("XPTO-0002");
     });
 
     it("A sequencia a ser gerada deve ser salva", async () => {
@@ -62,7 +62,7 @@ describe("PostgresSequenceGenerator - generate", () => {
         expect(spy).toHaveBeenCalled();
         expect(spy).toHaveBeenCalledTimes(1);
         expect(spy).toHaveBeenCalledWith({ data: { name: "XPTO", value: 1 } });
-        expect(sequence).toBe("XPTO - 0001");
+        expect(sequence).toBe("XPTO-0001");
     });
 });
 

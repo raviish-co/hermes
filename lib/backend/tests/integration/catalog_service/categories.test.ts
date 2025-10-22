@@ -91,7 +91,7 @@ describe("CatalogService - Registar categoria", () => {
 
         const category = await categoryRepository.last();
 
-        expect(category.categoryId.toString()).toEqual("RVSC - 1000");
+        expect(category.categoryId.toString()).toEqual("RVSC-1000");
     });
 
     it("Deve registar a descrição da categoria", async () => {

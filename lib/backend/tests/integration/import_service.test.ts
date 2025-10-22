@@ -161,11 +161,11 @@ describe("Test Upload Items", async () => {
             perPage: 12,
         });
 
-        expect(items[0].itemId.toString()).toEqual("RVS - 0005");
-        expect(items[1].itemId.toString()).toEqual("RVS - 0004");
-        expect(items[2].itemId.toString()).toEqual("RVS - 0003");
-        expect(items[3].itemId.toString()).toEqual("RVS - 0002");
-        expect(items[4].itemId.toString()).toEqual("RVS - 0001");
+        expect(items[0].itemId.toString()).toEqual("RVS-0005");
+        expect(items[1].itemId.toString()).toEqual("RVS-0004");
+        expect(items[2].itemId.toString()).toEqual("RVS-0003");
+        expect(items[3].itemId.toString()).toEqual("RVS-0002");
+        expect(items[4].itemId.toString()).toEqual("RVS-0001");
     });
 
     it("Deve retornar **VariationNotFound** caso os valores da variação não sejam encontrada no repositório", async () => {
@@ -298,7 +298,7 @@ describe("Import Service - Upload Items in Stock", async () => {
 
         const note = await goodsReceiptNoteRepository.last();
 
-        expect(note.noteId.toString()).toBe("GE - 0001");
+        expect(note.noteId.toString()).toBe("GE-0001");
         expect(note.lines.length).toBe(3);
     });
 

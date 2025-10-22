@@ -1,4 +1,4 @@
-import type { PrismaClient } from "~/lib/backend/persistence/postgres/generated/prisma";
+import type { PrismaClient } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { ItemStock } from "../../domain/warehouse/item_stock";
 import { PostgresItemStockRepository } from "../../persistence/postgres/postgres_item_stock_repository";
@@ -110,6 +110,38 @@ describe("PostgresItemStockRepository - saveAll", () => {
         expect(spyCreate).toHaveBeenCalledTimes(1);
         expect(spyUpdate).toHaveBeenCalled();
         expect(spyUpdate).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe("PostgresItemStockRepository - save", () => {
+    it("Deve salvar o artigo em stock", async () => {
+        const { stockRepo, prisma } = await createSetup();
+        const spy = vi.spyOn(prisma.stock, "upsert");
+
+        const itemStock = ItemStock.create(ID.fromString("1"));
+
+        await stockRepo.save(itemStock);
+
+        expect(spy).toHaveBeenCalled();
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledWith({
+            where: { productId: itemStock.itemId.toString() },
+            update: {
+                goodQuantities: itemStock.goodQuantities,
+                badQuantities: itemStock.badQuantities,
+                itemStockType: itemStock.itemStockType,
+                totalValueOfOutputs: itemStock.totalValueOfOutputs,
+            },
+            create: {
+                stockId: itemStock.itemStockId.toString(),
+                productId: itemStock.itemId.toString(),
+                goodQuantities: itemStock.goodQuantities,
+                badQuantities: itemStock.badQuantities,
+                itemStockType: itemStock.itemStockType,
+                consignmentValue: itemStock.consignmentValue,
+                totalValueOfOutputs: itemStock.totalValueOfOutputs,
+            },
+        });
     });
 });
 

@@ -1,4 +1,4 @@
-import { PrismaClient } from "~/lib/backend/persistence/postgres/generated/prisma";
+import { PrismaClient } from "@prisma/client";
 import { describe, expect, it, vi } from "vitest";
 import { GoodsIssueNote } from "../../domain/goods_issue/goods_issue_note";
 import { GoodsIssueNoteNotFound } from "../../domain/goods_issue/goods_issue_note_not_found_error";

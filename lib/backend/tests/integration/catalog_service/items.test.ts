@@ -280,7 +280,7 @@ describe("CatalogService - Registar artigo", () => {
 
         const item = await itemRepository.last();
 
-        expect(item.itemId.toString()).toEqual("RVS - 1000");
+        expect(item.itemId.toString()).toEqual("RVS-1000");
     });
 
     it("Deve registar o artigo com a categoria", async () => {

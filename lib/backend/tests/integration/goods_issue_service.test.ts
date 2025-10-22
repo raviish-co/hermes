@@ -295,12 +295,12 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
 
         await service.new(goodsIssueData);
 
-        const noteOrErr = await noteRepository.getById(ID.fromString("GS - 1000"));
+        const noteOrErr = await noteRepository.getById(ID.fromString("GS-1000"));
         const note = <GoodsIssueNote>noteOrErr.value;
 
         expect(note.noteId).toBeDefined();
         expect(note.noteId).toBeInstanceOf(ID);
-        expect(note.noteId.toString()).toEqual("GS - 1000");
+        expect(note.noteId.toString()).toEqual("GS-1000");
     });
 
     it("Deve gerar 2 solicitações com IDs diferentes", async () => {
@@ -309,14 +309,14 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
         await service.new(goodsIssueData);
         await service.new(goodsIssueData);
 
-        const note1OrErr = await noteRepository.getById(ID.fromString("GS - 1000"));
-        const note2OrErr = await noteRepository.getById(ID.fromString("GS - 1001"));
+        const note1OrErr = await noteRepository.getById(ID.fromString("GS-1000"));
+        const note2OrErr = await noteRepository.getById(ID.fromString("GS-1001"));
 
         const note1 = <GoodsIssueNote>note1OrErr.value;
         const note2 = <GoodsIssueNote>note2OrErr.value;
 
-        expect(note1.noteId.toString()).toEqual("GS - 1000");
-        expect(note2.noteId.toString()).toEqual("GS - 1001");
+        expect(note1.noteId.toString()).toEqual("GS-1000");
+        expect(note2.noteId.toString()).toEqual("GS-1001");
     });
 
     it("Deve calcular o valor total das saidas de um artigo", async () => {
