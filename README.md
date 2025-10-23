@@ -61,7 +61,7 @@ Depois de executar o comando acima a aplicação estará disponível no seguinte
 -   Configuração da base de dados
 
 ```bash
-bun run prisma:migrate:deploy
+bun prisma:migrate:deploy
 ```
 
 > NOTA: defina o valor de `DATABASE-URL` no seu ficheiro `.env`.
@@ -88,18 +88,10 @@ Para executar a aplicação no ambiente de desenvolvimento siga os seguintes pas
 bun install
 ```
 
--   Configuração da base de dados
-
-Para gerar cliente prisma execute o seguinte comando:
-
-```bash
-bun run prisma:generate
-```
-
 -   Executar servidor de desenvolvimente
 
 ```bash
-bun run dev
+bun dev
 ```
 
 Para o ambiente de desenvolvimento a aplicação estará disponível no seguinte endereço: <http://localhost:3000>
