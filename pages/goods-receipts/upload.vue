@@ -16,7 +16,16 @@ function importFile(formData: FormData) {
     service
         .importItemsStock(formData)
         .then((res) => alert(res.message))
-        .catch((err) => alert(err.statusMessage));
+        .catch((err) => {
+            if (err.statusCode === 500) {
+                alert("Não foi possível importar o stock. Tente novamente mais tarde.");
+                console.error("Erro ao importar o stock:", err);
+                return;
+            }
+
+            alert(err.statusMessage);
+            console.error("Erro ao importar o stock:", err);
+        });
 }
 </script>
 

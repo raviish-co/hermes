@@ -17,7 +17,16 @@ function newGoodsReceipt() {
             alert(res.message);
             note.clearLines();
         })
-        .catch((err) => alert(err.statusMessage));
+        .catch((err) => {
+            if (err.statusCode === 500) {
+                alert("Não foi possível criar a guia de entrada. Tente novamente mais tarde.");
+                console.error("Erro ao criar guia de entrada:", err);
+                return;
+            }
+
+            alert(err.statusMessage);
+            console.error("Erro ao criar guia de entrada:", err);
+        });
 }
 
 onMounted(async () => {

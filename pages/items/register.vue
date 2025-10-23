@@ -40,7 +40,16 @@ function register() {
         .then(() => {
             navigateTo("/items");
         })
-        .catch((err) => alert(err.statusMessage));
+        .catch((err) => {
+            if (err.statusCode === 500) {
+                alert("Não foi possivel registar o artigo. Tente novamente mais tarde.");
+                console.error("Erro ao registar o artigo:", err);
+                return;
+            }
+
+            alert(err.statusMessage);
+            console.error("Erro ao registar o artigo:", err);
+        });
 }
 
 onMounted(() => {

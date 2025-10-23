@@ -30,7 +30,15 @@ function register() {
     service
         .registerCategory(name.value, variationsIds, description.value)
         .then((res) => alert(res.message))
-        .catch((err) => alert(err.statusMessage));
+        .catch((err) => {
+            if (err.statusCode === 500) {
+                alert("Não foi possivel registar a categoria. Tente novamente mais tarde.");
+                console.error("Erro ao registar a categoria:", err);
+            }
+
+            alert(err.statusMessage);
+            console.error("Erro ao registar a categoria:", err);
+        });
 }
 
 onMounted(async () => {

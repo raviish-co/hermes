@@ -37,7 +37,13 @@ function getGoodsIssueById(noteId: string) {
             goodsReturnNote.value = new GoodsReturnNote(goodsIssueNote.value.lines);
             quantities.value = goodsIssueNote.value.lines?.map((l) => l.totalToReturn);
         })
-        .catch((err) => alert(err.statusMessage));
+        .catch((err) => {
+            if (err.statusCode === 500) {
+                alert("Não foi possivel obter a guia de saída de artigos.");
+            }
+
+            alert(err.statusMessage);
+        });
 }
 
 function newGoodsReturn() {
@@ -56,7 +62,16 @@ function newGoodsReturn() {
             alert(res.message);
             getGoodsIssueById(goodsIssueNote.value.goodsIssueNoteId);
         })
-        .catch((err) => alert(err.statusMessage));
+        .catch((err) => {
+            if (err.statusCode === 500) {
+                alert("Não foi possivel criar a guia de devolução. Tente novamente mais tarde.");
+                console.error("Erro ao criar guia de devolução:", err);
+                return;
+            }
+
+            alert(err.statusMessage);
+            console.error("Erro ao criar guia de devolução:", err);
+        });
 }
 
 const userAuthenticatedName = ref<string>("");

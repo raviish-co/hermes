@@ -22,7 +22,14 @@ function markItemInStockAsIntern() {
             await warehouse.listItemsStock();
         })
         .catch((err) => {
+            if (err.statusCode === 500) {
+                alert("Não foi possivel marcar o artigo como interno. Tente novamente mais tarde.");
+                console.error("Erro ao marcar o artigo como interno:", err);
+                return;
+            }
+
             alert(err.statusMessage);
+            console.error("Erro ao marcar o artigo como interno:", err);
         });
 }
 

@@ -44,7 +44,16 @@ function save() {
             alert("Artigo salvo com sucesso!");
             navigateTo("/items");
         })
-        .catch((err) => alert(err.statusMessage));
+        .catch((err) => {
+            if (err.statusCode === 500) {
+                alert("Não foi possivel salvar o artigo. Tente novamente mais tarde.");
+                console.error("Erro ao salvar o artigo:", err);
+                return;
+            }
+
+            alert(err.statusMessage);
+            console.error("Erro ao salvar o artigo:", err);
+        });
 }
 
 onBeforeMount(() => {

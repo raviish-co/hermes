@@ -16,7 +16,16 @@ function newGoodsIssue() {
             alert(res.message);
             navigateTo("/goods-issues/");
         })
-        .catch((err) => alert(err.statusMessage));
+        .catch((err) => {
+            if (err.statusCode === 500) {
+                alert("Não foi possível criar a guia de saída. Tente novamente mais tarde.");
+                console.error("Erro ao criar guia de saída:", err);
+                return;
+            }
+
+            alert(err.statusMessage);
+            console.error("Erro ao criar guia de saída:", err);
+        });
 
     wasSubmitted.value = true;
 }
