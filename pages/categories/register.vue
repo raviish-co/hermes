@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { VariationModel } from "~/lib/frontend/models/variation";
 import { CatalogService } from "~/lib/frontend/services/catalog_service";
+import { handleError } from "~/lib/frontend/utils/error_handler";
 
 const selectedVariations = ref<VariationModel[]>([]);
 const variations = ref<VariationModel[]>([]);
@@ -30,15 +31,13 @@ function register() {
     service
         .registerCategory(name.value, variationsIds, description.value)
         .then((res) => alert(res.message))
-        .catch((err) => {
-            if (err.statusCode === 500) {
-                alert("Não foi possivel registar a categoria. Tente novamente mais tarde.");
-                console.error("Erro ao registar a categoria:", err);
-            }
-
-            alert(err.statusMessage);
-            console.error("Erro ao registar a categoria:", err);
-        });
+        .catch((err) =>
+            handleError(
+                err,
+                "registerCategory",
+                "Não foi possivel registar a categoria. Tente novamente mais tarde."
+            )
+        );
 }
 
 onMounted(async () => {

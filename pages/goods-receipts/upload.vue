@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ImportService } from "~/lib/frontend/services/upload_service";
+import { handleError } from "~/lib/frontend/utils/error_handler";
 
 const service = new ImportService();
 
@@ -16,16 +17,13 @@ function importFile(formData: FormData) {
     service
         .importItemsStock(formData)
         .then((res) => alert(res.message))
-        .catch((err) => {
-            if (err.statusCode === 500) {
-                alert("Não foi possível importar o stock. Tente novamente mais tarde.");
-                console.error("Erro ao importar o stock:", err);
-                return;
-            }
-
-            alert(err.statusMessage);
-            console.error("Erro ao importar o stock:", err);
-        });
+        .catch((err) =>
+            handleError(
+                err,
+                "importFile",
+                "Não foi possivel importar o stock. Tente novamente mais tarde."
+            )
+        );
 }
 </script>
 

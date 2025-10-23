@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_values";
 import { formatCurrency } from "~/lib/frontend/helpers/format_currency";
+import { handleError } from "~/lib/frontend/utils/error_handler";
 
 const criteria = ref<string>("");
 const catalog = useCatalog();
@@ -21,16 +22,13 @@ function markItemInStockAsIntern() {
             close();
             await warehouse.listItemsStock();
         })
-        .catch((err) => {
-            if (err.statusCode === 500) {
-                alert("Não foi possivel marcar o artigo como interno. Tente novamente mais tarde.");
-                console.error("Erro ao marcar o artigo como interno:", err);
-                return;
-            }
-
-            alert(err.statusMessage);
-            console.error("Erro ao marcar o artigo como interno:", err);
-        });
+        .catch((err) =>
+            handleError(
+                err,
+                "markItemInStockAsIntern",
+                "Não foi possivel marcar o artigo como interno. Tente novamente mais tarde."
+            )
+        );
 }
 
 function setUserDataAndShowModal(itemId: string, itemName: string) {

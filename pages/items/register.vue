@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { CatalogService } from "~/lib/frontend/services/catalog_service";
+import { handleError } from "~/lib/frontend/utils/error_handler";
 
 const item = reactive({
     name: "",
@@ -40,16 +41,13 @@ function register() {
         .then(() => {
             navigateTo("/items");
         })
-        .catch((err) => {
-            if (err.statusCode === 500) {
-                alert("Não foi possivel registar o artigo. Tente novamente mais tarde.");
-                console.error("Erro ao registar o artigo:", err);
-                return;
-            }
-
-            alert(err.statusMessage);
-            console.error("Erro ao registar o artigo:", err);
-        });
+        .catch((err) =>
+            handleError(
+                err,
+                "registerItem",
+                "Não foi possivel registar o artigo. Tente novamente mais tarde."
+            )
+        );
 }
 
 onMounted(() => {

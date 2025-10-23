@@ -2,6 +2,7 @@
 import { getCurrentLocalDateTime } from "~/lib/frontend/helpers/current_local_date_time";
 import { GoodsReceiptService } from "~/lib/frontend/services/goods_receipt_service";
 import { GoodsReceiptNote } from "~/lib/frontend/domain/goods_receipt_note";
+import { handleError } from "~/lib/frontend/utils/error_handler";
 
 const entryDate = getCurrentLocalDateTime();
 const userAuthenticatedName = ref<string>("");
@@ -17,16 +18,13 @@ function newGoodsReceipt() {
             alert(res.message);
             note.clearLines();
         })
-        .catch((err) => {
-            if (err.statusCode === 500) {
-                alert("Não foi possível criar a guia de entrada. Tente novamente mais tarde.");
-                console.error("Erro ao criar guia de entrada:", err);
-                return;
-            }
-
-            alert(err.statusMessage);
-            console.error("Erro ao criar guia de entrada:", err);
-        });
+        .catch((err) =>
+            handleError(
+                err,
+                "newGoodsReceipt",
+                "Não foi possivel criar a guia de entrada de mercadoria. Tente novamente mais tarde."
+            )
+        );
 }
 
 onMounted(async () => {

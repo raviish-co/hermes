@@ -4,6 +4,7 @@ import { GoodsReturnService } from "~/lib/frontend/services/goods_return_service
 import { GoodsReturnNote } from "~/lib/frontend/domain/goods_return_note";
 import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
 import { formatDate } from "~/lib/frontend/helpers/format_date";
+import { handleError } from "~/lib/frontend/utils/error_handler";
 
 const quantities = ref<number[]>([]);
 const securityDepositWithHeld = ref<number>(0);
@@ -37,13 +38,13 @@ function getGoodsIssueById(noteId: string) {
             goodsReturnNote.value = new GoodsReturnNote(goodsIssueNote.value.lines);
             quantities.value = goodsIssueNote.value.lines?.map((l) => l.totalToReturn);
         })
-        .catch((err) => {
-            if (err.statusCode === 500) {
-                alert("Não foi possivel obter a guia de saída de artigos.");
-            }
-
-            alert(err.statusMessage);
-        });
+        .catch((err) =>
+            handleError(
+                err,
+                "getGoodsIssueById",
+                "Não foi possivel obter a guia de saída de artigos. Tente novamente mais tarde."
+            )
+        );
 }
 
 function newGoodsReturn() {
@@ -62,16 +63,13 @@ function newGoodsReturn() {
             alert(res.message);
             getGoodsIssueById(goodsIssueNote.value.goodsIssueNoteId);
         })
-        .catch((err) => {
-            if (err.statusCode === 500) {
-                alert("Não foi possivel criar a guia de devolução. Tente novamente mais tarde.");
-                console.error("Erro ao criar guia de devolução:", err);
-                return;
-            }
-
-            alert(err.statusMessage);
-            console.error("Erro ao criar guia de devolução:", err);
-        });
+        .catch((err) =>
+            handleError(
+                err,
+                "newGoodsReturn",
+                "Não foi possivel criar a guia de devolução. Tente novamente mais tarde."
+            )
+        );
 }
 
 const userAuthenticatedName = ref<string>("");

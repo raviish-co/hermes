@@ -2,6 +2,7 @@
 import { getCurrentLocalDateTime } from "~/lib/frontend/helpers/current_local_date_time";
 import { GoodsIssueService } from "~/lib/frontend/services/goods_issue_service";
 import { GoodsIssueNote } from "~/lib/frontend/domain/goods_issue_note";
+import { handleError } from "~/lib/frontend/utils/error_handler";
 
 const returnDate = getCurrentLocalDateTime();
 const auth = useAuth();
@@ -16,16 +17,13 @@ function newGoodsIssue() {
             alert(res.message);
             navigateTo("/goods-issues/");
         })
-        .catch((err) => {
-            if (err.statusCode === 500) {
-                alert("Não foi possível criar a guia de saída. Tente novamente mais tarde.");
-                console.error("Erro ao criar guia de saída:", err);
-                return;
-            }
-
-            alert(err.statusMessage);
-            console.error("Erro ao criar guia de saída:", err);
-        });
+        .catch((err) =>
+            handleError(
+                err,
+                "newGoodsIssue",
+                "Não foi possivel criar a guia de saída de artigos. Tente novamente mais tarde."
+            )
+        );
 
     wasSubmitted.value = true;
 }

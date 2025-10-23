@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { ItemModel } from "~/lib/frontend/models/item";
 import { CatalogService } from "~/lib/frontend/services/catalog_service";
+import { handleError } from "~/lib/frontend/utils/error_handler";
 
 const item = ref<ItemModel>({
     itemId: "",
     name: "",
     price: 0,
-    stock: 0,
     sectionId: "",
     categoryId: "",
     variationsValues: [],
@@ -44,16 +44,13 @@ function save() {
             alert("Artigo salvo com sucesso!");
             navigateTo("/items");
         })
-        .catch((err) => {
-            if (err.statusCode === 500) {
-                alert("Não foi possivel salvar o artigo. Tente novamente mais tarde.");
-                console.error("Erro ao salvar o artigo:", err);
-                return;
-            }
-
-            alert(err.statusMessage);
-            console.error("Erro ao salvar o artigo:", err);
-        });
+        .catch((err) =>
+            handleError(
+                err,
+                "updateItem",
+                "Não foi possivel salvar o artigo. Tente novamente mais tarde."
+            )
+        );
 }
 
 onBeforeMount(() => {
