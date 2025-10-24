@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import CreateButton from "~/components/CreateButton.vue";
+
 const catalog = useCatalog();
 const auth = useAuth();
 
@@ -13,11 +15,7 @@ onMounted(async () => {
     <div class="section-content">
         <h1 class="page-title">Categorias</h1>
 
-        <NuxtLink :to="{ path: '/categories/register' }">
-            <button class="btn-add mt-8 ml-auto block">
-                <span>Criar</span> <span class="text-base">+</span>
-            </button>
-        </NuxtLink>
+        <CreateButton path="/categories/register" title="Criar" />
 
         <div class="table-container overflow-y-auto">
             <table class="table">

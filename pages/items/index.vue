@@ -2,6 +2,7 @@
 import { formatVariationValues } from "~/lib/frontend/helpers/format_variation_values";
 import { formatCurrency } from "~/lib/frontend/helpers/format_currency";
 import { handleError } from "~/lib/frontend/utils/error_handler";
+import CreateButton from "~/components/CreateButton.vue";
 
 const criteria = ref<string>("");
 const catalog = useCatalog();
@@ -66,9 +67,7 @@ onMounted(async () => {
             />
         </div>
 
-        <NuxtLink :to="{ path: '/items/register' }">
-            <button class="btn-add"><span>Registar</span> <span class="text-base">+</span></button>
-        </NuxtLink>
+        <CreateButton path="/items/register" title="Registar" />
 
         <div class="table-container overflow-y-auto mb-6">
             <table class="table">

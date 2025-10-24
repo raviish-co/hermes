@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { formatDate } from "@frontend/helpers/format_date";
+import CreateButton from "~/components/CreateButton.vue";
 import ThePagination from "~/components/ThePagination.vue";
 import type { GoodsIssueNoteModel } from "~/lib/frontend/models/goods_issue_note";
 import type { PurposeModel } from "~/lib/frontend/models/purpose";
@@ -59,9 +60,7 @@ onMounted(async () => {
             />
         </div>
 
-        <NuxtLink to="/goods-issues/register">
-            <button class="btn-add"><span>Criar</span> <span class="text-base">+</span></button>
-        </NuxtLink>
+        <CreateButton path="/goods-issues/register" title="Criar" />
 
         <div class="table-container">
             <div class="overflow-y-auto">

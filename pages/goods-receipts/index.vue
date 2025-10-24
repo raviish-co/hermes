@@ -3,6 +3,7 @@ import type { GoodsReceiptNoteModel } from "~/lib/frontend/models/goods_receipt_
 import { GoodsReceiptService } from "~/lib/frontend/services/goods_receipt_service";
 import { formatDate } from "~/lib/frontend/helpers/format_date";
 import ThePagination from "~/components/ThePagination.vue";
+import CreateButton from "~/components/CreateButton.vue";
 
 const goodsReceiptService = new GoodsReceiptService();
 const notes = ref<GoodsReceiptNoteModel[]>([]);
@@ -30,9 +31,7 @@ onMounted(async () => {
     <div class="section-content">
         <h1 class="page-title">Guias de Entrada</h1>
 
-        <NuxtLink to="/goods-receipts/register">
-            <button class="btn-add"><span>Criar</span> <span class="text-base">+</span></button>
-        </NuxtLink>
+        <CreateButton path="/goods-receipts/register" title="Criar" />
 
         <div class="table-container">
             <div class="overflow-y-auto">
