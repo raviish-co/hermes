@@ -8,4 +8,4 @@ const repository =
         ? new SequenceGenerator(new InmemSequenceStorage())
         : new PostgresSequenceGenerator(usePrismaClient());
 
-export const useSequenceGenerator = () => new PostgresSequenceGenerator(usePrismaClient());
+export const useSequenceGenerator = () => repository;
