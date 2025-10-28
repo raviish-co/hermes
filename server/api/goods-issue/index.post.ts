@@ -1,9 +1,9 @@
-import { useGoodsIssueService } from "~/composables/useGoodsIssueService";
-import { InsufficientStock } from "~/lib/backend/domain/catalog/items/insufficient_stock_error";
-import { ItemNotFound } from "~/lib/backend/domain/catalog/items/item_not_found_error";
-import { InvalidPurpose } from "~/lib/backend/domain/goods_issue/invalid_purpose_error";
-import { InvalidTotal } from "~/lib/backend/domain/goods_issue/invalid_total_error";
-import { HttpStatus } from "~/server/api/http_status";
+import { useGoodsIssueService } from "@app/composables/useGoodsIssueService";
+import { InsufficientStock } from "@backend/domain/catalog/items/insufficient_stock_error";
+import { ItemNotFound } from "@backend/domain/catalog/items/item_not_found_error";
+import { InvalidPurpose } from "@backend/domain/goods_issue/invalid_purpose_error";
+import { InvalidTotal } from "@backend/domain/goods_issue/invalid_total_error";
+import { HttpStatus } from "../http_status";
 import { checkAnonymousUser } from "../check_anonymous_user";
 
 const service = useGoodsIssueService();

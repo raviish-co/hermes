@@ -1,6 +1,6 @@
-import { useGoodsReceiptService } from "~/composables/useGoodsReceiptService";
-import { GoodsReceiptNote } from "~/lib/backend/domain/goods_receipt/goods_receipt_note";
-import { GoodsReceiptNoteLine } from "~/lib/backend/domain/goods_receipt/goods_receipt_note_line";
+import { useGoodsReceiptService } from "@app/composables/useGoodsReceiptService";
+import { GoodsReceiptNote } from "@backend/domain/goods_receipt/goods_receipt_note";
+import { GoodsReceiptNoteLine } from "@backend/domain/goods_receipt/goods_receipt_note_line";
 import { checkAnonymousUser } from "../check_anonymous_user";
 
 const service = useGoodsReceiptService();

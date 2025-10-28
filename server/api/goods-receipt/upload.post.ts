@@ -1,13 +1,12 @@
-import { useImportService } from "~/composables/useImportService";
-import { useAuth } from "~/composables/useAuth";
-import { FileEmpty } from "~/lib/backend/adapters/readers/file_empty_error";
-import { FileNotSupported } from "~/lib/backend/adapters/readers/file_not_supported_error";
-import { InvalidFileHeader } from "~/lib/backend/adapters/readers/invalid_file_header_error";
-import { ItemStockNotFound } from "~/lib/backend/domain/warehouse/item_stock_not_found";
+import { useImportService } from "@app/composables/useImportService";
+import { FileEmpty } from "@backend/adapters/readers/file_empty_error";
+import { FileNotSupported } from "@backend/adapters/readers/file_not_supported_error";
+import { InvalidFileHeader } from "@backend/adapters/readers/invalid_file_header_error";
+import { ItemStockNotFound } from "@backend/domain/warehouse/item_stock_not_found";
 import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
-import { InvalidQuantitiesError } from "~/lib/backend/application/invalid_quantities_error";
-import { UserNotFound } from "~/lib/backend/domain/auth/user_not_found";
+import { InvalidQuantitiesError } from "@backend/application/invalid_quantities_error";
+import { UserNotFound } from "@backend/domain/auth/user_not_found";
 
 const service = useImportService();
 

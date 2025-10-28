@@ -1,6 +1,6 @@
-import { useWarehouseService } from "~/composables/useWarehouseService";
+import { useWarehouseService } from "@app/composables/useWarehouseService";
 import { HttpStatus } from "../http_status";
-import { ItemStockNotFound } from "~/lib/backend/domain/warehouse/item_stock_not_found";
+import { ItemStockNotFound } from "@backend/domain/warehouse/item_stock_not_found";
 
 const service = useWarehouseService();
 

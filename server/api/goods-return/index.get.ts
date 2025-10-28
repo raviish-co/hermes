@@ -1,4 +1,4 @@
-import { useGoodsReturnService } from "~/composables/useGoodsReturnService";
+import { useGoodsReturnService } from "@app/composables/useGoodsReturnService";
 import { checkAnonymousUser } from "../check_anonymous_user";
 import { toGoodsReturnNoteDTO } from "./goods_return_dto";
 

@@ -1,4 +1,4 @@
-import { usePurposeService } from "~/composables/usePurposeService";
+import { usePurposeService } from "@app/composables/usePurposeService";
 import { checkAnonymousUser } from "./check_anonymous_user";
 
 const service = usePurposeService();

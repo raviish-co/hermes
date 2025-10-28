@@ -1,5 +1,5 @@
-import { GoodsReturnNoteLine } from "~/lib/backend/domain/goods_return/goods_return_note_line";
-import { GoodsReturnNote } from "~/lib/backend/domain/goods_return/goods_return_note";
+import { GoodsReturnNoteLine } from "@backend/domain/goods_return/goods_return_note_line";
+import { GoodsReturnNote } from "@backend/domain/goods_return/goods_return_note";
 import { toVariationValuesDTO } from "../items/item_dto";
 
 interface VariationValues {

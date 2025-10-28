@@ -1,4 +1,4 @@
-import { useAuthService } from "~/composables/useAuthService";
+import { useAuthService } from "@app/composables/useAuthService";
 import { ANONYMOUS_USER } from "../api/check_anonymous_user";
 
 const service = useAuthService();

@@ -1,11 +1,11 @@
-import { useGoodsReturnService } from "~/composables/useGoodsReturnService";
-import { GoodsIssueNoteHasBeenReturned } from "~/lib/backend/domain/goods_issue/goods_issue_note_has_been_returned_error";
-import { GoodsIssueNoteNotFound } from "~/lib/backend/domain/goods_issue/goods_issue_note_not_found_error";
-import { GoodsIssueLineNotFound } from "~/lib/backend/domain/goods_issue/goods_lssue_line_not_found_error";
-import { InvalidGoodsIssueLineQuantity } from "~/lib/backend/domain/goods_issue/invalid_goods_issue_line_quantity_error";
+import { useGoodsReturnService } from "@app/composables/useGoodsReturnService";
+import { GoodsIssueNoteHasBeenReturned } from "@backend/domain/goods_issue/goods_issue_note_has_been_returned_error";
+import { GoodsIssueNoteNotFound } from "@backend/domain/goods_issue/goods_issue_note_not_found_error";
+import { GoodsIssueLineNotFound } from "@backend/domain/goods_issue/goods_lssue_line_not_found_error";
+import { InvalidGoodsIssueLineQuantity } from "@backend/domain/goods_issue/invalid_goods_issue_line_quantity_error";
 import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
-import { NoteDTO } from "~/lib/backend/application/goods_return_service";
+import { NoteDTO } from "@backend/application/goods_return_service";
 
 const service = useGoodsReturnService();
 

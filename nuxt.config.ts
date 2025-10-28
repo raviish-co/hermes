@@ -9,8 +9,9 @@ export default defineNuxtConfig({
     },
 
     alias: {
-        "@backend": fileURLToPath(new URL("./lib/backend", import.meta.url)),
-        "@frontend": fileURLToPath(new URL("./lib/frontend", import.meta.url)),
+        "@backend": fileURLToPath(new URL("./server/backend", import.meta.url)),
+        "@frontend": fileURLToPath(new URL("./server/frontend", import.meta.url)),
+        "@app": fileURLToPath(new URL("./app", import.meta.url)),
     },
 
     app: {
@@ -50,4 +51,8 @@ export default defineNuxtConfig({
     },
 
     compatibilityDate: "2024-10-12",
+
+    devtools: {
+        enabled: true,
+    },
 });

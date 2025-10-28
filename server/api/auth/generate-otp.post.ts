@@ -1,6 +1,6 @@
-import { useAuthService } from "~/composables/useAuthService";
+import { useAuthService } from "@app/composables/useAuthService";
 import { HttpStatus } from "../http_status";
-import { UserNotFound } from "~/lib/backend/domain/auth/user_not_found";
+import { UserNotFound } from "@backend/domain/auth/user_not_found";
 
 const service = useAuthService();
 
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
     if (voidOrErr.value instanceof UserNotFound) {
         throw createError({
             statusCode: HttpStatus.NotFound,
-            message: "Utilizador invalido"
+            message: "Utilizador invalido",
         });
     }
 
@@ -20,5 +20,5 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: HttpStatus.ServerError });
     }
 
-    return
+    return;
 });

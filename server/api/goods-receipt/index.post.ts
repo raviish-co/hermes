@@ -1,10 +1,10 @@
-import { useGoodsReceiptService } from "~/composables/useGoodsReceiptService";
-import { ItemNotFound } from "~/lib/backend/domain/catalog/items/item_not_found_error";
-import { InvalidEntryDate } from "~/lib/backend/domain/goods_receipt/invalid_entry_date_error";
-import { InvalidLines } from "~/lib/backend/domain/goods_receipt/invalid_lines_error";
+import { useGoodsReceiptService } from "@app/composables/useGoodsReceiptService";
+import { ItemNotFound } from "@backend/domain/catalog/items/item_not_found_error";
+import { InvalidEntryDate } from "@backend/domain/goods_receipt/invalid_entry_date_error";
+import { InvalidLines } from "@backend/domain/goods_receipt/invalid_lines_error";
 import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
-import { InvalidQuantitiesError } from "~/lib/backend/application/invalid_quantities_error";
+import { InvalidQuantitiesError } from "@backend/application/invalid_quantities_error";
 
 const service = useGoodsReceiptService();
 

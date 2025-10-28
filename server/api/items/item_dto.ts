@@ -1,4 +1,4 @@
-import { Item } from "../../../lib/backend/domain/catalog/items/item";
+import { Item } from "@backend/domain/catalog/items/item";
 
 interface VariationValues {
     variationId: string;

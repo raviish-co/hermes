@@ -1,5 +1,5 @@
-import { useGoodsIssueService } from "~/composables/useGoodsIssueService";
-import { GoodsIssueNoteNotFound } from "~/lib/backend/domain/goods_issue/goods_issue_note_not_found_error";
+import { useGoodsIssueService } from "@app/composables/useGoodsIssueService";
+import { GoodsIssueNoteNotFound } from "@backend/domain/goods_issue/goods_issue_note_not_found_error";
 import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
 import { toGoodsIssueNoteDTO } from "./goods_issue_note_dto";

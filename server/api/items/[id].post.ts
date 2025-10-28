@@ -1,5 +1,5 @@
-import { useCatalogService } from "~/composables/useCatalogService";
-import { SectionNotFound } from "~/lib/backend/domain/catalog/departments/section_not_found_error";
+import { useCatalogService } from "@app/composables/useCatalogService";
+import { SectionNotFound } from "@backend/domain/catalog/departments/section_not_found_error";
 import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
 

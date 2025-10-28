@@ -1,5 +1,5 @@
-import { useAuthService } from "~/composables/useAuthService";
-import { AuthenticationFailed } from "~/lib/backend/domain/auth/authentication_failed_error";
+import { useAuthService } from "@app/composables/useAuthService";
+import { AuthenticationFailed } from "@backend/domain/auth/authentication_failed_error";
 import { HttpStatus } from "../http_status";
 
 const service = useAuthService();

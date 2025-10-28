@@ -1,4 +1,4 @@
-import { useCatalogService } from "~/composables/useCatalogService";
+import { useCatalogService } from "@app/composables/useCatalogService";
 import { checkAnonymousUser } from "../check_anonymous_user";
 import { toItemDTO } from "./item_dto";
 
