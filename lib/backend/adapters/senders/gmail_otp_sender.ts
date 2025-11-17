@@ -1,5 +1,4 @@
 import { gmail_v1, google } from "googleapis";
-import { readFileSync } from "fs";
 import type { Sender } from "../../domain/auth/sender";
 
 const FROM_EMAIL = "exampleemail@gmail.com";
@@ -8,35 +7,27 @@ const SUBJECT = "Raviish - Hermes: Código de Autenticação (OTP)";
 const SCOPES = ["https://www.googleapis.com/auth/gmail.send"];
 
 export class GmailOtpSender implements Sender {
-    #otp: string;
-    #email: string;
-    #keyFilePath: string;
+    gmailClientEmail: string;
+    #gmailClientSecretKey: string;
 
-    constructor(keyFilePath: string, email: string, otp: string) {
-        if (!keyFilePath) {
-            throw new Error("GmailSender: Key file path is required");
+    constructor(gmailClientEmail: string, gmailClientSecretKey: string) {
+        if (!gmailClientEmail) {
+            throw new Error("GmailSender: Gmail Client Email is required");
         }
 
-        if (!email) {
-            throw new Error("GmailSender: Email is required");
+        if (!gmailClientSecretKey) {
+            throw new Error("GmailSender: Gmail Client Secret is required");
         }
 
-        if (!otp) {
-            throw new Error("GmailSender: OTP is required");
-        }
-
-        this.#otp = otp;
-        this.#email = email;
-        this.#keyFilePath = keyFilePath;
+        this.gmailClientEmail = gmailClientEmail;
+        this.#gmailClientSecretKey = gmailClientSecretKey;
     }
 
     async #authorize(): Promise<gmail_v1.Gmail> {
         try {
-            const serviceAccountKey = JSON.parse(readFileSync(this.#keyFilePath, "utf-8"));
-
             const jwtClient = new google.auth.JWT({
-                email: serviceAccountKey.client_email,
-                key: serviceAccountKey.private_key,
+                email: this.gmailClientEmail,
+                key: this.#gmailClientSecretKey,
                 scopes: SCOPES,
                 subject: FROM_EMAIL,
             });
@@ -52,8 +43,8 @@ export class GmailOtpSender implements Sender {
         }
     }
 
-    async send(): Promise<void> {
-        console.log(`Sending email to ${this.#email}...`);
+    async send(to: string, code: string): Promise<void> {
+        console.log(`Sending email to ${to}...`);
 
         const gmail = await this.#authorize();
 
@@ -61,12 +52,12 @@ export class GmailOtpSender implements Sender {
             `Content-Type: text/html; charset="UTF-8"`,
             `MIME-Version: 1.0`,
             `Content-Transfer-Encoding: 7bit`,
-            `to: ${this.#email}`,
+            `to: ${to}`,
             `from: "Raviish - Hermes" <${FROM_EMAIL}>`,
             `replyTo: "Raviish - Hermes" <${FROM_EMAIL}>`,
             `subject: ${SUBJECT}`,
             "",
-            emailBody(this.#otp),
+            emailBody(code),
         ];
 
         const email = emailLines.join("\r\n");
