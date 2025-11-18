@@ -7,7 +7,7 @@ const SUBJECT = "Raviish - Hermes: Código de Autenticação (OTP)";
 const SCOPES = ["https://www.googleapis.com/auth/gmail.send"];
 
 export class GmailOtpSender implements Sender {
-    gmailClientEmail: string;
+    #gmailClientEmail: string;
     #gmailClientSecretKey: string;
 
     constructor(gmailClientEmail: string, gmailClientSecretKey: string) {
@@ -19,14 +19,14 @@ export class GmailOtpSender implements Sender {
             throw new Error("GmailSender: Gmail Client Secret is required");
         }
 
-        this.gmailClientEmail = gmailClientEmail;
+        this.#gmailClientEmail = gmailClientEmail;
         this.#gmailClientSecretKey = gmailClientSecretKey;
     }
 
     async #authorize(): Promise<gmail_v1.Gmail> {
         try {
             const jwtClient = new google.auth.JWT({
-                email: this.gmailClientEmail,
+                email: this.#gmailClientEmail,
                 key: this.#gmailClientSecretKey,
                 scopes: SCOPES,
                 subject: FROM_EMAIL,
