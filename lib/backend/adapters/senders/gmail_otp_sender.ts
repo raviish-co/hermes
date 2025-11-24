@@ -64,8 +64,6 @@ export class GmailOtpSender implements Sender {
   }
 
     async send(to: string, code: string): Promise<void> {
-        console.log(`Sending email to ${to}...`);
-
         const gmail = await this.#authorize();
 
         const emailLines = [
@@ -94,7 +92,7 @@ export class GmailOtpSender implements Sender {
                     raw: encodedMessage,
                 },
             });
-            console.log("Email sent successfully! Message ID:", res.data.id);
+            console.log("Email sent successfully!");
         } catch (error) {
             console.error("Failed to send email:", error);
             throw error;
