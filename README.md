@@ -64,7 +64,18 @@ Depois de executar o comando acima a aplicação estará disponível no seguinte
 bun prisma:migrate:deploy
 ```
 
-> NOTA: defina o valor de `DATABASE-URL` no seu ficheiro `.env`.
+- Defina o valor das seguintes variáveis de ambiente no seu ficheiro `.env`.
+
+```plaintext
+# URL of database
+NUXT_DATABASE_URL=
+
+# GMAIL client 
+GMAIL_CLIENT_SECRET=
+GMAIL_CLIENT_ID=
+GMAIL_CLIENT_REFRESH_TOKEN=
+GMAIL_CLIENT_FROM_EMAIL=
+```
 
 -   Criação da tag no github
 

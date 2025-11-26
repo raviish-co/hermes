@@ -129,7 +129,7 @@ function validateForm(username: string, password: string) {
                 </p>
 
                 <button type="button" class="btn btn-secondary" @click="authenticate()">
-                    Vericar
+                    Verificar
                 </button>
 
                 <button type="button" class="btn bg-primary" @click="cancel()">Cancelar</button>

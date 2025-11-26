@@ -56,7 +56,7 @@ export class AuthService {
 
         this.#otpStorage.save(username, otp);
 
-        await this.#otpSender.send(userOrErr.value.phoneNumber, otp);
+        await this.#otpSender.send(userOrErr.value.email, otp);
 
         return right(undefined);
     }
