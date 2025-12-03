@@ -1,67 +1,58 @@
 import { gmail_v1, google } from "googleapis";
 import type { Sender } from "../../domain/auth/sender";
 
-
 const SUBJECT = "Raviish - Hermes: Código de Autenticação (OTP)";
-const REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob"
+const REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
 const SCOPES = ["https://www.googleapis.com/auth/gmail.send"];
 
 export class GmailOtpSender implements Sender {
-  #clientSecret: string;
-  #fromEmail: string;
-  #clientId:  string;
-  #refreshToken: string;
+    #clientSecret: string;
+    #fromEmail: string;
+    #clientId: string;
+    #refreshToken: string;
 
-  constructor() {
-    const clientSecret = process.env.GMAIL_CLIENT_SECRET;
-    const clientId = process.env.GMAIL_CLIENT_ID;
-    const refreshToken = process.env.GMAIL_CLIENT_REFRESH_TOKEN;
-    const fromEmail = process.env.GMAIL_CLIENT_FROM_EMAIL;
+    constructor(clientId: string, clientSecret: string, fromEmail: string, refreshToken: string) {
+        if (!clientSecret) {
+            throw new Error("GMAIL_CLIENT_SECRET is not defined.");
+        }
 
-    if (!clientSecret) {
-      throw new Error("GMAIL_CLIENT_SECRET is not defined.");
+        if (!fromEmail) {
+            throw new Error("GMAIL_CLIENT_FROM_EMAIL is not defined.");
+        }
+
+        if (!clientId) {
+            throw new Error("GMAIL_CLIENT_ID is not defined.");
+        }
+
+        if (!refreshToken) {
+            throw new Error("GMAIL_CLIENT_REFRESH_TOKEN is not defined.");
+        }
+
+        this.#clientId = clientId;
+        this.#clientSecret = clientSecret;
+        this.#fromEmail = fromEmail;
+        this.#refreshToken = refreshToken;
     }
 
-    if (!fromEmail) {
-      throw new Error("GMAIL_CLIENT_FROM_EMAIL is not defined.");
+    async #authorize(): Promise<gmail_v1.Gmail> {
+        try {
+            const oAuth2Client = new google.auth.OAuth2({
+                clientId: this.#clientId,
+                clientSecret: this.#clientSecret,
+                redirectUri: REDIRECT_URI,
+            });
+
+            oAuth2Client.setCredentials({
+                refresh_token: this.#refreshToken,
+                scope: SCOPES.join(" "),
+            });
+
+            const gmail = google.gmail({ version: "v1", auth: oAuth2Client });
+            return gmail;
+        } catch (error: any) {
+            throw new Error(`Failed to authorize Gmail API: ${error.message}`);
+        }
     }
-
-    if (!clientId) {
-      throw new Error("GMAIL_CLIENT_ID is not defined.");
-    }
-
-    if (!refreshToken) {
-      throw new Error("GMAIL_CLIENT_REFRESH_TOKEN is not defined.");
-    }
-
-    this.#clientId = clientId;
-    this.#clientSecret = clientSecret;
-    this.#fromEmail = fromEmail;
-    this.#refreshToken = refreshToken;
-  }
-
-
-  async #authorize(): Promise<gmail_v1.Gmail> {
-    try {
-
-      const oAuth2Client = new google.auth.OAuth2({
-        clientId: this.#clientId,
-        clientSecret: this.#clientSecret,
-        redirectUri: REDIRECT_URI,
-      });
-
-
-      oAuth2Client.setCredentials({
-        refresh_token: this.#refreshToken,
-        scope: SCOPES.join(" "),
-      });
-
-      const gmail = google.gmail({ version: "v1", auth: oAuth2Client });
-      return gmail;
-    } catch (error: any) {
-      throw new Error(`Failed to authorize Gmail API: ${error.message}`);
-    }
-  }
 
     async send(to: string, code: string): Promise<void> {
         const gmail = await this.#authorize();
