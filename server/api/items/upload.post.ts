@@ -1,10 +1,10 @@
-import { useImportService } from "~/composables/useImportService";
-import { FileEmpty } from "~/lib/backend/adapters/readers/file_empty_error";
-import { InvalidCsvRow } from "~/lib/backend/adapters/readers/file_empty_line_error";
-import { FileNotSupported } from "~/lib/backend/adapters/readers/file_not_supported_error";
-import { InvalidFileHeader } from "~/lib/backend/adapters/readers/invalid_file_header_error";
-import { VariationNotFound } from "~/lib/backend/domain/catalog/variations/variation_not_found_error";
-import { HttpStatus } from "~/server/api/http_status";
+import { useImportService } from "@app/composables/useImportService";
+import { FileEmpty } from "@backend/adapters/readers/file_empty_error";
+import { InvalidCsvRow } from "@backend/adapters/readers/file_empty_line_error";
+import { FileNotSupported } from "@backend/adapters/readers/file_not_supported_error";
+import { InvalidFileHeader } from "@backend/adapters/readers/invalid_file_header_error";
+import { VariationNotFound } from "@backend/domain/catalog/variations/variation_not_found_error";
+import { HttpStatus } from "~~/server/api/http_status";
 import { checkAnonymousUser } from "../check_anonymous_user";
 
 const service = useImportService();

@@ -1,5 +1,5 @@
-import { useCatalogService } from "~/composables/useCatalogService";
-import { Variation } from "~/lib/backend/domain/catalog/variations/variation";
+import { useCatalogService } from "@app/composables/useCatalogService";
+import { Variation } from "@backend/domain/catalog/variations/variation";
 import { checkAnonymousUser } from "../check_anonymous_user";
 const service = useCatalogService();
 

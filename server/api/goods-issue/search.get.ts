@@ -1,4 +1,4 @@
-import { useGoodsIssueService } from "~/composables/useGoodsIssueService";
+import { useGoodsIssueService } from "@app/composables/useGoodsIssueService";
 import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
 import { toGoodsIssueNoteDTO } from "./goods_issue_note_dto";

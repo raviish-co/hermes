@@ -1,5 +1,5 @@
-import { useWarehouseService } from "~/composables/useWarehouseService";
-import { ItemStock } from "~/lib/backend/domain/warehouse/item_stock";
+import { useWarehouseService } from "@app/composables/useWarehouseService";
+import { ItemStock } from "@backend/domain/warehouse/item_stock";
 import { checkAnonymousUser } from "../check_anonymous_user";
 
 const service = useWarehouseService();

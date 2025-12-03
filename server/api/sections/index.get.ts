@@ -1,5 +1,5 @@
-import { useCatalogService } from "~/composables/useCatalogService";
-import { Section } from "~/lib/backend/domain/catalog/departments/section";
+import { useCatalogService } from "@app/composables/useCatalogService";
+import { Section } from "@backend/domain/catalog/departments/section";
 import { checkAnonymousUser } from "../check_anonymous_user";
 
 const service = useCatalogService();
