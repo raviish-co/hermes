@@ -68,7 +68,8 @@ onMounted(async () => {
                     <thead>
                         <tr>
                             <th class="min-w-20 w-20">ID</th>
-                            <th class="min-w-40 w-40">Data de saída</th>
+                            <th class="min-w-40 w-40">Data de Saída</th>
+                            <th class="min-w-40 w-40">Data de Devolução</th>
                             <th class="min-w-60 w-60">Descrição</th>
                             <th class="min-w-40 w-40">Estado</th>
                         </tr>
@@ -80,6 +81,7 @@ onMounted(async () => {
                                     {{ note.goodsIssueNoteId }}
                                 </NuxtLink>
                             </td>
+                            <td class="text-gray-500">{{ formatDate(note.issueDate) }}</td>
                             <td class="text-gray-500">{{ formatDate(note.returnDate) }}</td>
                             <td class="text-gray-500">{{ formatPurpose(note.purpose) }}</td>
                             <td>

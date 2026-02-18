@@ -8,3 +8,14 @@ function getCurrentDate(): Date {
     currentDate.setHours(currentDate.getHours() + 1);
     return currentDate;
 }
+
+export function getReturnDate(): string {
+    const currentDate = getCurrentDate();
+    return addDays(currentDate, 4).toISOString().slice(0, 16);
+}
+
+function addDays(date: Date, days: number): Date {
+    const newDate = new Date(date);
+    newDate.setDate(newDate.getDate() + days);
+    return newDate;
+}

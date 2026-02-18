@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { getCurrentLocalDateTime } from "@frontend/helpers/current_local_date_time";
+import { getReturnDate } from "@frontend/helpers/current_local_date_time";
 import { GoodsIssueService } from "@frontend/services/goods_issue_service";
 import { GoodsIssueNote } from "@frontend/domain/goods_issue_note";
 import { handleError } from "@frontend/utils/error_handler";
 
-const returnDate = getCurrentLocalDateTime();
+const returnDate = getReturnDate();
 const auth = useAuth();
 const service = new GoodsIssueService();
 const note = reactive(new GoodsIssueNote(returnDate));
@@ -21,8 +21,8 @@ function newGoodsIssue() {
             handleError(
                 err,
                 "newGoodsIssue",
-                "Não foi possivel criar a guia de saída de artigos. Tente novamente mais tarde."
-            )
+                "Não foi possivel criar a guia de saída de artigos. Tente novamente mais tarde.",
+            ),
         );
 
     wasSubmitted.value = true;
@@ -46,7 +46,7 @@ onMounted(async () => {
         <section class="space-y-4 mb-4">
             <div class="input-container">
                 <div class="input-disabled">{{ userAuthenticatedName }}</div>
-                <input v-model="note.returnDate" type="datetime-local" class="input-field" />
+                <input v-model="note.returnDate" type="datetime-local" class="input-disabled" />
             </div>
 
             <ChoosePurpose @choosed="note.setPurpose($event)" />

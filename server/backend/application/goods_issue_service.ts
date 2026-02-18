@@ -30,7 +30,7 @@ export class GoodsIssueService {
         itemStockRepository: ItemStockRepository,
         noteRepository: GoodsIssueNoteRepository,
         generator: Generator,
-        purposeSpecification: PurposeSpecification
+        purposeSpecification: PurposeSpecification,
     ) {
         this.#itemRepository = itemRepository;
         this.#itemStockRepository = itemStockRepository;
@@ -51,7 +51,7 @@ export class GoodsIssueService {
 
         const voidOrErr = await this.#reduceStockAndCalculateTotalValueOfOutputs(
             itemsOrErr.value,
-            data
+            data,
         );
         if (voidOrErr.isLeft()) return left(voidOrErr.value);
 
@@ -121,13 +121,13 @@ export class GoodsIssueService {
             line.goodQuantities,
             line.badQuantities,
             item.variations,
-            line.comment
+            line.comment,
         );
     }
 
     async #reduceStockAndCalculateTotalValueOfOutputs(
         items: Item[],
-        data: NoteDTO
+        data: NoteDTO,
     ): Promise<Either<InsufficientStock, void>> {
         const itemsIds = this.#buildItemsIds(data.lines);
 

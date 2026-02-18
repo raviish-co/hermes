@@ -30,6 +30,7 @@ interface GoodsIssueNoteDTO {
     total: number;
     securityDeposit: number;
     returnDate: string;
+    issueDate: string;
     status: string;
     lines: GoodsIssueLineDTO[];
 }
@@ -58,6 +59,7 @@ export function toGoodsIssueNoteDTO(note: GoodsIssueNote): GoodsIssueNoteDTO {
         status: note.status,
         lines: note.lines.map(toGoodsIssueLineDTO),
         returnDate: note.returnDate.toISOString(),
+        issueDate: note.issuedAt.toISOString(),
         total: note.total.value,
         securityDeposit: note.securityDeposit.value,
     };

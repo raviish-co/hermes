@@ -1,9 +1,8 @@
 [
     {
-        "username": "admin",
+        "username": "admin@example.com",
         "password": "demo",
         "name": "Admin",
-        "email": "admin@example.com",
         "phoneNumber": "911000011"
     }
 ]

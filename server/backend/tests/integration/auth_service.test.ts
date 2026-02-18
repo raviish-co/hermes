@@ -15,12 +15,12 @@ describe("Auth Service - Login", async () => {
     it("Deve efectuar o login do utilizador", async () => {
         const { service } = makeService();
 
-        const output = await service.login("johndoe123", "123@Password", "Default");
+        const output = await service.login("john.doe@example.com", "123@Password", "Default");
 
         expect(output.isRight()).toBeTruthy();
         expect(output.value).toEqual({
             accessToken: "token",
-            username: "johndoe123",
+            username: "john.doe@example.com",
             name: "John Doe",
         });
     });
@@ -28,7 +28,7 @@ describe("Auth Service - Login", async () => {
     it("Deve retornar **AuthenticationFailed** quando o utilizador não for encontrado", async () => {
         const { service } = makeService();
 
-        const err = await service.login("username", "");
+        const err = await service.login("username@example.com", "");
 
         expect(err.isLeft()).toBeTruthy();
         expect(err.value).toBeInstanceOf(AuthenticationFailed);
@@ -37,7 +37,7 @@ describe("Auth Service - Login", async () => {
     it("Deve retornar **AuthenticationFailed** quanto a senha for inválida", async () => {
         const { service } = makeService();
 
-        const err = await service.login("john.doe", "Password", "Default");
+        const err = await service.login("john.doe@example.com", "Password", "Default");
 
         expect(err.isLeft()).toBeTruthy();
         expect(err.value).toBeInstanceOf(AuthenticationFailed);
@@ -49,21 +49,21 @@ describe("Auth Service - Login", async () => {
 
         const spy = vi.spyOn(tokenGenerator, "generate");
 
-        await service.login("johndoe123", "123@Password", "Default");
+        await service.login("john.doe@example.com", "123@Password", "Default");
 
         expect(spy).toHaveBeenCalled();
-        expect(spy).toHaveBeenCalledOnce();
-        expect(spy).toHaveBeenCalledWith("johndoe123");
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledWith("john.doe@example.com");
     });
 
     it("Deve retornar os dados do utilizador quando o login foi bem sucedido", async () => {
         const { service } = makeService();
 
-        const output = await service.login("johndoe123", "123@Password", "Default");
+        const output = await service.login("john.doe@example.com", "123@Password", "Default");
 
         expect(output.isRight()).toBeTruthy();
         expect(output.value).toEqual({
-            username: "johndoe123",
+            username: "john.doe@example.com",
             name: "John Doe",
             accessToken: "token",
         });
@@ -72,7 +72,7 @@ describe("Auth Service - Login", async () => {
     it("Deve fazer login com o OTP password", async () => {
         const { service } = makeService();
 
-        const output = await service.login("johndoe123", "0000");
+        const output = await service.login("john.doe@example.com", "0000");
 
         expect(output.isRight()).toBeTruthy();
     });
@@ -80,18 +80,18 @@ describe("Auth Service - Login", async () => {
     it("Deve remover o OTP depois do autenticação ser efectuada com sucesso", async () => {
         const { service, otpStorage } = makeService();
 
-        await service.login("johndoe123", "0000");
+        await service.login("john.doe@example.com", "0000");
 
-        const otp = otpStorage.get("johndoe123");
+        const otp = otpStorage.get("john.doe@example.com");
 
         expect(otp).toBeUndefined();
     });
 
     it("Deve retornar **AuthenticationFailed** quando não encontrar o OTP", async () => {
         const { service, otpStorage } = makeService();
-        otpStorage.remove("johndoe123");
+        otpStorage.remove("john.doe@example.com");
 
-        const output = await service.login("johndoe123", "0000");
+        const output = await service.login("john.doe@example.com", "0000");
 
         expect(output.isLeft()).toBeTruthy();
         expect(output.value).toBeInstanceOf(AuthenticationFailed);
@@ -116,14 +116,14 @@ describe("Auth Service - VerifyToken", async () => {
         await service.verifyToken("token");
 
         expect(spy).toHaveBeenCalled();
-        expect(spy).toHaveBeenCalledOnce();
+        expect(spy).toHaveBeenCalledTimes(1);
         expect(spy).toHaveBeenCalledWith("token");
     });
 
     it("Deve retornar **InvalidToken** quando o token não for válido", async () => {
         const tokenGenerator = new TokenGeneratorStub();
         vi.spyOn(tokenGenerator, "verify").mockReturnValue(
-            Promise.resolve({ username: "--empty--", isValid: false })
+            Promise.resolve({ username: "--empty--", isValid: false }),
         );
         const { service } = makeService(tokenGenerator);
 
@@ -136,7 +136,7 @@ describe("Auth Service - VerifyToken", async () => {
     it("Deve retornar o username com base no token a ser verificado", async () => {
         const tokenGenerator = new TokenGeneratorStub();
         vi.spyOn(tokenGenerator, "verify").mockReturnValue(
-            Promise.resolve({ username: "john.doe", isValid: true })
+            Promise.resolve({ username: "john.doe@example.com", isValid: true }),
         );
         const { service } = makeService();
 
@@ -144,7 +144,7 @@ describe("Auth Service - VerifyToken", async () => {
 
         expect(output.isRight()).toBeTruthy();
         expect(output.value).toEqual({
-            username: "john.doe",
+            username: "john.doe@example.com",
             isValid: true,
         });
     });
@@ -154,9 +154,9 @@ describe("Auth Service - Generate OTP", async () => {
     it("Deve gerar o OTP com 4 dígitos", async () => {
         const { service, otpStorage } = makeService();
 
-        await service.generateOtp("johndoe123");
+        await service.generateOtp("john.doe@example.com");
 
-        const otp = otpStorage.get("johndoe123");
+        const otp = otpStorage.get("john.doe@example.com");
 
         expect(otp).toHaveLength(4);
     });
@@ -166,13 +166,13 @@ describe("Auth Service - Generate OTP", async () => {
 
         const spy = vi.spyOn(otpSender, "send");
 
-        await service.generateOtp("johndoe123");
+        await service.generateOtp("john.doe@example.com");
 
-        const otp = otpStorage.get("johndoe123");
+        const otp = otpStorage.get("john.doe@example.com");
 
         expect(spy).toHaveBeenCalled();
-        expect(spy).toHaveBeenCalledOnce();
-        expect(spy).toHaveBeenCalledWith("911000011", otp);
+        expect(spy).toHaveBeenCalledTimes(1);
+        expect(spy).toHaveBeenCalledWith("john.doe@example.com", otp);
     });
 
     it("Deve retornar o erro **UserNotFound** caso o utilizador não for encontrado", async () => {
@@ -186,7 +186,7 @@ describe("Auth Service - Generate OTP", async () => {
 });
 
 function makeService(tokenGenerator?: TokenGenerator) {
-    const user = new User("johndoe123", "123@Password", "John Doe", "911000011");
+    const user = new User("john.doe@example.com", "123@Password", "John Doe", "911000011");
 
     const userRepository: UserRepository = new InmemUserRepository();
     userRepository.save(user);
@@ -194,13 +194,13 @@ function makeService(tokenGenerator?: TokenGenerator) {
     const otpSender = new ConsoleOtpSender();
 
     const otpStorage = new InmemOtpStorage();
-    otpStorage.save("johndoe123", "0000");
+    otpStorage.save("john.doe@example.com", "0000");
 
     const service = new AuthService(
         userRepository,
         tokenGenerator ?? new TokenGeneratorStub(),
         otpStorage,
-        otpSender
+        otpSender,
     );
 
     return {

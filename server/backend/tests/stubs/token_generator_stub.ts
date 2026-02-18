@@ -6,6 +6,6 @@ export class TokenGeneratorStub implements TokenGenerator {
     }
 
     async verify(_token: string): Promise<VerifyToken> {
-        return { username: "john.doe", isValid: true };
+        return { username: "john.doe@example.com", isValid: true };
     }
 }

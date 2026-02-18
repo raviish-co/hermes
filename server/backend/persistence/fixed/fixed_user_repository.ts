@@ -4,8 +4,6 @@ import _userData from "./fixed_user_data.json";
 
 export class FixedUserRepository extends InmemUserRepository {
     constructor() {
-        super(
-            _userData.map((u) => new User(u.username, u.password, u.name, u.phoneNumber, u.email))
-        );
+        super(_userData.map((u) => new User(u.username, u.password, u.name, u.phoneNumber)));
     }
 }

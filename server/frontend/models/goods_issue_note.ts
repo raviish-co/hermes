@@ -22,6 +22,7 @@ export interface GoodsIssueNoteModel {
     purpose: PurposeModel;
     status: string;
     returnDate: string;
+    issueDate: string;
     total: number;
     securityDeposit: number;
     lines: GoodsIssueNoteLineModel[];

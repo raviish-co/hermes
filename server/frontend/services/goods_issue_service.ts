@@ -28,7 +28,7 @@ export class GoodsIssueService {
 
     async list(
         pageToken = 1,
-        perPage = 12
+        perPage = 12,
     ): Promise<{ notes: GoodsIssueNoteModel[]; total: number }> {
         const response = await $fetch("/api/goods-issue/", {
             method: "get",
@@ -81,6 +81,7 @@ export class GoodsIssueService {
                 notes: data.purpose.notes,
             },
             returnDate: data.returnDate,
+            issueDate: data.issueDate,
             status: data.status,
             securityDeposit: data.securityDeposit,
             total: data.total,

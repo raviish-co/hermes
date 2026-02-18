@@ -229,6 +229,7 @@ describe("PostgresItemStockRepository - findAllOutOfStock", () => {
 const createSetup = async () => {
     const prisma = {
         stock: {
+            upsert: async (_args: object) => ({}),
             findMany: async (_args: object) => itemsStock,
             createMany: async (_args: object) => ({}),
             update: async (_args: object) => ({}),

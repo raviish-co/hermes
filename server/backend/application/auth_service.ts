@@ -19,7 +19,7 @@ export class AuthService {
         userRepository: UserRepository,
         tokenGenerator: TokenGenerator,
         otpStorage: OtpStorage,
-        otpSender: Sender
+        otpSender: Sender,
     ) {
         this.#userRepository = userRepository;
         this.#tokenGenerator = tokenGenerator;
@@ -30,7 +30,7 @@ export class AuthService {
     async login(
         username: string,
         password: string,
-        mode = "Otp"
+        mode = "Otp",
     ): Promise<Either<AuthenticationFailed, UserDTO>> {
         const userOrErr = await this.#userRepository.getByUsername(Username.fromString(username));
         if (userOrErr.isLeft()) return left(new AuthenticationFailed());
@@ -56,7 +56,7 @@ export class AuthService {
 
         this.#otpStorage.save(username, otp);
 
-        await this.#otpSender.send(userOrErr.value.email, otp);
+        await this.#otpSender.send(username, otp);
 
         return right(undefined);
     }
