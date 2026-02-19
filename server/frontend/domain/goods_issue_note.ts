@@ -9,6 +9,7 @@ export class GoodsIssueNote extends Note {
     purpose: Purpose;
     status: string = "";
     returnDate: string;
+    issueDate: string = "";
     grossTotal: number = 0;
     securityDeposit: number = 0;
     override lines: GoodsIssueNoteLine[] = [];
@@ -27,6 +28,7 @@ export class GoodsIssueNote extends Note {
         note.grossTotal = data.total;
         note.securityDeposit = data.securityDeposit;
         note.status = data.status;
+        note.issueDate = data.issueDate;
 
         for (const line of data.lines) {
             const noteLine = new GoodsIssueNoteLine(
@@ -34,7 +36,7 @@ export class GoodsIssueNote extends Note {
                 line.name,
                 line.price,
                 line.variationValues,
-                line.condition
+                line.condition,
             );
 
             noteLine.goodQuantities = line.goodQuantities;
@@ -120,7 +122,7 @@ export class GoodsIssueNote extends Note {
             options.name,
             options.price,
             options.variationsValues,
-            options.condition
+            options.condition,
         );
 
         line.changeQuantity(quantity);

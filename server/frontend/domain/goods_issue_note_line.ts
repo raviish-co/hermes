@@ -15,12 +15,12 @@ export class GoodsIssueNoteLine extends NoteLine {
         condition?: ConditionModel,
         quantityRequested?: number,
         quantityReturned?: number,
-        quantityToReturn?: number
+        quantityToReturn?: number,
     ) {
         super(itemId, name, variationsValues, condition);
 
         this.price = price;
-        this.total = 0;
+        this.total = this.price * (quantityToReturn ?? 0);
 
         this.quantityRequested = quantityRequested ?? 0;
         this.quantityReturned = quantityReturned ?? 0;
@@ -40,6 +40,7 @@ export class GoodsIssueNoteLine extends NoteLine {
     }
 
     get formattedTotal() {
+        this.calculate();
         return formatCurrency(this.total);
     }
 }

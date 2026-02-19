@@ -3,8 +3,11 @@ import { GoodsIssueService } from "@frontend/services/goods_issue_service";
 import { GoodsReturnService } from "@frontend/services/goods_return_service";
 import { GoodsReturnNote } from "@frontend/domain/goods_return_note";
 import { GoodsIssueNote } from "@frontend/domain/goods_issue_note";
+import { type GoodsIssueNoteClient } from "@frontend/domain/goods_issue_note_client";
 import { formatDate } from "@frontend/helpers/format_date";
 import { handleError } from "@frontend/utils/error_handler";
+import { generateGoodsIssuePdf } from "@frontend/helpers/generate_goods_issue_pdf";
+import type { VDialog } from "#components";
 
 const quantities = ref<number[]>([]);
 const securityDepositWithHeld = ref<number>(0);
@@ -12,6 +15,10 @@ const goodsReturnNote = ref<GoodsReturnNote>({} as GoodsReturnNote);
 const goodsIssueNote = ref<GoodsIssueNote>({} as GoodsIssueNote);
 const editSecurityDeposit = ref<boolean>(true);
 const invalidLine = ref<boolean>(false);
+
+const client = ref<GoodsIssueNoteClient>({} as GoodsIssueNoteClient);
+const dialogRef = ref<typeof VDialog>();
+const clientErrors = ref<{ name?: string; nif?: string; address?: string }>({});
 
 const goodsReturnService = new GoodsReturnService();
 const goodsIssueService = new GoodsIssueService();
@@ -21,6 +28,78 @@ const route = useRoute();
 const noteId = route.params.id as string;
 
 getGoodsIssueById(noteId);
+
+function validateClientData(): boolean {
+    clientErrors.value = {};
+    let isValid = true;
+
+    if (!client.value.name) {
+        clientErrors.value.name = "O nome do destinatário é obrigatório";
+        isValid = false;
+    }
+
+    if (!client.value.nif) {
+        clientErrors.value.nif = "O NIF do destinatário é obrigatório";
+        isValid = false;
+    } else if (client.value.nif.trim().length < 7) {
+        clientErrors.value.nif = "O NIF deve ter pelo menos 7 caracteres";
+        isValid = false;
+    }
+
+    if (!client.value.address) {
+        clientErrors.value.address = "O endereço do destinatário é obrigatório";
+        isValid = false;
+    }
+
+    return isValid;
+}
+
+watch(
+    () => client.value.name,
+    (newValue) => {
+        if (newValue && clientErrors.value.name) {
+            clientErrors.value.name = undefined;
+        }
+    }
+);
+
+watch(
+    () => client.value.nif,
+    (newValue) => {
+        if (newValue && newValue.trim().length >= 7 && clientErrors.value.nif) {
+            clientErrors.value.nif = undefined;
+        }
+    }
+);
+
+watch(
+    () => client.value.address,
+    (newValue) => {
+        if (newValue && clientErrors.value.address) {
+            clientErrors.value.address = undefined;
+        }
+    }
+);
+
+function printPdf() {
+    if (!validateClientData()) {
+        return;
+    }
+
+    generateGoodsIssuePdf(goodsIssueNote.value as GoodsIssueNote, client.value);
+    closeClientDialog();
+}
+
+function openClientDialog() {
+    clientErrors.value = {};
+    dialogRef.value?.show();
+}
+
+function closeClientDialog() {
+    clientErrors.value = {};
+    client.value = {} as GoodsIssueNoteClient;
+    dialogRef.value?.close();
+}
 
 function toggleEdit() {
     editSecurityDeposit.value = !editSecurityDeposit.value;
@@ -122,6 +201,13 @@ onMounted(async () => {
         <div class="footer-container">
             <div class="flex flex-wrap gap-2 w-full pb-3 md:w-auto sm:flex-nowrap md:gap-4 md:pb-0">
                 <button
+                    title="Imprimir Guia"
+                    @click="openClientDialog()"
+                    class="btn btn-secondary material-symbols-outlined"
+                >
+                    file_save
+                </button>
+                <button
                     class="btn-secondary"
                     @click="newGoodsReturn()"
                     :disabled="isReturned() || invalidLine"
@@ -159,4 +245,54 @@ onMounted(async () => {
             </div>
         </div>
     </section>
+
+    <VDialog ref="dialogRef" title="Dados do Destinatário" class="max-w-[36rem]">
+        <div class="flex flex-col gap-4">
+            <div>
+                <input
+                    class="input-field"
+                    :class="{ 'input-required': !!clientErrors.name }"
+                    type="text"
+                    v-model="client.name"
+                    placeholder="Nome"
+                />
+                <span v-if="clientErrors.name" class="text-red-500 text-sm mt-1">{{
+                    clientErrors.name
+                }}</span>
+            </div>
+
+            <div>
+                <input
+                    class="input-field"
+                    :class="{ 'input-required': !!clientErrors.nif }"
+                    type="text"
+                    v-model="client.nif"
+                    placeholder="NIF"
+                />
+                <span v-if="clientErrors.nif" class="text-red-500 text-sm mt-1">{{
+                    clientErrors.nif
+                }}</span>
+            </div>
+
+            <div>
+                <input
+                    class="input-field"
+                    :class="{ 'input-required': !!clientErrors.address }"
+                    type="text"
+                    v-model="client.address"
+                    placeholder="Endereço"
+                />
+                <span v-if="clientErrors.address" class="text-red-500 text-sm mt-1">{{
+                    clientErrors.address
+                }}</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <NuxtLink class="btn-danger text-center" @click="closeClientDialog"
+                    >Cancelar</NuxtLink
+                >
+                <button class="btn-secondary" @click="printPdf()">Imprimir Guia</button>
+            </div>
+        </div>
+    </VDialog>
 </template>
