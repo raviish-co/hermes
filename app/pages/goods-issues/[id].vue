@@ -200,13 +200,14 @@ onMounted(async () => {
     <section class="footer">
         <div class="footer-container">
             <div class="flex flex-wrap gap-2 w-full pb-3 md:w-auto sm:flex-nowrap md:gap-4 md:pb-0">
-                <button
+                <!-- Hide this button temporarily -->
+                <!-- <button
                     title="Imprimir Guia"
                     @click="openClientDialog()"
                     class="btn btn-secondary material-symbols-outlined"
                 >
                     file_save
-                </button>
+                </button> -->
                 <button
                     class="btn-secondary"
                     @click="newGoodsReturn()"
