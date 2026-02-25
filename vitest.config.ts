@@ -2,11 +2,11 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
     test: {
-        include: ["lib/backend/**/*.{test,spec}.ts"],
+        include: ["server/backend/tests/**/*.{test,spec}.ts"],
         coverage: {
             exclude: [
-                "lib/backend/tests/**/*",
-                "lib/frontend/**/*",
+                "server/backend/tests/**/*",
+                "app/**/*",
                 "**/node_modules/**/*",
                 "../../**/.*",
                 "../../**/*",

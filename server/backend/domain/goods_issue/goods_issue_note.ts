@@ -21,13 +21,15 @@ export class GoodsIssueNote {
     #status: Status;
     #total: Decimal;
     #securityDeposit: Decimal;
+    #hash?: string;
+    #previousHash?: string;
 
     constructor(
         noteId: ID,
         purpose: Purpose,
         user: ID,
         returnDate: Date,
-        lines: GoodsIssueNoteLine[],
+        lines: GoodsIssueNoteLine[]
     ) {
         this.noteId = noteId;
         this.purpose = purpose;
@@ -48,7 +50,7 @@ export class GoodsIssueNote {
         const purpose = new Purpose(
             data.purpose.description,
             data.purpose.notes,
-            data.purpose.details,
+            data.purpose.details
         );
 
         const note = new GoodsIssueNote(
@@ -56,20 +58,37 @@ export class GoodsIssueNote {
             purpose,
             ID.fromString(data.userId),
             data.returnDate,
-            data.lines.map(GoodsIssueNoteLine.restore),
+            data.lines.map(GoodsIssueNoteLine.restore)
         );
 
         note.updateStatus(data.status);
         note.#issuedAt = data.issuedAt;
         note.#total = new Decimal(data.total);
         note.#securityDeposit = new Decimal(data.securityDeposit);
+        note.#hash = data.hash;
+        note.#previousHash = data.previousHash;
 
         return note;
     }
 
+    setHash(hash: string): void {
+        this.#hash = hash;
+    }
+
+    setPreviousHash(previousHash: string): void {
+        this.#previousHash = previousHash;
+    }
+
+    get hash(): string | undefined {
+        return this.#hash;
+    }
+
+    get previousHash(): string | undefined {
+        return this.#previousHash;
+    }
+
     verifyTotal(total: number, securityDeposit: number): boolean {
-        return !this.isSameTotal(total) ||
-            !this.isSameSecurityDeposit(securityDeposit);
+        return !this.isSameTotal(total) || !this.isSameSecurityDeposit(securityDeposit);
     }
 
     returnTheGoods(lines: GoodsReturnNoteLine[]): void {
@@ -124,19 +143,11 @@ export class GoodsIssueNote {
 
     #returnLines(lines: GoodsReturnNoteLine[]): void {
         for (const line of lines) {
-            this.#returnLine(
-                line.itemId,
-                line.goodQuantities,
-                line.badQuantities,
-            );
+            this.#returnLine(line.itemId, line.goodQuantities, line.badQuantities);
         }
     }
 
-    #returnLine(
-        itemId: ID,
-        goodQuantities: number,
-        badQuantities: number,
-    ): void {
+    #returnLine(itemId: ID, goodQuantities: number, badQuantities: number): void {
         const line = this.#findLineByItemId(itemId);
         line.returnLine(goodQuantities, badQuantities);
     }

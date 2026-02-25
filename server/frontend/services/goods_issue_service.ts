@@ -53,6 +53,26 @@ export class GoodsIssueService {
         return notes.map(this.#toGoodsIssueNoteModel);
     }
 
+    async generatePDF(data: {
+        noteId: string;
+        destinationName: string;
+        destinationNIF: string;
+        destinationAddress: string;
+    }): Promise<File> {
+        const response = await $fetch<File>("/api/goods-issue/generate-pdf", {
+            method: "post",
+            headers: await this.#headers(),
+            body: {
+                noteId: data.noteId,
+                destinationName: data.destinationName,
+                destinationNIF: data.destinationNIF,
+                destinationAddress: data.destinationAddress,
+            },
+        });
+
+        return response;
+    }
+
     #toNoteLine(line: GoodsIssueNoteLine): LineDTO {
         return {
             itemId: line.itemId,
