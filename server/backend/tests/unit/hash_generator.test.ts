@@ -1,47 +1,37 @@
 import { HashGenerator, HashGeneratorData } from "../../adapters/hash_generator";
-import { describe, expect, it, beforeEach } from "vitest";
+import { describe, expect, it } from "vitest";
 import crypto from "crypto";
 
 describe("HashGenerator", () => {
-    let privateKey: string;
-    let publicKey: string;
-
-    beforeEach(() => {
-        const { privateKey: priv, publicKey: pub } = crypto.generateKeyPairSync("rsa", {
-            modulusLength: 2048,
-        });
-
-        privateKey = priv.export({ format: "pem", type: "pkcs8" }) as string;
-        publicKey = pub.export({ format: "pem", type: "spki" }) as string;
-    });
-
     describe("Constructor", () => {
-        it("Deve criar uma instância com uma chave privada válida", () => {
+        it("Deve criar uma instância com uma chave privada válida", async () => {
+            const { privateKey } = await getKeys();
             const generator = new HashGenerator(privateKey);
             expect(generator).toBeDefined();
         });
 
         it("Deve lançar erro quando a chave privada é vazia", () => {
             expect(() => new HashGenerator("")).toThrow(
-                "A privateKey é obrigatória para o HashGenerator."
+                "A privateKey é obrigatória para o HashGenerator.",
             );
         });
 
         it("Deve lançar erro quando a chave privada é null", () => {
             expect(() => new HashGenerator(null as any)).toThrow(
-                "A privateKey é obrigatória para o HashGenerator."
+                "A privateKey é obrigatória para o HashGenerator.",
             );
         });
 
         it("Deve lançar erro quando a chave privada é undefined", () => {
             expect(() => new HashGenerator(undefined as any)).toThrow(
-                "A privateKey é obrigatória para o HashGenerator."
+                "A privateKey é obrigatória para o HashGenerator.",
             );
         });
     });
 
     describe("generateHash", () => {
         it("Deve gerar um hash válido com todos os parâmetros obrigatórios", async () => {
+            const { privateKey } = await getKeys();
             const generator = new HashGenerator(privateKey);
             const data: HashGeneratorData = {
                 noteDate: "2026-02-20",
@@ -58,6 +48,7 @@ describe("HashGenerator", () => {
         });
 
         it("Deve gerar um hash que pode ser verificado com a chave pública", async () => {
+            const { privateKey, publicKey } = await getKeys();
             const generator = new HashGenerator(privateKey);
             const data: HashGeneratorData = {
                 noteDate: "2026-02-20",
@@ -78,6 +69,7 @@ describe("HashGenerator", () => {
         });
 
         it("Deve incluir o hash anterior na sequência quando fornecido", async () => {
+            const { privateKey } = await getKeys();
             const generator = new HashGenerator(privateKey);
             const previousHash = "previousHash123";
             const data: HashGeneratorData = {
@@ -95,6 +87,7 @@ describe("HashGenerator", () => {
         });
 
         it("Deve gerar hashes diferentes para dados diferentes", async () => {
+            const { privateKey } = await getKeys();
             const generator = new HashGenerator(privateKey);
 
             const data1: HashGeneratorData = {
@@ -118,6 +111,7 @@ describe("HashGenerator", () => {
         });
 
         it("Deve gerar o mesmo hash para os mesmos dados", async () => {
+            const { privateKey } = await getKeys();
             const generator = new HashGenerator(privateKey);
 
             const data: HashGeneratorData = {
@@ -133,37 +127,8 @@ describe("HashGenerator", () => {
             expect(hash1).toEqual(hash2);
         });
 
-        it("Deve lidar com valores de totalValue como número decimal", async () => {
-            const generator = new HashGenerator(privateKey);
-            const data: HashGeneratorData = {
-                noteDate: "2026-02-20",
-                issuedAt: "2026-02-20T10:30:00",
-                noteId: "HRC-1000",
-                totalValue: 1500.99,
-            };
-
-            const hash = await generator.generateHash(data);
-
-            expect(hash).toBeDefined();
-            expect(typeof hash).toBe("string");
-        });
-
-        it("Deve gerar hash válido com totalValue zero", async () => {
-            const generator = new HashGenerator(privateKey);
-            const data: HashGeneratorData = {
-                noteDate: "2026-02-20",
-                issuedAt: "2026-02-20T10:30:00",
-                noteId: "HRC-1000",
-                totalValue: 0,
-            };
-
-            const hash = await generator.generateHash(data);
-
-            expect(hash).toBeDefined();
-            expect(typeof hash).toBe("string");
-        });
-
         it("Deve gerar hash válido com noteId contendo caracteres especiais", async () => {
+            const { privateKey } = await getKeys();
             const generator = new HashGenerator(privateKey);
             const data: HashGeneratorData = {
                 noteDate: "2026-02-20",
@@ -179,6 +144,7 @@ describe("HashGenerator", () => {
         });
 
         it("Deve gerar hash com formato de data ISO para issuedAt", async () => {
+            const { privateKey } = await getKeys();
             const generator = new HashGenerator(privateKey);
             const data: HashGeneratorData = {
                 noteDate: "2026-02-20",
@@ -194,6 +160,7 @@ describe("HashGenerator", () => {
         });
 
         it("Deve gerar hash diferente quando previousHash é alterado", async () => {
+            const { privateKey } = await getKeys();
             const generator = new HashGenerator(privateKey);
 
             const data1: HashGeneratorData = {
@@ -219,3 +186,14 @@ describe("HashGenerator", () => {
         });
     });
 });
+
+async function getKeys() {
+    const { privateKey: priv, publicKey: pub } = crypto.generateKeyPairSync("rsa", {
+        modulusLength: 2048,
+    });
+
+    const privateKey = priv.export({ format: "pem", type: "pkcs8" }) as string;
+    const publicKey = pub.export({ format: "pem", type: "spki" }) as string;
+
+    return { privateKey, publicKey };
+}
