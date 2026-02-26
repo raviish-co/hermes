@@ -39,6 +39,8 @@ export default defineEventHandler(async (event) => {
         });
     }
 
+    setHeader(event, "Content-Type", "application/pdf");
+    setHeader(event, "Content-Disposition", `attachment; filename="guia-de-saida-${noteId}.pdf"`);
     setResponseStatus(event, HttpStatus.OK);
 
     return result.value;

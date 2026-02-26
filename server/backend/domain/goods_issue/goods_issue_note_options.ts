@@ -12,7 +12,7 @@ export type NoteOptions = {
     total: number;
     securityDeposit: number;
     lines: LineOptions[];
-    hash?: string;
+    hash: string;
     previousHash?: string;
 };
 

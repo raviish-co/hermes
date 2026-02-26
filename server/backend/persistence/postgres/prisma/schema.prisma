@@ -79,7 +79,7 @@ model GoodsReceiptNoteLine {
   badQuantities    Int              @default(0) @map("bad_quantities")
   comments         String?
   consignmentValue Float            @default(0) @map("consignment_value")
-  itemStockType    String           @default("") @map("item_stock_type")       
+  itemStockType    String           @default("") @map("item_stock_type")
 
   @@map("goods_receipt_note_lines")
 }
@@ -96,6 +96,8 @@ model GoodsIssueNote {
   userId           String               @map("user_id")
   lines            GoodsIssueNoteLine[]
   goodsReturnNotes GoodsReturnNote[]
+  hash             String?
+  previousHash     String?
 
   @@map("goods_issue_notes")
 }
@@ -158,14 +160,14 @@ model GoodsReturnNoteLine {
 }
 
 model Stock {
-  stockId               String        @id @unique @map("stock_id")
-  product               Product       @relation(fields: [productId], references: [productId])
-  productId             String        @unique @map("product_id")
-  goodQuantities        Int           @default(0) @map("good_quantities")
-  badQuantities         Int           @default(0) @map("bad_quantities")
-  consignmentValue      Float         @map("consignment_value")
-  totalValueOfOutputs   Float         @default(0) @map("total_value_of_outputs")  
-  itemStockType         String        @default("") @map("item_stock_type")
+  stockId             String  @id @unique @map("stock_id")
+  product             Product @relation(fields: [productId], references: [productId])
+  productId           String  @unique @map("product_id")
+  goodQuantities      Int     @default(0) @map("good_quantities")
+  badQuantities       Int     @default(0) @map("bad_quantities")
+  consignmentValue    Float   @map("consignment_value")
+  totalValueOfOutputs Float   @default(0) @map("total_value_of_outputs")
+  itemStockType       String  @default("") @map("item_stock_type")
 
   @@map("stock_of_products")
 }

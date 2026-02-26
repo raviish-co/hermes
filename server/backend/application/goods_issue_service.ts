@@ -8,7 +8,7 @@ import type { ItemRepository } from "../domain/catalog/items/item_repository";
 import type { GoodsIssueNote } from "../domain/goods_issue/goods_issue_note";
 import { GoodsIssueNoteBuilder } from "../domain/goods_issue/goods_issue_note_builder";
 import { GoodsIssueNoteLine } from "../domain/goods_issue/goods_issue_note_line";
-import type { GoodsIssueNoteNotFound } from "../domain/goods_issue/goods_issue_note_not_found_error";
+import { GoodsIssueNoteNotFound } from "../domain/goods_issue/goods_issue_note_not_found_error";
 import type { GoodsIssueNoteRepository } from "../domain/goods_issue/goods_issue_note_repository";
 import { InvalidPurpose } from "../domain/goods_issue/invalid_purpose_error";
 import { InvalidTotal } from "../domain/goods_issue/invalid_total_error";
@@ -81,9 +81,9 @@ export class GoodsIssueService {
             return left(new InvalidTotal());
         }
 
-        await this.#addHashToNote(noteOrErr.value);
+        const note = await this.#addHashToNote(noteOrErr.value);
 
-        await this.#noteRepository.save(noteOrErr.value);
+        await this.#noteRepository.save(note);
 
         return right(undefined);
     }
@@ -213,7 +213,7 @@ export class GoodsIssueService {
         return right(undefined);
     }
 
-    async #addHashToNote(note: GoodsIssueNote): Promise<void> {
+    async #addHashToNote(note: GoodsIssueNote): Promise<GoodsIssueNote> {
         const lastNote = await this.#noteRepository.last();
 
         const noteDate = formatDate(note.returnDate);
@@ -233,6 +233,8 @@ export class GoodsIssueService {
         if (lastNote?.hash) {
             note.setPreviousHash(lastNote.hash);
         }
+
+        return note;
     }
 
     #convertDataToNoteData(

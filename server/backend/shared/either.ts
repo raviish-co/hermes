@@ -7,6 +7,11 @@ export class Left<L, R> {
         this.value = value;
     }
 
+    get right(): R {
+        console.error(this.value);
+        throw new Error("Cannot get right value from a Left");
+    }
+
     isLeft(): this is Left<L, R> {
         return true;
     }
@@ -21,6 +26,10 @@ export class Right<L, R> {
 
     constructor(value: R) {
         this.value = value;
+    }
+
+    get right(): R {
+        return this.value;
     }
 
     isLeft(): this is Left<L, R> {

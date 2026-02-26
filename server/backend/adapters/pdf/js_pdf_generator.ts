@@ -23,7 +23,7 @@ export class JsPdfGenerator implements PdfGenerator {
             // Title
             doc.setFontSize(16);
             doc.setFont("helvetica", "bold");
-            doc.text("Guia de Saída de Mercadorias", pageWidth / 2, currentY, {
+            doc.text("Guia de Saída de Mercadoria", pageWidth / 2, currentY, {
                 align: "center",
             });
             currentY += 12;

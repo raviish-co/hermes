@@ -52,7 +52,7 @@ export class InmemGoodsIssueNoteRepository implements GoodsIssueNoteRepository {
         const notes = this.records.filter(
             (note) =>
                 note.noteId.toString().includes(query) ||
-                note.fulltext.includes(query.toLowerCase())
+                note.fulltext.includes(query.toLowerCase()),
         );
         return notes;
     }

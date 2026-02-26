@@ -100,6 +100,8 @@ export class PostgresGoodsIssueNoteRepository implements GoodsIssueNoteRepositor
                         })),
                     },
                 },
+                hash: note.hash,
+                previousHash: note.previousHash,
             },
         });
     }
@@ -137,7 +139,16 @@ export class PostgresGoodsIssueNoteRepository implements GoodsIssueNoteRepositor
         });
     }
 
-    last(): Promise<GoodsIssueNote> {
-        throw new Error("Method not implemented.");
+    async last(): Promise<GoodsIssueNote> {
+        const note = await this.#prisma.goodsIssueNote.findFirst({
+            orderBy: { issuedAt: "desc" },
+            include: { lines: true, purpose: true },
+        });
+
+        if (!note) {
+            throw new GoodsIssueNoteNotFound();
+        }
+
+        return GoodsIssueNote.restore(note as NoteOptions);
     }
 }

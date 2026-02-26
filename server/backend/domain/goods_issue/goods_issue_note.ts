@@ -29,7 +29,7 @@ export class GoodsIssueNote {
         purpose: Purpose,
         user: ID,
         returnDate: Date,
-        lines: GoodsIssueNoteLine[]
+        lines: GoodsIssueNoteLine[],
     ) {
         this.noteId = noteId;
         this.purpose = purpose;
@@ -50,7 +50,7 @@ export class GoodsIssueNote {
         const purpose = new Purpose(
             data.purpose.description,
             data.purpose.notes,
-            data.purpose.details
+            data.purpose.details,
         );
 
         const note = new GoodsIssueNote(
@@ -58,7 +58,7 @@ export class GoodsIssueNote {
             purpose,
             ID.fromString(data.userId),
             data.returnDate,
-            data.lines.map(GoodsIssueNoteLine.restore)
+            data.lines.map(GoodsIssueNoteLine.restore),
         );
 
         note.updateStatus(data.status);
