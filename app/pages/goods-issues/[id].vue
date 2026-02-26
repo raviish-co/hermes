@@ -94,7 +94,13 @@ function printPdf() {
         })
         .then((res) => {
             const url = URL.createObjectURL(res);
-            window.open(url, "_blank");
+            const a = document.createElement("a");
+
+            a.href = url;
+            a.download = `guia-de-saida-${goodsIssueNote.value.goodsIssueNoteId}.pdf`;
+            a.click();
+            URL.revokeObjectURL(url);
+
             alert("PDF da guia de saída de artigos gerado com sucesso");
         })
         .catch((err) =>
