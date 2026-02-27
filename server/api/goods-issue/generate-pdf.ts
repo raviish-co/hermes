@@ -9,39 +9,66 @@ const service = useGoodsIssueService();
 export default defineEventHandler(async (event) => {
     checkAnonymousUser(event);
 
-    const { noteId, destinationName, destinationNIF, destinationAddress } = await readBody(event);
+    const body = await readBody(event);
 
     const result = await service.generatePDF({
-        noteId: noteId,
-        destinationName: destinationName,
-        destinationNIF: destinationNIF,
-        destinationAddress: destinationAddress,
+        noteId: body.noteId,
+        destinationName: body.destinationName,
+        destinationNIF: body.destinationNIF,
+        destinationAddress: body.destinationAddress,
     });
 
     if (result.value instanceof GoodsIssueNoteNotFound) {
-        throw createError({
-            statusCode: HttpStatus.NotFound,
-            statusMessage: "Guia de saída não encontrada",
-        });
+        return new Response(
+            JSON.stringify({
+                message: "Guia de saída não encontrada",
+            }),
+            {
+                status: HttpStatus.NotFound,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            },
+        );
     }
 
     if (result instanceof ValidationError) {
-        throw createError({
-            statusCode: HttpStatus.BadRequest,
-            statusMessage: result.message,
-        });
+        return new Response(
+            JSON.stringify({
+                message: result.message,
+            }),
+            {
+                status: HttpStatus.BadRequest,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            },
+        );
     }
 
     if (result instanceof Error) {
-        throw createError({
-            statusCode: HttpStatus.ServerError,
-            statusMessage: "Erro ao gerar PDF da guia de saída",
-        });
+        return new Response(
+            JSON.stringify({
+                message: "Erro ao gerar PDF da guia de saída",
+            }),
+            {
+                status: HttpStatus.ServerError,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            },
+        );
     }
 
     setHeader(event, "Content-Type", "application/pdf");
-    setHeader(event, "Content-Disposition", `attachment; filename="guia-de-saida-${noteId}.pdf"`);
+    setHeader(
+        event,
+        "Content-Disposition",
+        `attachment; filename="guia-de-saida-${body.noteId}.pdf"`,
+    );
     setResponseStatus(event, HttpStatus.OK);
 
-    return result.value;
+    const file = <File>result.value;
+
+    return file;
 });

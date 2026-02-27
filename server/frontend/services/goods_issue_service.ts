@@ -1,3 +1,4 @@
+import { Either, left, right } from "~~/server/backend/shared/either";
 import type { GoodsIssueNote } from "../domain/goods_issue_note";
 import type { GoodsIssueNoteLine } from "../domain/goods_issue_note_line";
 import type { GoodsIssueNoteModel } from "../models/goods_issue_note";
@@ -7,23 +8,47 @@ import { useAuth } from "@app/composables/useAuth";
 const auth = useAuth();
 
 export class GoodsIssueService {
-    async new(note: GoodsIssueNote) {
-        const data = await this.#toNoteDTO(note);
+    async new(note: GoodsIssueNote): Promise<Either<Error, { message: string }>> {
+        try {
+            const data = await this.#toNoteDTO(note);
 
-        return await $fetch("/api/goods-issue", {
-            method: "post",
-            headers: await this.#headers(),
-            body: { data },
-        });
+            const response = await fetch("/api/goods-issue", {
+                method: "post",
+                headers: await this.#headers(),
+                body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                return left(new Error(result.message));
+            }
+
+            return right(result);
+        } catch (error) {
+            console.error(error);
+            return left(new Error("Erro ao criar a guia de saída. Tente novamente mais tarde."));
+        }
     }
 
-    async getById(noteId: string): Promise<GoodsIssueNoteModel> {
-        const data = await $fetch<GoodsIssueNoteModel>(`/api/goods-issue/${noteId}`, {
-            method: "get",
-            headers: await this.#headers(),
-        });
+    async getById(noteId: string): Promise<Either<Error, GoodsIssueNoteModel>> {
+        try {
+            const response = await fetch(`/api/goods-issue/${noteId}`, {
+                method: "get",
+                headers: await this.#headers(),
+            });
 
-        return this.#toGoodsIssueNoteModel(data);
+            const result = await response.json();
+
+            if (!response.ok) {
+                return left(new Error(result.message));
+            }
+
+            return right(this.#toGoodsIssueNoteModel(result.data));
+        } catch (error) {
+            console.error(error);
+            return left(new Error("Erro ao buscar a guia de saída. Tente novamente mais tarde."));
+        }
     }
 
     async list(
@@ -58,19 +83,30 @@ export class GoodsIssueService {
         destinationName: string;
         destinationNIF: string;
         destinationAddress: string;
-    }): Promise<File> {
-        const response = await $fetch<File>("/api/goods-issue/generate-pdf", {
-            method: "post",
-            headers: await this.#headers(),
-            body: {
-                noteId: data.noteId,
-                destinationName: data.destinationName,
-                destinationNIF: data.destinationNIF,
-                destinationAddress: data.destinationAddress,
-            },
-        });
+    }): Promise<Either<Error, Blob>> {
+        try {
+            const response = await fetch("/api/goods-issue/generate-pdf", {
+                method: "post",
+                headers: await this.#headers(),
+                body: JSON.stringify({
+                    noteId: data.noteId,
+                    destinationName: data.destinationName,
+                    destinationNIF: data.destinationNIF,
+                    destinationAddress: data.destinationAddress,
+                }),
+            });
 
-        return response;
+            if (!response.ok) {
+                const body = await response.json();
+                console.error(body.message);
+                return left(new Error(body.message));
+            }
+
+            return right(await response.blob());
+        } catch (error) {
+            console.error(error);
+            return left(new Error("Erro ao gerar o PDF da guia de saída"));
+        }
     }
 
     #toNoteLine(line: GoodsIssueNoteLine): LineDTO {
@@ -111,6 +147,7 @@ export class GoodsIssueService {
 
     async #headers() {
         return {
+            "Content-Type": "application/json",
             "X-Access-Token": await auth.getAccessToken(),
         };
     }

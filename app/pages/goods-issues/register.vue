@@ -11,19 +11,15 @@ const note = reactive(new GoodsIssueNote(returnDate));
 const wasSubmitted = ref<boolean>(false);
 
 function newGoodsIssue() {
-    service
-        .new(note as GoodsIssueNote)
-        .then((res) => {
-            alert(res.message);
-            navigateTo("/goods-issues/");
-        })
-        .catch((err) =>
-            handleError(
-                err,
-                "newGoodsIssue",
-                "Não foi possivel criar a guia de saída de artigos. Tente novamente mais tarde.",
-            ),
-        );
+    service.new(note as GoodsIssueNote).then((result) => {
+        if (result.isLeft()) {
+            handleError(result.value, "goodsIssueService.new");
+            return;
+        }
+
+        alert(result.value.message);
+        navigateTo("/goods-issues/");
+    });
 
     wasSubmitted.value = true;
 }

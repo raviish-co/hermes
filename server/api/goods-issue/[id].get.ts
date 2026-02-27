@@ -12,27 +12,48 @@ export default defineEventHandler(async (event) => {
     const noteId = getRouterParam(event, "id", { decode: true });
 
     if (!noteId) {
-        throw createError({
-            statusMessage: "ID da Guia de Saida nao informado.",
-            statusCode: HttpStatus.BadRequest,
-        });
+        return new Response(
+            JSON.stringify({
+                message: "ID da Guia de Saida nao informado.",
+            }),
+            {
+                status: HttpStatus.BadRequest,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            },
+        );
     }
 
     const noteOrErr = await service.get(noteId);
 
     if (noteOrErr.value instanceof GoodsIssueNoteNotFound) {
-        throw createError({
-            statusMessage: "Guia de saida nao encontrada.",
-            statusCode: HttpStatus.NotFound,
-        });
+        return new Response(
+            JSON.stringify({
+                message: "Guia de saida nao encontrada.",
+            }),
+            {
+                status: HttpStatus.NotFound,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            },
+        );
     }
 
     if (noteOrErr.isLeft()) {
-        throw createError({
-            statusMessage: "Erro ao buscar guia de saida.",
-            statusCode: HttpStatus.ServerError,
-        });
+        return new Response(
+            JSON.stringify({
+                message: "Erro ao buscar guia de saida.",
+            }),
+            {
+                status: HttpStatus.ServerError,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            },
+        );
     }
 
-    return toGoodsIssueNoteDTO(noteOrErr.value);
+    return { data: toGoodsIssueNoteDTO(noteOrErr.value) };
 });

@@ -93,7 +93,12 @@ function printPdf() {
             destinationAddress: client.value.address,
         })
         .then((res) => {
-            const url = URL.createObjectURL(res);
+            if (res.isLeft()) {
+                handleError(res.value, "generateGoodsIssuePdf");
+                return;
+            }
+
+            const url = URL.createObjectURL(res.value);
             const a = document.createElement("a");
 
             a.href = url;
@@ -102,14 +107,7 @@ function printPdf() {
             URL.revokeObjectURL(url);
 
             alert("PDF da guia de saída de artigos gerado com sucesso");
-        })
-        .catch((err) =>
-            handleError(
-                err,
-                "generateGoodsIssuePdf",
-                "Não foi possivel gerar o PDF da guia de saída de artigos. Tente novamente mais tarde.",
-            ),
-        );
+        });
 
     closeClientDialog();
 }
@@ -134,20 +132,16 @@ function isReturned() {
 }
 
 function getGoodsIssueById(noteId: string) {
-    goodsIssueService
-        .getById(noteId)
-        .then((result) => {
-            goodsIssueNote.value = GoodsIssueNote.build(result);
-            goodsReturnNote.value = new GoodsReturnNote(goodsIssueNote.value.lines);
-            quantities.value = goodsIssueNote.value.lines?.map((l) => l.totalToReturn);
-        })
-        .catch((err) =>
-            handleError(
-                err,
-                "getGoodsIssueById",
-                "Não foi possivel obter a guia de saída de artigos. Tente novamente mais tarde.",
-            ),
-        );
+    goodsIssueService.getById(noteId).then((result) => {
+        if (result.isLeft()) {
+            handleError(result.value, "goodsIssueNote.getGoodsIssueById");
+            return;
+        }
+
+        goodsIssueNote.value = GoodsIssueNote.build(result.value);
+        goodsReturnNote.value = new GoodsReturnNote(goodsIssueNote.value.lines);
+        quantities.value = goodsIssueNote.value.lines?.map((l) => l.totalToReturn);
+    });
 }
 
 function newGoodsReturn() {
@@ -162,17 +156,16 @@ function newGoodsReturn() {
             securityDepositWithHeld.value,
             goodsReturnNote.value.returnLines,
         )
-        .then((res) => {
-            alert(res.message);
+        .then((result) => {
+            if (result.isLeft()) {
+                handleError(result.value, "goodsReturnService.new");
+                return;
+            }
+
+            alert(result.value.message);
+
             getGoodsIssueById(goodsIssueNote.value.goodsIssueNoteId);
-        })
-        .catch((err) =>
-            handleError(
-                err,
-                "newGoodsReturn",
-                "Não foi possivel criar a guia de devolução. Tente novamente mais tarde.",
-            ),
-        );
+        });
 }
 
 const userAuthenticatedName = ref<string>("");

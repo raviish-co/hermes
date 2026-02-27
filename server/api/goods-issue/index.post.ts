@@ -16,38 +16,73 @@ export default defineEventHandler(async (event) => {
     const voidOrErr = await service.new(data);
 
     if (voidOrErr.value instanceof InvalidPurpose) {
-        throw createError({
-            statusCode: HttpStatus.BadRequest,
-            statusMessage: "Finalidade invalida",
-        });
+        return new Response(
+            JSON.stringify({
+                message: "A finalidade informada é inválida",
+            }),
+            {
+                status: HttpStatus.BadRequest,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            },
+        );
     }
 
     if (voidOrErr.value instanceof ItemNotFound) {
-        throw createError({
-            statusCode: HttpStatus.NotFound,
-            statusMessage: "Artigo nao encontrado",
-        });
+        return new Response(
+            JSON.stringify({
+                message: "Artigo não encontrado",
+            }),
+            {
+                status: HttpStatus.NotFound,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            },
+        );
     }
 
     if (voidOrErr.value instanceof InvalidTotal) {
-        throw createError({
-            statusCode: HttpStatus.BadRequest,
-            statusMessage: "Total da guia de saida invalido",
-        });
+        return new Response(
+            JSON.stringify({
+                message: "Total da guia de saída inválido",
+            }),
+            {
+                status: HttpStatus.BadRequest,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            },
+        );
     }
 
     if (voidOrErr.value instanceof InsufficientStock) {
-        throw createError({
-            statusCode: HttpStatus.BadRequest,
-            statusMessage: "Stock insuficiente",
-        });
+        return new Response(
+            JSON.stringify({
+                message: "Stock insuficiente",
+            }),
+            {
+                status: HttpStatus.BadRequest,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            },
+        );
     }
 
     if (voidOrErr instanceof Error) {
-        throw createError({
-            statusCode: HttpStatus.ServerError,
-            statusMessage: "Erro ao efetuar a saida de artigos",
-        });
+        return new Response(
+            JSON.stringify({
+                message: "Erro ao efetuar a saida de artigos",
+            }),
+            {
+                status: HttpStatus.ServerError,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            },
+        );
     }
 
     setResponseStatus(event, HttpStatus.Created);
