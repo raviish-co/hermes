@@ -5,10 +5,11 @@ import { InvalidLines } from "@backend/domain/goods_receipt/invalid_lines_error"
 import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
 import { InvalidQuantitiesError } from "@backend/application/invalid_quantities_error";
+import { defineSafeEventHandler } from "~~/server/utils/handler";
 
 const service = useGoodsReceiptService();
 
-export default defineEventHandler(async (event) => {
+export default defineSafeEventHandler(async (event) => {
     checkAnonymousUser(event);
 
     const { data } = await readBody(event);
@@ -18,39 +19,40 @@ export default defineEventHandler(async (event) => {
     if (voidOrErr.value instanceof InvalidEntryDate) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "A data de entrada de mercadoria invalida",
+            message: "A data de entrada de mercadoria é inválida",
         });
     }
 
     if (voidOrErr.value instanceof InvalidLines) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Linhas invalidas",
+            message: "Linhas inválidas",
         });
     }
 
     if (voidOrErr.value instanceof InvalidQuantitiesError) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage:
-                "O total de quantidades boas e com defeito de um artigo em consignacao nao deve ser superior a 1",
+            message:
+                "O total de quantidades boas e com defeito de um artigo em consignacao não deve ser superior a 1",
         });
     }
 
     if (voidOrErr.value instanceof ItemNotFound) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Artigo nao encontrado",
+            message: "Artigo não encontrado",
         });
     }
 
     if (voidOrErr instanceof Error) {
         throw createError({
             statusCode: HttpStatus.ServerError,
-            statusMessage: "Erro ao efeturar saida de mercadoria",
+            message: "Erro ao efeturar saida de mercadoria",
         });
     }
 
     setResponseStatus(event, HttpStatus.Created);
+
     return { message: "Entrada de mercadoria efetuada com sucesso" };
 });

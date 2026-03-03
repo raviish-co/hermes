@@ -40,29 +40,28 @@ function save() {
             ...item.value,
             variations: item.value.variationsValues,
         })
-        .then(() => {
-            alert("Artigo salvo com sucesso!");
+        .then((res) => {
+            if (res.isLeft()) {
+                handleError(res.value, "updateItem");
+                return;
+            }
+
+            alert(res.value.message);
             navigateTo("/items");
-        })
-        .catch((err) =>
-            handleError(
-                err,
-                "updateItem",
-                "Não foi possivel salvar o artigo. Tente novamente mais tarde."
-            )
-        );
+        });
 }
 
 onBeforeMount(() => {
-    catalog
-        .getItem(itemId)
-        .then((res) => (item.value = res))
-        .catch((err) => {
-            alert(err.statusMessage);
+    catalog.getItem(itemId).then((res) => {
+        if (res.isLeft()) {
+            handleError(res.value, "catalogService.getItem");
             navigateTo("/items");
-        });
+            return;
+        }
 
-    catalog.listCategories();
+        item.value = res.value;
+        catalog.listCategories();
+    });
 });
 </script>
 

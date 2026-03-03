@@ -3,56 +3,36 @@ import { GoodsIssueNoteNotFound } from "@backend/domain/goods_issue/goods_issue_
 import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
 import { toGoodsIssueNoteDTO } from "./goods_issue_note_dto";
+import { defineSafeEventHandler } from "~~/server/utils/handler";
 
 const service = useGoodsIssueService();
 
-export default defineEventHandler(async (event) => {
+export default defineSafeEventHandler(async (event) => {
     checkAnonymousUser(event);
 
     const noteId = getRouterParam(event, "id", { decode: true });
 
     if (!noteId) {
-        return new Response(
-            JSON.stringify({
-                message: "ID da Guia de Saida nao informado.",
-            }),
-            {
-                status: HttpStatus.BadRequest,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            },
-        );
+        throw createError({
+            statusCode: HttpStatus.BadRequest,
+            message: "ID da guia de saída não informado",
+        });
     }
 
     const noteOrErr = await service.get(noteId);
 
     if (noteOrErr.value instanceof GoodsIssueNoteNotFound) {
-        return new Response(
-            JSON.stringify({
-                message: "Guia de saida nao encontrada.",
-            }),
-            {
-                status: HttpStatus.NotFound,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            },
-        );
+        throw createError({
+            statusCode: HttpStatus.NotFound,
+            message: "Guia de saída não encontrada",
+        });
     }
 
     if (noteOrErr.isLeft()) {
-        return new Response(
-            JSON.stringify({
-                message: "Erro ao buscar guia de saida.",
-            }),
-            {
-                status: HttpStatus.ServerError,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            },
-        );
+        throw createError({
+            statusCode: HttpStatus.ServerError,
+            message: "Erro ao buscar guia de saída",
+        });
     }
 
     return { data: toGoodsIssueNoteDTO(noteOrErr.value) };

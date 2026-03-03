@@ -2,6 +2,7 @@ import { useGoodsReceiptService } from "@app/composables/useGoodsReceiptService"
 import { GoodsReceiptNote } from "@backend/domain/goods_receipt/goods_receipt_note";
 import { GoodsReceiptNoteLine } from "@backend/domain/goods_receipt/goods_receipt_note_line";
 import { checkAnonymousUser } from "../check_anonymous_user";
+import { defineSafeEventHandler } from "~~/server/utils/handler";
 
 const service = useGoodsReceiptService();
 
@@ -37,7 +38,7 @@ function toGoodsReceiptNoteDTO(note: GoodsReceiptNote): GoodsReceiptNoteDTO {
     };
 }
 
-export default defineEventHandler(async (event) => {
+export default defineSafeEventHandler(async (event) => {
     checkAnonymousUser(event);
 
     const query = getQuery(event);

@@ -18,7 +18,7 @@ function toSectionDTO(section: Section): SectionDTO {
     };
 }
 
-export default defineEventHandler(async (event) => {
+export default defineSafeEventHandler(async (event) => {
     checkAnonymousUser(event);
 
     const sections = await service.listSections();

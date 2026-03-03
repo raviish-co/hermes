@@ -6,10 +6,11 @@ import { InvalidGoodsIssueLineQuantity } from "@backend/domain/goods_issue/inval
 import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
 import { NoteDTO } from "@backend/application/goods_return_service";
+import { defineSafeEventHandler } from "~~/server/utils/handler";
 
 const service = useGoodsReturnService();
 
-export default defineEventHandler(async (event) => {
+export default defineSafeEventHandler(async (event) => {
     checkAnonymousUser(event);
 
     const { noteId, securityDepositWithheld, items } = await readBody(event);
@@ -25,40 +26,40 @@ export default defineEventHandler(async (event) => {
 
     if (voidOrErr.value instanceof GoodsIssueNoteNotFound) {
         throw createError({
-            statusMessage: "Guia de saida nao encontrada.",
+            message: "Guia de saída não encontrada.",
             statusCode: HttpStatus.NotFound,
         });
     }
 
     if (voidOrErr.value instanceof InvalidGoodsIssueLineQuantity) {
         throw createError({
-            statusMessage: "Quantidade invalida.",
+            message: "Quantidade inválida.",
             statusCode: HttpStatus.BadRequest,
         });
     }
 
     if (voidOrErr.value instanceof GoodsIssueNoteHasBeenReturned) {
         throw createError({
-            statusMessage: "Guia de saida ja foi devolvida.",
+            message: "Guia de saida já foi devolvida.",
             statusCode: HttpStatus.BadRequest,
         });
     }
 
     if (voidOrErr.value instanceof GoodsIssueLineNotFound) {
         throw createError({
-            statusMessage: "Artigo para devolucao nao encontrado.",
+            message: "Artigo para devolução não encontrado.",
             statusCode: HttpStatus.NotFound,
         });
     }
 
     if (voidOrErr instanceof Error) {
         throw createError({
-            statusMessage: "Erro ao registar a devolucao.",
+            message: "Erro ao registar a devolução.",
             statusCode: HttpStatus.ServerError,
         });
     }
 
     setResponseStatus(event, HttpStatus.Created);
 
-    return { message: "Devolucao efetuada com sucesso." };
+    return { message: "Devolução efetuada com sucesso" };
 });

@@ -17,7 +17,7 @@ function toVariationDTO(v: Variation): VariationDTO {
     };
 }
 
-export default defineEventHandler(async (event) => {
+export default defineSafeEventHandler(async (event) => {
     checkAnonymousUser(event);
 
     const variations = await service.listVariations();

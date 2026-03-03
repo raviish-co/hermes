@@ -4,17 +4,23 @@ import { HttpStatus } from "../http_status";
 
 const service = useAuthService();
 
-export default defineEventHandler(async (event) => {
+export default defineSafeEventHandler(async (event) => {
     const data = await readBody(event);
 
     const userOrErr = await service.login(data.username, data.password);
 
     if (userOrErr.value instanceof AuthenticationFailed) {
-        throw createError({ statusCode: HttpStatus.Unauthorized });
+        throw createError({
+            message: "Utilizador não autorizado",
+            statusCode: HttpStatus.Unauthorized,
+        });
     }
 
     if (userOrErr.value instanceof Error) {
-        throw createError({ statusCode: HttpStatus.ServerError });
+        throw createError({
+            message: "Erro ao iniciar a sessão",
+            statusCode: HttpStatus.ServerError,
+        });
     }
 
     setCookie(event, "raviish::access-token", userOrErr.value.accessToken, {
@@ -25,5 +31,8 @@ export default defineEventHandler(async (event) => {
         path: "/",
     });
 
-    return { name: userOrErr.value.name, username: userOrErr.value.username };
+    return {
+        name: userOrErr.value.name,
+        username: userOrErr.value.username,
+    };
 });

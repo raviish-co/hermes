@@ -12,42 +12,42 @@ export class GoodsIssueService {
         try {
             const data = await this.#toNoteDTO(note);
 
-            const response = await fetch("/api/goods-issue", {
+            const response = await $fetch("/api/goods-issue", {
                 method: "post",
                 headers: await this.#headers(),
                 body: JSON.stringify(data),
             });
 
-            const result = await response.json();
+            return right(response);
+        } catch (error: any) {
+            console.error("Erro ao criar a guia de saída:", error);
 
-            if (!response.ok) {
-                return left(new Error(result.message));
-            }
+            const message =
+                error.data?.message ?? "Erro ao criar a guia de saída. Tente novamente mais tarde.";
 
-            return right(result);
-        } catch (error) {
-            console.error(error);
-            return left(new Error("Erro ao criar a guia de saída. Tente novamente mais tarde."));
+            return left(new Error(message));
         }
     }
 
     async getById(noteId: string): Promise<Either<Error, GoodsIssueNoteModel>> {
         try {
-            const response = await fetch(`/api/goods-issue/${noteId}`, {
-                method: "get",
-                headers: await this.#headers(),
-            });
+            const response = await $fetch<{ data: GoodsIssueNoteModel }>(
+                `/api/goods-issue/${noteId}`,
+                {
+                    method: "get",
+                    headers: await this.#headers(),
+                },
+            );
 
-            const result = await response.json();
+            return right(this.#toGoodsIssueNoteModel(response.data));
+        } catch (error: any) {
+            console.error("Erro ao buscar a guia de saída:", error);
 
-            if (!response.ok) {
-                return left(new Error(result.message));
-            }
+            const message =
+                error.data?.message ??
+                "Erro ao buscar a guia de saída. Tente novamente mais tarde.";
 
-            return right(this.#toGoodsIssueNoteModel(result.data));
-        } catch (error) {
-            console.error(error);
-            return left(new Error("Erro ao buscar a guia de saída. Tente novamente mais tarde."));
+            return left(new Error(message));
         }
     }
 
@@ -104,7 +104,7 @@ export class GoodsIssueService {
 
             return right(await response.blob());
         } catch (error) {
-            console.error(error);
+            console.error("Erro ao gerar o PDF da guia de saída:", error);
             return left(new Error("Erro ao gerar o PDF da guia de saída"));
         }
     }

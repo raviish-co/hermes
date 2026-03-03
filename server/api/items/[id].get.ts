@@ -5,14 +5,14 @@ import { toItemDTO } from "./item_dto";
 
 const service = useCatalogService();
 
-export default defineEventHandler(async (event) => {
+export default defineSafeEventHandler(async (event) => {
     checkAnonymousUser(event);
 
     const itemId = getRouterParam(event, "id", { decode: true });
 
     if (!itemId) {
         throw createError({
-            statusMessage: "ID do item nao informado.",
+            message: "ID do item não informado",
             statusCode: HttpStatus.BadRequest,
         });
     }
@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
 
     if (itemOrErr.isLeft()) {
         throw createError({
-            statusMessage: "Item nao encontrado.",
+            message: "Item não encontrado",
             statusCode: HttpStatus.NotFound,
         });
     }

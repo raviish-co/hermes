@@ -3,10 +3,11 @@ import { CategoryAlreadyExists } from "@backend/domain/catalog/categories/catego
 import { VariationNotFound } from "@backend/domain/catalog/variations/variation_not_found_error";
 import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
+import { defineSafeEventHandler } from "~~/server/utils/handler";
 
 const service = useCatalogService();
 
-export default defineEventHandler(async (event) => {
+export default defineSafeEventHandler(async (event) => {
     checkAnonymousUser(event);
 
     const data = await readBody(event);
@@ -14,30 +15,31 @@ export default defineEventHandler(async (event) => {
     const voidOrErr = await service.registerCategory(
         data.name,
         data.variationsIds,
-        data.description
+        data.description,
     );
 
     if (voidOrErr.value instanceof CategoryAlreadyExists) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Categoria com o mesmo nome foi registada anteriormente",
+            message: "Categoria com o mesmo nome foi registada anteriormente",
         });
     }
 
     if (voidOrErr.value instanceof VariationNotFound) {
         throw createError({
             statusCode: HttpStatus.NotFound,
-            statusMessage: "Variacao nao encontrada",
+            message: "Variação não encontrada",
         });
     }
 
     if (voidOrErr instanceof Error) {
         throw createError({
             statusCode: HttpStatus.ServerError,
-            statusMessage: "Erro ao registar categoria",
+            message: "Erro ao registar categoria",
         });
     }
 
     setResponseStatus(event, HttpStatus.Created);
+
     return { message: "Categoria registada com sucesso" };
 });

@@ -12,6 +12,7 @@ export default defineNuxtConfig({
         "@backend": fileURLToPath(new URL("./server/backend", import.meta.url)),
         "@frontend": fileURLToPath(new URL("./server/frontend", import.meta.url)),
         "@app": fileURLToPath(new URL("./app", import.meta.url)),
+        "@shared": fileURLToPath(new URL("./shared", import.meta.url)),
     },
 
     app: {

@@ -1,10 +1,11 @@
 import { useGoodsIssueService } from "@app/composables/useGoodsIssueService";
 import { checkAnonymousUser } from "../check_anonymous_user";
 import { toGoodsIssueNoteDTO } from "./goods_issue_note_dto";
+import { defineSafeEventHandler } from "~~/server/utils/handler";
 
 const service = useGoodsIssueService();
 
-export default defineEventHandler(async (event) => {
+export default defineSafeEventHandler(async (event) => {
     checkAnonymousUser(event);
 
     const query = getQuery(event);

@@ -1,3 +1,4 @@
+import { Either, left, right } from "~~/server/backend/shared/either";
 import type { GoodsReceiptNote } from "../domain/goods_receipt_note";
 import type { NoteLine } from "../domain/note_line";
 import type { ConditionModel } from "../models/condition";
@@ -7,19 +8,31 @@ import { useAuth } from "@app/composables/useAuth";
 const auth = useAuth();
 
 export class GoodsReceiptService {
-    async new(note: GoodsReceiptNote) {
-        const data = await this.#toGoodsReceiptDTO(note);
+    async new(note: GoodsReceiptNote): Promise<Either<Error, { message: string }>> {
+        try {
+            const data = await this.#toGoodsReceiptDTO(note);
 
-        return await $fetch("/api/goods-receipt", {
-            method: "post",
-            body: { data },
-            headers: await this.#headers(),
-        });
+            const response = await $fetch("/api/goods-receipt", {
+                method: "post",
+                body: { data },
+                headers: await this.#headers(),
+            });
+
+            return right(response);
+        } catch (error: any) {
+            console.error("Erro ao criar a guia de entrada:", error);
+
+            const message =
+                error.data?.message ||
+                "Erro ao criar a guia de entrada. Tente novamente mais tarde.";
+
+            return left(new Error(message));
+        }
     }
 
     async getAll(
         pageToken = 1,
-        perPage = 12
+        perPage = 12,
     ): Promise<{ notes: GoodsReceiptNoteModel[]; total: number }> {
         const response = await $fetch("/api/goods-receipt", {
             method: "get",

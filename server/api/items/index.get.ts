@@ -4,7 +4,7 @@ import { toItemDTO } from "./item_dto";
 
 const service = useCatalogService();
 
-export default defineEventHandler(async (event) => {
+export default defineSafeEventHandler(async (event) => {
     checkAnonymousUser(event);
 
     const query = getQuery(event);

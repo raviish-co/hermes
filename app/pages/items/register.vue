@@ -35,19 +35,15 @@ function register() {
         tags: tags.value,
     };
 
-    service
-        .registerItem(data)
-        .then((res) => alert(res.message))
-        .then(() => {
-            navigateTo("/items");
-        })
-        .catch((err) =>
-            handleError(
-                err,
-                "registerItem",
-                "Não foi possivel registar o artigo. Tente novamente mais tarde."
-            )
-        );
+    service.registerItem(data).then((res) => {
+        if (res.isLeft()) {
+            handleError(res.value, "registerItem");
+            return;
+        }
+
+        alert(res.value.message);
+        navigateTo("/items");
+    });
 }
 
 onMounted(() => {

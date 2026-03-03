@@ -5,7 +5,7 @@ import { HttpStatus } from "../http_status";
 
 const service = useCatalogService();
 
-export default defineEventHandler(async (event) => {
+export default defineSafeEventHandler(async (event) => {
     checkAnonymousUser(event);
 
     const itemId = getRouterParam(event, "id", { decode: true });
@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
 
     if (!itemId) {
         throw createError({
-            statusMessage: "ID do item nao informado.",
+            message: "ID do item não informado",
             statusCode: HttpStatus.BadRequest,
         });
     }
@@ -23,17 +23,18 @@ export default defineEventHandler(async (event) => {
     if (voidOrErr.value instanceof SectionNotFound) {
         throw createError({
             statusCode: HttpStatus.NotFound,
-            statusMessage: "Seccao nao encontrada.",
+            message: "Secçao não encontrada",
         });
     }
 
     if (voidOrErr.isLeft()) {
         throw createError({
             statusCode: HttpStatus.ServerError,
-            statusMessage: "Erro ao registar o artigo.",
+            message: "Erro ao registar o artigo",
         });
     }
 
     setResponseStatus(event, HttpStatus.Created);
+
     return { message: "Artigo salvo com sucesso." };
 });

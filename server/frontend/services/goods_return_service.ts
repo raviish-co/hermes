@@ -2,37 +2,64 @@ import type { GoodsReturnNoteModel } from "../models/goods_return_note";
 import type { NoteLine } from "../domain/note_line";
 
 import { useAuth } from "@app/composables/useAuth";
+import { Either, left, right } from "~~/server/backend/shared/either";
 
 const auth = useAuth();
 
 export class GoodsReturnService {
-    async new(noteId: string, securityDepositWithheld: number, lines: NoteLine[]) {
-        const data: GoodsReturnDTO = {
-            noteId,
-            securityDepositWithheld,
-            items: lines.map(this.#toItemDTO),
-        };
+    async new(
+        noteId: string,
+        securityDepositWithheld: number,
+        lines: NoteLine[],
+    ): Promise<Either<Error, { message: string }>> {
+        try {
+            const data: GoodsReturnDTO = {
+                noteId,
+                securityDepositWithheld,
+                items: lines.map(this.#toItemDTO),
+            };
 
-        return await $fetch("/api/goods-return", {
-            method: "post",
-            body: data,
-            headers: await this.#headers(),
-        });
+            const response = await $fetch("/api/goods-return", {
+                method: "post",
+                body: data,
+                headers: await this.#headers(),
+            });
+
+            return right(response);
+        } catch (error: any) {
+            console.error("Erro ao gerar a guia de devolução:", error);
+
+            const message =
+                error.data?.message ||
+                "Erro ao gerar a guia de devolução. Tente novamente mais tarde.";
+
+            return left(new Error(message));
+        }
     }
 
-    async getById(noteId: string): Promise<GoodsReturnNoteModel> {
-        const response = await $fetch<GoodsReturnNoteModel>(`/api/goods-return/${noteId}`, {
-            method: "get",
-            headers: await this.#headers(),
-        });
+    async getById(noteId: string): Promise<Either<Error, GoodsReturnNoteModel>> {
+        try {
+            const response = await $fetch<GoodsReturnNoteModel>(`/api/goods-return/${noteId}`, {
+                method: "get",
+                headers: await this.#headers(),
+            });
 
-        return {
-            goodsIssueNoteId: response.goodsIssueNoteId,
-            goodsReturnNoteId: response.goodsReturnNoteId,
-            issuedAt: response.issuedAt,
-            securityDepositWithHeld: response.securityDepositWithHeld,
-            lines: response.lines,
-        };
+            return right({
+                goodsIssueNoteId: response.goodsIssueNoteId,
+                goodsReturnNoteId: response.goodsReturnNoteId,
+                issuedAt: response.issuedAt,
+                securityDepositWithHeld: response.securityDepositWithHeld,
+                lines: response.lines,
+            });
+        } catch (error: any) {
+            console.error("Erro ao buscar a guia de devolução:", error);
+
+            const message =
+                error.data?.message ||
+                "Erro ao buscar a guia de devolução. Tente novamente mais tarde.";
+
+            return left(new Error(message));
+        }
     }
 
     async list(): Promise<GoodsReturnNoteModel[]> {

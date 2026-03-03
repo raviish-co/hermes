@@ -11,78 +11,49 @@ const service = useGoodsIssueService();
 export default defineEventHandler(async (event) => {
     checkAnonymousUser(event);
 
-    const { data } = await readBody(event);
+    const { userId, purpose, lines, total, returnDate } = await readBody(event);
 
-    const voidOrErr = await service.new(data);
+    const voidOrErr = await service.new({
+        userId,
+        purpose,
+        lines,
+        total,
+        returnDate,
+    });
 
     if (voidOrErr.value instanceof InvalidPurpose) {
-        return new Response(
-            JSON.stringify({
-                message: "A finalidade informada é inválida",
-            }),
-            {
-                status: HttpStatus.BadRequest,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            },
-        );
+        throw createError({
+            statusCode: HttpStatus.BadRequest,
+            message: "A finalidade informada é inválida",
+        });
     }
 
     if (voidOrErr.value instanceof ItemNotFound) {
-        return new Response(
-            JSON.stringify({
-                message: "Artigo não encontrado",
-            }),
-            {
-                status: HttpStatus.NotFound,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            },
-        );
+        throw createError({
+            statusCode: HttpStatus.NotFound,
+            message: "Artigo não encontrado",
+        });
     }
 
     if (voidOrErr.value instanceof InvalidTotal) {
-        return new Response(
-            JSON.stringify({
-                message: "Total da guia de saída inválido",
-            }),
-            {
-                status: HttpStatus.BadRequest,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            },
-        );
+        throw createError({
+            statusCode: HttpStatus.BadRequest,
+            message: "Total da guia de saída inválido",
+        });
     }
 
     if (voidOrErr.value instanceof InsufficientStock) {
-        return new Response(
-            JSON.stringify({
-                message: "Stock insuficiente",
-            }),
-            {
-                status: HttpStatus.BadRequest,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            },
-        );
+        throw createError({
+            statusCode: HttpStatus.BadRequest,
+            message: "Stock insuficiente",
+        });
     }
 
     if (voidOrErr instanceof Error) {
-        return new Response(
-            JSON.stringify({
-                message: "Erro ao efetuar a saida de artigos",
-            }),
-            {
-                status: HttpStatus.ServerError,
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            },
-        );
+        throw createError({
+            statusCode: HttpStatus.ServerError,
+            message: "Erro ao efetuar a saida de artigos",
+        });
     }
 
     setResponseStatus(event, HttpStatus.Created);
