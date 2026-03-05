@@ -121,14 +121,6 @@ export class JsPdfGenerator implements PdfGenerator {
             doc.line(120, signatureY, 196, signatureY);
             doc.text("Cliente", 158, signatureY + 5, { align: "center" });
 
-            // Hash and validation info
-            doc.setFontSize(8);
-            doc.text(
-                `${data.hash}-Processado por programa validado n. 'Não definido ainda.`,
-                leftMargin,
-                pageHeight - 10,
-            );
-
             const blob = doc.output("blob");
 
             const newFile = new File([blob], `guia_saida_${data.noteId}.pdf`, {
