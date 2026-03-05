@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { DefaultPurposeSpecification } from "../../adapters/default_purpose_specification";
 import { SequenceGenerator } from "../../adapters/sequences/sequence_generator";
+import { FakePdfGenerator } from "../../adapters/pdf/fake_pdf_generator";
 import { GoodsIssueService } from "../../application/goods_issue_service";
 import { InsufficientStock } from "../../domain/catalog/items/insufficient_stock_error";
 import { ItemNotFound } from "../../domain/catalog/items/item_not_found_error";
@@ -16,6 +17,9 @@ import { ID } from "../../shared/id";
 import { GoodsIssueNoteRepositoryStub } from "../stubs/goods_issue_note_repository_stub";
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
+import { ValidationError } from "../../application/validation_error";
+import { HashGeneratorStub } from "../stubs/hash_generator_stub";
+import { PdfGenerator } from "../../adapters/pdf/pdf_generator";
 
 describe("GoodsIssueService - Saída de mercadoria", () => {
     it("Deve retornar error **InvalidPurpose** se não existir", async () => {
@@ -330,6 +334,34 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
         expect(itemStock.length).toEqual(1);
         expect(itemStock[0].totalValueOfOutputs).toEqual(18000);
     });
+
+    it("Deve adicionar a assinatura da guia", async () => {
+        const { service, noteRepository } = makeService();
+
+        await service.new(goodsIssueData);
+
+        const note = await noteRepository.last();
+
+        expect(note.hash).toBeDefined();
+    });
+
+    it("A guia deve conter assinatura da guia anterior excepto a primeira", async () => {
+        const { service, noteRepository } = makeService();
+
+        await service.new(goodsIssueData);
+        const firstNote = await noteRepository.last();
+
+        expect(firstNote.hash).toBeDefined();
+        expect(firstNote.previousHash).toBeUndefined();
+
+        await service.new(goodsIssueData);
+        const secondNote = await noteRepository.last();
+
+        expect(secondNote.hash).toBeDefined();
+        expect(secondNote.previousHash).toBeDefined();
+        expect(secondNote.previousHash).toBe(firstNote.hash);
+        expect(secondNote.hash).not.toBe(firstNote.hash);
+    });
 });
 
 describe("GoodsIssueService - Recuperar as guias de saída de mercadorias", () => {
@@ -425,6 +457,111 @@ describe("GoodsIssueService - Pesquisar guia de saída de mercadoria", () => {
     });
 });
 
+describe("GoodsIssueService - Gerar PDF da guia de saída de mercadoria", () => {
+    it("Deve gerar o PDF da guia de saída de mercadoria", async () => {
+        const goodsIssueRepository = new GoodsIssueNoteRepositoryStub();
+        const { service } = makeService({ goodsIssueRepository });
+
+        const result = await service.generatePDF({
+            noteId: "GS - 1006",
+            destinationName: "John Doe",
+            destinationNIF: "123456789",
+            destinationAddress: "Rua Exemplo, 123, Huambo",
+        });
+
+        expect(result.isRight()).toBeTruthy();
+    });
+
+    it("Deve gerar o PDF da guia com os dados do destinatário", async () => {
+        const goodsIssueRepository = new GoodsIssueNoteRepositoryStub();
+        const { service } = makeService({ goodsIssueRepository });
+
+        const result = await service.generatePDF({
+            noteId: "GS - 1006",
+            destinationName: "John Doe",
+            destinationNIF: "123456789",
+            destinationAddress: "Rua Exemplo, 123, Luanda",
+        });
+
+        expect(result.isRight()).toBeTruthy();
+    });
+
+    it("Deve retornar **GoodsIssueNoteNotFound** se a guia de saída não existir", async () => {
+        const goodsIssueRepository = new InmemGoodsIssueNoteRepository();
+        const { service } = makeService({ goodsIssueRepository });
+
+        const error = await service.generatePDF({
+            noteId: "GS - 9999",
+            destinationName: "John Doe",
+            destinationNIF: "123456789",
+            destinationAddress: "Rua Exemplo, 123, Luanda",
+        });
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(GoodsIssueNoteNotFound);
+    });
+
+    it("Deve retornar **ValidationError** se o nome do destinatário for vazio", async () => {
+        const goodsIssueRepository = new GoodsIssueNoteRepositoryStub();
+        const { service } = makeService({ goodsIssueRepository });
+
+        const error = await service.generatePDF({
+            noteId: "GS - 1006",
+            destinationName: "",
+            destinationNIF: "123456789",
+            destinationAddress: "Rua Exemplo, 123, Luanda",
+        });
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(ValidationError);
+    });
+
+    it("Deve retornar **ValidationError** se o NIF do destinatário for vazio", async () => {
+        const goodsIssueRepository = new GoodsIssueNoteRepositoryStub();
+        const { service } = makeService({ goodsIssueRepository });
+
+        const error = await service.generatePDF({
+            noteId: "GS - 1006",
+            destinationName: "John Doe",
+            destinationNIF: "",
+            destinationAddress: "Rua Exemplo, 123, Luanda",
+        });
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(ValidationError);
+    });
+
+    it("Deve retornar **ValidationError** se o endereço do destinatário for vazio", async () => {
+        const goodsIssueRepository = new GoodsIssueNoteRepositoryStub();
+        const { service } = makeService({ goodsIssueRepository });
+
+        const error = await service.generatePDF({
+            noteId: "GS - 1006",
+            destinationName: "John Doe",
+            destinationNIF: "123456789",
+            destinationAddress: "",
+        });
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(ValidationError);
+    });
+
+    it("Deve retornar **ValidationError** se o ID da guia for vazio", async () => {
+        const goodsIssueRepository = new GoodsIssueNoteRepositoryStub();
+        const { service } = makeService({ goodsIssueRepository });
+
+        const error = await service.generatePDF({
+            noteId: "",
+            destinationName: "John Doe",
+            destinationNIF: "123456789",
+            destinationAddress: "Rua Exemplo, 123, Luanda",
+        });
+
+        expect(error.isLeft()).toBeTruthy();
+        expect(error.value).toBeInstanceOf(ValidationError);
+    });
+});
+
 const goodsIssueData = {
     purpose: {
         description: "Lavandaria",
@@ -449,6 +586,7 @@ const goodsIssueData = {
 interface Dependencies {
     itemRepository?: ItemRepository;
     goodsIssueRepository?: GoodsIssueNoteRepository;
+    pdfGenerator?: PdfGenerator;
 }
 
 function makeService(deps?: Dependencies) {
@@ -458,12 +596,16 @@ function makeService(deps?: Dependencies) {
     const storage = new InmemSequenceStorage();
     const generator = new SequenceGenerator(storage, 1000);
     const itemStockRepository = new ItemStockRepositoryStub();
+    const hashGenerator = new HashGeneratorStub();
+    const pdfGenerator = new FakePdfGenerator();
     const service = new GoodsIssueService(
         itemRepository,
         itemStockRepository,
         noteRepository,
         generator,
-        purposeSource
+        purposeSource,
+        hashGenerator,
+        pdfGenerator,
     );
 
     return {

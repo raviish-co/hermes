@@ -26,7 +26,7 @@ function toItemStockDTO(stock: ItemStock): ItemStockDTO {
     };
 }
 
-export default defineEventHandler(async (event) => {
+export default defineSafeEventHandler(async (event) => {
     checkAnonymousUser(event);
 
     const itemsStock = await service.listItemStock();

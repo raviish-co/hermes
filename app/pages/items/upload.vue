@@ -4,16 +4,13 @@ import { handleError } from "@frontend/utils/error_handler";
 
 const service = new ImportService();
 function importItems(formData: FormData) {
-    service
-        .importItems(formData)
-        .then((res) => alert(res.message))
-        .catch((err) =>
-            handleError(
-                err,
-                "importItems",
-                "Não foi possivel importar os artigos. Tente novamente mais tarde."
-            )
-        );
+    service.importItems(formData).then((res) => {
+        if (res.isLeft()) {
+            handleError(res.value, "importItems");
+            return;
+        }
+        alert(res.value.message);
+    });
 }
 </script>
 

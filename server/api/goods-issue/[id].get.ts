@@ -3,18 +3,19 @@ import { GoodsIssueNoteNotFound } from "@backend/domain/goods_issue/goods_issue_
 import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
 import { toGoodsIssueNoteDTO } from "./goods_issue_note_dto";
+import { defineSafeEventHandler } from "~~/server/utils/handler";
 
 const service = useGoodsIssueService();
 
-export default defineEventHandler(async (event) => {
+export default defineSafeEventHandler(async (event) => {
     checkAnonymousUser(event);
 
     const noteId = getRouterParam(event, "id", { decode: true });
 
     if (!noteId) {
         throw createError({
-            statusMessage: "ID da Guia de Saida nao informado.",
             statusCode: HttpStatus.BadRequest,
+            message: "ID da guia de saída não informado",
         });
     }
 
@@ -22,17 +23,17 @@ export default defineEventHandler(async (event) => {
 
     if (noteOrErr.value instanceof GoodsIssueNoteNotFound) {
         throw createError({
-            statusMessage: "Guia de saida nao encontrada.",
             statusCode: HttpStatus.NotFound,
+            message: "Guia de saída não encontrada",
         });
     }
 
     if (noteOrErr.isLeft()) {
         throw createError({
-            statusMessage: "Erro ao buscar guia de saida.",
             statusCode: HttpStatus.ServerError,
+            message: "Erro ao buscar guia de saída",
         });
     }
 
-    return toGoodsIssueNoteDTO(noteOrErr.value);
+    return { data: toGoodsIssueNoteDTO(noteOrErr.value) };
 });

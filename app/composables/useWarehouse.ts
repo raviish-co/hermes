@@ -16,7 +16,7 @@ export function useWarehouse() {
     };
 
     const markItemInStockAsIntern = async (itemId: string) => {
-        await warehouseService.markItemInStockAsIntern(itemId);
+        return await warehouseService.markItemInStockAsIntern(itemId);
     };
 
     const isInternalItemStock = (itemId: string): boolean => {

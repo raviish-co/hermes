@@ -21,8 +21,8 @@ async function authenticate() {
 
     const voidOrErr = await service.authenticate(username.value, password.value);
 
-    if (voidOrErr) {
-        error.value.message = voidOrErr.message;
+    if (voidOrErr.isLeft()) {
+        error.value.message = voidOrErr.value.message;
         return;
     }
 
@@ -32,8 +32,8 @@ async function authenticate() {
 async function sendOTP() {
     const voidOrErr = await service.generateOtp(username.value);
 
-    if (voidOrErr) {
-        error.value.message = voidOrErr.message;
+    if (voidOrErr.isLeft()) {
+        error.value.message = voidOrErr.value.message;
         sentStatus.value = false;
         return;
     }

@@ -11,42 +11,48 @@ const service = useGoodsIssueService();
 export default defineEventHandler(async (event) => {
     checkAnonymousUser(event);
 
-    const { data } = await readBody(event);
+    const { userId, purpose, lines, total, returnDate } = await readBody(event);
 
-    const voidOrErr = await service.new(data);
+    const voidOrErr = await service.new({
+        userId,
+        purpose,
+        lines,
+        total,
+        returnDate,
+    });
 
     if (voidOrErr.value instanceof InvalidPurpose) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Finalidade invalida",
+            message: "A finalidade informada é inválida",
         });
     }
 
     if (voidOrErr.value instanceof ItemNotFound) {
         throw createError({
             statusCode: HttpStatus.NotFound,
-            statusMessage: "Artigo nao encontrado",
+            message: "Artigo não encontrado",
         });
     }
 
     if (voidOrErr.value instanceof InvalidTotal) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Total da guia de saida invalido",
+            message: "Total da guia de saída inválido",
         });
     }
 
     if (voidOrErr.value instanceof InsufficientStock) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Stock insuficiente",
+            message: "Stock insuficiente",
         });
     }
 
     if (voidOrErr instanceof Error) {
         throw createError({
             statusCode: HttpStatus.ServerError,
-            statusMessage: "Erro ao efetuar a saida de artigos",
+            message: "Erro ao efetuar a saida de artigos",
         });
     }
 

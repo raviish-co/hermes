@@ -6,7 +6,6 @@ import { GoodsIssueNote } from "@frontend/domain/goods_issue_note";
 import { type GoodsIssueNoteClient } from "@frontend/domain/goods_issue_note_client";
 import { formatDate } from "@frontend/helpers/format_date";
 import { handleError } from "@frontend/utils/error_handler";
-import { generateGoodsIssuePdf } from "@frontend/helpers/generate_goods_issue_pdf";
 import type { VDialog } from "#components";
 
 const quantities = ref<number[]>([]);
@@ -60,7 +59,7 @@ watch(
         if (newValue && clientErrors.value.name) {
             clientErrors.value.name = undefined;
         }
-    }
+    },
 );
 
 watch(
@@ -69,7 +68,7 @@ watch(
         if (newValue && newValue.trim().length >= 7 && clientErrors.value.nif) {
             clientErrors.value.nif = undefined;
         }
-    }
+    },
 );
 
 watch(
@@ -78,7 +77,7 @@ watch(
         if (newValue && clientErrors.value.address) {
             clientErrors.value.address = undefined;
         }
-    }
+    },
 );
 
 function printPdf() {
@@ -86,7 +85,30 @@ function printPdf() {
         return;
     }
 
-    generateGoodsIssuePdf(goodsIssueNote.value as GoodsIssueNote, client.value);
+    goodsIssueService
+        .generatePDF({
+            noteId: goodsIssueNote.value.goodsIssueNoteId,
+            destinationName: client.value.name,
+            destinationNIF: client.value.nif,
+            destinationAddress: client.value.address,
+        })
+        .then((res) => {
+            if (res.isLeft()) {
+                handleError(res.value, "generateGoodsIssuePdf");
+                return;
+            }
+
+            const url = URL.createObjectURL(res.value);
+            const a = document.createElement("a");
+
+            a.href = url;
+            a.download = `guia-de-saida-${goodsIssueNote.value.goodsIssueNoteId}.pdf`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            alert("PDF da guia de saída de artigos gerado com sucesso");
+        });
+
     closeClientDialog();
 }
 
@@ -110,20 +132,16 @@ function isReturned() {
 }
 
 function getGoodsIssueById(noteId: string) {
-    goodsIssueService
-        .getById(noteId)
-        .then((result) => {
-            goodsIssueNote.value = GoodsIssueNote.build(result);
-            goodsReturnNote.value = new GoodsReturnNote(goodsIssueNote.value.lines);
-            quantities.value = goodsIssueNote.value.lines?.map((l) => l.totalToReturn);
-        })
-        .catch((err) =>
-            handleError(
-                err,
-                "getGoodsIssueById",
-                "Não foi possivel obter a guia de saída de artigos. Tente novamente mais tarde."
-            )
-        );
+    goodsIssueService.getById(noteId).then((result) => {
+        if (result.isLeft()) {
+            handleError(result.value, "goodsIssueNote.getGoodsIssueById");
+            return;
+        }
+
+        goodsIssueNote.value = GoodsIssueNote.build(result.value);
+        goodsReturnNote.value = new GoodsReturnNote(goodsIssueNote.value.lines);
+        quantities.value = goodsIssueNote.value.lines?.map((l) => l.totalToReturn);
+    });
 }
 
 function newGoodsReturn() {
@@ -136,19 +154,18 @@ function newGoodsReturn() {
         .new(
             goodsIssueNote.value.goodsIssueNoteId,
             securityDepositWithHeld.value,
-            goodsReturnNote.value.returnLines
+            goodsReturnNote.value.returnLines,
         )
-        .then((res) => {
-            alert(res.message);
+        .then((result) => {
+            if (result.isLeft()) {
+                handleError(result.value, "goodsReturnService.new");
+                return;
+            }
+
+            alert(result.value.message);
+
             getGoodsIssueById(goodsIssueNote.value.goodsIssueNoteId);
-        })
-        .catch((err) =>
-            handleError(
-                err,
-                "newGoodsReturn",
-                "Não foi possivel criar a guia de devolução. Tente novamente mais tarde."
-            )
-        );
+        });
 }
 
 const userAuthenticatedName = ref<string>("");
@@ -201,13 +218,13 @@ onMounted(async () => {
         <div class="footer-container">
             <div class="flex flex-wrap gap-2 w-full pb-3 md:w-auto sm:flex-nowrap md:gap-4 md:pb-0">
                 <!-- Hide this button temporarily -->
-                <!-- <button
+                <button
                     title="Imprimir Guia"
                     @click="openClientDialog()"
                     class="btn btn-secondary material-symbols-outlined"
                 >
                     file_save
-                </button> -->
+                </button>
                 <button
                     class="btn-secondary"
                     @click="newGoodsReturn()"

@@ -7,10 +7,11 @@ import { checkAnonymousUser } from "../check_anonymous_user";
 import { HttpStatus } from "../http_status";
 import { InvalidQuantitiesError } from "@backend/application/invalid_quantities_error";
 import { UserNotFound } from "@backend/domain/auth/user_not_found";
+import { defineSafeEventHandler } from "~~/server/utils/handler";
 
 const service = useImportService();
 
-export default defineEventHandler(async (event) => {
+export default defineSafeEventHandler(async (event) => {
     checkAnonymousUser(event);
 
     const formData = await readFormData(event);
@@ -23,50 +24,50 @@ export default defineEventHandler(async (event) => {
     if (voidOrErr.value instanceof InvalidFileHeader) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Cabecalho do arquivo invalido.",
+            message: "Cabeçalho do arquivo inválido.",
         });
     }
 
     if (voidOrErr.value instanceof FileEmpty) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Arquivo vazio.",
+            message: "Arquivo vazio.",
         });
     }
 
     if (voidOrErr.value instanceof UserNotFound) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Utilizador não encontrado.",
+            message: "Utilizador não encontrado.",
         });
     }
 
     if (voidOrErr.value instanceof FileNotSupported) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Tipo de arquivo nao suportado.",
+            message: "Tipo de arquivo não suportado.",
         });
     }
 
     if (voidOrErr.value instanceof InvalidQuantitiesError) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage:
-                "O total de quantidades boas e com defeito de um artigo em consignacao nao deve ser superior a 1.",
+            message:
+                "O total de quantidades boas e com defeito de um artigo em consignacao não deve ser superior a 1.",
         });
     }
 
     if (voidOrErr.value instanceof ItemStockNotFound) {
         throw createError({
             statusCode: HttpStatus.NotFound,
-            statusMessage: "Artigos em armazem nao encontrados.",
+            message: "Artigos em armazem não encontrados.",
         });
     }
 
     if (voidOrErr.value instanceof Error) {
         throw createError({
             statusCode: HttpStatus.ServerError,
-            statusMessage: "Erro carregar os artigos em armazem.",
+            message: "Erro ao carregar os artigos em armazem.",
         });
     }
 

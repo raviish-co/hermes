@@ -212,12 +212,27 @@ describe("PostgresGoodsIssueNoteRepository - update", () => {
     });
 });
 
+describe("PostgresGoodsIssueNoteRepository - last", () => {
+    it("Deve buscar a última guia emitida", async () => {
+        const noteRepository = new PostgresGoodsIssueNoteRepository(prisma);
+        const note = GoodsIssueNote.restore(_notes[1]);
+        const spy = vi.spyOn(prisma.goodsIssueNote, "findFirst");
+
+        const lastNote = await noteRepository.last();
+
+        expect(spy).toBeCalled();
+        expect(spy).toBeCalledTimes(1);
+        expect(lastNote.noteId.toString()).toBe(note.noteId.toString());
+    });
+});
+
 const prisma = {
     goodsIssueNote: {
         findUnique: async (_args: object) => _notes[0],
         findMany: async (_args: object) => _notes,
         create: async (_args: object) => ({}),
         update: async (_args: object) => ({}),
+        findFirst: async () => _notes[1],
     },
     goodsIssueNoteLine: {
         update: async (_args: object) => ({}),
@@ -257,6 +272,8 @@ const _notes = [
                 }),
             },
         ],
+        hash: "dummy hash",
+        previousHash: "",
     },
     {
         noteId: "2",
@@ -290,5 +307,7 @@ const _notes = [
                 }),
             },
         ],
+        hash: "dummy hash",
+        previousHash: "dummy previousHash",
     },
 ];

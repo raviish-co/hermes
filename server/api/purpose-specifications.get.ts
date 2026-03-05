@@ -17,7 +17,7 @@ function toPurposeDTO(p: any): PurposeDTO {
     };
 }
 
-export default defineEventHandler(async (event) => {
+export default defineSafeEventHandler(async (event) => {
     checkAnonymousUser(event);
 
     const specs = await service.listPurposeSpecifications();

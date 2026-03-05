@@ -16,20 +16,16 @@ const dialogRef = ref<HTMLDialogElement>();
 function markItemInStockAsIntern() {
     if (!selectedItemId.value) return;
 
-    warehouse
-        .markItemInStockAsIntern(selectedItemId.value)
-        .then(async () => {
-            alert("Artigo marcado como interno com sucesso");
-            close();
-            await warehouse.listItemsStock();
-        })
-        .catch((err) =>
-            handleError(
-                err,
-                "markItemInStockAsIntern",
-                "Não foi possivel marcar o artigo como interno. Tente novamente mais tarde."
-            )
-        );
+    warehouse.markItemInStockAsIntern(selectedItemId.value).then(async (res) => {
+        if (res.isLeft()) {
+            handleError(res.value, "markItemInStockAsIntern");
+            return;
+        }
+
+        alert(res.value.message);
+        close();
+        await warehouse.listItemsStock();
+    });
 }
 
 function setUserDataAndShowModal(itemId: string, itemName: string) {
@@ -137,7 +133,7 @@ onMounted(async () => {
                             <span v-else>
                                 {{
                                     formatCurrency(
-                                        warehouse.findItemStock(item.itemId)?.totalValueOfOutputs!
+                                        warehouse.findItemStock(item.itemId)?.totalValueOfOutputs!,
                                     )
                                 }}
                             </span>

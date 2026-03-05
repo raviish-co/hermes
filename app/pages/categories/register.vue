@@ -13,7 +13,7 @@ const service = new CatalogService();
 function selectVariation(variationId: string) {
     if (isSelected(variationId)) {
         selectedVariations.value = selectedVariations.value.filter(
-            (v) => v.variationId !== variationId
+            (v) => v.variationId !== variationId,
         );
         return;
     }
@@ -28,16 +28,14 @@ function isSelected(variationId: string) {
 
 function register() {
     const variationsIds = selectedVariations.value.map((v) => v.variationId);
-    service
-        .registerCategory(name.value, variationsIds, description.value)
-        .then((res) => alert(res.message))
-        .catch((err) =>
-            handleError(
-                err,
-                "registerCategory",
-                "Não foi possivel registar a categoria. Tente novamente mais tarde."
-            )
-        );
+    service.registerCategory(name.value, variationsIds, description.value).then((res) => {
+        if (res.isLeft()) {
+            handleError(res.value, "registerCategory");
+            return;
+        }
+
+        alert(res.value.message);
+    });
 }
 
 onMounted(async () => {

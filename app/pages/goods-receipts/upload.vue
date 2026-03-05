@@ -14,16 +14,13 @@ onMounted(async () => {
 
 function importFile(formData: FormData) {
     formData.append("username", username.value as string);
-    service
-        .importItemsStock(formData)
-        .then((res) => alert(res.message))
-        .catch((err) =>
-            handleError(
-                err,
-                "importFile",
-                "Não foi possivel importar o stock. Tente novamente mais tarde."
-            )
-        );
+    service.importItemsStock(formData).then((res) => {
+        if (res.isLeft()) {
+            handleError(res.value, "importItemsStock");
+            return;
+        }
+        alert(res.value.message);
+    });
 }
 </script>
 

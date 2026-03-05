@@ -1,12 +1,10 @@
 import { useAuth } from "@app/composables/useAuth";
+import { Either, left, right } from "~~/server/backend/shared/either";
 
 const auth = useAuth();
 
 export class AuthService {
-    async authenticate(
-        username: string,
-        password: string
-    ): Promise<{ message: string } | undefined> {
+    async authenticate(username: string, password: string): Promise<Either<Error, void>> {
         try {
             const user = await $fetch("/api/auth/login/", {
                 method: "post",
@@ -14,31 +12,31 @@ export class AuthService {
             });
 
             auth.login(user);
+            return right(undefined);
         } catch (error: any) {
-            if (error.statusCode === 401) {
-                return { message: "Credenciais inválidas" };
-            }
+            console.error("Erro ao autenticar-se:", error);
 
-            return {
-                message: "Erro desconhecido, contacte o administrador do sistema.",
-            };
+            const message =
+                error.message ?? "Erro desconhecido ao autenticar-se. Tente novamente mais tarde.";
+
+            return left(new Error(message));
         }
     }
 
-    async generateOtp(username: string): Promise<{ message: string } | void> {
+    async generateOtp(username: string): Promise<Either<Error, void>> {
         try {
             await $fetch("/api/auth/generate-otp/", {
                 method: "post",
                 body: { username },
             });
+            return right(undefined);
         } catch (error: any) {
-            if (error.statusCode === 404) {
-                return { message: "Utilizador inválido" };
-            }
+            console.error("Erro ao gerar o OTP:", error);
 
-            return {
-                message: "Erro desconhecido, contacte o administrador do sistema.",
-            };
+            const message =
+                error.message ?? "Erro desconhecido ao gerar o OTP. Tente novamente mais tarde.";
+
+            return left(new Error(message));
         }
     }
 }

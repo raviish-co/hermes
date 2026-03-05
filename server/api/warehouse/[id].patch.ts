@@ -4,13 +4,13 @@ import { ItemStockNotFound } from "@backend/domain/warehouse/item_stock_not_foun
 
 const service = useWarehouseService();
 
-export default defineEventHandler(async (event) => {
+export default defineSafeEventHandler(async (event) => {
     const itemId = getRouterParam(event, "id");
 
     if (!itemId) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "ID do item nao informado",
+            message: "ID do item não informado",
         });
     }
 
@@ -19,16 +19,16 @@ export default defineEventHandler(async (event) => {
     if (voidOrErr.value instanceof ItemStockNotFound) {
         throw createError({
             statusCode: HttpStatus.NotFound,
-            statusMessage: "Item nao encontrado no stock",
+            message: "Item não encontrado no stock",
         });
     }
 
     if (voidOrErr.isLeft()) {
         throw createError({
             statusCode: HttpStatus.ServerError,
-            statusMessage: "Nao foi possivel actualizar o estado do item no stock",
+            message: "Não foi possível actualizar o estado do item no stock",
         });
     }
 
-    return { message: "Item marcado como interno com sucesso" };
+    return { message: "Artigo marcado como interno com sucesso" };
 });

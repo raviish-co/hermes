@@ -25,7 +25,6 @@ onMounted(async () => {
         <h1 class="page-title">Guias de Devoluções</h1>
 
         <div v-if="notes.length > 0" class="table-container space-y-2">
-            <p class="p-2">Filtro: {{ noteId }}</p>
             <table class="table text-center">
                 <thead>
                     <tr>
@@ -38,7 +37,7 @@ onMounted(async () => {
                 <tbody>
                     <tr
                         v-for="note in notes.sort((a, b) =>
-                            b.goodsIssueNoteId.localeCompare(a.goodsIssueNoteId)
+                            b.goodsIssueNoteId.localeCompare(a.goodsIssueNoteId),
                         )"
                         :key="note.goodsReturnNoteId"
                     >

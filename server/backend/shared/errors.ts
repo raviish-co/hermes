@@ -15,8 +15,15 @@ import type { CategoryAlreadyExists } from "../domain/catalog/categories/categor
 import type { VariationNotFound } from "../domain/catalog/variations/variation_not_found_error";
 import type { CategoryNotFound } from "../domain/catalog/categories/category_not_found_error";
 import type { SectionNotFound } from "../domain/catalog/departments/section_not_found_error";
+import { ValidationError } from "../application/validation_error";
 
-export type GoodsIssueNoteError = InvalidPurpose | ItemNotFound | InvalidTotal | InsufficientStock;
+export type GoodsIssueNoteError =
+    | InvalidPurpose
+    | ItemNotFound
+    | InvalidTotal
+    | InsufficientStock
+    | ValidationError
+    | Error;
 
 export type GoodsReturnNoteError =
     | GoodsIssueNoteNotFound

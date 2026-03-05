@@ -1,9 +1,10 @@
 import { useDashboardService } from "@app/composables/useDashboardService";
 import { checkAnonymousUser } from "../check_anonymous_user";
+import { defineSafeEventHandler } from "~~/server/utils/handler";
 
 const service = useDashboardService();
 
-export default defineEventHandler(async (event) => {
+export default defineSafeEventHandler(async (event) => {
     checkAnonymousUser(event);
 
     const totalExpiredGoodsIssueNotes = await service.totalExpiredGoodsIssueNotes();

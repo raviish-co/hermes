@@ -4,7 +4,7 @@ import { UserNotFound } from "@backend/domain/auth/user_not_found";
 
 const service = useAuthService();
 
-export default defineEventHandler(async (event) => {
+export default defineSafeEventHandler(async (event) => {
     const data = await readBody(event);
 
     const voidOrErr = await service.generateOtp(data.username);
@@ -12,12 +12,15 @@ export default defineEventHandler(async (event) => {
     if (voidOrErr.value instanceof UserNotFound) {
         throw createError({
             statusCode: HttpStatus.NotFound,
-            message: "Utilizador invalido",
+            message: "Utilizador não encontrado",
         });
     }
 
     if (voidOrErr instanceof Error) {
-        throw createError({ statusCode: HttpStatus.ServerError });
+        throw createError({
+            message: "Erro ao gerar o OTP",
+            statusCode: HttpStatus.ServerError,
+        });
     }
 
     return;

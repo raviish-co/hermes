@@ -21,42 +21,42 @@ export default defineEventHandler(async (event) => {
     if (voidOrErr.value instanceof InvalidFileHeader) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Cabecalho do arquivo invalido.",
+            message: "Cabeçalho do arquivo inválido",
         });
     }
 
     if (voidOrErr.value instanceof FileEmpty) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Arquivo vazio.",
+            message: "Arquivo vazio",
         });
     }
 
     if (voidOrErr.value instanceof FileNotSupported) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Tipo de arquivo nao suportado.",
+            message: "Tipo de arquivo não suportado",
         });
     }
 
     if (voidOrErr.value instanceof InvalidCsvRow) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            statusMessage: "Arquivo contem linhas vazias.",
+            message: "Arquivo contém linhas vazias",
         });
     }
 
     if (voidOrErr.value instanceof VariationNotFound) {
         throw createError({
             statusCode: HttpStatus.ServerError,
-            statusMessage: "Variacao nao encontrada.",
+            message: "Variação não encontrada",
         });
     }
 
     if (voidOrErr.value instanceof Error) {
         throw createError({
             statusCode: HttpStatus.ServerError,
-            statusMessage: "Erro ao importar artigos.",
+            message: "Erro ao importar artigos",
         });
     }
 

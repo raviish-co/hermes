@@ -4,6 +4,7 @@ import { formatDate } from "@frontend/helpers/format_date";
 import { GoodsReturnService } from "@frontend/services/goods_return_service";
 import { formatVariationValues } from "@frontend/helpers/format_variation_values";
 import { formatCurrency } from "@frontend/helpers/format_currency";
+import { handleError } from "~~/server/frontend/utils/error_handler";
 
 const route = useRoute();
 const auth = useAuth();
@@ -15,8 +16,15 @@ const userAuthenticatedName = ref<string>("");
 const service = new GoodsReturnService();
 
 onMounted(async () => {
-    note.value = await service.getById(noteId);
-    userAuthenticatedName.value = await auth.getName();
+    await service.getById(noteId).then(async (res) => {
+        if (res.isLeft()) {
+            handleError(res.value, "goodsReturnService.getById");
+            return;
+        }
+
+        note.value = res.value;
+        userAuthenticatedName.value = await auth.getName();
+    });
 });
 </script>
 <template>

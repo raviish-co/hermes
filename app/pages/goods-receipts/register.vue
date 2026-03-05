@@ -12,19 +12,15 @@ const note = reactive(new GoodsReceiptNote(entryDate));
 const service = new GoodsReceiptService();
 
 function newGoodsReceipt() {
-    service
-        .new(note as GoodsReceiptNote)
-        .then((res) => {
-            alert(res.message);
-            note.clearLines();
-        })
-        .catch((err) =>
-            handleError(
-                err,
-                "newGoodsReceipt",
-                "Não foi possivel criar a guia de entrada de mercadoria. Tente novamente mais tarde."
-            )
-        );
+    service.new(note as GoodsReceiptNote).then((res) => {
+        if (res.isLeft()) {
+            handleError(res.value, "newGoodsReceipt");
+            return;
+        }
+
+        alert(res.value.message);
+        note.clearLines();
+    });
 }
 
 onMounted(async () => {
