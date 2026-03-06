@@ -96,8 +96,6 @@ model GoodsIssueNote {
   userId           String               @map("user_id")
   lines            GoodsIssueNoteLine[]
   goodsReturnNotes GoodsReturnNote[]
-  hash             String?
-  previousHash     String?
 
   @@map("goods_issue_notes")
 }

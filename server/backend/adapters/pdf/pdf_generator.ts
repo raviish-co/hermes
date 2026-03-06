@@ -13,7 +13,6 @@ export interface NoteData {
     dateReturn: string;
     total: string;
     securityDeposit: string;
-    hash: string;
     lines: Array<{
         itemId: string;
         name: string;

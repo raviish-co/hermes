@@ -100,8 +100,6 @@ export class PostgresGoodsIssueNoteRepository implements GoodsIssueNoteRepositor
                         })),
                     },
                 },
-                hash: note.hash,
-                previousHash: note.previousHash,
             },
         });
     }

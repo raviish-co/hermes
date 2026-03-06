@@ -21,8 +21,6 @@ export class GoodsIssueNote {
     #status: Status;
     #total: Decimal;
     #securityDeposit: Decimal;
-    #hash?: string;
-    #previousHash?: string;
 
     constructor(
         noteId: ID,
@@ -65,26 +63,8 @@ export class GoodsIssueNote {
         note.#issuedAt = data.issuedAt;
         note.#total = new Decimal(data.total);
         note.#securityDeposit = new Decimal(data.securityDeposit);
-        note.#hash = data.hash;
-        note.#previousHash = data.previousHash;
 
         return note;
-    }
-
-    setHash(hash: string): void {
-        this.#hash = hash;
-    }
-
-    setPreviousHash(previousHash: string): void {
-        this.#previousHash = previousHash;
-    }
-
-    get hash(): string | undefined {
-        return this.#hash;
-    }
-
-    get previousHash(): string | undefined {
-        return this.#previousHash;
     }
 
     verifyTotal(total: number, securityDeposit: number): boolean {

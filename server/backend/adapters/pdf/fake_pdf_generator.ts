@@ -188,10 +188,6 @@ export class FakePdfGenerator implements PdfGenerator {
                 </div>
             </div>
 
-            <div class="footer-note">
-                ${data.hash} - Processado por programa validado n.º 'Não definido ainda'
-            </div>
-
         </div>
 
         </body>

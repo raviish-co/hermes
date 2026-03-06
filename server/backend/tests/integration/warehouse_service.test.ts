@@ -12,7 +12,6 @@ import { InmemSequenceStorage } from "../../persistence/inmem/inmem_sequence_sto
 import { SequenceGenerator } from "../../adapters/sequences/sequence_generator";
 import { GoodsIssueService } from "../../application/goods_issue_service";
 import { FakePdfGenerator } from "../../adapters/pdf/fake_pdf_generator";
-import { HashGeneratorStub } from "../stubs/hash_generator_stub";
 
 describe("WharehouseService - Artigos em Stock", async () => {
     it("listItemStock - Deve recuperar os artigos em stock", async () => {
@@ -56,7 +55,6 @@ async function makeGoodsIssueService(itemStockRepo?: ItemStockRepository) {
     const storage = new InmemSequenceStorage();
     const generator = new SequenceGenerator(storage, 1000);
     const itemStockRepository = itemStockRepo ? itemStockRepo : new ItemStockRepositoryStub();
-    const hashGenerator = new HashGeneratorStub();
     const pdfGenerator = new FakePdfGenerator();
     const service = new GoodsIssueService(
         itemRepository,
@@ -64,7 +62,6 @@ async function makeGoodsIssueService(itemStockRepo?: ItemStockRepository) {
         noteRepository,
         generator,
         purposeSource,
-        hashGenerator,
         pdfGenerator,
     );
 

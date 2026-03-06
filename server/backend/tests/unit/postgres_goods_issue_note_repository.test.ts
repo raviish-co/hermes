@@ -272,8 +272,6 @@ const _notes = [
                 }),
             },
         ],
-        hash: "dummy hash",
-        previousHash: "",
     },
     {
         noteId: "2",
@@ -307,7 +305,5 @@ const _notes = [
                 }),
             },
         ],
-        hash: "dummy hash",
-        previousHash: "dummy previousHash",
     },
 ];

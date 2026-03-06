@@ -18,7 +18,6 @@ import { GoodsIssueNoteRepositoryStub } from "../stubs/goods_issue_note_reposito
 import { ItemRepositoryStub } from "../stubs/item_repository_stub";
 import { ItemStockRepositoryStub } from "../stubs/item_stock_repository_stub";
 import { ValidationError } from "../../application/validation_error";
-import { HashGeneratorStub } from "../stubs/hash_generator_stub";
 import { PdfGenerator } from "../../adapters/pdf/pdf_generator";
 
 describe("GoodsIssueService - Saída de mercadoria", () => {
@@ -334,34 +333,6 @@ describe("GoodsIssueService - Saída de mercadoria", () => {
         expect(itemStock.length).toEqual(1);
         expect(itemStock[0].totalValueOfOutputs).toEqual(18000);
     });
-
-    it("Deve adicionar a assinatura da guia", async () => {
-        const { service, noteRepository } = makeService();
-
-        await service.new(goodsIssueData);
-
-        const note = await noteRepository.last();
-
-        expect(note.hash).toBeDefined();
-    });
-
-    it("A guia deve conter assinatura da guia anterior excepto a primeira", async () => {
-        const { service, noteRepository } = makeService();
-
-        await service.new(goodsIssueData);
-        const firstNote = await noteRepository.last();
-
-        expect(firstNote.hash).toBeDefined();
-        expect(firstNote.previousHash).toBeUndefined();
-
-        await service.new(goodsIssueData);
-        const secondNote = await noteRepository.last();
-
-        expect(secondNote.hash).toBeDefined();
-        expect(secondNote.previousHash).toBeDefined();
-        expect(secondNote.previousHash).toBe(firstNote.hash);
-        expect(secondNote.hash).not.toBe(firstNote.hash);
-    });
 });
 
 describe("GoodsIssueService - Recuperar as guias de saída de mercadorias", () => {
@@ -596,7 +567,6 @@ function makeService(deps?: Dependencies) {
     const storage = new InmemSequenceStorage();
     const generator = new SequenceGenerator(storage, 1000);
     const itemStockRepository = new ItemStockRepositoryStub();
-    const hashGenerator = new HashGeneratorStub();
     const pdfGenerator = new FakePdfGenerator();
     const service = new GoodsIssueService(
         itemRepository,
@@ -604,7 +574,6 @@ function makeService(deps?: Dependencies) {
         noteRepository,
         generator,
         purposeSource,
-        hashGenerator,
         pdfGenerator,
     );
 

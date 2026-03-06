@@ -1,5 +1,4 @@
 import type { Generator } from "../adapters/sequences/generator";
-import type { IHashGenerator, HashGeneratorData } from "../adapters/hash_generator";
 import type { PdfGenerator, NoteData } from "../adapters/pdf/pdf_generator";
 import { Sequence } from "../adapters/sequences/sequence";
 import { InsufficientStock } from "../domain/catalog/items/insufficient_stock_error";
@@ -28,7 +27,6 @@ export class GoodsIssueService {
     #noteRepository: GoodsIssueNoteRepository;
     #purposeSpecification: PurposeSpecification;
     #sequenceGenerator: Generator;
-    #hashGenerator: IHashGenerator;
     #pdfGenerator: PdfGenerator;
 
     constructor(
@@ -37,7 +35,6 @@ export class GoodsIssueService {
         noteRepository: GoodsIssueNoteRepository,
         sequenceGenerator: Generator,
         purposeSpecification: PurposeSpecification,
-        hashGenerator: IHashGenerator,
         pdfGenerator: PdfGenerator,
     ) {
         this.#itemRepository = itemRepository;
@@ -45,7 +42,6 @@ export class GoodsIssueService {
         this.#noteRepository = noteRepository;
         this.#purposeSpecification = purposeSpecification;
         this.#sequenceGenerator = sequenceGenerator;
-        this.#hashGenerator = hashGenerator;
         this.#pdfGenerator = pdfGenerator;
     }
 
@@ -81,9 +77,7 @@ export class GoodsIssueService {
             return left(new InvalidTotal());
         }
 
-        const note = await this.#addHashToNote(noteOrErr.value);
-
-        await this.#noteRepository.save(note);
+        await this.#noteRepository.save(noteOrErr.value);
 
         return right(undefined);
     }
@@ -213,30 +207,6 @@ export class GoodsIssueService {
         return right(undefined);
     }
 
-    async #addHashToNote(note: GoodsIssueNote): Promise<GoodsIssueNote> {
-        const lastNote = await this.#noteRepository.last();
-
-        const noteDate = formatDate(note.returnDate);
-        const issuedAt = formatDateTime(note.issuedAt);
-
-        const hashData: HashGeneratorData = {
-            noteDate,
-            issuedAt,
-            noteId: note.noteId.toString(),
-            totalValue: note.total.value,
-            previousHash: lastNote?.hash,
-        };
-
-        const hash = await this.#hashGenerator.generateHash(hashData);
-        note.setHash(hash);
-
-        if (lastNote?.hash) {
-            note.setPreviousHash(lastNote.hash);
-        }
-
-        return note;
-    }
-
     #convertDataToNoteData(
         note: GoodsIssueNote,
         destination: {
@@ -257,7 +227,7 @@ export class GoodsIssueService {
             dateReturn: formatDateTime(note.returnDate),
             total: formatCurrency(note.total),
             securityDeposit: formatCurrency(note.securityDeposit),
-            hash: note.hash ? this.#getShortHash(note.hash) : "0",
+
             lines: note.lines.map((line) => ({
                 itemId: line.itemId.toString(),
                 name: line.name,
@@ -273,10 +243,6 @@ export class GoodsIssueService {
                 address: destination.address,
             },
         };
-    }
-
-    #getShortHash(fullHash: string): string {
-        return fullHash.charAt(0) + fullHash.charAt(10) + fullHash.charAt(20) + fullHash.charAt(30);
     }
 }
 
