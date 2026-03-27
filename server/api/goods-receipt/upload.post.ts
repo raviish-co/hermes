@@ -24,28 +24,28 @@ export default defineSafeEventHandler(async (event) => {
     if (voidOrErr.value instanceof InvalidFileHeader) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            message: "Cabeçalho do arquivo inválido.",
+            message: "Cabeçalho do arquivo inválido",
         });
     }
 
     if (voidOrErr.value instanceof FileEmpty) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            message: "Arquivo vazio.",
+            message: "Arquivo vazio",
         });
     }
 
     if (voidOrErr.value instanceof UserNotFound) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            message: "Utilizador não encontrado.",
+            message: "Utilizador não encontrado",
         });
     }
 
     if (voidOrErr.value instanceof FileNotSupported) {
         throw createError({
             statusCode: HttpStatus.BadRequest,
-            message: "Tipo de arquivo não suportado.",
+            message: "Tipo de arquivo não suportado",
         });
     }
 
@@ -53,21 +53,21 @@ export default defineSafeEventHandler(async (event) => {
         throw createError({
             statusCode: HttpStatus.BadRequest,
             message:
-                "O total de quantidades boas e com defeito de um artigo em consignacao não deve ser superior a 1.",
+                "O total de quantidades boas e com defeito de um artigo em consignacao não deve ser superior a 1",
         });
     }
 
     if (voidOrErr.value instanceof ItemStockNotFound) {
         throw createError({
             statusCode: HttpStatus.NotFound,
-            message: "Artigos em armazem não encontrados.",
+            message: "Artigos em armazem não encontrados",
         });
     }
 
     if (voidOrErr.value instanceof Error) {
         throw createError({
             statusCode: HttpStatus.ServerError,
-            message: "Erro ao carregar os artigos em armazem.",
+            message: "Erro ao carregar os artigos em armazem",
         });
     }
 

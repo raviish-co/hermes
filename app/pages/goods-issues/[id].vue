@@ -217,8 +217,8 @@ onMounted(async () => {
     <section class="footer">
         <div class="footer-container">
             <div class="flex flex-wrap gap-2 w-full pb-3 md:w-auto sm:flex-nowrap md:gap-4 md:pb-0">
-                <!-- Hide this button temporarily -->
                 <button
+                    v-show="!isReturned()"
                     title="Imprimir Guia"
                     @click="openClientDialog()"
                     class="btn btn-secondary material-symbols-outlined"

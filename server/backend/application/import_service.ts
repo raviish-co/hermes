@@ -51,7 +51,7 @@ export class ImportService {
         noteRepository: GoodsReceiptNoteRepository,
         generator: Generator,
         reader: CsvReader,
-        userRepository: UserRepository
+        userRepository: UserRepository,
     ) {
         this.#itemRepository = itemRepository;
         this.#itemStockRepository = itemStockRepository;
@@ -101,7 +101,7 @@ export class ImportService {
         }
 
         if (this.#hasValidQuantities(itemsStock, lines)) {
-            return left(new InvalidQuantitiesError("ImportService"));
+            return left(new InvalidQuantitiesError("ImportService:uploadItemsInStock"));
         }
 
         const noteId = await this.#generator.generate(Sequence.GoodsReceiptNote);
@@ -146,7 +146,11 @@ export class ImportService {
             itemsIds.push(ID.fromString(itemId));
         });
 
-        return itemsIds;
+        return this.#cleanItemsIds(itemsIds);
+    }
+
+    #cleanItemsIds(ids: ID[]): ID[] {
+        return ids.filter((id) => id.toString().trim() !== "");
     }
 
     #buildNoteLines(itemsStock: ItemStock[]) {
@@ -156,7 +160,7 @@ export class ImportService {
             const line = new GoodsReceiptNoteLine(
                 itemStock.itemId,
                 itemStock.goodQuantities,
-                itemStock.badQuantities
+                itemStock.badQuantities,
             );
             lines.push(line);
         }
@@ -238,10 +242,11 @@ export class ImportService {
         if (categoryOrErr.isLeft()) return left(categoryOrErr.value);
 
         const variationsNames = Object.keys(csvRow.variations).map((v) =>
-            (v.charAt(0).toUpperCase() + v.slice(1)).trim()
+            (v.charAt(0).toUpperCase() + v.slice(1)).trim(),
         );
+
         const variationsValues = Object.values(csvRow.variations).map((v) =>
-            (v.charAt(0).toUpperCase() + v.slice(1)).trim()
+            (v.charAt(0).toUpperCase() + v.slice(1)).trim(),
         );
 
         const variationsOrErr = await this.#variationRepository.findByNames(variationsNames);
@@ -252,7 +257,7 @@ export class ImportService {
 
         const variations = this.#makeVariationsValues(
             variationsOrErr.value,
-            Object.values(csvRow.variations)
+            Object.values(csvRow.variations),
         );
 
         return right({
